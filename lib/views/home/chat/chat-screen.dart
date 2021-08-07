@@ -28,6 +28,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
@@ -151,12 +152,13 @@ class ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
-  onViewUserDetails({Message? message, String? userId}) {
+  onViewUserDetails({Message? message, String? userId, User? user}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ModalUserDetails(
+        user: user,
         userId: userId ?? message!.sender,
       ),
     );

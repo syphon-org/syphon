@@ -28,9 +28,21 @@ enum FontSize {
   Default,
   Large,
 }
+
 enum AvatarShape {
   Circle,
   Square,
+}
+
+enum MainFabType {
+  Ring,
+  Bar,
+  // Circle,
+}
+
+enum MainFabLocation {
+  Right,
+  Left,
 }
 
 @JsonSerializable()
@@ -44,6 +56,8 @@ class ThemeSettings extends Equatable {
   final FontSize fontSize;
   final MessageSize messageSize;
   final AvatarShape avatarShape;
+  final MainFabType mainFabType;
+  final MainFabLocation mainFabLocation;
 
   const ThemeSettings({
     this.primaryColor = Colours.cyanSyphon,
@@ -55,20 +69,24 @@ class ThemeSettings extends Equatable {
     this.fontSize = FontSize.Default,
     this.messageSize = MessageSize.Default,
     this.avatarShape = AvatarShape.Circle,
+    this.mainFabType = MainFabType.Ring,
+    this.mainFabLocation = MainFabLocation.Right,
   });
 
   @override
   List<Object?> get props => [
-    primaryColor,
-    accentColor,
-    appBarColor,
-    brightness,
-    themeType,
-    fontName,
-    fontSize,
-    messageSize,
-    avatarShape,
-  ];
+        primaryColor,
+        accentColor,
+        appBarColor,
+        brightness,
+        themeType,
+        fontName,
+        fontSize,
+        messageSize,
+        avatarShape,
+        mainFabType,
+        mainFabLocation
+      ];
 
   ThemeSettings copyWith({
     int? primaryColor,
@@ -80,6 +98,8 @@ class ThemeSettings extends Equatable {
     FontSize? fontSize,
     MessageSize? messageSize,
     AvatarShape? avatarShape,
+    MainFabType? mainFabType,
+    MainFabLocation? mainFabLocation,
   }) =>
       ThemeSettings(
         primaryColor: primaryColor ?? this.primaryColor,
@@ -91,6 +111,8 @@ class ThemeSettings extends Equatable {
         fontSize: fontSize ?? this.fontSize,
         messageSize: messageSize ?? this.messageSize,
         avatarShape: avatarShape ?? this.avatarShape,
+        mainFabType: mainFabType ?? this.mainFabType,
+        mainFabLocation: mainFabLocation ?? this.mainFabLocation,
       );
 
   Map<String, dynamic> toJson() => _$ThemeSettingsToJson(this);

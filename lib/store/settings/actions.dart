@@ -31,6 +31,16 @@ class SetAvatarShape {
   SetAvatarShape({this.avatarShape});
 }
 
+class SetMainFabType {
+  final MainFabType? fabType;
+  SetMainFabType({this.fabType});
+}
+
+class SetMainFabLocation {
+  final MainFabLocation? fabLocation;
+  SetMainFabLocation({this.fabLocation});
+}
+
 class SetAccentColor {
   final int? color;
   SetAccentColor({this.color});
@@ -345,6 +355,30 @@ ThunkAction<AppState> incrementAvatarShape() {
 
     store.dispatch(SetAvatarShape(
       avatarShape: AvatarShape.values[(avatarShapeIndex + 1) % AvatarShape.values.length],
+    ));
+  };
+}
+
+/// Iterate over AvatarShapes on action
+ThunkAction<AppState> incrementFabType() {
+  return (Store<AppState> store) async {
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final fabTypeIndex = MainFabType.values.indexOf(currentTheme.mainFabType);
+
+    store.dispatch(SetMainFabType(
+      fabType: MainFabType.values[(fabTypeIndex + 1) % MainFabType.values.length],
+    ));
+  };
+}
+
+/// Iterate over AvatarShapes on action
+ThunkAction<AppState> incrementFabLocation() {
+  return (Store<AppState> store) async {
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final fabTypeIndex = MainFabLocation.values.indexOf(currentTheme.mainFabLocation);
+
+    store.dispatch(SetMainFabLocation(
+      fabLocation: MainFabLocation.values[(fabTypeIndex + 1) % MainFabLocation.values.length],
     ));
   };
 }

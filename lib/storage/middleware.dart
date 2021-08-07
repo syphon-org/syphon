@@ -79,6 +79,8 @@ storageMiddleware(Database storage) {
       case ToggleReadReceipts:
       case LogAppAgreement:
       case SetSyncInterval:
+      case SetMainFabLocation:
+      case SetMainFabType:
         saveSettings(store.state.settingsStore, storage: storage);
         break;
       case SetOlmAccountBackup:

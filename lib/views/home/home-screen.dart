@@ -12,6 +12,8 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
+import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -35,7 +37,7 @@ import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
-import 'package:syphon/views/widgets/containers/ring-actions.dart';
+import 'package:syphon/views/widgets/containers/fabs/fab-ring.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
 
@@ -49,7 +51,9 @@ class HomeScreen extends StatefulWidget {
 class HomeState extends State<HomeScreen> {
   HomeState() : super();
 
-  final fabKey = GlobalKey<FabCircularMenuState>();
+  final fabKeyRing = GlobalKey<FabCircularMenuState>();
+  final fabKeyCircle = GlobalKey<FabBarContainerState>();
+  final fabKeyBar = GlobalKey<FabBarContainerState>();
 
   Room? selectedRoom;
   Map<String, Color> roomColorDefaults = {};
@@ -521,6 +525,44 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
+  selectActionAlignment(_Props props) {
+    if (props.fabLocation == MainFabLocation.Left) {
+      return Alignment.bottomLeft;
+    }
+
+    return Alignment.bottomRight;
+  }
+
+  buildActionFab(_Props props) {
+    final fabType = props.fabType;
+
+    if (fabType == MainFabType.Bar) {
+      return FabBarExpanding(
+        alignment: selectActionAlignment(props),
+      );
+    }
+
+    // if (fabType == MainFabType.Circle) {
+    //   return FabCircleExpanding(
+    //     fabKey: fabKeyCircle,
+    //     alignment: selectActionAlignment(props),
+    //   );
+    // }
+
+    return FabRing(
+      fabKey: fabKeyRing,
+      alignment: selectActionAlignment(props),
+    );
+  }
+
+  selectActionLocation(_Props props) {
+    if (props.fabLocation == MainFabLocation.Left) {
+      return FloatingActionButtonLocation.startFloat;
+    }
+
+    return FloatingActionButtonLocation.endFloat;
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -540,7 +582,8 @@ class HomeState extends State<HomeScreen> {
 
           return Scaffold(
             appBar: currentAppBar as PreferredSizeWidget?,
-            floatingActionButton: ActionRing(fabKey: fabKey),
+            floatingActionButton: buildActionFab(props),
+            floatingActionButtonLocation: selectActionLocation(props),
             body: Align(
               alignment: Alignment.topCenter,
               child: Column(
@@ -580,6 +623,8 @@ class _Props extends Equatable {
   final bool roomTypeBadgesEnabled;
   final User currentUser;
   final ThemeType themeType;
+  final MainFabType fabType;
+  final MainFabLocation fabLocation;
   final Map<String, ChatSetting> chatSettings;
   final Map<String, List<Message>> messages;
 
@@ -600,6 +645,8 @@ class _Props extends Equatable {
     required this.messages,
     required this.currentUser,
     required this.chatSettings,
+    required this.fabType,
+    required this.fabLocation,
     required this.roomTypeBadgesEnabled,
     required this.onDebug,
     required this.onLeaveChat,
@@ -621,6 +668,8 @@ class _Props extends Equatable {
         currentUser,
         chatSettings,
         roomTypeBadgesEnabled,
+        fabType,
+        fabLocation,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -632,6 +681,8 @@ class _Props extends Equatable {
         messages: store.state.eventStore.messages,
         unauthed: store.state.syncStore.unauthed,
         offline: store.state.syncStore.offline,
+        fabType: store.state.settingsStore.themeSettings.mainFabType,
+        fabLocation: store.state.settingsStore.themeSettings.mainFabLocation,
         syncing: () {
           final synced = store.state.syncStore.synced;
           final syncing = store.state.syncStore.syncing;

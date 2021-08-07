@@ -276,7 +276,7 @@ class LoginScreenState extends State<LoginScreen> {
                 tooltip: 'General Settings',
                 color: Theme.of(context).scaffoldBackgroundColor,
                 onPressed: () {
-                  Navigator.pushNamed(context, NavigationPaths.theming);
+                  Navigator.pushNamed(context, NavigationPaths.settingsTheme);
                   props.onDebug();
                 },
               ),

@@ -26,7 +26,7 @@ class MessageList extends StatefulWidget {
   final ScrollController scrollController;
 
   final Function? onSelectReply;
-  final Function? onViewUserDetails;
+  final void Function({Message? message, User? user, String? userId})? onViewUserDetails;
   final void Function(Message?)? onToggleSelectedMessage;
 
   const MessageList({
@@ -114,7 +114,6 @@ class MessageListState extends State<MessageList> {
                   typing: props.room.userTyping,
                   usersTyping: props.room.usersTyping,
                   selectedMessageId: widget.selectedMessage != null ? widget.selectedMessage!.id : null,
-                  onPressAvatar: widget.onViewUserDetails,
                 ),
                 ListView.builder(
                   reverse: true,
@@ -137,8 +136,9 @@ class MessageListState extends State<MessageList> {
                     final selectedMessageId =
                         widget.selectedMessage != null ? widget.selectedMessage!.id : null;
 
-                    final avatarUri = props.users[message.sender]?.avatarUri;
-                    final displayName = props.users[message.sender]?.displayName;
+                    final user = props.users[message.sender];
+                    final avatarUri = user?.avatarUri;
+                    final displayName = user?.displayName;
 
                     return MessageWidget(
                       message: message,
@@ -154,7 +154,11 @@ class MessageListState extends State<MessageList> {
                       color: props.chatColorPrimary,
                       timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
                       onSwipe: props.onSelectReply,
-                      onPressAvatar: widget.onViewUserDetails,
+                      onPressAvatar: () => widget.onViewUserDetails!(
+                        message: message,
+                        user: user,
+                        userId: message.sender,
+                      ),
                       onLongPress: (msg) => widget.onToggleSelectedMessage!(msg),
                       onInputReaction: () => onInputReaction(
                         message: message,

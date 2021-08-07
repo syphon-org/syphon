@@ -169,7 +169,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, NavigationPaths.theming);
+                            Navigator.pushNamed(context, NavigationPaths.settingsTheme);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(

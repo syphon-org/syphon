@@ -23,7 +23,7 @@ import 'package:syphon/views/home/settings/settings-notifications-screen.dart';
 import 'package:syphon/views/home/settings/password/password-update-screen.dart';
 import 'package:syphon/views/home/settings/settings-privacy-screen.dart';
 import 'package:syphon/views/home/settings/settings-storage-screen.dart';
-import 'package:syphon/views/home/settings/settings-theming-screen.dart';
+import 'package:syphon/views/home/settings/settings-theme-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
 import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
@@ -96,7 +96,7 @@ class NavigationPaths {
   static const settingsNotifications = '/home/settings/notifications';
 
   // Settings (Global)
-  static const theming = '/settings/theming';
+  static const settingsTheme = '/settings/theming';
 
   // Misc
   static const licenses = '/licenses';
@@ -132,7 +132,7 @@ class NavigationProvider {
             const LicensePage(applicationName: Values.appName),
         NavigationPaths.settingsPrivacy: (BuildContext context) => const PrivacySettingsScreen(),
         NavigationPaths.settingsChat: (BuildContext context) => const ChatsSettingsScreen(),
-        NavigationPaths.theming: (BuildContext context) => const ThemingSettingsScreen(),
+        NavigationPaths.settingsTheme: (BuildContext context) => const ThemeSettingsScreen(),
         NavigationPaths.settingsDevices: (BuildContext context) => DevicesScreen(),
         NavigationPaths.settings: (BuildContext context) => const SettingsScreen(),
         NavigationPaths.settingsBlocked: (BuildContext context) => const BlockedScreen(),
