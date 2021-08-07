@@ -12,8 +12,8 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/views/navigation.dart';
-import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
+import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -51,7 +51,9 @@ class HomeScreen extends StatefulWidget {
 class HomeState extends State<HomeScreen> {
   HomeState() : super();
 
-  final fabKey = GlobalKey<FabCircularMenuState>();
+  final fabKeyRing = GlobalKey<FabCircularMenuState>();
+  final fabKeyCircle = GlobalKey<FabBarContainerState>();
+  final fabKeyBar = GlobalKey<FabBarContainerState>();
 
   Room? selectedRoom;
   Map<String, Color> roomColorDefaults = {};
@@ -534,22 +536,21 @@ class HomeState extends State<HomeScreen> {
   buildActionFab(_Props props) {
     final fabType = props.fabType;
 
-    if (fabType == MainFabType.Circle) {
-      return FabCircleExpanding(
-        fabKey: fabKey,
-        alignment: selectActionAlignment(props),
-      );
-    }
-
     if (fabType == MainFabType.Bar) {
       return FabBarExpanding(
-        fabKey: fabKey,
         alignment: selectActionAlignment(props),
       );
     }
 
+    // if (fabType == MainFabType.Circle) {
+    //   return FabCircleExpanding(
+    //     fabKey: fabKeyCircle,
+    //     alignment: selectActionAlignment(props),
+    //   );
+    // }
+
     return FabRing(
-      fabKey: fabKey,
+      fabKey: fabKeyRing,
       alignment: selectActionAlignment(props),
     );
   }

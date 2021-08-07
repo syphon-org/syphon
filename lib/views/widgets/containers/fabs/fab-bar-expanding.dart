@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:equatable/equatable.dart';
-import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 
@@ -15,41 +15,34 @@ import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
 class FabBarExpanding extends StatelessWidget {
-  final GlobalKey<FabCircularMenuState>? fabKey;
-
   final Alignment? alignment;
 
   const FabBarExpanding({
     Key? key,
-    this.fabKey,
     this.alignment,
   }) : super(key: key);
 
   @protected
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
-    fabKey!.currentState!.close();
     Navigator.pushNamed(context, NavigationPaths.searchGroups);
   }
 
   @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
-    fabKey!.currentState!.close();
     Navigator.pushNamed(context, NavigationPaths.searchUsers);
   }
 
   @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
-    fabKey!.currentState!.close();
     Navigator.pushNamed(context, NavigationPaths.groupCreate);
   }
 
   @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
-    fabKey!.currentState!.close();
     Navigator.pushNamed(context, NavigationPaths.groupCreatePublic);
   }
 
@@ -57,68 +50,62 @@ class FabBarExpanding extends StatelessWidget {
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
-        builder: (context, props) => FabCircularMenu(
-          key: fabKey,
-          fabSize: 58,
-          fabElevation: 4.0,
-          fabOpenIcon: Icon(
-            Icons.bubble_chart,
-            size: Dimensions.iconSizeLarge,
-            semanticLabel: 'Open Actions Ring',
-            color: Colors.white,
-          ),
-          fabCloseIcon: Icon(
-            Icons.close,
-            semanticLabel: 'Close Actions Ring',
-            color: Colors.white,
-          ),
-          fabColor: props.primaryColor,
-          ringColor: props.primaryColor.withAlpha(144),
-          ringDiameter: Dimensions.actionRingDefaultWidth(context),
-          animationDuration: Duration(milliseconds: 275),
-          onDisplayChange: (opened) {},
-          children: [
-            FloatingActionButton(
-              heroTag: 'fab1',
-              tooltip: 'Create Public Room',
+        builder: (context, props) => SpeedDial(
+          overlayOpacity: 0.4,
+          switchLabelPosition: alignment == Alignment.bottomLeft,
+          // childrenButtonSize: 64.0,
+          childMargin: EdgeInsets.symmetric(vertical: 16),
+          spacing: 8,
+          children: <SpeedDialChild>[
+            SpeedDialChild(
+              label: 'Create A Public Chat',
               backgroundColor: props.primaryColor,
-              onPressed: () => onNavigateToCreateGroupPublic(context),
+              onTap: () => onNavigateToCreateGroupPublic(context),
               child: SvgPicture.asset(
                 Assets.iconPublicAddBeing,
                 color: Colors.white,
               ),
             ),
-            FloatingActionButton(
-              heroTag: 'fab2',
-              tooltip: 'Create Group',
+            SpeedDialChild(
+              label: 'Create Group',
+              labelStyle: TextStyle(),
               backgroundColor: props.primaryColor,
-              onPressed: () => onNavigateToCreateGroup(context),
+              onTap: () => onNavigateToCreateGroup(context),
               child: SvgPicture.asset(
                 Assets.iconGroupAddBeing,
                 color: Colors.white,
               ),
             ),
-            FloatingActionButton(
-              heroTag: 'fab3',
-              tooltip: 'Direct Message',
+            SpeedDialChild(
+              label: 'Direct Message',
               backgroundColor: props.primaryColor,
-              onPressed: () => onNavigateToDraft(context),
+              onTap: () => onNavigateToDraft(context),
               child: SvgPicture.asset(
                 Assets.iconPersonAddBeing,
                 color: Colors.white,
               ),
             ),
-            FloatingActionButton(
-              heroTag: 'fab4',
-              tooltip: 'Search Public Groups',
+            SpeedDialChild(
+              label: 'Search Public Chats',
               backgroundColor: props.primaryColor,
-              onPressed: () => onNavigateToPublicSearch(context),
+              onTap: () => onNavigateToPublicSearch(context),
               child: SvgPicture.asset(
                 Assets.iconSearchPublicCondensedBeing,
                 color: Colors.white,
               ),
             ),
           ],
+          activeChild: Icon(
+            Icons.close,
+            semanticLabel: 'Close Actions Ring',
+            color: Colors.white,
+          ),
+          child: Icon(
+            Icons.bubble_chart,
+            size: Dimensions.iconSizeLarge,
+            semanticLabel: 'Open Actions Ring',
+            color: Colors.white,
+          ),
         ),
       );
 }

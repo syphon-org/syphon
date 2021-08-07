@@ -122,6 +122,7 @@ dependencies:
   flutter_colorpicker: ^0.4.0
   palette_generator: ^0.3.0
   emoji_picker_flutter: ^1.0.3
+  flutter_speed_dial: ^4.2.0
   fab_circular_menu:
     git:
       url: https://github.com/ereio/fab-circular-menu.git
@@ -184,9 +185,9 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   # On release, change .env.debug to .env
   assets:
-    - assets/translations/en.json 
-    - assets/translations/nl.json 
-    - assets/translations/de.json 
+    - assets/translations/en.json
+    - assets/translations/nl.json
+    - assets/translations/de.json
     - assets/translations/ru.json
     - assets/translations/pl.json
     - assets/graphics/undraw_avatar_male.svg
