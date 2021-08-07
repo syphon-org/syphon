@@ -260,7 +260,7 @@ class _Props extends Equatable {
   final Function onBlockUser;
   final Function onCreateChatDirect;
 
-  _Props({
+  const _Props({
     required this.user,
     required this.users,
     required this.loading,
@@ -273,15 +273,14 @@ class _Props extends Equatable {
   List<Object> get props => [
         user,
         users,
+        loading,
+        blocked,
       ];
 
-  static _Props mapStateToProps(
-    Store<AppState> store, {
-    User? user,
-    String? userId,
-  }) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store, {User? user, String? userId}) => _Props(
         user: () {
+          final users = store.state.userStore.users;
+          final loading = store.state.userStore.loading;
           if (user != null) {
             return user;
           }
@@ -290,11 +289,11 @@ class _Props extends Equatable {
             return User();
           }
 
-          if (!store.state.userStore.users.containsKey(userId)) {
+          if (!users.containsKey(userId) && !loading) {
             store.dispatch(fetchUser(user: User(userId: userId)));
           }
 
-          return store.state.userStore.users[userId] ?? User();
+          return users[userId] ?? User();
         }(),
         users: store.state.userStore.users,
         loading: store.state.userStore.loading,

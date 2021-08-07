@@ -184,54 +184,6 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           width: width,
                           padding: Dimensions.listPadding,
                           child: Text(
-                            'Fonts',
-                            textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
-                          ),
-                        ),
-                        ListTile(
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Font',
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                          trailing: Text(
-                            props.fontName,
-                          ),
-                          onTap: () => props.onIncrementFontType(),
-                        ),
-                        ListTile(
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Font Size',
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                          trailing: Text(
-                            props.fontSize,
-                          ),
-                          onTap: () => props.onIncrementFontSize(),
-                        ),
-                        ListTile(
-                          contentPadding: Dimensions.listPadding,
-                          title: Text(
-                            'Message Size',
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                          trailing: Text(
-                            props.messageSize,
-                          ),
-                          onTap: () => props.onIncrementMessageSize(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  CardSection(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: width,
-                          padding: Dimensions.listPadding,
-                          child: Text(
                             'App',
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.subtitle2,
@@ -280,6 +232,54 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           trailing: Text(
                             props.mainFabLocation,
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  CardSection(
+                    child: Column(
+                      children: [
+                        Container(
+                          width: width,
+                          padding: Dimensions.listPadding,
+                          child: Text(
+                            'Fonts',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.subtitle2,
+                          ),
+                        ),
+                        ListTile(
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Font',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(
+                            props.fontName,
+                          ),
+                          onTap: () => props.onIncrementFontType(),
+                        ),
+                        ListTile(
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Font Size',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(
+                            props.fontSize,
+                          ),
+                          onTap: () => props.onIncrementFontSize(),
+                        ),
+                        ListTile(
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Message Size',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(
+                            props.messageSize,
+                          ),
+                          onTap: () => props.onIncrementMessageSize(),
                         ),
                       ],
                     ),

@@ -334,7 +334,7 @@ class MessageWidget extends StatelessWidget {
               mainAxisAlignment: alignmentMessage,
               // ignore: avoid_redundant_argument_values
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
+              children: const <Widget>[
                 Icon(Icons.reply, size: Dimensions.iconSizeLarge),
               ],
             ),
@@ -374,7 +374,7 @@ class MessageWidget extends StatelessWidget {
                           onTap: () {
                             if (onPressAvatar != null) {
                               HapticFeedback.lightImpact();
-                              onPressAvatar!(message: message);
+                              onPressAvatar!();
                             }
                           },
                           child: Container(
