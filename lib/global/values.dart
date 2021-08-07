@@ -8,16 +8,19 @@ extension StringExtension on String {
   }
 }
 
+// https://stackoverflow.com/questions/53999971/how-to-get-languages-full-name-from-languagecode-e-g-from-en-to-english
 class LangCodes {
-  static const en = 'en';
-  static const de = 'de';
-  static const pl = 'pl';
-  static const ru = 'ru';
-  static const nl = 'nl';
+  static const english = 'en';
+  static const german = 'de';
+  static const polish = 'pl';
+  static const russian = 'ru';
+  static const dutch = 'nl';
+  static const czech = 'cs';
+  static const slovak = 'sk';
 
-  static const all = [en, de, pl, ru, nl];
+  static const all = [english, german, polish, russian, dutch, czech, slovak];
 
-  static final localeList = all.map((locale) => Locale(locale)).toList();
+  static final list = all.map((locale) => Locale(locale)).toList();
 }
 
 class Languages {
@@ -26,10 +29,12 @@ class Languages {
   static const polish = 'polish';
   static const russian = 'russian';
   static const dutch = 'dutch';
+  static const czech = 'czech';
+  static const slovak = 'slovak';
 
-  static final all = [english, german, polish, russian, dutch];
+  static final all = [english, german, polish, russian, dutch, czech, slovak];
 
-  static final displayList = all.map((l) => l.capitalize()).toList();
+  static final list = all.map((l) => l.capitalize()).toList();
 }
 
 /// Constants that cannot be localized

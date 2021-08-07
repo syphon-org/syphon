@@ -13,17 +13,21 @@ String formatUserId(String displayName, {String homeserver = Values.homeserverDe
 String formatLanguageCode(String? language) {
   switch ((language ?? Languages.english).toLowerCase()) {
     case Languages.english:
-      return LangCodes.en;
+      return LangCodes.english;
     case Languages.dutch:
-      return LangCodes.nl;
+      return LangCodes.dutch;
     case Languages.german:
-      return LangCodes.de;
+      return LangCodes.german;
     case Languages.russian:
-      return LangCodes.ru;
+      return LangCodes.russian;
     case Languages.polish:
-      return LangCodes.pl;
+      return LangCodes.polish;
+    case Languages.czech:
+      return LangCodes.czech;
+    case Languages.slovak:
+      return LangCodes.slovak;
     default:
-      return LangCodes.en;
+      return LangCodes.english;
   }
 }
 
