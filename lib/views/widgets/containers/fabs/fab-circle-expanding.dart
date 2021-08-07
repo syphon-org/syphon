@@ -14,13 +14,16 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
-class ActionRing extends StatelessWidget {
-  const ActionRing({
+class FabCircleExpanding extends StatelessWidget {
+  final GlobalKey<FabCircularMenuState>? fabKey;
+
+  final Alignment? alignment;
+
+  const FabCircleExpanding({
     Key? key,
     this.fabKey,
+    this.alignment,
   }) : super(key: key);
-
-  final GlobalKey<FabCircularMenuState>? fabKey;
 
   @protected
   onNavigateToPublicSearch(context) {

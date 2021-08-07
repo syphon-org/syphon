@@ -88,104 +88,102 @@ class MessageTypingState extends State<MessageTypingWidget> with TickerProviderS
       opacity: opacity,
       child: wrapAnimation(
         milliseconds: 225,
-        animatedWidget: Container(
-          child: Flex(
-            direction: Axis.vertical,
-            children: <Widget>[
-              Container(
-                margin: bubbleSpacing,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                ),
-                child: Flex(
-                  direction: Axis.horizontal,
-                  mainAxisAlignment: messageAlignment,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Visibility(
-                      visible: userTyping.avatarUri != null,
-                      maintainSize: true,
-                      maintainState: true,
-                      maintainAnimation: true,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (widget.onPressAvatar != null) {
-                            HapticFeedback.lightImpact();
-                            widget.onPressAvatar!(userId: userTyping.userId);
-                          }
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          child: userTyping.userId == null
-                              ? null
-                              : Avatar(
-                                  uri: userTyping.avatarUri,
-                                  alt: userTyping.displayName ?? userTyping.userId,
-                                  size: Dimensions.avatarSizeMessage,
-                                  background: Colours.hashedColorUser(userTyping),
-                                ),
-                        ),
-                      ),
-                    ),
-                    wrapAnimation(
-                      milliseconds: 175,
-                      animatedWidget: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: bubbleColor,
-                          borderRadius: bubbleBorder,
-                        ),
-                        child: Flex(
-                          direction: Axis.horizontal,
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: messageTextAlignment,
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 4),
-                              child: Text(
-                                '·',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  color: textColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 4),
-                              child: Text(
-                                '·',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  color: textColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 4),
-                              child: Text(
-                                '·',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  color: textColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+        animatedWidget: Flex(
+          direction: Axis.vertical,
+          children: <Widget>[
+            Container(
+              margin: bubbleSpacing,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
               ),
-            ],
-          ),
+              child: Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: messageAlignment,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Visibility(
+                    visible: userTyping.avatarUri != null,
+                    maintainSize: true,
+                    maintainState: true,
+                    maintainAnimation: true,
+                    child: GestureDetector(
+                      onTap: () {
+                        if (widget.onPressAvatar != null) {
+                          HapticFeedback.lightImpact();
+                          widget.onPressAvatar!(userId: userTyping.userId);
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        child: userTyping.userId == null
+                            ? null
+                            : Avatar(
+                                uri: userTyping.avatarUri,
+                                alt: userTyping.displayName ?? userTyping.userId,
+                                size: Dimensions.avatarSizeMessage,
+                                background: Colours.hashedColorUser(userTyping),
+                              ),
+                      ),
+                    ),
+                  ),
+                  wrapAnimation(
+                    milliseconds: 175,
+                    animatedWidget: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: bubbleColor,
+                        borderRadius: bubbleBorder,
+                      ),
+                      child: Flex(
+                        direction: Axis.horizontal,
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: messageTextAlignment,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              '·',
+                              style: TextStyle(
+                                fontSize: 28,
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              '·',
+                              style: TextStyle(
+                                fontSize: 28,
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              '·',
+                              style: TextStyle(
+                                fontSize: 28,
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

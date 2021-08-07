@@ -12,6 +12,8 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
+import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -35,7 +37,7 @@ import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
-import 'package:syphon/views/widgets/containers/ring-actions.dart';
+import 'package:syphon/views/widgets/containers/fabs/fab-ring.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
 
@@ -521,14 +523,35 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
+  selectActionAlignment(_Props props) {
+    if (props.fabLocation == MainFabLocation.Left) {
+      return Alignment.bottomLeft;
+    }
+
+    return Alignment.bottomRight;
+  }
+
   buildActionFab(_Props props) {
     final fabType = props.fabType;
 
-    if (fabType == MainFabType.Bar) {
-      return ActionRing(fabKey: fabKey);
+    if (fabType == MainFabType.Circle) {
+      return FabCircleExpanding(
+        fabKey: fabKey,
+        alignment: selectActionAlignment(props),
+      );
     }
 
-    return ActionRing(fabKey: fabKey);
+    if (fabType == MainFabType.Bar) {
+      return FabBarExpanding(
+        fabKey: fabKey,
+        alignment: selectActionAlignment(props),
+      );
+    }
+
+    return FabRing(
+      fabKey: fabKey,
+      alignment: selectActionAlignment(props),
+    );
   }
 
   selectActionLocation(_Props props) {

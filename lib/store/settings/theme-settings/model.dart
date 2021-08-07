@@ -37,6 +37,7 @@ enum AvatarShape {
 enum MainFabType {
   Ring,
   Bar,
+  Circle,
 }
 
 enum MainFabLocation {
