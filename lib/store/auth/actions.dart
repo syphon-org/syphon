@@ -1074,10 +1074,6 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
 
         await store.dispatch(removeAvailableUser(user));
 
-        // Attempt to switch to another user if session is present
-        // final nextAvailableUser = store.state.authStore.availableUsers;
-        // final nextUser = nextAvailableUser.isNotEmpty ? nextAvailableUser.first : null;
-
         store.state.authStore.contextObserver?.add(null);
       } catch (error) {
         store.dispatch(addAlert(

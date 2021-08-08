@@ -12,7 +12,6 @@ String formatUserId(String displayName, {String homeserver = Values.homeserverDe
 
 // TODO: remoove after switching to Locale / LanguageCode as source of truth
 String formatLocale(String? language) {
-  print('TESTING $language');
   if (language!.length == 2) {
     return language;
   }

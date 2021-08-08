@@ -79,6 +79,7 @@ class Languages {
   static const dutch = 'nl';
   static const czech = 'cs';
   static const slovak = 'sk';
+  static const portuguese = 'pt';
 
   static const all = [
     english,
@@ -88,6 +89,7 @@ class Languages {
     dutch,
     czech,
     slovak,
+    portuguese,
   ];
 
   static final list = all.map((locale) => Locale(locale)).toList();

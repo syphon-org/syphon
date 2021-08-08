@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 
 import 'package:syphon/store/index.dart';
@@ -69,7 +68,7 @@ ThunkAction<AppState> addInfo({
   Function? onAction,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] [INFO] $message');
+    printInfo('[$origin] [INFO] $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert = Alert(
@@ -91,7 +90,7 @@ ThunkAction<AppState> addConfirmation({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] [CONFIRMATION] $message');
+    printInfo('[$origin] [CONFIRMATION] $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert = Alert(type: type, message: message, error: error.toString());
@@ -107,7 +106,7 @@ ThunkAction<AppState> addAlert({
   error,
 }) {
   return (Store<AppState> store) async {
-    debugPrint('[$origin] [ERROR] ${error.toString()}');
+    printError('[$origin] [ERROR] ${error.toString()}');
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert =
