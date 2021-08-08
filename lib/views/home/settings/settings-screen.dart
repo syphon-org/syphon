@@ -158,7 +158,7 @@ class SettingsScreen extends StatelessWidget {
                                 size: 28,
                               )),
                           title: Text(
-                            Strings.listItemSettingsPrivacy,
+                            Strings.titlePrivacy,
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           subtitle: Text(

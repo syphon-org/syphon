@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-extension StringExtension on String {
+extension Capitalize on String {
   String capitalize() {
     return '${this[0].toUpperCase()}${substring(1)}';
   }
@@ -70,6 +70,29 @@ class Values {
 
 // ignore: non_constant_identifier_names
 final bool DEBUG_MODE = !kReleaseMode;
+
+class Languages {
+  static const english = 'en';
+  static const german = 'de';
+  static const polish = 'pl';
+  static const russian = 'ru';
+  static const dutch = 'nl';
+  static const czech = 'cs';
+  static const slovak = 'sk';
+
+  static const all = [
+    english,
+    german,
+    polish,
+    russian,
+    dutch,
+    czech,
+    slovak,
+  ];
+
+  static final list = all.map((locale) => Locale(locale)).toList();
+  static final displayNames = all.map((locale) => Locale(locale).toDisplayName().capitalize()).toList();
+}
 
 // https://stackoverflow.com/questions/53999971/how-to-get-languages-full-name-from-languagecode-e-g-from-en-to-english
 extension DisplayName on Locale {
@@ -268,27 +291,4 @@ extension DisplayName on Locale {
       return 'english';
     }
   }
-}
-
-class Languages {
-  static const english = 'en';
-  static const german = 'de';
-  static const polish = 'pl';
-  static const russian = 'ru';
-  static const dutch = 'nl';
-  static const czech = 'cs';
-  static const slovak = 'sk';
-
-  static const all = [
-    english,
-    german,
-    polish,
-    russian,
-    dutch,
-    czech,
-    slovak,
-  ];
-
-  static final list = all.map((locale) => Locale(locale)).toList();
-  static final displayNames = all.map((locale) => Locale(locale).toDisplayName().capitalize()).toList();
 }
