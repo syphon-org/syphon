@@ -139,7 +139,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ListTile(
                             contentPadding: Dimensions.listPadding,
                             title: Text(
-                              'Public Name',
+                              'Public Device Name',
                             ),
                             subtitle: Text(
                               props.sessionName,

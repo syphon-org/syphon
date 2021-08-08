@@ -74,8 +74,12 @@ class IntroScreenState extends State<IntroScreen> {
     final alphaAgreement = store.state.settingsStore.alphaAgreement;
     final double width = MediaQuery.of(context).size.width;
 
-    // TODO: decide on alway showing alpha aggrement on intro
+    // TODO: decide on always showing alpha aggrement on intro
     if (alphaAgreement == null || true && !showingTerms) {
+      setState(() {
+        showingTerms = true;
+      });
+
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
       showDialog(
@@ -161,10 +165,6 @@ class IntroScreenState extends State<IntroScreen> {
           ),
         ),
       );
-
-      setState(() {
-        showingTerms = true;
-      });
     }
   }
 

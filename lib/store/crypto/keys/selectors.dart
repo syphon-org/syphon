@@ -1,6 +1,5 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 
@@ -21,18 +20,15 @@ extension Chunked on String {
 }
 
 String selectCurrentSessionKey(Store<AppState> store) {
-  final currentUser = store.state.authStore.user;
-  final currentUserId = store.state.authStore.user.userId;
-  final currentSessionId = store.state.authStore.user.deviceId;
+  final curretnDeviceId = store.state.authStore.user.deviceId;
   final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
 
-  if (deviceKeysOwned.containsKey(currentSessionId)) {
-    final currentDeviceKey = deviceKeysOwned[currentSessionId];
-    final fingerprintId = Keys.fingerprintId(deviceId: currentUser.deviceId);
+  if (deviceKeysOwned.containsKey(curretnDeviceId)) {
+    final currentDeviceKey = deviceKeysOwned[curretnDeviceId];
+    final fingerprintId = Keys.fingerprintId(deviceId: curretnDeviceId);
 
     final String fingerprint = currentDeviceKey?.keys?[fingerprintId] ?? Values.UNKNOWN;
 
-    printJson(currentDeviceKey?.keys);
     return fingerprint.chunk(4);
   }
 
