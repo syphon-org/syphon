@@ -37,7 +37,7 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
         state.outboundKeySessions,
       );
 
-      outboundSessions.putIfAbsent(action.identityKey, () => action.session);
+      outboundSessions.putIfAbsent(action.identityKey, () => action.authSession);
 
       return state.copyWith(
         outboundKeySessions: outboundSessions,
@@ -47,7 +47,7 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
         state.inboundKeySessions,
       );
 
-      inboundKeySessions.putIfAbsent(action.identityKey, () => action.session);
+      inboundKeySessions.putIfAbsent(action.identityKey, () => action.authSession);
 
       return state.copyWith(
         inboundKeySessions: inboundKeySessions,
@@ -59,8 +59,8 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
 
       outboundMessageSessions.update(
         action.roomId,
-        (sessionCurrent) => action.session,
-        ifAbsent: () => action.session,
+        (sessionCurrent) => action.authSession,
+        ifAbsent: () => action.authSession,
       );
 
       return state.copyWith(
@@ -83,7 +83,7 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       );
 
       // add or update inbound message session by roomId + identity
-      final Map<String, String> messageSessionInboundNew = {action.identityKey: action.session};
+      final Map<String, String> messageSessionInboundNew = {action.identityKey: action.authSession};
 
       messageSessionsInbound[action.roomId]!.addAll(messageSessionInboundNew);
 

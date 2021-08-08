@@ -626,7 +626,7 @@ ThunkAction<AppState> checkPasswordResetVerification({
     try {
       final homeserver = store.state.authStore.homeserver.baseUrl;
       final clientSecret = store.state.authStore.clientSecret;
-      final session = store.state.authStore.session;
+      final session = store.state.authStore.authSession;
       final protocol = store.state.authStore.protocol;
 
       final data = await MatrixApi.resetPassword(
@@ -666,7 +666,7 @@ ThunkAction<AppState> resetPassword({int sendAttempt = 1, String? password}) {
 
       final homeserver = store.state.authStore.homeserver.baseUrl;
       final clientSecret = store.state.authStore.clientSecret;
-      final session = store.state.authStore.session;
+      final session = store.state.authStore.authSession;
       final protocol = store.state.authStore.protocol;
 
       final data = await MatrixApi.resetPassword(
@@ -793,7 +793,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
       final homeserver = store.state.authStore.homeserver.baseUrl;
       final credential = store.state.authStore.credential;
-      final session = store.state.authStore.session;
+      final session = store.state.authStore.authSession;
       final authType = session != null ? credential!.type : MatrixAuthTypes.DUMMY;
       final authValue = session != null ? credential!.value : null;
       final authParams = session != null ? credential!.params : null;
@@ -807,7 +807,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
         homeserver: homeserver,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
-        session: store.state.authStore.session,
+        session: store.state.authStore.authSession,
         authType: authType,
         authValue: authValue,
         authParams: authParams,
@@ -892,7 +892,7 @@ ThunkAction<AppState> updatePassword(String password) {
           homeserver: store.state.authStore.user.homeserver,
           accessToken: store.state.authStore.user.accessToken,
           userId: store.state.authStore.user.userId,
-          session: store.state.authStore.session,
+          session: store.state.authStore.authSession,
           password: password,
           currentPassword: store.state.authStore.passwordCurrent,
         );
@@ -1058,7 +1058,7 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
           homeserver: homeserver,
           accessToken: user.accessToken,
           identityServer: idServer ?? homeserver,
-          session: store.state.authStore.session,
+          session: store.state.authStore.authSession,
           userId: user.userId,
           authType: MatrixAuthTypes.PASSWORD,
           authValue: currentCredential.value,

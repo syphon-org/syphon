@@ -16,6 +16,7 @@ class Strings {
   static final titlePrivacy = tr('title-view-privacy');
   static final titleSettings = tr('title-view-settings');
   static final titleAdvanced = tr('title-view-advanced');
+  static final titleVerification = tr('title-verification');
   static final titleInvite = tr('title-view-invite');
   static final titleChatUsers = tr('title-view-chat-users');
   static final titleChatSettings = tr('title-view-settings-chat');

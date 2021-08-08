@@ -17,7 +17,7 @@ class AuthStore extends Equatable {
   final User user;
 
   @JsonKey()
-  final String? session; // a.k.a sid or session id
+  final String? authSession; // a.k.a sid or session id
 
   @JsonKey()
   final String? clientSecret;
@@ -69,7 +69,7 @@ class AuthStore extends Equatable {
   const AuthStore({
     this.user = const User(),
     this.availableUsers = const [],
-    this.session,
+    this.authSession,
     this.clientSecret,
     this.authObserver,
     this.contextObserver,
@@ -107,7 +107,7 @@ class AuthStore extends Equatable {
   List<Object?> get props => [
         user,
         availableUsers,
-        session,
+        authSession,
         clientSecret,
         authObserver,
         contextObserver,
@@ -136,7 +136,7 @@ class AuthStore extends Equatable {
   AuthStore copyWith({
     User? user,
     List<User>? availableUsers,
-    String? session,
+    String? authSession,
     String? clientSecret,
     protocol,
     email,
@@ -167,7 +167,7 @@ class AuthStore extends Equatable {
       AuthStore(
         user: user ?? this.user,
         availableUsers: availableUsers ?? this.availableUsers,
-        session: session ?? this.session,
+        authSession: authSession ?? this.authSession,
         clientSecret: clientSecret ?? this.clientSecret,
         protocol: protocol ?? this.protocol,
         email: email ?? this.email,

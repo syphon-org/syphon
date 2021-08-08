@@ -19,6 +19,7 @@ class Values {
 
   static const EMPTY_CHAT = 'Empty Chat';
   static const EMPTY = '';
+  static const UNKNOWN = 'Unknown';
 
   // Notifications and Background service
   static const channel_id = '${appLabel}_notifications';

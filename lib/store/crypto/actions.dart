@@ -270,11 +270,9 @@ ThunkAction<AppState> generateIdentityKeys() {
       final olmAccount = store.state.cryptoStore.olmAccount!;
 
       final identityKeys = await json.decode(olmAccount.identity_keys());
-      // fingerprint keypair - ed25519
-      final fingerprintKeyName = '${Algorithms.ed25519}:${authUser.deviceId}';
 
-      // identity key pair - curve25519
-      final identityKeyName = '${Algorithms.curve25591}:${authUser.deviceId}';
+      final fingerprintId = Keys.fingerprintId(deviceId: authUser.deviceId);
+      final identityKeyId = Keys.identityKeyId(deviceId: authUser.deviceId);
 
       // formatting json for the signature required by matrix
       final deviceIdentityKeys = {
@@ -284,8 +282,8 @@ ThunkAction<AppState> generateIdentityKeys() {
         ],
         'device_id': authUser.deviceId,
         'keys': {
-          fingerprintKeyName: identityKeys[Algorithms.ed25519],
-          identityKeyName: identityKeys[Algorithms.curve25591],
+          fingerprintId: identityKeys[Algorithms.ed25519],
+          identityKeyId: identityKeys[Algorithms.curve25591],
         },
         'user_id': authUser.userId,
       };
@@ -299,7 +297,7 @@ ThunkAction<AppState> generateIdentityKeys() {
 
       deviceKeysPayload['device_keys']?['signatures'] = {
         authUser.userId: {
-          fingerprintKeyName: deviceKeysSigned,
+          fingerprintId: deviceKeysSigned,
         }
       };
 
@@ -387,10 +385,12 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
       final oneTimeKeyId = '${Algorithms.signedcurve25519}:$keyId';
       oneTimeKeysSignedAll[oneTimeKeyId] = {'key': value};
 
+      final fingerprintKeyId = Keys.fingerprintId(deviceId: authUser.deviceId);
+
       // append signature for new signed key
       oneTimeKeysSignedAll[oneTimeKeyId]['signatures'] = {
         authUser.userId: {
-          '${Algorithms.ed25519}:${authUser.deviceId}': oneTimeKeySigned,
+          fingerprintKeyId: oneTimeKeySigned,
         }
       };
     });
@@ -629,7 +629,7 @@ ThunkAction<AppState> claimOneTimeKeys({
           if (deviceKey.deviceId == currentUser.deviceId) return claims;
 
           // find the identityKey for the device
-          final keyId = Keys.identity(deviceId: deviceKey.deviceId);
+          final keyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
           final identityKey = deviceKey.keys![keyId];
 
           // don't claim one time keys for already claimed devices
@@ -700,7 +700,7 @@ ThunkAction<AppState> claimOneTimeKeys({
       oneTimekeys.forEach((deviceId, oneTimeKey) {
         final userId = oneTimeKey.userId;
         final deviceKey = store.state.cryptoStore.deviceKeys[userId!]![deviceId]!;
-        final keyId = Keys.identity(deviceId: deviceKey.deviceId);
+        final keyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
         final identityKey = deviceKey.keys![keyId];
 
         store.dispatch(createKeySessionOutbound(
@@ -932,8 +932,10 @@ ThunkAction<AppState> createMessageSessionOutbound({String? roomId}) {
     final deviceId = store.state.authStore.user.deviceId;
     final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
     final deviceKey = deviceKeysOwned[deviceId!]!;
-    final deviceKeyId = '${Algorithms.curve25591}:$deviceId';
-    final identityKeyCurrent = deviceKey.keys![deviceKeyId];
+
+    final identityKeyId = Keys.identityKeyId(deviceId: deviceId);
+
+    final identityKey = deviceKey.keys![identityKeyId];
 
     final outboundMessageSession = olm.OutboundGroupSession();
     final inboundMessageSession = olm.InboundGroupSession();
@@ -953,7 +955,7 @@ ThunkAction<AppState> createMessageSessionOutbound({String? roomId}) {
 
     store.dispatch(AddInboundMessageSession(
       roomId: roomId,
-      identityKey: identityKeyCurrent,
+      identityKey: identityKey,
       session: inboundMessageSession.pickle(roomId),
       messageIndex: inboundMessageSession.first_known_index(),
     ));

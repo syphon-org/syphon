@@ -12,11 +12,11 @@ String formatUserId(String displayName, {String homeserver = Values.homeserverDe
 
 // TODO: remoove after switching to Locale / LanguageCode as source of truth
 String formatLocale(String? language) {
-  if (language!.length == 2) {
-    return language;
+  if (language!.length > 3) {
+    return Languages.english;
   }
 
-  return Languages.english;
+  return language;
 }
 
 // @again_guy:matrix.org -> AG

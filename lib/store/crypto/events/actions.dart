@@ -126,13 +126,14 @@ ThunkAction<AppState> encryptKeyContent({
     // pull current user identity keys out of olm account
     final userCurrent = store.state.authStore.user;
     final userOlmAccount = store.state.cryptoStore.olmAccount!;
-    final userIdentityKeys = await json.decode(userOlmAccount.identity_keys());
-    final userFingerprintKey = userIdentityKeys[Algorithms.ed25519];
+    final currentIdentityKeys = await json.decode(userOlmAccount.identity_keys());
+    final currentFingerprint = currentIdentityKeys[Algorithms.ed25519];
 
     // pull recipient key data and id
-    final fingerprintKeyId = Keys.fingerprint(deviceId: recipientKeys!.deviceId);
-    final identityKeyId = Keys.identity(deviceId: recipientKeys.deviceId);
-    final fingerprintKey = recipientKeys.keys![fingerprintKeyId]; // recipient
+    final fingerprintId = Keys.fingerprintId(deviceId: recipientKeys!.deviceId);
+    final identityKeyId = Keys.identityKeyId(deviceId: recipientKeys.deviceId);
+
+    final fingerprint = recipientKeys.keys![fingerprintId]; // recipient
     final identityKey = recipientKeys.keys![identityKeyId]!; // recipient
 
     // create payload for olm key sharing per spec
@@ -141,10 +142,10 @@ ThunkAction<AppState> encryptKeyContent({
       'sender_device': userCurrent.deviceId,
       'recipient': recipient,
       'recipient_keys': {
-        Algorithms.ed25519: fingerprintKey,
+        Algorithms.ed25519: fingerprint,
       },
       'keys': {
-        Algorithms.ed25519: userFingerprintKey,
+        Algorithms.ed25519: currentFingerprint,
       },
       'type': eventType,
       'content': content,
@@ -172,7 +173,7 @@ ThunkAction<AppState> encryptKeyContent({
     if (payloadEncrypted.type == 0) {
       return {
         'algorithm': Algorithms.olmv1,
-        'sender_key': userIdentityKeys[Algorithms.curve25591],
+        'sender_key': currentIdentityKeys[Algorithms.curve25591],
         'ciphertext': {
           // receiver identity key
           identityKey: {
@@ -185,7 +186,7 @@ ThunkAction<AppState> encryptKeyContent({
 
     return {
       'algorithm': Algorithms.olmv1,
-      'sender_key': userIdentityKeys[Algorithms.curve25591],
+      'sender_key': currentIdentityKeys[Algorithms.curve25591],
       'ciphertext': payloadEncrypted.body,
     };
   };
@@ -203,14 +204,16 @@ ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
     // Get current user device identity key
     final deviceId = store.state.authStore.user.deviceId;
     final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
+
     final deviceKey = deviceKeysOwned[deviceId!]!;
-    final deviceKeyId = '${Algorithms.curve25591}:$deviceId';
-    final identityKeyOwned = deviceKey.keys![deviceKeyId];
+
+    final identityKeyId = Keys.identityKeyId(deviceId: deviceId);
+    final identityKey = deviceKey.keys![identityKeyId];
 
     // Extract the payload meant for this device by identity
     final Map content = event['content'];
     final identityKeySender = content['sender_key'];
-    final ciphertextContent = content['ciphertext'][identityKeyOwned];
+    final ciphertextContent = content['ciphertext'][identityKey];
 
     // Load and deserialize or create session
     final olm.Session keySession = await store.dispatch(
