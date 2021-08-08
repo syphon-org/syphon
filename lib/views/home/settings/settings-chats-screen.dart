@@ -9,6 +9,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -305,7 +306,7 @@ class Props extends Equatable {
       ];
 
   static Props mapStateToProps(Store<AppState> store, BuildContext context) => Props(
-        language: store.state.settingsStore.language,
+        language: DisplayName(Locale(store.state.settingsStore.language)).toDisplayName(),
         enterSend: store.state.settingsStore.enterSendEnabled,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
         dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
