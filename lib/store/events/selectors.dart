@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -15,7 +13,7 @@ List<Message> roomOutbox(AppState state, String? roomId) {
 }
 
 Map<String, List<Reaction>> selectReactions(AppState state) {
-  return (state.eventStore.reactions as Map<String, List<Reaction>>? ?? []) as Map<String, List<Reaction>>;
+  return state.eventStore.reactions;
 }
 
 // remove messages from blocked users

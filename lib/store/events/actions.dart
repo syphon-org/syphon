@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
@@ -29,12 +28,12 @@ class SetEvents {
   SetEvents({this.roomId, this.events});
 }
 
-class SetMessages {
+class AddMessages {
   final String roomId;
   final List<Message> messages;
   final List<Message> outbox;
 
-  SetMessages({
+  AddMessages({
     required this.roomId,
     this.messages = const [],
     this.outbox = const [],
@@ -95,7 +94,7 @@ ThunkAction<AppState> setMessages({
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        SetMessages(roomId: room.id, messages: messages, outbox: outbox),
+        AddMessages(roomId: room.id, messages: messages, outbox: outbox),
       );
     };
 
@@ -149,7 +148,7 @@ ThunkAction<AppState> loadMessagesCached({
       );
 
       // load cold storage messages to state
-      store.dispatch(SetMessages(roomId: room.id, messages: messagesStored));
+      store.dispatch(AddMessages(roomId: room.id, messages: messagesStored));
     } catch (error) {
       printError('[fetchMessageEvents] $error');
     } finally {
@@ -215,9 +214,61 @@ ThunkAction<AppState> fetchMessageEvents({
   };
 }
 
+ThunkAction<AppState> decryptMessages(Room room, List<Message> messages) => (Store<AppState> store) async {
+      try {
+        final roomId = room.id;
+        final verified = store.state.authStore.verified;
+
+        bool sentKeyRequest = false;
+        final decryptedAll = <Message>[];
+
+        // map through each event and decrypt if possible
+        await Future.forEach(messages, (Message message) async {
+          if (message.type != EventTypes.encrypted) {
+            return;
+          }
+
+          try {
+            final decryptedMessage = await store.dispatch(
+              decryptMessage(roomId: roomId, message: message),
+            );
+
+            decryptedAll.add(decryptedMessage);
+          } catch (error) {
+            debugPrint('[decryptMessageEvent] $error');
+
+            if (!sentKeyRequest && verified) {
+              sentKeyRequest = true;
+              debugPrint('[decryptMessageEvent] SENDING KEY REQUEST');
+              store.dispatch(sendKeyRequest(
+                event: message,
+                roomId: room.id,
+              ));
+            }
+          }
+        });
+
+        return decryptedAll;
+      } catch (error) {
+        debugPrint(
+          '[decryptEvents] ${room.name ?? 'Unknown Room Name'} ${error.toString()}',
+        );
+      } finally {
+        store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      }
+    };
+
+///
 /// Decrypt Events
 ///
 /// Reattribute decrypted events to the timeline
+///
+/// TODO: DEPRECATE - REMOVE
+///
+@Deprecated(
+  'All encrypted messages are now decrypted post sync in a temp thread'
+  'Remove once recreatable decryption is stable',
+)
 ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
   return (Store<AppState> store) async {
     try {
@@ -235,7 +286,7 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
           case EventTypes.encrypted:
             try {
               return await store.dispatch(
-                decryptMessageEvent(roomId: room.id, event: event),
+                decryptMessageJson(roomId: room.id, event: event),
               );
             } catch (error) {
               debugPrint('[decryptMessageEvent] $error');
@@ -244,7 +295,7 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
                 sentKeyRequest = true;
                 debugPrint('[decryptMessageEvent] SENDING KEY REQUEST');
                 store.dispatch(sendKeyRequest(
-                  event: Event.fromMatrix(event),
+                  event: Message.fromEvent(Event.fromMatrix(event)),
                   roomId: room.id,
                 ));
               }

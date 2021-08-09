@@ -106,14 +106,15 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         if (json.isEmpty) return;
 
-        // First past to decrypt encrypted events
-        // && json['timeline'] != null theres an issue here
-        if (room.encryptionEnabled) {
-          // reassign the mapped decrypted evets to the json timeline
-          json['timeline']['events'] = await store.dispatch(
-            decryptEvents(room, Map<String, dynamic>.from(json)),
-          );
-        }
+        // // First past to decrypt encrypted events
+        // // && json['timeline'] != null theres an issue here
+        // TODO: remove after decryption is stable else where
+        // if (room.encryptionEnabled) {
+        //   // reassign the mapped decrypted evets to the json timeline
+        //   json['timeline']['events'] = await store.dispatch(
+        //     decryptEvents(room, Map<String, dynamic>.from(json)),
+        //   );
+        // }
 
         // parse room and events
         room = await compute(parseRoom, {

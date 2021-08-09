@@ -18,9 +18,13 @@ class EventStore extends Equatable {
   final Map<String, Map<String, ReadReceipt>> receipts; // eventId indexed
   final Map<String, Map<String, Message>> outbox; // roomId and tempId subindex
 
+  @JsonKey(ignore: true)
+  final Map<String, List<Message>> messagesDecrypted; // messages decrypted - in memory only
+
   const EventStore({
     this.events = const {},
     this.messages = const {},
+    this.messagesDecrypted = const {},
     this.reactions = const {},
     this.receipts = const {},
     this.redactions = const {},
@@ -31,6 +35,7 @@ class EventStore extends Equatable {
   List<Object> get props => [
         events,
         messages,
+        messagesDecrypted,
         reactions,
         receipts,
         redactions,
@@ -40,6 +45,7 @@ class EventStore extends Equatable {
   EventStore copyWith({
     Map<String, List<Event>>? events,
     Map<String, List<Message>>? messages,
+    Map<String, List<Message>>? messagesDecrypted,
     Map<String, Redaction>? redactions,
     Map<String, List<Reaction>>? reactions,
     Map<String, Map<String, ReadReceipt>>? receipts,
@@ -48,6 +54,7 @@ class EventStore extends Equatable {
       EventStore(
         events: events ?? this.events,
         messages: messages ?? this.messages,
+        messagesDecrypted: messagesDecrypted ?? this.messagesDecrypted,
         redactions: redactions ?? this.redactions,
         reactions: reactions ?? this.reactions,
         receipts: receipts ?? this.receipts,
@@ -55,6 +62,5 @@ class EventStore extends Equatable {
       );
 
   Map<String, dynamic> toJson() => _$EventStoreToJson(this);
-  factory EventStore.fromJson(Map<String, dynamic> json) =>
-      _$EventStoreFromJson(json);
+  factory EventStore.fromJson(Map<String, dynamic> json) => _$EventStoreFromJson(json);
 }

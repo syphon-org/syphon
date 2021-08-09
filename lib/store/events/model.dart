@@ -32,14 +32,14 @@ class Event {
   });
 
   Event copyWith({
-    id,
-    type,
-    sender,
-    roomId,
-    stateKey,
-    content,
+    String? id,
+    String? type,
+    String? sender,
+    String? roomId,
+    String? stateKey,
     int? timestamp,
-    data,
+    dynamic content,
+    dynamic data,
   }) =>
       Event(
         id: id ?? this.id,

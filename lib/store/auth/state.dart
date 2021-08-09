@@ -28,6 +28,9 @@ class AuthStore extends Equatable {
   @JsonKey()
   final List<User> availableUsers;
 
+  @JsonKey()
+  final bool verified; // a.k.a sid or session id
+
   User get currentUser => user;
 
   final StreamController<User?>? authObserver;
@@ -70,6 +73,7 @@ class AuthStore extends Equatable {
     this.user = const User(),
     this.availableUsers = const [],
     this.authSession,
+    this.verified = false,
     this.clientSecret,
     this.authObserver,
     this.contextObserver,
@@ -131,6 +135,7 @@ class AuthStore extends Equatable {
         loading,
         creating,
         verificationNeeded,
+        verified,
       ];
 
   AuthStore copyWith({
@@ -138,7 +143,8 @@ class AuthStore extends Equatable {
     List<User>? availableUsers,
     String? authSession,
     String? clientSecret,
-    protocol,
+    String? protocol,
+    bool? verified,
     email,
     loading,
     username,
@@ -170,6 +176,7 @@ class AuthStore extends Equatable {
         authSession: authSession ?? this.authSession,
         clientSecret: clientSecret ?? this.clientSecret,
         protocol: protocol ?? this.protocol,
+        verified: verified ?? this.verified,
         email: email ?? this.email,
         loading: loading ?? this.loading,
         authObserver: authObserver ?? this.authObserver,

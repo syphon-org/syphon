@@ -71,8 +71,14 @@ class ChatScreenState extends State<ChatScreen> {
     super.initState();
   }
 
-  @protected
-  Future onMounted(_Props props) async {
+  @override
+  void dispose() {
+    inputFieldNode.dispose();
+    messagesController.dispose();
+    super.dispose();
+  }
+
+  onMounted(_Props props) async {
     final draft = props.room.draft;
 
     // only marked if read receipts are enabled
@@ -135,7 +141,20 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  @protected
+  onCheatCode(_Props props) async {
+    final store = StoreProvider.of<AppState>(context);
+    final messages = store.state.eventStore.messages;
+    final roomMessages = messages[props.room.id] ?? [];
+
+    final List<Message> messagesDecrypted = await store.dispatch(
+      decryptMessages(props.room, roomMessages),
+    );
+
+    messagesDecrypted.forEach((element) {
+      printJson(element.toJson());
+    });
+  }
+
   onDidChange(_Props? propsOld, _Props props) {
     if (props.room.encryptionEnabled && mediumType != MediumType.encryption) {
       setState(() {
@@ -143,13 +162,6 @@ class ChatScreenState extends State<ChatScreen> {
       });
       props.onUpdateDeviceKeys();
     }
-  }
-
-  @override
-  void dispose() {
-    inputFieldNode.dispose();
-    messagesController.dispose();
-    super.dispose();
   }
 
   onViewUserDetails({Message? message, String? userId, User? user}) {
@@ -384,7 +396,7 @@ class ChatScreenState extends State<ChatScreen> {
             color: props.chatColorPrimary,
             badgesEnabled: props.roomTypeBadgesEnabled,
             onDebug: () {
-              props.onCheatCode();
+              onCheatCode(props);
             },
             onBack: () {
               if (editorController.text.isNotEmpty) {
@@ -695,18 +707,14 @@ class _Props extends Equatable {
         ));
       },
       onCheatCode: () async {
-        // await store.dispatch(store.dispatch(generateDeviceId(
-        //   salt: store.state.authStore.username,
-        // )));
+        // final room = selectRoom(state: store.state, id: roomId);
 
-        final room = selectRoom(state: store.state, id: roomId);
+        // store.dispatch(updateKeySessions(room: room));
 
-        store.dispatch(updateKeySessions(room: room));
+        // final usersDeviceKeys = await store.dispatch(
+        //   fetchDeviceKeys(userIds: room.userIds),
+        // );
 
-        final usersDeviceKeys = await store.dispatch(
-          fetchDeviceKeys(userIds: room.userIds),
-        );
-
-        printJson(usersDeviceKeys);
+        // printJson(usersDeviceKeys);
       });
 }

@@ -35,16 +35,17 @@ class Message extends Event {
   final String? algorithm;
   final String? sessionId;
   final String? senderKey; // Curve25519 device key which initiated the session
+  final String? deviceId;
 
   const Message({
-    id,
-    userId,
-    roomId,
-    type,
-    sender,
-    stateKey,
-    content,
-    timestamp = 0,
+    String? id,
+    String? userId,
+    String? roomId,
+    String? type,
+    String? sender,
+    String? stateKey,
+    dynamic content,
+    int timestamp = 0,
     this.body,
     this.msgtype,
     this.format,
@@ -53,6 +54,7 @@ class Message extends Event {
     this.received,
     this.ciphertext,
     this.senderKey,
+    this.deviceId,
     this.algorithm,
     this.sessionId,
     this.relatedEventId,
@@ -77,12 +79,13 @@ class Message extends Event {
 
   @override
   Message copyWith({
-    id,
-    type,
-    sender,
-    roomId,
-    stateKey,
-    content,
+    String? id,
+    String? type,
+    String? sender,
+    String? roomId,
+    String? stateKey,
+    dynamic content,
+    dynamic data,
     timestamp,
     body,
     msgtype,
@@ -91,6 +94,7 @@ class Message extends Event {
     formattedBody,
     ciphertext,
     senderKey,
+    deviceId,
     algorithm,
     sessionId,
     received,
@@ -102,7 +106,6 @@ class Message extends Event {
     relatedEventId,
     edits,
     reactions,
-    data,
   }) =>
       Message(
         id: id ?? this.id,
@@ -120,6 +123,7 @@ class Message extends Event {
         received: received ?? this.received,
         ciphertext: ciphertext ?? this.ciphertext,
         senderKey: senderKey ?? this.senderKey,
+        deviceId: deviceId ?? this.deviceId,
         algorithm: algorithm ?? this.algorithm,
         sessionId: sessionId ?? this.sessionId,
         syncing: syncing ?? this.syncing,
@@ -134,8 +138,7 @@ class Message extends Event {
 
   @override
   Map<String, dynamic> toJson() => _$MessageToJson(this);
-  factory Message.fromJson(Map<String, dynamic> json) =>
-      _$MessageFromJson(json);
+  factory Message.fromJson(Map<String, dynamic> json) => _$MessageFromJson(json);
 
   factory Message.fromEvent(Event event) {
     try {
@@ -171,6 +174,7 @@ class Message extends Event {
         algorithm: event.content['algorithm'],
         senderKey: event.content['sender_key'],
         sessionId: event.content['session_id'],
+        deviceId: event.content['device_id'],
         replacement: replacement,
         relatedEventId: relatedEventId,
         received: DateTime.now().millisecondsSinceEpoch,

@@ -318,10 +318,11 @@ class Room {
         timelineEventsRaw.map((event) => Event.fromMatrix(event)),
       );
 
-      for (Event event in timelineEvents) {
+      for (final Event event in timelineEvents) {
         switch (event.type) {
           case EventTypes.message:
           case EventTypes.encrypted:
+            printJson(Message.fromEvent(event).toJson());
             messageEvents.add(Message.fromEvent(event));
             break;
           case EventTypes.reaction:

@@ -1,14 +1,13 @@
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
 import './actions.dart';
-import '../events/model.dart';
 import './state.dart';
-import 'package:syphon/store/events/messages/model.dart';
 
-EventStore eventReducer(
-    [EventStore state = const EventStore(), dynamic action]) {
+EventStore eventReducer([EventStore state = const EventStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetEvents:
       final roomId = action.roomId;
@@ -21,7 +20,7 @@ EventStore eventReducer(
         state.reactions,
       );
 
-      for (Reaction reaction in action.reactions ?? []) {
+      for (final Reaction reaction in action.reactions ?? []) {
         final reactionEventId = reaction.relEventId;
         final exists = reactionsUpdated.containsKey(reactionEventId);
 
@@ -37,12 +36,12 @@ EventStore eventReducer(
 
       return state.copyWith(reactions: reactionsUpdated);
 
-    case SetMessages:
+    case AddMessages:
       if (action.messages.isEmpty) {
         return state;
       }
 
-      final roomId = (action as SetMessages).roomId;
+      final roomId = (action as AddMessages).roomId;
 
       final Map<String, List<Message>> messages = Map.from(state.messages);
 
@@ -64,8 +63,7 @@ EventStore eventReducer(
       messages[roomId] = messagesAll.values.toList();
 
       // remove locally saved outbox messages if they've now been received from a server
-      if (state.outbox.containsKey(roomId) &&
-          state.outbox[roomId]!.isNotEmpty) {
+      if (state.outbox.containsKey(roomId) && state.outbox[roomId]!.isNotEmpty) {
         final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
 
         // removed based on eventId, not tempId

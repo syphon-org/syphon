@@ -33,40 +33,45 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
         oneTimeKeysClaimed: action.oneTimeKeys,
       );
     case AddOutboundKeySession:
+      final _action = action as AddOutboundKeySession;
       final outboundSessions = Map<String, String>.from(
         state.outboundKeySessions,
       );
 
-      outboundSessions.putIfAbsent(action.identityKey, () => action.authSession);
+      outboundSessions.putIfAbsent(_action.identityKey, () => _action.session);
 
       return state.copyWith(
         outboundKeySessions: outboundSessions,
       );
     case AddInboundKeySession:
+      final _action = action as AddInboundKeySession;
       final inboundKeySessions = Map<String, String>.from(
         state.inboundKeySessions,
       );
 
-      inboundKeySessions.putIfAbsent(action.identityKey, () => action.authSession);
+      inboundKeySessions.putIfAbsent(_action.identityKey, () => _action.session);
 
       return state.copyWith(
         inboundKeySessions: inboundKeySessions,
       );
     case AddOutboundMessageSession:
+      final _action = action as AddOutboundMessageSession;
       final outboundMessageSessions = Map<String, String>.from(
         state.outboundMessageSessions,
       );
 
       outboundMessageSessions.update(
-        action.roomId,
-        (sessionCurrent) => action.authSession,
-        ifAbsent: () => action.authSession,
+        _action.roomId,
+        (sessionCurrent) => _action.session,
+        ifAbsent: () => _action.session,
       );
 
       return state.copyWith(
         outboundMessageSessions: outboundMessageSessions,
       );
     case AddInboundMessageSession:
+      final _action = action as AddInboundMessageSession;
+
       final messageSessionIndex = Map<String, Map<String, int>>.from(
         state.messageSessionIndex,
       );
@@ -83,12 +88,12 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       );
 
       // add or update inbound message session by roomId + identity
-      final Map<String, String> messageSessionInboundNew = {action.identityKey: action.authSession};
+      final Map<String, String> messageSessionInboundNew = {action.identityKey: action.session};
 
       messageSessionsInbound[action.roomId]!.addAll(messageSessionInboundNew);
 
-      // add or update inbound message index by roomId + identity
-      final Map<String, int> messageSessionIndexUpdated = {action.identityKey: action.messageIndex};
+      // add or update inbound message index by roomId + identity - TODO: should not be -1!!!
+      final Map<String, int> messageSessionIndexUpdated = {action.identityKey: action.messageIndex ?? -1};
 
       messageSessionIndex[action.roomId]!.addAll(messageSessionIndexUpdated);
 
