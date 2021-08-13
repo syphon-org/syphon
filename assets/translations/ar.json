@@ -1,1 +1,8 @@
-{}
+{
+    "title-view-invite-users": "دعوة المستخدمين",
+    "title-view-search-users": "البحث عن المستخدمين",
+    "button-start-chat": "فلندردش",
+    "header-signup-username": "يُرجى إنشاء اسم المستخدم",
+    "header-intro": "الخصوصية والحرية\nدون متاعب.",
+    "title-intro": "أهلا بك في {}"
+}
