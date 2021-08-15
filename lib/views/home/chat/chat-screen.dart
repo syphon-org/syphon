@@ -16,6 +16,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/crypto/events/selectors.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -89,7 +90,7 @@ class ChatScreenState extends State<ChatScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => DialogInvite(
+        builder: (_) => DialogInvite(
           onAccept: props.onAcceptInvite,
           onReject: () {
             props.onRejectInvite();
@@ -107,10 +108,11 @@ class ChatScreenState extends State<ChatScreen> {
       setState(() {
         mediumType = MediumType.encryption;
       });
+      // onAttemptDecryption(props); TODO: uncomment
     }
 
     if (props.messagesLength! < 10) {
-      props.onLoadFirstBatch();
+      props.onFetchNewest();
     }
 
     if (draft != null && draft.type == MessageTypes.TEXT) {
@@ -143,7 +145,28 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   onCheatCode(_Props props) async {
+    onAttemptDecryption(props);
+  }
+
+  onAttemptDecryption(_Props props) async {
     final store = StoreProvider.of<AppState>(context);
+    final room = props.room;
+
+    printDebug("HELLOOOO?");
+
+    // dont attempt to decrypt if encryption is not enabled
+    if (!room.encryptionEnabled) {
+      return;
+    }
+
+    final hasDecryptable = selectHasDecryptableMessages(store, props.room.id);
+
+    print("WHAT? $hasDecryptable");
+    // dont attempt to decrypt if all messages are already decrypted
+    if (!hasDecryptable) {
+      return;
+    }
+
     final messages = store.state.eventStore.messages;
     final roomMessages = messages[props.room.id] ?? [];
 
@@ -151,9 +174,10 @@ class ChatScreenState extends State<ChatScreen> {
       decryptMessages(props.room, roomMessages),
     );
 
-    messagesDecrypted.forEach((element) {
-      printJson(element.toJson());
-    });
+    await store.dispatch(addMessagesDecrypted(
+      room: props.room,
+      messages: messagesDecrypted,
+    ));
   }
 
   onDidChange(_Props? propsOld, _Props props) {
@@ -533,12 +557,11 @@ class _Props extends Equatable {
   final Function onSaveDraftMessage;
   final Function onClearDraftMessage;
   final Function onLoadMoreMessages;
-  final Function onLoadFirstBatch;
+  final Function onFetchNewest;
   final Function onAcceptInvite;
   final Function onRejectInvite;
   final Function onToggleEncryption;
   final Function onToggleReaction;
-  final Function onCheatCode;
   final Function onMarkRead;
   final Function onSelectReply;
 
@@ -558,12 +581,11 @@ class _Props extends Equatable {
     required this.onSaveDraftMessage,
     required this.onClearDraftMessage,
     required this.onLoadMoreMessages,
-    required this.onLoadFirstBatch,
+    required this.onFetchNewest,
     required this.onAcceptInvite,
     required this.onRejectInvite,
     required this.onToggleEncryption,
     required this.onToggleReaction,
-    required this.onCheatCode,
     required this.onMarkRead,
     required this.onSelectReply,
   });
@@ -578,144 +600,126 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
-      room: selectRoom(id: roomId, state: store.state),
-      themeType: store.state.settingsStore.themeSettings.themeType,
-      userId: store.state.authStore.user.userId,
-      roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
-      dismissKeyboardEnabled: store.state.settingsStore.dismissKeyboardEnabled,
-      enterSendEnabled: store.state.settingsStore.enterSendEnabled,
-      loading: selectRoom(state: store.state, id: roomId).syncing,
-      messagesLength: store.state.eventStore.messages.containsKey(roomId)
-          ? store.state.eventStore.messages[roomId]?.length
-          : 0,
-      onSelectReply: (Message? message) {
-        store.dispatch(selectReply(roomId: roomId, message: message));
-      },
-      chatColorPrimary: selectChatColor(store, roomId),
-      onUpdateDeviceKeys: () async {
-        final room = store.state.roomStore.rooms[roomId]!;
+        room: selectRoom(id: roomId, state: store.state),
+        themeType: store.state.settingsStore.themeSettings.themeType,
+        userId: store.state.authStore.user.userId,
+        roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
+        dismissKeyboardEnabled: store.state.settingsStore.dismissKeyboardEnabled,
+        enterSendEnabled: store.state.settingsStore.enterSendEnabled,
+        loading: selectRoom(state: store.state, id: roomId).syncing,
+        messagesLength: store.state.eventStore.messages.containsKey(roomId)
+            ? store.state.eventStore.messages[roomId]?.length
+            : 0,
+        onSelectReply: (Message? message) {
+          store.dispatch(selectReply(roomId: roomId, message: message));
+        },
+        chatColorPrimary: selectChatColor(store, roomId),
+        onUpdateDeviceKeys: () async {
+          final room = store.state.roomStore.rooms[roomId]!;
 
-        final usersDeviceKeys = await store.dispatch(
-          fetchDeviceKeys(userIds: room.userIds),
-        );
+          final usersDeviceKeys = await store.dispatch(
+            fetchDeviceKeys(userIds: room.userIds),
+          );
 
-        store.dispatch(setDeviceKeys(usersDeviceKeys));
-      },
-      onSaveDraftMessage: ({
-        String? body,
-        String? type,
-      }) {
-        store.dispatch(saveDraft(
-          body: body,
-          type: type,
-          room: store.state.roomStore.rooms[roomId],
-        ));
-      },
-      onClearDraftMessage: ({
-        String? body,
-        String? type,
-      }) {
-        store.dispatch(clearDraft(
-          room: store.state.roomStore.rooms[roomId],
-        ));
-      },
-      onSendMessage: ({required String body, String? type}) async {
-        if (roomId == null || body.isEmpty) return;
+          store.dispatch(setDeviceKeys(usersDeviceKeys));
+        },
+        onSaveDraftMessage: ({String? body, String? type}) {
+          store.dispatch(saveDraft(
+            body: body,
+            type: type,
+            room: store.state.roomStore.rooms[roomId],
+          ));
+        },
+        onClearDraftMessage: ({String? body, String? type}) {
+          store.dispatch(clearDraft(
+            room: store.state.roomStore.rooms[roomId],
+          ));
+        },
+        onSendMessage: ({required String body, String? type}) async {
+          if (roomId == null || body.isEmpty) return;
 
-        final room = store.state.roomStore.rooms[roomId]!;
+          final room = store.state.roomStore.rooms[roomId]!;
 
-        final message = Message(
-          body: body,
-          type: type,
-        );
+          final message = Message(
+            body: body,
+            type: type,
+          );
 
-        if (room.encryptionEnabled) {
-          return store.dispatch(sendMessageEncrypted(
-            roomId: roomId,
+          if (room.encryptionEnabled) {
+            return store.dispatch(sendMessageEncrypted(
+              roomId: roomId,
+              message: message,
+            ));
+          }
+
+          return store.dispatch(sendMessage(
+            room: room,
             message: message,
           ));
-        }
+        },
+        onDeleteMessage: ({Message? message}) {
+          if (message != null) {
+            store.dispatch(deleteMessage(message: message));
+          }
+        },
+        onAcceptInvite: () {
+          store.dispatch(acceptRoom(
+            room: selectRoom(state: store.state, id: roomId),
+          ));
+        },
+        onRejectInvite: () {
+          store.dispatch(leaveRoom(
+            room: selectRoom(state: store.state, id: roomId),
+          ));
+        },
+        onMarkRead: () {
+          store.dispatch(markRoomRead(roomId: roomId));
+        },
+        onFetchNewest: () {
+          final room = selectRoom(id: roomId, state: store.state);
 
-        return store.dispatch(sendMessage(
-          room: room,
-          message: message,
-        ));
-      },
-      onDeleteMessage: ({
-        Message? message,
-      }) {
-        if (message != null) {
-          store.dispatch(deleteMessage(message: message));
-        }
-      },
-      onAcceptInvite: () {
-        store.dispatch(acceptRoom(
-          room: selectRoom(state: store.state, id: roomId),
-        ));
-      },
-      onRejectInvite: () {
-        store.dispatch(leaveRoom(
-          room: selectRoom(state: store.state, id: roomId),
-        ));
-      },
-      onMarkRead: () {
-        store.dispatch(markRoomRead(roomId: roomId));
-      },
-      onLoadFirstBatch: () {
-        final room = selectRoom(id: roomId, state: store.state);
+          store.dispatch(fetchMessageEvents(
+            room: room,
+            from: room.nextHash,
+            limit: 25,
+          ));
+        },
+        onToggleReaction: ({Message? message, String? emoji}) {
+          final room = selectRoom(id: roomId, state: store.state);
 
-        store.dispatch(fetchMessageEvents(
-          room: room,
-          from: room.nextHash,
-          limit: 25,
-        ));
-      },
-      onToggleReaction: ({Message? message, String? emoji}) {
-        final room = selectRoom(id: roomId, state: store.state);
+          store.dispatch(
+            toggleReaction(room: room, message: message, emoji: emoji),
+          );
+        },
+        onToggleEncryption: () {
+          final room = selectRoom(id: roomId, state: store.state);
+          store.dispatch(
+            toggleRoomEncryption(room: room),
+          );
+        },
+        onLoadMoreMessages: () {
+          final room = selectRoom(state: store.state, id: roomId);
 
-        store.dispatch(
-          toggleReaction(room: room, message: message, emoji: emoji),
-        );
-      },
-      onToggleEncryption: () {
-        final room = selectRoom(id: roomId, state: store.state);
-        store.dispatch(
-          toggleRoomEncryption(room: room),
-        );
-      },
-      onLoadMoreMessages: () {
-        final room = selectRoom(state: store.state, id: roomId);
+          // load message from cold storage
+          // TODO: paginate cold storage messages
+          // final messages = roomMessages(store.state, roomId);
+          // if (messages.length < room.messageIds.length) {
+          //   printDebug(
+          //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
+          //   return store.dispatch(
+          //     loadMessageEvents(
+          //       room: room,
+          //       offset: messages.length,
+          //     ),
+          //   );
+          // }
 
-        // load message from cold storage
-        // TODO: paginate cold storage messages
-        // final messages = roomMessages(store.state, roomId);
-        // if (messages.length < room.messageIds.length) {
-        //   printDebug(
-        //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
-        //   return store.dispatch(
-        //     loadMessageEvents(
-        //       room: room,
-        //       offset: messages.length,
-        //     ),
-        //   );
-        // }
-
-        // fetch messages beyond the oldest known message - lastHash
-        return store.dispatch(fetchMessageEvents(
-          room: room,
-          from: room.lastHash,
-          oldest: true,
-        ));
-      },
-      onCheatCode: () async {
-        // final room = selectRoom(state: store.state, id: roomId);
-
-        // store.dispatch(updateKeySessions(room: room));
-
-        // final usersDeviceKeys = await store.dispatch(
-        //   fetchDeviceKeys(userIds: room.userIds),
-        // );
-
-        // printJson(usersDeviceKeys);
-      });
+          // fetch messages beyond the oldest known message - lastHash
+          return store.dispatch(fetchMessageEvents(
+            room: room,
+            from: room.lastHash,
+            oldest: true,
+          ));
+        },
+      );
 }

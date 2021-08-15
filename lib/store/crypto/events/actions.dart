@@ -66,6 +66,12 @@ ThunkAction<AppState> encryptMessageContent({
   };
 }
 
+///
+/// Decrypt Message(s)
+///
+/// Decrypt a series of messages found in the normal
+/// events cache
+///
 ThunkAction<AppState> decryptMessages(
   Room room,
   List<Message> messages,
@@ -155,8 +161,8 @@ ThunkAction<AppState> decryptMessage({
     final messageIndexNew = payloadDecrypted.message_index;
 
     // protection against replay attacks
-    if (messageIndexNew < identityMessageIndex) {
-      throw '[decryptMessage] messageIndex invalid $messageIndexNew < $identityMessageIndex';
+    if (messageIndexNew <= identityMessageIndex) {
+      throw '[decryptMessage] messageIndex invalid $messageIndexNew <= $identityMessageIndex';
     }
 
     final decryptedJson = json.decode(payloadScrubbed);
@@ -259,6 +265,7 @@ ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
 ///
+/// TODO: REMOVE
 @Deprecated('No longer used after decryption fixes branch release - version 0.1.11')
 ThunkAction<AppState> decryptMessageJson({
   required String roomId,
@@ -477,7 +484,8 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
       // Extract the new events
       final List<dynamic> events = toDeviceRaw['events'];
 
-      // Parse and decrypt necessary events
+      // parse and decrypt each to_device encrypted event
+      // can be run in parrallel unlike message decryption
       await Future.wait(events.map((event) async {
         final eventType = event['type'];
         final identityKeySender = event['content']['sender_key'];
@@ -501,16 +509,19 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 try {
                   // redecrypt events in the room with new key
                   final roomId = eventDecrypted['content']['room_id'];
-
-                  final room = store.state.roomStore.rooms[roomId];
                   final messages = store.state.eventStore.messages;
-                  final messagesDecrypted = store.state.eventStore.messagesDecrypted;
+                  final room = store.state.roomStore.rooms[roomId];
 
-                  if (!messages.containsKey(roomId) || room == null) {
-                    return;
+                  if (!messages.containsKey(roomId)) {
+                    throw 'No messages found to decrypt for this room';
+                  }
+
+                  if (room == null) {
+                    throw 'No room found for room ID $roomId';
                   }
 
                   // grab room messages and attempt decrypting ones that have not been
+                  final messagesDecrypted = store.state.eventStore.messagesDecrypted;
                   final roomMessages = messages[roomId] ?? [];
                   final roomDecrypted = messagesDecrypted[roomId] ?? [];
 
@@ -526,7 +537,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                     messages: decrypted,
                   ));
                 } catch (error) {
-                  debugPrint('[syncRooms|error] $error');
+                  debugPrint('[syncDevice] parsing $error');
                 }
               }
             } catch (error) {

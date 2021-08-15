@@ -37,11 +37,12 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       return state.copyWith(reactions: reactionsUpdated);
 
     case AddMessages:
+      final _action = action as AddMessages;
       if (action.messages.isEmpty) {
         return state;
       }
 
-      final roomId = (action as AddMessages).roomId;
+      final roomId = _action.roomId;
 
       final messages = Map<String, List<Message>>.from(
         state.messages,
@@ -60,7 +61,7 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
         value: (msg) => msg,
       );
 
-      // prioritize new message data though over the old (invalidates using Set)
+      // prioritize new message data though over the old (invalidates using Map overwrite)
       final messagesAll = messagesOld..addAll(messagesNew);
       messages[roomId] = messagesAll.values.toList();
 
@@ -85,12 +86,11 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
     case AddMessagesDecrypted:
       final _action = action as AddMessagesDecrypted;
+      final roomId = _action.roomId;
 
       if (_action.messages.isEmpty) {
         return state;
       }
-
-      final roomId = (action as AddMessages).roomId;
 
       final messages = Map<String, List<Message>>.from(
         state.messagesDecrypted,

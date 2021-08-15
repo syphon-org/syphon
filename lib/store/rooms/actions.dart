@@ -14,8 +14,6 @@ import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/parsers.dart';
-import 'package:syphon/store/events/receipts/storage.dart';
-import 'package:syphon/store/events/storage.dart';
 
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
@@ -28,7 +26,6 @@ import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/store/user/model.dart';
 import 'room/model.dart';
 
@@ -106,7 +103,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         if (json.isEmpty) return;
 
-        // parse room and events
+        // TODO: remove with parsers - parse room and events
         room = await compute(parseRoom, {
           'json': json,
           'room': room,
@@ -118,34 +115,45 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
         );
 
-        final decrypted = await store.dispatch(decryptMessages(
-          room,
-          room.messagesNew,
-        )) as List<Message>;
-
-        // mutation filters - handles editing newly fetched messages
-        final messages = await store.dispatch(mutateMessages(
-          messages: room.messagesNew,
-        )) as List<Message>;
-
-        // update store
+        // update various message mutations and meta data
         await store.dispatch(setUsers(room.usersNew));
         await store.dispatch(setReactions(reactions: room.reactions));
         await store.dispatch(setRedactions(redactions: room.redactions));
         await store.dispatch(setReceipts(room: room, receipts: room.readReceipts));
+
+        // mutation filters - handles backfilling mutations for old messages
+        await store.dispatch(mutateMessagesRoom(room: room));
+
+        // handles editing newly fetched messages
+        final messages = await store.dispatch(mutateMessages(
+          messages: room.messagesNew,
+        )) as List<Message>;
+
+        // save normal or encrypted messages
         await store.dispatch(addMessages(
           room: room,
           messages: messages,
           outbox: room.outbox,
         ));
-        await store.dispatch(addMessagesDecrypted(
-          room: room,
-          messages: decrypted,
-          outbox: room.outbox,
-        ));
 
-        // mutation filters - handles backfilling mutations for old messages
-        await store.dispatch(mutateMessagesRoom(room: room));
+        // update encrypted messages
+        if (room.encryptionEnabled) {
+          final decrypted = await store.dispatch(decryptMessages(
+            room,
+            messages,
+          )) as List<Message>;
+
+          // handles editing newly fetched decrypted messages
+          final decryptedMutated = await store.dispatch(mutateMessages(
+            messages: decrypted,
+          )) as List<Message>;
+
+          await store.dispatch(addMessagesDecrypted(
+            room: room,
+            messages: decryptedMutated,
+            outbox: room.outbox,
+          ));
+        }
 
         // TODO: remove with parsers - clear users from parsed room objects
         room = room.copyWith(
@@ -435,8 +443,6 @@ ThunkAction<AppState> createRoom({
       }
 
       await store.dispatch(SetRoom(room: room));
-
-      saveRooms({room.id: room}, storage: Storage.instance);
 
       return room.id;
     } catch (error) {

@@ -285,9 +285,10 @@ class HomeState extends State<HomeScreen> {
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
+        final decrypted = props.decrypted[room.id] ?? const [];
         final chatSettings = props.chatSettings[room.id];
 
-        final messageLatest = latestMessage(messages);
+        final messageLatest = latestMessage(messages, room: room, decrypted: decrypted);
         final preview = formatPreview(room: room, message: messageLatest);
         final chatName = room.name ?? '';
         final newMessage = messageLatest != null &&
@@ -627,6 +628,7 @@ class _Props extends Equatable {
   final MainFabLocation fabLocation;
   final Map<String, ChatSetting> chatSettings;
   final Map<String, List<Message>> messages;
+  final Map<String, List<Message>> decrypted;
 
   final Function onDebug;
   final Function onLeaveChat;
@@ -643,6 +645,7 @@ class _Props extends Equatable {
     required this.syncing,
     required this.unauthed,
     required this.messages,
+    required this.decrypted,
     required this.currentUser,
     required this.chatSettings,
     required this.fabType,
@@ -679,6 +682,7 @@ class _Props extends Equatable {
           store.state.userStore.blocked,
         ))),
         messages: store.state.eventStore.messages,
+        decrypted: store.state.eventStore.messagesDecrypted,
         unauthed: store.state.syncStore.unauthed,
         offline: store.state.syncStore.offline,
         fabType: store.state.settingsStore.themeSettings.mainFabType,
