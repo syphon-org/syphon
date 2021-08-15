@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 
@@ -6,12 +7,18 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Message extends Event {
+  // message drafting
+  @JsonKey(defaultValue: false)
   final bool pending;
+  @JsonKey(defaultValue: false)
   final bool syncing;
+  @JsonKey(defaultValue: false)
   final bool failed;
 
   // message editing
+  @JsonKey(defaultValue: false)
   final bool edited;
+  @JsonKey(defaultValue: false)
   final bool replacement;
 
   final String? relatedEventId;
@@ -31,6 +38,7 @@ class Message extends Event {
   final int? received;
 
   // Encrypted Messages only
+  final String? typeAlt; // inner type of decrypted event
   final String? ciphertext;
   final String? algorithm;
   final String? sessionId;
@@ -47,6 +55,7 @@ class Message extends Event {
     dynamic content,
     int timestamp = 0,
     this.body,
+    this.typeAlt,
     this.msgtype,
     this.format,
     this.filename,
@@ -86,8 +95,9 @@ class Message extends Event {
     String? stateKey,
     dynamic content,
     dynamic data,
-    timestamp,
-    body,
+    int? timestamp,
+    String? body,
+    String? typeAlt, // inner type of decrypted event
     msgtype,
     format,
     filename,
@@ -110,6 +120,7 @@ class Message extends Event {
       Message(
         id: id ?? this.id,
         type: type ?? this.type,
+        typeAlt: typeAlt ?? this.typeAlt,
         sender: sender ?? this.sender,
         roomId: roomId ?? this.roomId,
         stateKey: stateKey ?? this.stateKey,
@@ -161,6 +172,7 @@ class Message extends Event {
         userId: event.userId,
         roomId: event.roomId,
         type: event.type,
+        typeAlt: null,
         sender: event.sender,
         stateKey: event.stateKey,
         timestamp: event.timestamp,
@@ -184,6 +196,7 @@ class Message extends Event {
         edited: false,
       );
     } catch (error) {
+      printError('[Message.fromEvent] ${error.toString()}');
       return Message(
         id: event.id,
         userId: event.userId,

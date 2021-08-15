@@ -237,7 +237,6 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
           await store.dispatch(syncRooms(invitesJson));
         }
       }
-
       if (toDeviceJson.isNotEmpty) {
         // Updates for device specific data (mostly room encryption)
         await store.dispatch(syncDevice(toDeviceJson));

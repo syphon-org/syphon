@@ -64,7 +64,7 @@ ThunkAction<AppState> mutateMessagesAll({List<String>? messages}) {
           'messages': allMessages,
         });
 
-        await store.dispatch(setMessages(
+        await store.dispatch(addMessages(
           room: Room(id: roomId),
           messages: revisedMessages,
         ));
@@ -97,7 +97,7 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
       'messages': messages,
     });
 
-    await store.dispatch(setMessages(
+    await store.dispatch(addMessages(
       room: Room(id: room.id),
       messages: revisedMessages,
     ));

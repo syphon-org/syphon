@@ -322,7 +322,8 @@ class Room {
         switch (event.type) {
           case EventTypes.message:
           case EventTypes.encrypted:
-            printJson(Message.fromEvent(event).toJson());
+            // TEST:
+            // printJson(Message.fromEvent(event).toJson());
             messageEvents.add(Message.fromEvent(event));
             break;
           case EventTypes.reaction:

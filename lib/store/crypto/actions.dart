@@ -122,12 +122,12 @@ class AddInboundMessageSession {
   String roomId;
   String identityKey;
   String session;
-  int? messageIndex;
+  int messageIndex;
   AddInboundMessageSession({
     required this.roomId,
     required this.identityKey,
     required this.session,
-    this.messageIndex,
+    required this.messageIndex,
   });
 }
 
@@ -822,11 +822,12 @@ ThunkAction<AppState> loadKeySessionInbound({
   String? identityKey, // sender_key
 }) {
   return (Store<AppState> store) async {
-    // TEST: printJson({
-    //   'type': type,
-    //   'body': body,
-    //   'identityKey': identityKey,
-    // });
+    // TEST:
+    printJson({
+      'type': type,
+      'body': body,
+      'identityKey': identityKey,
+    });
 
     try {
       // type 1 - attempt to decrypt with an existing session
@@ -892,8 +893,8 @@ ThunkAction<AppState> createMessageSessionInbound({
     store.dispatch(AddInboundMessageSession(
       roomId: roomId,
       identityKey: identityKey,
-      session: inboundMessageSession.pickle(roomId),
       messageIndex: messageIndex,
+      session: inboundMessageSession.pickle(roomId),
     ));
   };
 }
@@ -923,7 +924,7 @@ ThunkAction<AppState> saveMessageSessionInbound({
   required String roomId,
   required String identityKey,
   required olm.InboundGroupSession session,
-  int? messageIndex,
+  required int messageIndex,
 }) {
   return (Store<AppState> store) async {
     return await store.dispatch(AddInboundMessageSession(

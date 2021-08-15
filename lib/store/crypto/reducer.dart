@@ -81,19 +81,16 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       );
 
       // safety functions to catch newly cached store
-      messageSessionIndex.putIfAbsent(action.roomId, () => <String, int>{});
-      messageSessionsInbound.putIfAbsent(
-        action.roomId,
-        () => <String, String>{},
-      );
+      messageSessionIndex.putIfAbsent(_action.roomId, () => <String, int>{});
+      messageSessionsInbound.putIfAbsent(action.roomId, () => <String, String>{});
 
       // add or update inbound message session by roomId + identity
-      final Map<String, String> messageSessionInboundNew = {action.identityKey: action.session};
+      final Map<String, String> messageSessionInboundNew = {_action.identityKey: _action.session};
 
-      messageSessionsInbound[action.roomId]!.addAll(messageSessionInboundNew);
+      messageSessionsInbound[_action.roomId]!.addAll(messageSessionInboundNew);
 
-      // add or update inbound message index by roomId + identity - TODO: should not be -1!!!
-      final Map<String, int> messageSessionIndexUpdated = {action.identityKey: action.messageIndex ?? -1};
+      // add or update inbound message index by roomId + identity
+      final Map<String, int> messageSessionIndexUpdated = {_action.identityKey: _action.messageIndex};
 
       messageSessionIndex[action.roomId]!.addAll(messageSessionIndexUpdated);
 

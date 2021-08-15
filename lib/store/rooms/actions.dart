@@ -9,6 +9,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -42,8 +43,8 @@ class SetRooms {
 }
 
 class SetRoom {
-  final Room? room;
-  SetRoom({this.room});
+  final Room room;
+  SetRoom({required this.room});
 }
 
 // Atomically Update specific room attributes
@@ -102,19 +103,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
       try {
         final Map json = roomData[id] ?? {};
         Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
-        List<Message> messages = [];
 
         if (json.isEmpty) return;
-
-        // // First past to decrypt encrypted events
-        // // && json['timeline'] != null theres an issue here
-        // TODO: remove after decryption is stable else where
-        // if (room.encryptionEnabled) {
-        //   // reassign the mapped decrypted evets to the json timeline
-        //   json['timeline']['events'] = await store.dispatch(
-        //     decryptEvents(room, Map<String, dynamic>.from(json)),
-        //   );
-        // }
 
         // parse room and events
         room = await compute(parseRoom, {
@@ -128,36 +118,33 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
         );
 
-        // update cold storage
-        await Future.wait([
-          saveUsers(room.usersNew, storage: Storage.instance!),
-          saveRooms({room.id: room}, storage: Storage.instance),
-          saveReactions(room.reactions, storage: Storage.instance!),
-          saveMessages(room.messagesNew, storage: Storage.instance!),
-          saveRedactions(room.redactions, storage: Storage.instance!),
-          saveReceipts(room.readReceipts, storage: Storage.instance, ready: synced),
-        ]);
+        final decrypted = await store.dispatch(decryptMessages(
+          room,
+          room.messagesNew,
+        )) as List<Message>;
 
-        // mutation filters - handles previously fetched messages
-        messages = await store.dispatch(mutateMessages(
+        // mutation filters - handles editing newly fetched messages
+        final messages = await store.dispatch(mutateMessages(
           messages: room.messagesNew,
-        ));
+        )) as List<Message>;
 
         // update store
         await store.dispatch(setUsers(room.usersNew));
         await store.dispatch(setReactions(reactions: room.reactions));
         await store.dispatch(setRedactions(redactions: room.redactions));
-        await store.dispatch(setReceipts(
-          room: room,
-          receipts: room.readReceipts,
-        ));
-        await store.dispatch(setMessages(
+        await store.dispatch(setReceipts(room: room, receipts: room.readReceipts));
+        await store.dispatch(addMessages(
           room: room,
           messages: messages,
           outbox: room.outbox,
         ));
+        await store.dispatch(addMessagesDecrypted(
+          room: room,
+          messages: decrypted,
+          outbox: room.outbox,
+        ));
 
-        // mutation filters - handles backfilling mutations
+        // mutation filters - handles backfilling mutations for old messages
         await store.dispatch(mutateMessagesRoom(room: room));
 
         // TODO: remove with parsers - clear users from parsed room objects

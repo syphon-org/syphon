@@ -11,11 +11,15 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 /// Encrypt event content with loaded outbound session for room
 ///
@@ -62,6 +66,54 @@ ThunkAction<AppState> encryptMessageContent({
   };
 }
 
+ThunkAction<AppState> decryptMessages(
+  Room room,
+  List<Message> messages,
+) =>
+    (Store<AppState> store) async {
+      try {
+        final roomId = room.id;
+        final verified = store.state.authStore.verified;
+        final decryptedAll = <Message>[];
+
+        bool sentKeyRequest = false;
+
+        // map through each event and decrypt if possible
+        await Future.forEach(messages, (Message message) async {
+          if (message.type != EventTypes.encrypted) {
+            return;
+          }
+
+          try {
+            final decryptedMessage = await store.dispatch(
+              decryptMessage(roomId: roomId, message: message),
+            );
+
+            decryptedAll.add(decryptedMessage);
+          } catch (error) {
+            debugPrint('[decryptMessage] $error');
+
+            if (!sentKeyRequest && verified) {
+              sentKeyRequest = true;
+              debugPrint('[decryptMessage] SENDING KEY REQUEST');
+              store.dispatch(sendKeyRequest(
+                event: message,
+                roomId: room.id,
+              ));
+            }
+          }
+        });
+
+        return decryptedAll;
+      } catch (error) {
+        printDebug(
+          '[decryptMessage(s)] ${room.name ?? 'Unknown Room'} ${error.toString()}',
+        );
+      } finally {
+        store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      }
+    };
+
 ///
 /// Decrypt Message
 ///
@@ -77,11 +129,14 @@ ThunkAction<AppState> decryptMessage({
     // Pull out event data
     final ciphertext = message.ciphertext;
     final identityKey = message.senderKey;
+    final roomMessageIndexs = store.state.cryptoStore.messageSessionIndex[roomId];
 
     // return already decrypted events
     if (ciphertext == null || identityKey == null) {
       return message;
     }
+
+    final identityMessageIndex = roomMessageIndexs?[identityKey] ?? 0;
 
     // Load and deserialize session
     final olm.InboundGroupSession messageSession = await store.dispatch(
@@ -97,20 +152,102 @@ ThunkAction<AppState> decryptMessage({
         .replaceAll(RegExp(r'\n', multiLine: true), '\\n')
         .replaceAll(RegExp(r'\t', multiLine: true), '\\t');
 
-    print("decryptedMessage !!!");
+    final messageIndexNew = payloadDecrypted.message_index;
 
-    // TEST: printJson(json.decode(payloadScrubbed));
+    // protection against replay attacks
+    if (messageIndexNew < identityMessageIndex) {
+      throw '[decryptMessage] messageIndex invalid $messageIndexNew < $identityMessageIndex';
+    }
 
-    final decryptedMessage = Message.fromJson(json.decode(payloadScrubbed));
+    final decryptedJson = json.decode(payloadScrubbed);
+
+    // TODO: TEST:
+    printJson(decryptedJson);
+
+    final decryptedMessage = Message.fromEvent(Event.fromMatrix(decryptedJson));
+
+    // combine all possible decrypted fields with encrypted version of message
+    final combinedMessage = message.copyWith(
+      body: decryptedMessage.body,
+      msgtype: decryptedMessage.msgtype,
+      typeAlt: decryptedMessage.type,
+    );
+
+    // TODO: TEST:
+    printJson(combinedMessage.toJson());
 
     await store.dispatch(saveMessageSessionInbound(
       roomId: roomId,
       identityKey: identityKey,
       session: messageSession,
-      messageIndex: payloadDecrypted.message_index,
+      messageIndex: messageIndexNew,
     ));
 
-    return decryptedMessage;
+    return combinedMessage;
+  };
+}
+
+///
+/// Decrypt Events
+///
+/// Reattribute decrypted events to the timeline
+///
+/// TODO: REMOVE
+@Deprecated(
+  'All encrypted messages are now decrypted post sync in a temp thread '
+  'Remove once recreatable decryption is stable',
+)
+ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
+  return (Store<AppState> store) async {
+    try {
+      final verified = store.state.cryptoStore.deviceKeyVerified;
+
+      // First past to decrypt encrypted events
+      final List<dynamic> timelineEvents = json['timeline']['events'];
+
+      bool sentKeyRequest = false;
+
+      // map through each event and decrypt if possible
+      final decryptTimelineActions = timelineEvents.map((event) async {
+        final eventType = event['type'];
+        switch (eventType) {
+          case EventTypes.encrypted:
+            try {
+              return await store.dispatch(
+                decryptMessageJson(roomId: room.id, event: event),
+              );
+            } catch (error) {
+              debugPrint('[decryptMessageEvent] $error');
+
+              if (!sentKeyRequest && verified) {
+                sentKeyRequest = true;
+                debugPrint('[decryptMessageEvent] SENDING KEY REQUEST');
+                store.dispatch(sendKeyRequest(
+                  event: Message.fromEvent(Event.fromMatrix(event)),
+                  roomId: room.id,
+                ));
+              }
+
+              return event;
+            }
+          default:
+            return event;
+        }
+      });
+
+      // add the decrypted events back to the
+      final decryptedTimelineEvents = await Future.wait(
+        decryptTimelineActions,
+      );
+
+      return decryptedTimelineEvents;
+    } catch (error) {
+      debugPrint(
+        '[decryptEvents] ${room.name ?? 'Unknown Room Name'} ${error.toString()}',
+      );
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
   };
 }
 
@@ -122,6 +259,7 @@ ThunkAction<AppState> decryptMessage({
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
 ///
+@Deprecated('No longer used after decryption fixes branch release - version 0.1.11')
 ThunkAction<AppState> decryptMessageJson({
   required String roomId,
   String eventType = EventTypes.encrypted,
@@ -363,9 +501,30 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 try {
                   // redecrypt events in the room with new key
                   final roomId = eventDecrypted['content']['room_id'];
-                  final Map<String, dynamic> room = {roomId: {}};
 
-                  return await store.dispatch(syncRooms(room));
+                  final room = store.state.roomStore.rooms[roomId];
+                  final messages = store.state.eventStore.messages;
+                  final messagesDecrypted = store.state.eventStore.messagesDecrypted;
+
+                  if (!messages.containsKey(roomId) || room == null) {
+                    return;
+                  }
+
+                  // grab room messages and attempt decrypting ones that have not been
+                  final roomMessages = messages[roomId] ?? [];
+                  final roomDecrypted = messagesDecrypted[roomId] ?? [];
+
+                  final undecrypted = roomMessages.where((msg) => roomDecrypted.contains(msg)).toList();
+
+                  final decrypted = await store.dispatch(decryptMessages(
+                    room,
+                    undecrypted,
+                  )) as List<Message>;
+
+                  return await store.dispatch(addMessagesDecrypted(
+                    room: room,
+                    messages: decrypted,
+                  ));
                 } catch (error) {
                   debugPrint('[syncRooms|error] $error');
                 }

@@ -43,7 +43,9 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       final roomId = (action as AddMessages).roomId;
 
-      final Map<String, List<Message>> messages = Map.from(state.messages);
+      final messages = Map<String, List<Message>>.from(
+        state.messages,
+      );
 
       // convert to map to merge old and new messages based on ids
       final messagesOld = Map<String, Message>.fromIterable(
@@ -81,6 +83,38 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       // otherwise, save messages
       return state.copyWith(messages: messages);
 
+    case AddMessagesDecrypted:
+      final _action = action as AddMessagesDecrypted;
+
+      if (_action.messages.isEmpty) {
+        return state;
+      }
+
+      final roomId = (action as AddMessages).roomId;
+
+      final messages = Map<String, List<Message>>.from(
+        state.messagesDecrypted,
+      );
+
+      // convert to map to merge old and new messages based on ids
+      final messagesOld = Map<String, Message>.fromIterable(
+        messages[roomId] ?? [],
+        key: (msg) => msg.id,
+        value: (msg) => msg,
+      );
+
+      final messagesNew = Map<String, Message>.fromIterable(
+        action.messages,
+        key: (msg) => msg.id,
+        value: (msg) => msg,
+      );
+
+      // prioritize new message data though over the old (invalidates using Set)
+      final messagesAll = messagesOld..addAll(messagesNew);
+      messages[roomId] = messagesAll.values.toList();
+
+      // otherwise, save messages
+      return state.copyWith(messagesDecrypted: messages);
     case SaveOutboxMessage:
       final tempId = (action as SaveOutboxMessage).tempId;
       final message = action.pendingMessage;
