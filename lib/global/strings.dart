@@ -16,6 +16,7 @@ class Strings {
   static final titlePrivacy = tr('title-view-privacy');
   static final titleSettings = tr('title-view-settings');
   static final titleAdvanced = tr('title-view-advanced');
+  static final titleVerification = tr('title-verification');
   static final titleInvite = tr('title-view-invite');
   static final titleChatUsers = tr('title-view-chat-users');
   static final titleChatSettings = tr('title-view-settings-chat');
@@ -97,7 +98,7 @@ class Strings {
   static final buttonTextSeeAllUsers = tr('button-text-see-users'); // ; 'See All Users';
   static final buttonTextLoadCaptcha = tr('button-text-load-captcha');
   static final buttonTextConfirmed = tr('button-text-confirmed');
-  static final buttonTextDeleteKeys = tr('button-delete-key'); //  'delete keys';
+  static final buttonTextDeleteKeys = tr('button-delete-keys'); //  'delete keys';
 
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');

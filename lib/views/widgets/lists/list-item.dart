@@ -17,6 +17,8 @@ enum ListItemUserType {
 /// Still uses userId because users
 /// are still indexed by room
 ///
+/// TODO: rename because user specific, use this to wrap ListTile styling
+///
 class ListItem extends StatelessWidget {
   const ListItem({
     Key? key,

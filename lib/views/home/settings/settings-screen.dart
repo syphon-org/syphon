@@ -11,6 +11,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
@@ -61,6 +62,13 @@ class SettingsScreen extends StatelessWidget {
         onDismiss: () => Navigator.pop(context),
       ),
     );
+  }
+
+  // Preloads owned devices before viewing current device
+  onNavigatePrivacySettings(BuildContext context) {
+    final store = StoreProvider.of<AppState>(context);
+
+    store.dispatch(fetchDevices());
   }
 
   @override
@@ -145,25 +153,28 @@ class SettingsScreen extends StatelessWidget {
                             style: TextStyle(fontSize: 14.0),
                           ),
                         ),
-                        ListTile(
-                          enabled: !props.authLoading,
-                          onTap: () {
-                            Navigator.pushNamed(context, NavigationPaths.settingsPrivacy);
-                          },
-                          contentPadding: Dimensions.listPaddingSettings,
-                          leading: Container(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
-                                Icons.lock,
-                                size: 28,
-                              )),
-                          title: Text(
-                            Strings.listItemSettingsPrivacy,
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                          subtitle: Text(
-                            'Screen Lock Off, Registration Lock Off',
-                            style: Theme.of(context).textTheme.caption,
+                        GestureDetector(
+                          onTapDown: (details) => onNavigatePrivacySettings(context),
+                          child: ListTile(
+                            enabled: !props.authLoading,
+                            onTap: () {
+                              Navigator.pushNamed(context, NavigationPaths.settingsPrivacy);
+                            },
+                            contentPadding: Dimensions.listPaddingSettings,
+                            leading: Container(
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.lock,
+                                  size: 28,
+                                )),
+                            title: Text(
+                              Strings.titlePrivacy,
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            subtitle: Text(
+                              'Screen Lock Off, Registration Lock Off',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
                           ),
                         ),
                         ListTile(

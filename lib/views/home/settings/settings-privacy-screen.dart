@@ -12,8 +12,10 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/keys/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/devices-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
@@ -129,34 +131,38 @@ class PrivacySettingsScreen extends StatelessWidget {
                             width: width,
                             padding: Dimensions.listPadding,
                             child: Text(
-                              'App access',
+                              Strings.titleVerification,
                               textAlign: TextAlign.start,
                               style: Theme.of(context).textTheme.subtitle2,
                             ),
                           ),
                           ListTile(
-                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
-                              'Screen lock',
+                              'Public Device Name',
                             ),
                             subtitle: Text(
-                              'Lock ${Values.appName} access with native device screen lock or fingerprint',
+                              props.sessionName,
                               style: Theme.of(context).textTheme.caption,
-                            ),
-                            trailing: Switch(
-                              value: false,
-                              onChanged: null,
                             ),
                           ),
                           ListTile(
-                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
-                              'Screen lock inactivity timeout',
+                              'Session ID',
                             ),
                             subtitle: Text(
-                              'None',
+                              props.sessionId,
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                          ListTile(
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Session Key',
+                            ),
+                            subtitle: Text(
+                              props.sessionKey,
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ),
@@ -256,6 +262,47 @@ class PrivacySettingsScreen extends StatelessWidget {
                             width: width,
                             padding: Dimensions.listPadding,
                             child: Text(
+                              'App access',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
+                          ),
+                          ListTile(
+                            enabled: false,
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Screen lock',
+                            ),
+                            subtitle: Text(
+                              'Lock ${Values.appName} access with native device screen lock or fingerprint',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                            trailing: Switch(
+                              value: false,
+                              onChanged: null,
+                            ),
+                          ),
+                          ListTile(
+                            enabled: false,
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Screen lock inactivity timeout',
+                            ),
+                            subtitle: Text(
+                              'None',
+                              style: Theme.of(context).textTheme.caption,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    CardSection(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width,
+                            padding: Dimensions.listPadding,
+                            child: Text(
                               'Encryption Keys',
                               textAlign: TextAlign.start,
                               style: Theme.of(context).textTheme.subtitle2,
@@ -338,6 +385,10 @@ class _Props extends Equatable {
   final bool? readReceipts;
   final bool? typingIndicators;
 
+  final String sessionId;
+  final String sessionName;
+  final String sessionKey;
+
   final Function onToggleTypingIndicators;
   final Function onToggleReadReceipts;
   final Function onExportDeviceKey;
@@ -351,6 +402,9 @@ class _Props extends Equatable {
     required this.loading,
     required this.readReceipts,
     required this.typingIndicators,
+    required this.sessionId,
+    required this.sessionName,
+    required this.sessionKey,
     required this.onDisabled,
     required this.onToggleTypingIndicators,
     required this.onToggleReadReceipts,
@@ -366,12 +420,18 @@ class _Props extends Equatable {
         loading,
         typingIndicators,
         readReceipts,
+        sessionId,
+        sessionName,
+        sessionKey,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
         readReceipts: store.state.settingsStore.readReceiptsEnabled,
+        sessionId: store.state.authStore.user.deviceId ?? Values.EMPTY,
+        sessionName: selectCurrentDeviceName(store),
+        sessionKey: selectCurrentSessionKey(store),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onDeactivateAccount: (BuildContext context) async {
@@ -379,7 +439,7 @@ class _Props extends Equatable {
           await store.dispatch(deactivateAccount());
 
           // Prompt for password if an Interactive Auth sessions was started
-          final authSession = store.state.authStore.session;
+          final authSession = store.state.authStore.authSession;
           if (authSession != null) {
             showDialog(
               context: context,

@@ -3,13 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
 
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/store/crypto/events/actions.dart';
-import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
@@ -17,7 +14,6 @@ import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
@@ -29,12 +25,24 @@ class SetEvents {
   SetEvents({this.roomId, this.events});
 }
 
-class SetMessages {
+class AddMessagesDecrypted {
   final String roomId;
   final List<Message> messages;
   final List<Message> outbox;
 
-  SetMessages({
+  AddMessagesDecrypted({
+    required this.roomId,
+    this.messages = const [],
+    this.outbox = const [],
+  });
+}
+
+class AddMessages {
+  final String roomId;
+  final List<Message> messages;
+  final List<Message> outbox;
+
+  AddMessages({
     required this.roomId,
     this.messages = const [],
     this.outbox = const [],
@@ -86,7 +94,7 @@ class DeleteOutboxMessage {
   DeleteOutboxMessage({required this.message});
 }
 
-ThunkAction<AppState> setMessages({
+ThunkAction<AppState> addMessages({
   required Room room,
   List<Message> messages = const [],
   List<Message> outbox = const [],
@@ -95,7 +103,25 @@ ThunkAction<AppState> setMessages({
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        SetMessages(roomId: room.id, messages: messages, outbox: outbox),
+        AddMessages(roomId: room.id, messages: messages, outbox: outbox),
+      );
+    };
+
+///
+/// Add Messages Decrypted
+///
+/// Saves in memory only version of the decrypted message
+///
+ThunkAction<AppState> addMessagesDecrypted({
+  required Room room,
+  required List<Message> messages,
+  List<Message> outbox = const [],
+}) =>
+    (Store<AppState> store) {
+      if (messages.isEmpty && outbox.isEmpty) return;
+
+      return store.dispatch(
+        AddMessagesDecrypted(roomId: room.id, messages: messages, outbox: outbox),
       );
     };
 
@@ -149,7 +175,7 @@ ThunkAction<AppState> loadMessagesCached({
       );
 
       // load cold storage messages to state
-      store.dispatch(SetMessages(roomId: room.id, messages: messagesStored));
+      store.dispatch(AddMessages(roomId: room.id, messages: messagesStored));
     } catch (error) {
       printError('[fetchMessageEvents] $error');
     } finally {
@@ -211,63 +237,6 @@ ThunkAction<AppState> fetchMessageEvents({
       debugPrint('[fetchMessageEvents] error $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
-    }
-  };
-}
-
-/// Decrypt Events
-///
-/// Reattribute decrypted events to the timeline
-ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
-  return (Store<AppState> store) async {
-    try {
-      final verified = store.state.cryptoStore.deviceKeyVerified;
-
-      // First past to decrypt encrypted events
-      final List<dynamic> timelineEvents = json['timeline']['events'];
-
-      bool sentKeyRequest = false;
-
-      // map through each event and decrypt if possible
-      final decryptTimelineActions = timelineEvents.map((event) async {
-        final eventType = event['type'];
-        switch (eventType) {
-          case EventTypes.encrypted:
-            try {
-              return await store.dispatch(
-                decryptMessageEvent(roomId: room.id, event: event),
-              );
-            } catch (error) {
-              debugPrint('[decryptMessageEvent] $error');
-
-              if (!sentKeyRequest && verified) {
-                sentKeyRequest = true;
-                debugPrint('[decryptMessageEvent] SENDING KEY REQUEST');
-                store.dispatch(sendKeyRequest(
-                  event: Event.fromMatrix(event),
-                  roomId: room.id,
-                ));
-              }
-
-              return event;
-            }
-          default:
-            return event;
-        }
-      });
-
-      // add the decrypted events back to the
-      final decryptedTimelineEvents = await Future.wait(
-        decryptTimelineActions,
-      );
-
-      return decryptedTimelineEvents;
-    } catch (error) {
-      debugPrint(
-        '[decryptEvents] ${room.name ?? 'Unknown Room Name'} ${error.toString()}',
-      );
-    } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
     }
   };
 }

@@ -10,21 +10,13 @@ String formatUserId(String displayName, {String homeserver = Values.homeserverDe
   return '@$displayName:$homeserver';
 }
 
-String formatLanguageCode(String? language) {
-  switch ((language ?? Languages.english).toLowerCase()) {
-    case Languages.english:
-      return LangCodes.en;
-    case Languages.dutch:
-      return LangCodes.nl;
-    case Languages.german:
-      return LangCodes.de;
-    case Languages.russian:
-      return LangCodes.ru;
-    case Languages.polish:
-      return LangCodes.pl;
-    default:
-      return LangCodes.en;
+// TODO: remoove after switching to Locale / LanguageCode as source of truth
+String formatLocale(String? language) {
+  if (language!.length > 3) {
+    return Languages.english;
   }
+
+  return language;
 }
 
 // @again_guy:matrix.org -> AG

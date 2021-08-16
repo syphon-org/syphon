@@ -276,7 +276,6 @@ class DeviceViewState extends State<DevicesScreen> {
 
 class _Props extends Equatable {
   final bool loading;
-  final String? session;
   final List<Device> devices;
   final String? currentDeviceId;
 
@@ -286,7 +285,6 @@ class _Props extends Equatable {
   const _Props({
     required this.loading,
     required this.devices,
-    required this.session,
     required this.currentDeviceId,
     required this.onFetchDevices,
     required this.onDeleteDevices,
@@ -301,7 +299,6 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.settingsStore.loading,
         devices: store.state.settingsStore.devices,
-        session: store.state.authStore.session,
         currentDeviceId: store.state.authStore.user.deviceId,
         onDeleteDevices: (BuildContext context, List<Device> devices) async {
           if (devices.isEmpty) return;
@@ -314,7 +311,7 @@ class _Props extends Equatable {
             await store.dispatch(deleteDevices(deviceIds: deviceIds));
           }
 
-          final authSession = store.state.authStore.session;
+          final authSession = store.state.authStore.authSession;
           if (authSession != null) {
             showDialog(
               context: context,

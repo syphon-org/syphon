@@ -146,7 +146,7 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         completed: store.state.authStore.captcha,
         onShowCaptcha: (BuildContext context) async {
-          final authSession = store.state.authStore.session;
+          final authSession = store.state.authStore.authSession;
           await showDialog(
             context: context,
             builder: (context) {

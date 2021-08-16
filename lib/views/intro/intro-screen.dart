@@ -39,6 +39,7 @@ class IntroScreenState extends State<IntroScreen> {
   bool showingTerms = false;
   String loginText = Strings.buttonTextLoginQuestion;
   PageController? pageController;
+  BuildContext? dialogContext;
 
   final List<Widget> sections = [
     LandingPage(),
@@ -66,105 +67,109 @@ class IntroScreenState extends State<IntroScreen> {
     });
   }
 
-  @protected
-  void onMounted() {
-    // init authenticated navigation
+  @override
+  void dispose() {
+    if (dialogContext != null) {
+      Navigator.pop(dialogContext!);
+    }
+    super.dispose();
+  }
 
+  onMounted() {
     final store = StoreProvider.of<AppState>(context);
     final alphaAgreement = store.state.settingsStore.alphaAgreement;
     final double width = MediaQuery.of(context).size.width;
 
-    // TODO: decide on alway showing alpha aggrement on intro
-    if (alphaAgreement == null || true && !showingTerms) {
+    // TODO: decide on always showing alpha aggrement on intro
+    if (alphaAgreement == null || true) {
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (dialogContext) => Container(
-          constraints: BoxConstraints(
-            minWidth: width * 0.9,
-          ),
-          child: SimpleDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+        builder: (dialogContext) {
+          dialogContext = dialogContext;
+          return Container(
+            constraints: BoxConstraints(
+              minWidth: width * 0.9,
             ),
-            title: Text(
-              termsTitle,
-              textAlign: TextAlign.center,
-            ),
-            titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(24),
-                child: Image(
-                  width: 98,
-                  height: 98,
-                  image: AssetImage(Assets.appIconPng),
-                ),
+            child: SimpleDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-              Text(
-                Strings.confirmThanks,
+              title: Text(
+                termsTitle,
                 textAlign: TextAlign.center,
               ),
-              Visibility(
-                visible: !Platform.isIOS,
-                child: Text(
-                  Strings.confirmAlphaVersion,
+              titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 12,
+              ),
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(24),
+                  child: Image(
+                    width: 98,
+                    height: 98,
+                    image: AssetImage(Assets.appIconPng),
+                  ),
+                ),
+                Text(
+                  Strings.confirmThanks,
                   textAlign: TextAlign.center,
                 ),
-              ),
-              Visibility(
-                visible: !Platform.isIOS,
-                child: Text(
-                  Strings.confirmAlphaWarning,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.w100),
+                Visibility(
+                  visible: !Platform.isIOS,
+                  child: Text(
+                    Strings.confirmAlphaVersion,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              Text(
-                Strings.confirmAlphaWarningAlt,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w300),
-              ),
-              Text(
-                Strings.confirmTermsOfServiceConclusion,
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                Strings.confirmAppTermsOfService,
-                style: TextStyle(fontSize: 12),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: TextButton(
-                      onPressed: () async {
-                        await store.dispatch(acceptAgreement());
-                        Navigator.of(dialogContext).pop();
-                      },
-                      child: Text(
-                        Strings.buttonTextAgreement,
-                        style: TextStyle(color: Theme.of(context).primaryColor),
+                Visibility(
+                  visible: !Platform.isIOS,
+                  child: Text(
+                    Strings.confirmAlphaWarning,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.w100),
+                  ),
+                ),
+                Text(
+                  Strings.confirmAlphaWarningAlt,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.w300),
+                ),
+                Text(
+                  Strings.confirmTermsOfServiceConclusion,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  Strings.confirmAppTermsOfService,
+                  style: TextStyle(fontSize: 12),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: TextButton(
+                        onPressed: () async {
+                          await store.dispatch(acceptAgreement());
+                          Navigator.of(dialogContext).pop();
+                        },
+                        child: Text(
+                          Strings.buttonTextAgreement,
+                          style: TextStyle(color: Theme.of(context).primaryColor),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ),
+                  ],
+                )
+              ],
+            ),
+          );
+        },
       );
-
-      setState(() {
-        showingTerms = true;
-      });
     }
   }
 

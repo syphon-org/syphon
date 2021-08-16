@@ -47,12 +47,11 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
-          double height = MediaQuery.of(context).size.height;
+          final double width = MediaQuery.of(context).size.width;
+          final double height = MediaQuery.of(context).size.height;
 
           return Scaffold(
             appBar: AppBar(
-              brightness: Brightness.light,
               elevation: 0,
               backgroundColor: Colors.transparent,
               leading: IconButton(

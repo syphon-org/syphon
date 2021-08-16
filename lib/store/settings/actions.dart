@@ -198,7 +198,7 @@ ThunkAction<AppState> deleteDevice({String? deviceId, bool? disableLoading}) {
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         deviceIds: [deviceId],
-        session: store.state.authStore.session,
+        session: store.state.authStore.authSession,
         userId: store.state.authStore.user.userId,
         authType: MatrixAuthTypes.PASSWORD,
         authValue: currentCredential.value,
@@ -241,7 +241,7 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
         homeserver: store.state.authStore.user.homeserver,
         accessToken: store.state.authStore.user.accessToken,
         deviceIds: deviceIds,
-        session: store.state.authStore.session,
+        session: store.state.authStore.authSession,
         userId: store.state.authStore.user.userId,
         authType: MatrixAuthTypes.PASSWORD,
         authValue: currentCredential.value,
@@ -384,9 +384,8 @@ ThunkAction<AppState> incrementFabLocation() {
 }
 
 ThunkAction<AppState> incrementLanguage(context) {
-  final languages = Languages.displayList;
-
   return (Store<AppState> store) async {
+    final languages = Languages.all;
     final languageIndex = languages.indexWhere(
       (name) => name == store.state.settingsStore.language,
     );

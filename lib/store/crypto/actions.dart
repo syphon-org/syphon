@@ -80,48 +80,54 @@ class SetOneTimeKeysClaimed {
 }
 
 class AddOutboundKeySession {
-  String? identityKey;
-  String? session;
-  AddOutboundKeySession({this.identityKey, this.session});
+  String identityKey;
+  String session;
+  AddOutboundKeySession({
+    required this.identityKey,
+    required this.session,
+  });
 }
 
 class AddInboundKeySession {
-  String? identityKey;
-  String? session;
-  AddInboundKeySession({this.identityKey, this.session});
+  String identityKey;
+  String session;
+  AddInboundKeySession({
+    required this.identityKey,
+    required this.session,
+  });
 }
 
 class AddOutboundMessageSession {
-  String? roomId;
-  String? session;
+  String roomId;
+  String session;
   AddOutboundMessageSession({
-    this.roomId,
-    this.session,
+    required this.roomId,
+    required this.session,
   });
 }
 
 class UpdateMessageSessionOutbound {
-  String? roomId;
-  String? session;
+  String roomId;
+  String session;
   int? messageIndex;
 
   UpdateMessageSessionOutbound({
-    this.roomId,
-    this.session,
+    required this.roomId,
+    required this.session,
     this.messageIndex,
   });
 }
 
 class AddInboundMessageSession {
-  String? roomId;
-  String? identityKey;
-  String? session;
-  int? messageIndex;
+  String roomId;
+  String identityKey;
+  String session;
+  int messageIndex;
   AddInboundMessageSession({
-    this.roomId,
-    this.identityKey,
-    this.session,
-    this.messageIndex,
+    required this.roomId,
+    required this.identityKey,
+    required this.session,
+    required this.messageIndex,
   });
 }
 
@@ -270,11 +276,9 @@ ThunkAction<AppState> generateIdentityKeys() {
       final olmAccount = store.state.cryptoStore.olmAccount!;
 
       final identityKeys = await json.decode(olmAccount.identity_keys());
-      // fingerprint keypair - ed25519
-      final fingerprintKeyName = '${Algorithms.ed25519}:${authUser.deviceId}';
 
-      // identity key pair - curve25519
-      final identityKeyName = '${Algorithms.curve25591}:${authUser.deviceId}';
+      final fingerprintId = Keys.fingerprintId(deviceId: authUser.deviceId);
+      final identityKeyId = Keys.identityKeyId(deviceId: authUser.deviceId);
 
       // formatting json for the signature required by matrix
       final deviceIdentityKeys = {
@@ -284,8 +288,8 @@ ThunkAction<AppState> generateIdentityKeys() {
         ],
         'device_id': authUser.deviceId,
         'keys': {
-          fingerprintKeyName: identityKeys[Algorithms.ed25519],
-          identityKeyName: identityKeys[Algorithms.curve25591],
+          fingerprintId: identityKeys[Algorithms.ed25519],
+          identityKeyId: identityKeys[Algorithms.curve25591],
         },
         'user_id': authUser.userId,
       };
@@ -299,7 +303,7 @@ ThunkAction<AppState> generateIdentityKeys() {
 
       deviceKeysPayload['device_keys']?['signatures'] = {
         authUser.userId: {
-          fingerprintKeyName: deviceKeysSigned,
+          fingerprintId: deviceKeysSigned,
         }
       };
 
@@ -387,10 +391,12 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
       final oneTimeKeyId = '${Algorithms.signedcurve25519}:$keyId';
       oneTimeKeysSignedAll[oneTimeKeyId] = {'key': value};
 
+      final fingerprintKeyId = Keys.fingerprintId(deviceId: authUser.deviceId);
+
       // append signature for new signed key
       oneTimeKeysSignedAll[oneTimeKeyId]['signatures'] = {
         authUser.userId: {
-          '${Algorithms.ed25519}:${authUser.deviceId}': oneTimeKeySigned,
+          fingerprintKeyId: oneTimeKeySigned,
         }
       };
     });
@@ -629,8 +635,8 @@ ThunkAction<AppState> claimOneTimeKeys({
           if (deviceKey.deviceId == currentUser.deviceId) return claims;
 
           // find the identityKey for the device
-          final keyId = Keys.identity(deviceId: deviceKey.deviceId);
-          final identityKey = deviceKey.keys![keyId];
+          final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
+          final identityKey = deviceKey.keys![identityKeyId];
 
           // don't claim one time keys for already claimed devices
           if (outboundKeySessions.containsKey(identityKey)) return claims;
@@ -700,8 +706,8 @@ ThunkAction<AppState> claimOneTimeKeys({
       oneTimekeys.forEach((deviceId, oneTimeKey) {
         final userId = oneTimeKey.userId;
         final deviceKey = store.state.cryptoStore.deviceKeys[userId!]![deviceId]!;
-        final keyId = Keys.identity(deviceId: deviceKey.deviceId);
-        final identityKey = deviceKey.keys![keyId];
+        final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
+        final identityKey = deviceKey.keys![identityKeyId];
 
         store.dispatch(createKeySessionOutbound(
           identityKey: identityKey,
@@ -755,8 +761,8 @@ ThunkAction<AppState> createKeySessionOutbound({
 }
 
 ThunkAction<AppState> saveKeySessionOutbound({
-  String? identityKey,
-  String? session,
+  required String identityKey,
+  required String session,
 }) {
   return (Store<AppState> store) {
     store.dispatch(AddOutboundKeySession(
@@ -767,8 +773,8 @@ ThunkAction<AppState> saveKeySessionOutbound({
 }
 
 ThunkAction<AppState> saveKeySessionInbound({
-  String? session,
-  String? identityKey,
+  required String session,
+  required String identityKey,
 }) {
   return (Store<AppState> store) {
     store.dispatch(AddInboundKeySession(
@@ -779,11 +785,12 @@ ThunkAction<AppState> saveKeySessionInbound({
 }
 
 ThunkAction<AppState> loadKeySessionOutbound({
-  String? identityKey, // sender_key
+  required String identityKey, // sender_key
 }) {
   return (Store<AppState> store) async {
     try {
-      final outboundKeySessionSerialized = store.state.cryptoStore.outboundKeySessions[identityKey!];
+      final outboundKeySessions = store.state.cryptoStore.outboundKeySessions;
+      final outboundKeySessionSerialized = outboundKeySessions[identityKey];
 
       // Deserialize outbound key session with device identity key
       if (outboundKeySessionSerialized != null) {
@@ -809,28 +816,80 @@ ThunkAction<AppState> loadKeySessionOutbound({
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
 ///
+/// TODO:  find the Type 1 Olm key session issue
+///
 ThunkAction<AppState> loadKeySessionInbound({
-  int? type,
-  String? body,
-  String? identityKey, // sender_key
+  required int type,
+  required String body,
+  required String identityKey, // sender_key
 }) {
   return (Store<AppState> store) async {
+    // TEST:
+    // printJson({
+    //   'type': type,
+    //   'body': body,
+    //   'identityKey': identityKey,
+    // });
+
     try {
       // type 1 - attempt to decrypt with an existing session
-      final inboundKeySessionSerialized = store.state.cryptoStore.inboundKeySessions[identityKey!];
+      final inboundSerialized = store.state.cryptoStore.inboundKeySessions[identityKey];
 
-      if (inboundKeySessionSerialized != null) {
-        final inboundKeySession = olm.Session()..unpickle(identityKey, inboundKeySessionSerialized);
+      if (inboundSerialized != null) {
+        final inboundKeySession = olm.Session()..unpickle(identityKey, inboundSerialized);
 
         // This returns a flag indicating whether the message was encrypted using that session.
-        final inboundkeySessionMatch = inboundKeySession.matches_inbound_from(identityKey, body!);
+        final inboundkeySessionMatch = inboundKeySession.matches_inbound_from(identityKey, body);
 
         if (inboundkeySessionMatch) {
           return inboundKeySession;
         }
       }
+
+      throw 'Failed to find inboundKeySession';
     } catch (error) {
-      debugPrint('[loadKeySessionInbound] $error');
+      debugPrint('[loadKeySessionInbound] TYPE 1 error $error');
+    }
+
+    try {
+      // type 1 - attempt to decrypt with an existing session
+      final outbound = store.state.cryptoStore.outboundKeySessions[identityKey];
+
+      if (outbound != null) {
+        final outboundKeySession = olm.Session()..unpickle(identityKey, outbound);
+
+        // This returns a flag indicating whether the message was encrypted using that session.
+        final outboundkeySessionMatch = outboundKeySession.matches_inbound_from(identityKey, body);
+
+        if (outboundkeySessionMatch) {
+          return outboundKeySession;
+        }
+
+        throw 'Failed to find outboundKeySession';
+      }
+    } catch (error) {
+      debugPrint('[outboundKeySession] TYPE 1 error $error');
+    }
+
+    final inboundKeySessionsAll = store.state.cryptoStore.inboundKeySessionsAll[identityKey] ?? [];
+
+    // type 1 - attempt to decrypt with an existing session
+    for (final session in inboundKeySessionsAll) {
+      try {
+        // type 1 - attempt to decrypt with an existing sessions
+        final inboundKeySession = olm.Session()..unpickle(identityKey, session);
+
+        // This returns a flag indicating whether the message was encrypted using that session.
+        final inboundkeySessionMatch = inboundKeySession.matches_inbound_from(identityKey, body);
+
+        if (inboundkeySessionMatch) {
+          return inboundKeySession;
+        }
+
+        throw 'Failed to find inboundKeySession(s)';
+      } catch (error) {
+        debugPrint('[loadKeySessionInboundTesting] TYPE 1 error $error');
+      }
     }
 
     try {
@@ -839,7 +898,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         final account = store.state.cryptoStore.olmAccount!;
 
         // Call olm_create_inbound_session_from using the olm account, and the sender_key and body of the message.
-        newKeySession.create_inbound_from(account, identityKey!, body!);
+        newKeySession.create_inbound_from(account, identityKey, body);
 
         // that the same one-time-key from the sender cannot be reused.
         account.remove_one_time_keys(newKeySession);
@@ -866,38 +925,38 @@ ThunkAction<AppState> loadKeySessionInbound({
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
 ThunkAction<AppState> createMessageSessionInbound({
-  String? roomId,
-  String? identityKey,
-  String? sessionKey,
+  required String roomId,
+  required String identityKey,
+  required String sessionKey,
 }) {
   return (Store<AppState> store) async {
     final inboundMessageSession = olm.InboundGroupSession();
 
-    inboundMessageSession.create(sessionKey!);
+    inboundMessageSession.create(sessionKey);
     final messageIndex = inboundMessageSession.first_known_index();
 
     store.dispatch(AddInboundMessageSession(
       roomId: roomId,
       identityKey: identityKey,
-      session: inboundMessageSession.pickle(roomId!),
       messageIndex: messageIndex,
+      session: inboundMessageSession.pickle(roomId),
     ));
   };
 }
 
 ThunkAction<AppState> loadMessageSessionInbound({
-  String? roomId,
-  String? identityKey,
+  required String roomId,
+  required String identityKey,
 }) {
   return (Store<AppState> store) async {
-    final messageSessions = store.state.cryptoStore.inboundMessageSessions[roomId!];
+    final messageSessions = store.state.cryptoStore.inboundMessageSessions[roomId];
 
     if (messageSessions == null || !messageSessions.containsKey(identityKey)) {
       throw 'Unable to find inbound message session for decryption';
     }
 
     final session = olm.InboundGroupSession();
-    session.unpickle(roomId, messageSessions[identityKey!]!);
+    session.unpickle(roomId, messageSessions[identityKey]!);
     return session;
   };
 }
@@ -907,16 +966,16 @@ ThunkAction<AppState> loadMessageSessionInbound({
 ///
 /// Saves the message session and index after encrypting and sending an event
 ThunkAction<AppState> saveMessageSessionInbound({
-  String? roomId,
-  String? identityKey,
-  olm.InboundGroupSession? session,
-  int? messageIndex,
+  required String roomId,
+  required String identityKey,
+  required olm.InboundGroupSession session,
+  required int messageIndex,
 }) {
   return (Store<AppState> store) async {
     return await store.dispatch(AddInboundMessageSession(
       roomId: roomId,
       identityKey: identityKey,
-      session: session!.pickle(roomId!),
+      session: session.pickle(roomId),
       messageIndex: messageIndex,
     ));
   };
@@ -926,14 +985,21 @@ ThunkAction<AppState> saveMessageSessionInbound({
 /// Outbound Message Session Functionality
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#starting-a-megolm-session
-ThunkAction<AppState> createMessageSessionOutbound({String? roomId}) {
+ThunkAction<AppState> createMessageSessionOutbound({required String roomId}) {
   return (Store<AppState> store) async {
     // Get current user device identity key
     final deviceId = store.state.authStore.user.deviceId;
     final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
-    final deviceKey = deviceKeysOwned[deviceId!]!;
-    final deviceKeyId = '${Algorithms.curve25591}:$deviceId';
-    final identityKeyCurrent = deviceKey.keys![deviceKeyId];
+
+    final currentDeviceKey = deviceKeysOwned[deviceId!]!;
+
+    final identityKeyId = Keys.identityKeyId(deviceId: deviceId);
+
+    final identityKey = currentDeviceKey.keys![identityKeyId];
+
+    if (identityKey == null) {
+      throw 'Failed to extract identityKey for this session';
+    }
 
     final outboundMessageSession = olm.OutboundGroupSession();
     final inboundMessageSession = olm.InboundGroupSession();
@@ -948,12 +1014,12 @@ ThunkAction<AppState> createMessageSessionOutbound({String? roomId}) {
 
     store.dispatch(AddOutboundMessageSession(
       roomId: roomId,
-      session: outboundMessageSession.pickle(roomId!),
+      session: outboundMessageSession.pickle(roomId),
     ));
 
     store.dispatch(AddInboundMessageSession(
       roomId: roomId,
-      identityKey: identityKeyCurrent,
+      identityKey: identityKey,
       session: inboundMessageSession.pickle(roomId),
       messageIndex: inboundMessageSession.first_known_index(),
     ));
@@ -986,8 +1052,8 @@ ThunkAction<AppState> loadMessageSessionOutbound({String? roomId}) {
 }
 
 ThunkAction<AppState> saveMessageSessionOutbound({
-  String? roomId,
-  String? session,
+  required String roomId,
+  required String session,
 }) {
   return (Store<AppState> store) async {
     store.dispatch(AddOutboundMessageSession(
