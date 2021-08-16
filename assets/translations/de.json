@@ -1,4 +1,4 @@
-{ 
+{
     "title-intro": "Willkommen bei {}",
     "header-login": "take back the chat",
     "header-intro": "Privatsphäre und Freiheit\nohne Probleme.",
@@ -29,12 +29,12 @@
     "title-user-verification": "Benutzerüberprüfung",
     "title-confirm-password": "Passwort bestätigen",
     "title-confirm-email": "E-Mail bestätigen",
-    "label-searching": "Suchen...",
-    "label-search-homeservers": "Suche nach Homeservern...",
-    "label-search-user": "Suche nach Benutzer...",
-    "label-search-users": "Suche nach Benutzern...",
+    "label-searching": "Suchen…",
+    "label-search-homeservers": "Suche nach Homeservern…",
+    "label-search-user": "Suche nach Benutzer…",
+    "label-search-users": "Suche nach Benutzern…",
     "label-search-results": "Suchergebnisse",
-    "label-syncing": "Chats synchronisieren...",
+    "label-syncing": "Chats synchronisieren…",
     "label-on": "An",
     "label-off": "Aus",
     "label-email": "Email",
@@ -131,7 +131,7 @@
     "semnatics-image-private-message": "Eine Person hält eine private Nachrichtenblase hoch",
     "semnatics-image-intro-section-third": "Leute, die herumlungern und sich gegenseitig Nachrichten schicken",
     "semnatics-image-intro-section-four": "Zwei unterschiedliche Menschen, die sich selbstbewusst fühlen und gut aussehen",
-    "semantics-image-empty-chat-list": "Mehrere winzige, niedliche Monster, die hinter Laub hervorlugen",
+    "semantics-image-empty-chat-list": "Mehrere winzige, niedliche Monster, die hinter Laub hervorlugen.",
     "semantics-image-terms-of-service": "Hand, die ein Telefon mit aktiviertem Kontrollkästchen für die Nutzungsbedingungen hält",
     "semantics-image-signup-username": "Person stützt den Ellbogen auf den Ausweis",
     "semantics-image-password-reset": "Person, die den Arm auf einen Brief mit einem Kästchen legt"
