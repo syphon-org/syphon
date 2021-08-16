@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/print.dart';
 
 part 'model.g.dart';
 
@@ -11,6 +10,8 @@ class Event {
   final String? type;
   final String? sender;
   final String? stateKey;
+
+  @JsonKey(defaultValue: 0)
   final int timestamp;
 
   @JsonKey(ignore: true)
@@ -32,14 +33,14 @@ class Event {
   });
 
   Event copyWith({
-    id,
-    type,
-    sender,
-    roomId,
-    stateKey,
-    content,
+    String? id,
+    String? type,
+    String? sender,
+    String? roomId,
+    String? stateKey,
     int? timestamp,
-    data,
+    dynamic content,
+    dynamic data,
   }) =>
       Event(
         id: id ?? this.id,

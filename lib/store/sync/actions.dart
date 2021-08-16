@@ -189,6 +189,8 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
     try {
       debugPrint('[fetchSync] *** starting sync *** ');
       store.dispatch(SetSyncing(syncing: true));
+
+      final lastSince = store.state.syncStore.lastSince;
       final isFullSync = forceFull || since == null || store.state.roomStore.rooms.isEmpty;
 
       if (isFullSync) {
@@ -201,7 +203,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'fullState': isFullSync,
-        'since': forceFull ? null : since ?? store.state.syncStore.lastSince,
+        'since': forceFull ? null : since ?? lastSince,
         'filter': null,
         'timeout': store.state.settingsStore.syncPollTimeout
       });
@@ -235,7 +237,6 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
           await store.dispatch(syncRooms(invitesJson));
         }
       }
-
       if (toDeviceJson.isNotEmpty) {
         // Updates for device specific data (mostly room encryption)
         await store.dispatch(syncDevice(toDeviceJson));

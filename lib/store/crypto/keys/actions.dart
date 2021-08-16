@@ -4,9 +4,8 @@ import 'package:crypto/crypto.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/events/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 
 ///
@@ -17,14 +16,14 @@ import 'package:syphon/store/index.dart';
 /// at least one if an event cannot be decrypted
 ///
 ThunkAction<AppState> sendKeyRequest({
-  required Event event,
+  required Message event,
   required String roomId,
 }) {
   return (Store<AppState> store) async {
     try {
-      final String deviceId = event.content['device_id'];
-      final String senderKey = event.content['sender_key'];
-      final String sessionId = event.content['session_id'];
+      final String deviceId = event.deviceId ?? '';
+      final String senderKey = event.senderKey ?? '';
+      final String sessionId = event.sessionId ?? '';
 
       // Just needs to be unique, but different
       final requestId = sha1.convert(utf8.encode(sessionId)).toString();

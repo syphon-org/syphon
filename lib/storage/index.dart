@@ -10,6 +10,7 @@ import 'package:syphon/storage/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
@@ -81,13 +82,11 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
 
     printInfo('initStorage $storageLocation $storageKey');
 
-    Storage.instance = await storageFactory.openDatabase(
+    return Storage.instance = await storageFactory.openDatabase(
       storageLocation,
       codec: codec,
       version: version,
     );
-
-    return Storage.instance;
   } catch (error) {
     printDebug('[initStorage] $error');
     return null;
@@ -155,11 +154,17 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     final redactions = await loadRedactions(storage: storage);
 
     final messages = <String, List<Message>>{};
+    final decrypted = <String, List<Message>>{};
     final reactions = <String, List<Reaction>>{};
     final receipts = <String, Map<String, ReadReceipt>>{};
 
     for (final Room room in rooms.values) {
       messages[room.id] = await loadMessages(
+        room.messageIds,
+        storage: storage,
+      );
+
+      decrypted[room.id] = await loadDecrypted(
         room.messageIds,
         storage: storage,
       );
@@ -176,16 +181,17 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
     }
 
     return {
-      'auth': auth,
-      'users': users.isNotEmpty ? users : null,
-      'rooms': rooms,
-      'media': media,
-      'crypto': crypto,
-      'messages': messages.isNotEmpty ? messages : null,
-      'reactions': reactions,
-      'redactions': redactions,
-      'receipts': receipts,
-      'settings': settings,
+      StorageKeys.AUTH: auth,
+      StorageKeys.USERS: users,
+      StorageKeys.ROOMS: rooms,
+      StorageKeys.MEDIA: media,
+      StorageKeys.CRYPTO: crypto,
+      StorageKeys.MESSAGES: messages,
+      StorageKeys.DECRYPTED: decrypted,
+      StorageKeys.REACTIONS: reactions,
+      StorageKeys.REDACTIONS: redactions,
+      StorageKeys.RECEIPTS: receipts,
+      StorageKeys.SETTINGS: settings,
     };
   } catch (error) {
     printError('[loadStorage]  ${error.toString()}');

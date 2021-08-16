@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
 
 ///
 /// Save Receipts
@@ -22,8 +20,8 @@ Future<void> saveReceipts(
   // TODO: the initial sync loads way too many read receipts
   if (!ready) return;
 
-  return await storage!.transaction((txn) async {
-    for (String key in receipts!.keys) {
+  return storage!.transaction((txn) async {
+    for (final key in receipts!.keys) {
       final record = store.record(key);
       await record.put(txn, json.encode(receipts[key]));
     }

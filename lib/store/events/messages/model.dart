@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 
@@ -6,12 +7,18 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Message extends Event {
+  // message drafting
+  @JsonKey(defaultValue: false)
   final bool pending;
+  @JsonKey(defaultValue: false)
   final bool syncing;
+  @JsonKey(defaultValue: false)
   final bool failed;
 
   // message editing
+  @JsonKey(defaultValue: false)
   final bool edited;
+  @JsonKey(defaultValue: false)
   final bool replacement;
 
   final String? relatedEventId;
@@ -31,21 +38,24 @@ class Message extends Event {
   final int? received;
 
   // Encrypted Messages only
+  final String? typeAlt; // inner type of decrypted event
   final String? ciphertext;
   final String? algorithm;
   final String? sessionId;
   final String? senderKey; // Curve25519 device key which initiated the session
+  final String? deviceId;
 
   const Message({
-    id,
-    userId,
-    roomId,
-    type,
-    sender,
-    stateKey,
-    content,
-    timestamp = 0,
+    String? id,
+    String? userId,
+    String? roomId,
+    String? type,
+    String? sender,
+    String? stateKey,
+    dynamic content,
+    int timestamp = 0,
     this.body,
+    this.typeAlt,
     this.msgtype,
     this.format,
     this.filename,
@@ -53,6 +63,7 @@ class Message extends Event {
     this.received,
     this.ciphertext,
     this.senderKey,
+    this.deviceId,
     this.algorithm,
     this.sessionId,
     this.relatedEventId,
@@ -77,20 +88,23 @@ class Message extends Event {
 
   @override
   Message copyWith({
-    id,
-    type,
-    sender,
-    roomId,
-    stateKey,
-    content,
-    timestamp,
-    body,
+    String? id,
+    String? type,
+    String? sender,
+    String? roomId,
+    String? stateKey,
+    dynamic content,
+    dynamic data,
+    int? timestamp,
+    String? body,
+    String? typeAlt, // inner type of decrypted event
     msgtype,
     format,
     filename,
     formattedBody,
     ciphertext,
     senderKey,
+    deviceId,
     algorithm,
     sessionId,
     received,
@@ -102,11 +116,11 @@ class Message extends Event {
     relatedEventId,
     edits,
     reactions,
-    data,
   }) =>
       Message(
         id: id ?? this.id,
         type: type ?? this.type,
+        typeAlt: typeAlt ?? this.typeAlt,
         sender: sender ?? this.sender,
         roomId: roomId ?? this.roomId,
         stateKey: stateKey ?? this.stateKey,
@@ -120,6 +134,7 @@ class Message extends Event {
         received: received ?? this.received,
         ciphertext: ciphertext ?? this.ciphertext,
         senderKey: senderKey ?? this.senderKey,
+        deviceId: deviceId ?? this.deviceId,
         algorithm: algorithm ?? this.algorithm,
         sessionId: sessionId ?? this.sessionId,
         syncing: syncing ?? this.syncing,
@@ -134,8 +149,7 @@ class Message extends Event {
 
   @override
   Map<String, dynamic> toJson() => _$MessageToJson(this);
-  factory Message.fromJson(Map<String, dynamic> json) =>
-      _$MessageFromJson(json);
+  factory Message.fromJson(Map<String, dynamic> json) => _$MessageFromJson(json);
 
   factory Message.fromEvent(Event event) {
     try {
@@ -158,6 +172,7 @@ class Message extends Event {
         userId: event.userId,
         roomId: event.roomId,
         type: event.type,
+        typeAlt: null,
         sender: event.sender,
         stateKey: event.stateKey,
         timestamp: event.timestamp,
@@ -171,6 +186,7 @@ class Message extends Event {
         algorithm: event.content['algorithm'],
         senderKey: event.content['sender_key'],
         sessionId: event.content['session_id'],
+        deviceId: event.content['device_id'],
         replacement: replacement,
         relatedEventId: relatedEventId,
         received: DateTime.now().millisecondsSinceEpoch,
@@ -180,6 +196,7 @@ class Message extends Event {
         edited: false,
       );
     } catch (error) {
+      printError('[Message.fromEvent] ${error.toString()}');
       return Message(
         id: event.id,
         userId: event.userId,

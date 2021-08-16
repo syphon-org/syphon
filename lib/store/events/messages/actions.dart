@@ -47,30 +47,15 @@ ThunkAction<AppState> mutateMessages({List<Message>? messages}) {
 /// the required, necessary mutations by matrix after the
 /// message has been sent (such as reactions, redactions, and edits)
 ///
-ThunkAction<AppState> mutateMessagesAll({List<String>? messages}) {
+ThunkAction<AppState> mutateMessagesAll() {
   return (Store<AppState> store) async {
-    final reactions = store.state.eventStore.reactions;
-    final redactions = store.state.eventStore.redactions;
-    final roomMessages = store.state.eventStore.messages;
+    final rooms = store.state.roomStore.roomList;
 
-    await Future.wait(roomMessages.entries.map((entry) async {
+    await Future.wait(rooms.map((room) async {
       try {
-        final roomId = entry.key;
-        final allMessages = entry.value;
-
-        final revisedMessages = await compute(reviseMessagesBackground, {
-          'reactions': reactions,
-          'redactions': redactions,
-          'messages': allMessages,
-        });
-
-        await store.dispatch(setMessages(
-          room: Room(id: roomId),
-          messages: revisedMessages,
-        ));
+        await store.dispatch(mutateMessagesRoom(room: room));
       } catch (error) {
-        // TODO: Error handling for mutating messages per room
-        debugPrint(error.toString());
+        debugPrint('[mutateMessagesAll] error ${room.id} ${error.toString()}');
       }
     }));
   };
@@ -88,18 +73,38 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
     if (room.messagesNew.isEmpty) return;
 
     final messages = store.state.eventStore.messages[room.id];
+    final decrypted = store.state.eventStore.messagesDecrypted[room.id];
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
 
-    final revisedMessages = await compute(reviseMessagesBackground, {
-      'reactions': reactions,
-      'redactions': redactions,
-      'messages': messages,
-    });
+    final mutations = [
+      compute(reviseMessagesBackground, {
+        'reactions': reactions,
+        'redactions': redactions,
+        'messages': messages,
+      })
+    ];
 
-    await store.dispatch(setMessages(
+    if (room.encryptionEnabled) {
+      mutations.add(compute(reviseMessagesBackground, {
+        'reactions': reactions,
+        'redactions': redactions,
+        'messages': decrypted,
+      }));
+    }
+
+    final messagesLists = await Future.wait(mutations);
+
+    if (room.encryptionEnabled) {
+      await store.dispatch(addMessagesDecrypted(
+        room: Room(id: room.id),
+        messages: messagesLists[1],
+      ));
+    }
+
+    await store.dispatch(addMessages(
       room: Room(id: room.id),
-      messages: revisedMessages,
+      messages: messagesLists[0],
     ));
   };
 }

@@ -98,7 +98,7 @@ class Strings {
   static final buttonTextSeeAllUsers = tr('button-text-see-users'); // ; 'See All Users';
   static final buttonTextLoadCaptcha = tr('button-text-load-captcha');
   static final buttonTextConfirmed = tr('button-text-confirmed');
-  static final buttonTextDeleteKeys = tr('button-delete-key'); //  'delete keys';
+  static final buttonTextDeleteKeys = tr('button-delete-keys'); //  'delete keys';
 
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');

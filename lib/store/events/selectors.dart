@@ -1,13 +1,37 @@
-import 'dart:async';
-
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 List<Message> roomMessages(AppState state, String? roomId) {
-  return List.from(state.eventStore.messages[roomId] ?? []);
+  final room = state.roomStore.rooms[roomId] ?? Room(id: '');
+  var messages = (state.eventStore.messages[roomId] ?? []).toList();
+
+  // If encryption is enabled, combine the decrypted event cache
+  if (room.encryptionEnabled) {
+    final decrypted = state.eventStore.messagesDecrypted[roomId] ?? [];
+
+    final messagesNormal = Map<String, Message>.fromIterable(
+      messages,
+      key: (msg) => msg.id,
+      value: (msg) => msg,
+    );
+
+    final messagesDecrypted = Map<String, Message>.fromIterable(
+      decrypted,
+      key: (msg) => msg.id,
+      value: (msg) => msg,
+    );
+
+    messages = messagesNormal.keys
+        .map((id) =>
+            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? Message())
+        .toList();
+  }
+
+  return messages;
 }
 
 List<Message> roomOutbox(AppState state, String? roomId) {
@@ -15,7 +39,7 @@ List<Message> roomOutbox(AppState state, String? roomId) {
 }
 
 Map<String, List<Reaction>> selectReactions(AppState state) {
-  return (state.eventStore.reactions as Map<String, List<Reaction>>? ?? []) as Map<String, List<Reaction>>;
+  return state.eventStore.reactions;
 }
 
 // remove messages from blocked users
@@ -140,15 +164,21 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   return messagesMap;
 }
 
-Message? latestMessage(List<Message> messages) {
+Message? latestMessage(List<Message> messages, {Room? room, List<Message>? decrypted}) {
   if (messages.isEmpty) {
     return null;
   }
 
-  return messages.fold(
+  final Message latestMessage = messages.fold(
     messages[0],
-    (latest, msg) => msg.timestamp > latest!.timestamp ? msg : latest,
+    (latest, msg) => msg.timestamp > latest.timestamp ? msg : latest,
   );
+
+  if (room != null && decrypted != null && room.encryptionEnabled && decrypted.isNotEmpty) {
+    return decrypted.firstWhere((msg) => msg.id == latestMessage.id, orElse: () => latestMessage);
+  }
+
+  return latestMessage;
 }
 
 List<Message> latestMessages(List<Message> messages) {

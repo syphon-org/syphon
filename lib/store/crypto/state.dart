@@ -46,6 +46,9 @@ class CryptoStore extends Equatable {
 
   final Map<String, OneTimeKey> oneTimeKeysClaimed;
 
+  // TODO: testing only
+  final Map<String, List<String>> inboundKeySessionsAll;
+
   const CryptoStore({
     this.olmAccount,
     this.olmAccountKey,
@@ -56,6 +59,7 @@ class CryptoStore extends Equatable {
     this.outboundMessageSessions = const {}, // messages //
     this.inboundKeySessions = const {}, // one-time device keys
     this.outboundKeySessions = const {}, // one-time device keys
+    this.inboundKeySessionsAll = const {},
     this.messageSessionIndex = const {},
     this.deviceKeys = const {},
     this.deviceKeysOwned = const {},
@@ -73,6 +77,7 @@ class CryptoStore extends Equatable {
         messageSessionIndex,
         inboundMessageSessions,
         outboundMessageSessions,
+        inboundKeySessionsAll,
         inboundKeySessions,
         outboundKeySessions,
         deviceKeys,
@@ -91,6 +96,7 @@ class CryptoStore extends Equatable {
     Map<String, Map<String, String>>? inboundMessageSessions,
     Map<String, String>? outboundMessageSessions,
     Map<String, String>? inboundKeySessions,
+    Map<String, List<String>>? inboundKeySessionsAll,
     Map<String, String>? outboundKeySessions,
     Map<String, DeviceKey>? deviceKeysOwned,
     Map<String, Map<String, DeviceKey>>? deviceKeys,
@@ -104,6 +110,7 @@ class CryptoStore extends Equatable {
         outboundMessageSessions: outboundMessageSessions ?? this.outboundMessageSessions,
         messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
         inboundKeySessions: inboundKeySessions ?? this.inboundKeySessions,
+        inboundKeySessionsAll: inboundKeySessionsAll ?? this.inboundKeySessionsAll,
         outboundKeySessions: outboundKeySessions ?? this.outboundKeySessions,
         deviceKeys: deviceKeys ?? this.deviceKeys,
         deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,

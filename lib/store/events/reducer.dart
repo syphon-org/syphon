@@ -1,14 +1,13 @@
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
 import './actions.dart';
-import '../events/model.dart';
 import './state.dart';
-import 'package:syphon/store/events/messages/model.dart';
 
-EventStore eventReducer(
-    [EventStore state = const EventStore(), dynamic action]) {
+EventStore eventReducer([EventStore state = const EventStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetEvents:
       final roomId = action.roomId;
@@ -21,7 +20,7 @@ EventStore eventReducer(
         state.reactions,
       );
 
-      for (Reaction reaction in action.reactions ?? []) {
+      for (final Reaction reaction in action.reactions ?? []) {
         final reactionEventId = reaction.relEventId;
         final exists = reactionsUpdated.containsKey(reactionEventId);
 
@@ -37,14 +36,65 @@ EventStore eventReducer(
 
       return state.copyWith(reactions: reactionsUpdated);
 
-    case SetMessages:
+    case AddMessages:
+      final _action = action as AddMessages;
       if (action.messages.isEmpty) {
         return state;
       }
 
-      final roomId = (action as SetMessages).roomId;
+      final roomId = _action.roomId;
 
-      final Map<String, List<Message>> messages = Map.from(state.messages);
+      final messages = Map<String, List<Message>>.from(
+        state.messages,
+      );
+
+      // convert to map to merge old and new messages based on ids
+      final messagesOld = Map<String, Message>.fromIterable(
+        messages[roomId] ?? [],
+        key: (msg) => msg.id,
+        value: (msg) => msg,
+      );
+
+      final messagesNew = Map<String, Message>.fromIterable(
+        action.messages,
+        key: (msg) => msg.id,
+        value: (msg) => msg,
+      );
+
+      // prioritize new message data though over the old (invalidates using Map overwrite)
+      final messagesAll = messagesOld..addAll(messagesNew);
+      messages[roomId] = messagesAll.values.toList();
+
+      // remove locally saved outbox messages if they've now been received from a server
+      if (state.outbox.containsKey(roomId) && state.outbox[roomId]!.isNotEmpty) {
+        final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
+
+        // removed based on eventId, not tempId
+        outbox.removeWhere(
+          (tempId, outmessage) => messagesAll.containsKey(outmessage.id),
+        );
+
+        final outboxNew = Map<String, Map<String, Message>>.from(state.outbox);
+
+        outboxNew[roomId] = outbox;
+
+        return state.copyWith(messages: messages, outbox: outboxNew);
+      }
+
+      // otherwise, save messages
+      return state.copyWith(messages: messages);
+
+    case AddMessagesDecrypted:
+      final _action = action as AddMessagesDecrypted;
+      final roomId = _action.roomId;
+
+      if (_action.messages.isEmpty) {
+        return state;
+      }
+
+      final messages = Map<String, List<Message>>.from(
+        state.messagesDecrypted,
+      );
 
       // convert to map to merge old and new messages based on ids
       final messagesOld = Map<String, Message>.fromIterable(
@@ -63,26 +113,8 @@ EventStore eventReducer(
       final messagesAll = messagesOld..addAll(messagesNew);
       messages[roomId] = messagesAll.values.toList();
 
-      // remove locally saved outbox messages if they've now been received from a server
-      if (state.outbox.containsKey(roomId) &&
-          state.outbox[roomId]!.isNotEmpty) {
-        final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
-
-        // removed based on eventId, not tempId
-        outbox.removeWhere(
-          (tempId, outmessage) => messagesAll.containsKey(outmessage.id),
-        );
-
-        final outboxNew = Map<String, Map<String, Message>>.from(state.outbox);
-
-        outboxNew[roomId] = outbox;
-
-        return state.copyWith(messages: messages, outbox: outboxNew);
-      }
-
       // otherwise, save messages
-      return state.copyWith(messages: messages);
-
+      return state.copyWith(messagesDecrypted: messages);
     case SaveOutboxMessage:
       final tempId = (action as SaveOutboxMessage).tempId;
       final message = action.pendingMessage;
