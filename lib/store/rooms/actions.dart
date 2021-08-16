@@ -129,14 +129,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           messages: room.messagesNew,
         )) as List<Message>;
 
-        // save normal or encrypted messages
-        await store.dispatch(addMessages(
-          room: room,
-          messages: messages,
-          outbox: room.outbox,
-        ));
-
-        // update encrypted messages
+        // update encrypted messages (updating before normal messages prevents flicker)
         if (room.encryptionEnabled) {
           final decrypted = await store.dispatch(decryptMessages(
             room,
@@ -154,6 +147,13 @@ ThunkAction<AppState> syncRooms(Map roomData) {
             outbox: room.outbox,
           ));
         }
+
+        // save normal or encrypted messages
+        await store.dispatch(addMessages(
+          room: room,
+          messages: messages,
+          outbox: room.outbox,
+        ));
 
         // TODO: remove with parsers - clear users from parsed room objects
         room = room.copyWith(

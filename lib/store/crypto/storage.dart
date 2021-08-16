@@ -15,7 +15,7 @@ Future<void> saveCrypto(
 }) async {
   final store = StoreRef<String, String>(StorageKeys.CRYPTO);
 
-  return await storage.transaction((txn) async {
+  return storage.transaction((txn) async {
     final record = store.record(StorageKeys.CRYPTO);
     await record.put(txn, json.encode(cryptoStore));
   });

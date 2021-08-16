@@ -90,6 +90,10 @@ storageMiddleware(Database storage) {
         final _action = action as AddMessages;
         saveMessages(_action.messages, storage: storage);
         break;
+      case AddMessagesDecrypted:
+        final _action = action as AddMessagesDecrypted;
+        saveDecrypted(_action.messages, storage: storage);
+        break;
       case SetThemeType:
       case SetPrimaryColor:
       case SetAvatarShape:

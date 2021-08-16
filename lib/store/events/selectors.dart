@@ -175,7 +175,7 @@ Message? latestMessage(List<Message> messages, {Room? room, List<Message>? decry
   );
 
   if (room != null && decrypted != null && room.encryptionEnabled && decrypted.isNotEmpty) {
-    return decrypted.firstWhere((msg) => msg.id == latestMessage.id, orElse: () => Message());
+    return decrypted.firstWhere((msg) => msg.id == latestMessage.id, orElse: () => latestMessage);
   }
 
   return latestMessage;

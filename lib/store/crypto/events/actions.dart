@@ -142,7 +142,7 @@ ThunkAction<AppState> decryptMessage({
       return message;
     }
 
-    final identityMessageIndex = roomMessageIndexs?[identityKey] ?? 0;
+    final identityMessageIndex = roomMessageIndexs?[identityKey] ?? -1;
 
     // Load and deserialize session
     final olm.InboundGroupSession messageSession = await store.dispatch(
@@ -161,14 +161,11 @@ ThunkAction<AppState> decryptMessage({
     final messageIndexNew = payloadDecrypted.message_index;
 
     // protection against replay attacks
-    if (messageIndexNew <= identityMessageIndex) {
+    if (messageIndexNew <= identityMessageIndex && identityMessageIndex != 0) {
       throw '[decryptMessage] messageIndex invalid $messageIndexNew <= $identityMessageIndex';
     }
 
     final decryptedJson = json.decode(payloadScrubbed);
-
-    // TODO: TEST:
-    printJson(decryptedJson);
 
     final decryptedMessage = Message.fromEvent(Event.fromMatrix(decryptedJson));
 
@@ -179,9 +176,6 @@ ThunkAction<AppState> decryptMessage({
       typeAlt: decryptedMessage.type,
     );
 
-    // TODO: TEST:
-    printJson(combinedMessage.toJson());
-
     await store.dispatch(saveMessageSessionInbound(
       roomId: roomId,
       identityKey: identityKey,
@@ -190,123 +184,6 @@ ThunkAction<AppState> decryptMessage({
     ));
 
     return combinedMessage;
-  };
-}
-
-///
-/// Decrypt Events
-///
-/// Reattribute decrypted events to the timeline
-///
-/// TODO: REMOVE
-@Deprecated(
-  'All encrypted messages are now decrypted post sync in a temp thread '
-  'Remove once recreatable decryption is stable',
-)
-ThunkAction<AppState> decryptEvents(Room room, Map<String, dynamic> json) {
-  return (Store<AppState> store) async {
-    try {
-      final verified = store.state.cryptoStore.deviceKeyVerified;
-
-      // First past to decrypt encrypted events
-      final List<dynamic> timelineEvents = json['timeline']['events'];
-
-      bool sentKeyRequest = false;
-
-      // map through each event and decrypt if possible
-      final decryptTimelineActions = timelineEvents.map((event) async {
-        final eventType = event['type'];
-        switch (eventType) {
-          case EventTypes.encrypted:
-            try {
-              return await store.dispatch(
-                decryptMessageJson(roomId: room.id, event: event),
-              );
-            } catch (error) {
-              debugPrint('[decryptMessageEvent] $error');
-
-              if (!sentKeyRequest && verified) {
-                sentKeyRequest = true;
-                debugPrint('[decryptMessageEvent] SENDING KEY REQUEST');
-                store.dispatch(sendKeyRequest(
-                  event: Message.fromEvent(Event.fromMatrix(event)),
-                  roomId: room.id,
-                ));
-              }
-
-              return event;
-            }
-          default:
-            return event;
-        }
-      });
-
-      // add the decrypted events back to the
-      final decryptedTimelineEvents = await Future.wait(
-        decryptTimelineActions,
-      );
-
-      return decryptedTimelineEvents;
-    } catch (error) {
-      debugPrint(
-        '[decryptEvents] ${room.name ?? 'Unknown Room Name'} ${error.toString()}',
-      );
-    } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
-    }
-  };
-}
-
-///
-/// Decrypt Message Event
-///
-/// Decrypt Encrypted Message event content and return
-/// a newly parsed decrypted, and seemingly unencrypted, Message
-///
-/// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
-///
-/// TODO: REMOVE
-@Deprecated('No longer used after decryption fixes branch release - version 0.1.11')
-ThunkAction<AppState> decryptMessageJson({
-  required String roomId,
-  String eventType = EventTypes.encrypted,
-  Map event = const {},
-}) {
-  return (Store<AppState> store) async {
-    // Pull out event data
-    final Map content = event['content'];
-    final String identityKey = content['sender_key'];
-
-    // return already decrypted events
-    if (content['ciphertext'] == null) {
-      return event;
-    }
-
-    // Load and deserialize session
-    final olm.InboundGroupSession messageSession = await store.dispatch(
-      loadMessageSessionInbound(
-        roomId: roomId,
-        identityKey: identityKey,
-      ),
-    );
-
-    // Decrypt the payload with the session
-    final payloadDecrypted = messageSession.decrypt(content['ciphertext']);
-    final payloadScrubbed = payloadDecrypted.plaintext
-        .replaceAll(RegExp(r'\n', multiLine: true), '\\n')
-        .replaceAll(RegExp(r'\t', multiLine: true), '\\t');
-
-    // Return the content to be sent or processed
-    event['content'] = json.decode(payloadScrubbed)['content'];
-
-    await store.dispatch(saveMessageSessionInbound(
-      roomId: roomId,
-      identityKey: identityKey,
-      session: messageSession,
-      messageIndex: payloadDecrypted.message_index,
-    ));
-
-    return event;
   };
 }
 
@@ -393,13 +270,17 @@ ThunkAction<AppState> encryptKeyContent({
   };
 }
 
-/// Decrypting toDevice event content with loaded
+///
+/// Decrypting Key Event
+///
+/// Decrypt to_device event content with loaded
 /// key session (outbound | inbound) for that device
 ///
 /// NOTE: Utilizes available one time keys pre-fetched
 /// and claimed by the current user
 ///
 /// https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
+///
 ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
   return (Store<AppState> store) async {
     // Get current user device identity key
@@ -420,8 +301,8 @@ ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
     final olm.Session keySession = await store.dispatch(
       loadKeySessionInbound(
         identityKey: identityKeySender,
-        type: ciphertextContent['type'],
-        body: ciphertextContent['body'],
+        type: ciphertextContent['type'] as int,
+        body: ciphertextContent['body'] as String,
       ),
     );
 
@@ -430,6 +311,12 @@ ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
       ciphertextContent['type'],
       ciphertextContent['body'],
     );
+
+    // save the outbound session after decrypting event
+    await store.dispatch(saveKeySessionInbound(
+      session: keySession.pickle(identityKeySender),
+      identityKey: identityKeySender,
+    ));
 
     // Return the content to be sent or processed
     return json.decode(decryptedPayload);
@@ -495,7 +382,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
             try {
               // printJson(toDeviceRaw); // TODO: test olm recovery
 
-              final eventDecrypted = await store.dispatch(
+              final Map eventDecrypted = await store.dispatch(
                 decryptKeyEvent(event: event),
               );
 

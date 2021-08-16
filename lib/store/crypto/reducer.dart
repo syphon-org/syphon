@@ -38,7 +38,7 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
         state.outboundKeySessions,
       );
 
-      outboundSessions.putIfAbsent(_action.identityKey, () => _action.session);
+      outboundSessions.addAll({_action.identityKey: _action.session});
 
       return state.copyWith(
         outboundKeySessions: outboundSessions,
@@ -49,10 +49,21 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
         state.inboundKeySessions,
       );
 
-      inboundKeySessions.putIfAbsent(_action.identityKey, () => _action.session);
+      final inboundKeySessionsAll = Map<String, List<String>>.from(
+        state.inboundKeySessionsAll,
+      );
+
+      inboundKeySessions.addAll({_action.identityKey: _action.session});
+
+      inboundKeySessionsAll.update(
+        _action.identityKey,
+        (value) => [...value, _action.session],
+        ifAbsent: () => [_action.session],
+      );
 
       return state.copyWith(
         inboundKeySessions: inboundKeySessions,
+        inboundKeySessionsAll: inboundKeySessionsAll,
       );
     case AddOutboundMessageSession:
       final _action = action as AddOutboundMessageSession;
@@ -85,12 +96,12 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       messageSessionsInbound.putIfAbsent(action.roomId, () => <String, String>{});
 
       // add or update inbound message session by roomId + identity
-      final Map<String, String> messageSessionInboundNew = {_action.identityKey: _action.session};
+      final messageSessionInboundNew = {_action.identityKey: _action.session};
 
       messageSessionsInbound[_action.roomId]!.addAll(messageSessionInboundNew);
 
       // add or update inbound message index by roomId + identity
-      final Map<String, int> messageSessionIndexUpdated = {_action.identityKey: _action.messageIndex};
+      final messageSessionIndexUpdated = {_action.identityKey: _action.messageIndex};
 
       messageSessionIndex[action.roomId]!.addAll(messageSessionIndexUpdated);
 

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
@@ -108,7 +109,7 @@ class ChatScreenState extends State<ChatScreen> {
       setState(() {
         mediumType = MediumType.encryption;
       });
-      // onAttemptDecryption(props); TODO: uncomment
+      onAttemptDecryption(props);
     }
 
     if (props.messagesLength! < 10) {
@@ -145,14 +146,23 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   onCheatCode(_Props props) async {
-    onAttemptDecryption(props);
+    final store = StoreProvider.of<AppState>(context);
+    final keys = store.state.cryptoStore.inboundKeySessions;
+    final keys2 = store.state.cryptoStore.outboundKeySessions;
+    final keys3 = store.state.cryptoStore.inboundKeySessionsAll;
+
+    try {
+      printJson(jsonDecode(jsonEncode(keys)));
+      printJson(jsonDecode(jsonEncode(keys2)));
+      printJson(jsonDecode(jsonEncode(keys3)));
+    } catch (error) {
+      printDebug(error.toString());
+    }
   }
 
   onAttemptDecryption(_Props props) async {
     final store = StoreProvider.of<AppState>(context);
     final room = props.room;
-
-    printDebug("HELLOOOO?");
 
     // dont attempt to decrypt if encryption is not enabled
     if (!room.encryptionEnabled) {
@@ -161,7 +171,6 @@ class ChatScreenState extends State<ChatScreen> {
 
     final hasDecryptable = selectHasDecryptableMessages(store, props.room.id);
 
-    print("WHAT? $hasDecryptable");
     // dont attempt to decrypt if all messages are already decrypted
     if (!hasDecryptable) {
       return;

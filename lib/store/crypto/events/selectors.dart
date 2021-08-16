@@ -13,6 +13,5 @@ bool selectHasDecryptableMessages(Store<AppState> store, String roomId) {
 
   final hasEncrypted = ids.firstWhere((id) => !decryptedIds.contains(id), orElse: () => null);
 
-  print('HOW IS THIS DONE $hasEncrypted');
   return hasEncrypted != null;
 }

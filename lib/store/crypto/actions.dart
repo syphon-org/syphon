@@ -816,35 +816,80 @@ ThunkAction<AppState> loadKeySessionOutbound({
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
 ///
+/// TODO:  find the Type 1 Olm key session issue
+///
 ThunkAction<AppState> loadKeySessionInbound({
-  int? type,
-  String? body,
-  String? identityKey, // sender_key
+  required int type,
+  required String body,
+  required String identityKey, // sender_key
 }) {
   return (Store<AppState> store) async {
     // TEST:
-    printJson({
-      'type': type,
-      'body': body,
-      'identityKey': identityKey,
-    });
+    // printJson({
+    //   'type': type,
+    //   'body': body,
+    //   'identityKey': identityKey,
+    // });
 
     try {
       // type 1 - attempt to decrypt with an existing session
-      final inboundKeySessionSerialized = store.state.cryptoStore.inboundKeySessions[identityKey!];
+      final inboundSerialized = store.state.cryptoStore.inboundKeySessions[identityKey];
 
-      if (inboundKeySessionSerialized != null) {
-        final inboundKeySession = olm.Session()..unpickle(identityKey, inboundKeySessionSerialized);
+      if (inboundSerialized != null) {
+        final inboundKeySession = olm.Session()..unpickle(identityKey, inboundSerialized);
 
         // This returns a flag indicating whether the message was encrypted using that session.
-        final inboundkeySessionMatch = inboundKeySession.matches_inbound_from(identityKey, body!);
+        final inboundkeySessionMatch = inboundKeySession.matches_inbound_from(identityKey, body);
 
         if (inboundkeySessionMatch) {
           return inboundKeySession;
         }
       }
+
+      throw 'Failed to find inboundKeySession';
     } catch (error) {
-      debugPrint('[loadKeySessionInbound] $error');
+      debugPrint('[loadKeySessionInbound] TYPE 1 error $error');
+    }
+
+    try {
+      // type 1 - attempt to decrypt with an existing session
+      final outbound = store.state.cryptoStore.outboundKeySessions[identityKey];
+
+      if (outbound != null) {
+        final outboundKeySession = olm.Session()..unpickle(identityKey, outbound);
+
+        // This returns a flag indicating whether the message was encrypted using that session.
+        final outboundkeySessionMatch = outboundKeySession.matches_inbound_from(identityKey, body);
+
+        if (outboundkeySessionMatch) {
+          return outboundKeySession;
+        }
+
+        throw 'Failed to find outboundKeySession';
+      }
+    } catch (error) {
+      debugPrint('[outboundKeySession] TYPE 1 error $error');
+    }
+
+    final inboundKeySessionsAll = store.state.cryptoStore.inboundKeySessionsAll[identityKey] ?? [];
+
+    // type 1 - attempt to decrypt with an existing session
+    for (final session in inboundKeySessionsAll) {
+      try {
+        // type 1 - attempt to decrypt with an existing sessions
+        final inboundKeySession = olm.Session()..unpickle(identityKey, session);
+
+        // This returns a flag indicating whether the message was encrypted using that session.
+        final inboundkeySessionMatch = inboundKeySession.matches_inbound_from(identityKey, body);
+
+        if (inboundkeySessionMatch) {
+          return inboundKeySession;
+        }
+
+        throw 'Failed to find inboundKeySession(s)';
+      } catch (error) {
+        debugPrint('[loadKeySessionInboundTesting] TYPE 1 error $error');
+      }
     }
 
     try {
@@ -853,7 +898,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         final account = store.state.cryptoStore.olmAccount!;
 
         // Call olm_create_inbound_session_from using the olm account, and the sender_key and body of the message.
-        newKeySession.create_inbound_from(account, identityKey!, body!);
+        newKeySession.create_inbound_from(account, identityKey, body);
 
         // that the same one-time-key from the sender cannot be reused.
         account.remove_one_time_keys(newKeySession);
