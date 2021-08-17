@@ -376,7 +376,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                               enabled: !props.loading,
                               contentPadding: contentPadding,
                               title: Text(
-                                'Toggle Direct Room',
+                                'Toggle Direct Chat',
                                 style: Theme.of(context).textTheme.subtitle1,
                               ),
                               trailing: Switch(
