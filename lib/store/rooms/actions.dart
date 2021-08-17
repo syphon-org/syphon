@@ -641,11 +641,6 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool enabled = false}) {
 
       // Refresh room information with toggle enabled
       await store.dispatch(fetchRoom(room.id, direct: true));
-
-      // WARN: toggles the rooms as "direct" within Syphon
-      // There's got to be a better
-      // TODO: remove this in version 0.1.7
-      // await store.dispatch(fetchDirectRooms());
     } catch (error) {
       debugPrint('[toggleDirectRoom] $error');
     } finally {

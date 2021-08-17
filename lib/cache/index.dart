@@ -11,6 +11,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:syphon/storage/index.dart';
 
 class Cache {
   // cache key identifiers
@@ -68,6 +69,10 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
       cacheFactory = getDatabaseFactorySqflite(
         sqflite_ffi.databaseFactoryFfi,
       );
+      // TODO: TEMP: remove after 0.1.11 release
+      if (!(await checkKey(Storage.keyLocation))) {
+        await (cacheFactory as DatabaseFactory).deleteDatabase(cacheLocation);
+      }
     }
 
     if (cacheFactory == null) {
