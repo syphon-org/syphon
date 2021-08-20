@@ -298,24 +298,16 @@ ThunkAction<AppState> encryptKeyContent({
     ));
 
     // return the content to be sent or processed
-    if (payloadEncrypted.type == 0) {
-      return {
-        'algorithm': Algorithms.olmv1,
-        'sender_key': currentIdentityKeys[Algorithms.curve25591],
-        'ciphertext': {
-          // receiver identity key
-          identityKey: {
-            'body': payloadEncrypted.body,
-            'type': payloadEncrypted.type,
-          }
-        },
-      };
-    }
-
     return {
       'algorithm': Algorithms.olmv1,
       'sender_key': currentIdentityKeys[Algorithms.curve25591],
-      'ciphertext': payloadEncrypted.body,
+      'ciphertext': {
+        // receiver identity key
+        identityKey: {
+          'body': payloadEncrypted.body,
+          'type': payloadEncrypted.type,
+        }
+      },
     };
   };
 }
