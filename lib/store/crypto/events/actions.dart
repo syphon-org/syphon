@@ -72,6 +72,54 @@ ThunkAction<AppState> encryptMessageContent({
 /// Decrypt a series of messages found in the normal
 /// events cache
 ///
+ThunkAction<AppState> backfillDecryptMessages(
+  String roomId,
+) {
+  return (Store<AppState> store) async {
+    final room = store.state.roomStore.rooms[roomId];
+
+    if (room == null) {
+      throw 'No room found for room ID $roomId';
+    }
+
+    try {
+      // redecrypt events in the room with new key
+      final messages = store.state.eventStore.messages;
+
+      if (!messages.containsKey(roomId)) {
+        throw 'No messages found to decrypt for this room';
+      }
+
+      // grab room messages and attempt decrypting ones that have not been
+      final messagesDecrypted = store.state.eventStore.messagesDecrypted;
+      final roomMessages = messages[roomId] ?? [];
+      final roomDecrypted = messagesDecrypted[roomId] ?? [];
+
+      final undecrypted = roomMessages.where((msg) => roomDecrypted.contains(msg)).toList();
+
+      final decrypted = await store.dispatch(decryptMessages(
+        room,
+        undecrypted,
+      )) as List<Message>;
+
+      return await store.dispatch(addMessagesDecrypted(
+        room: room,
+        messages: decrypted,
+      ));
+    } catch (error) {
+      debugPrint('[syncDevice] parsing $error');
+    } finally {
+      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+    }
+  };
+}
+
+///
+/// Decrypt Message(s)
+///
+/// Decrypt a series of messages found in the normal
+/// events cache
+///
 ThunkAction<AppState> decryptMessages(
   Room room,
   List<Message> messages,
@@ -195,8 +243,7 @@ ThunkAction<AppState> decryptMessage({
 /// https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
 ThunkAction<AppState> encryptKeyContent({
   String? roomId,
-  String? recipient,
-  DeviceKey? recipientKeys, // recipient
+  DeviceKey? recipientKey,
   String eventType = EventTypes.roomKey,
   Map? content,
 }) {
@@ -208,17 +255,17 @@ ThunkAction<AppState> encryptKeyContent({
     final currentFingerprint = currentIdentityKeys[Algorithms.ed25519];
 
     // pull recipient key data and id
-    final fingerprintId = Keys.fingerprintId(deviceId: recipientKeys!.deviceId);
-    final identityKeyId = Keys.identityKeyId(deviceId: recipientKeys.deviceId);
+    final fingerprintId = Keys.fingerprintId(deviceId: recipientKey!.deviceId);
+    final identityKeyId = Keys.identityKeyId(deviceId: recipientKey.deviceId);
 
-    final fingerprint = recipientKeys.keys![fingerprintId]; // recipient
-    final identityKey = recipientKeys.keys![identityKeyId]!; // recipient
+    final fingerprint = recipientKey.keys![fingerprintId]; // recipient
+    final identityKey = recipientKey.keys![identityKeyId]!; // recipient
 
     // create payload for olm key sharing per spec
     final payload = {
       'sender': userCurrent.userId,
       'sender_device': userCurrent.deviceId,
-      'recipient': recipient,
+      'recipient': recipientKey.userId,
       'recipient_keys': {
         Algorithms.ed25519: fingerprint,
       },
@@ -229,22 +276,25 @@ ThunkAction<AppState> encryptKeyContent({
       'content': content,
     };
 
-    // all olm sessions should already be created
+    printJson(payload);
+
+    // all olm sessions should already be created or received
     // before sending a room key event to devices
     // load and deserialize session
-    final olm.Session outboundKeySession = await store.dispatch(
+    final olm.Session keySession = await store.dispatch(
       loadKeySessionOutbound(identityKey: identityKey),
     );
 
     // canoncially encode the json for encryption
     final payloadEncoded = canonicalJson.encode(payload);
     final payloadSerialized = utf8.decode(payloadEncoded);
-    final payloadEncrypted = outboundKeySession.encrypt(payloadSerialized);
+    final payloadEncrypted = keySession.encrypt(payloadSerialized);
 
     // save the outbound session after processing content
-    await store.dispatch(saveKeySessionOutbound(
+    store.dispatch(saveKeySession(
       identityKey: identityKey,
-      session: outboundKeySession.pickle(identityKey),
+      sessionId: keySession.session_id(),
+      session: keySession.pickle(identityKey),
     ));
 
     // return the content to be sent or processed
@@ -312,10 +362,10 @@ ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
       ciphertextContent['body'],
     );
 
-    // save the outbound session after decrypting event
-    await store.dispatch(saveKeySessionInbound(
-      session: keySession.pickle(identityKeySender),
+    await store.dispatch(saveKeySession(
       identityKey: identityKeySender,
+      sessionId: keySession.session_id(),
+      session: keySession.pickle(identityKeySender),
     ));
 
     // Return the content to be sent or processed
@@ -380,7 +430,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
         switch (eventType) {
           case EventTypes.encrypted:
             try {
-              // printJson(toDeviceRaw); // TODO: test olm recovery
+              printJson(toDeviceRaw); // TODO: test olm recovery
 
               final Map eventDecrypted = await store.dispatch(
                 decryptKeyEvent(event: event),
@@ -393,39 +443,9 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                   identityKey: identityKeySender,
                 ));
 
-                try {
-                  // redecrypt events in the room with new key
-                  final roomId = eventDecrypted['content']['room_id'];
-                  final messages = store.state.eventStore.messages;
-                  final room = store.state.roomStore.rooms[roomId];
+                final roomId = eventDecrypted['content']['room_id'];
 
-                  if (!messages.containsKey(roomId)) {
-                    throw 'No messages found to decrypt for this room';
-                  }
-
-                  if (room == null) {
-                    throw 'No room found for room ID $roomId';
-                  }
-
-                  // grab room messages and attempt decrypting ones that have not been
-                  final messagesDecrypted = store.state.eventStore.messagesDecrypted;
-                  final roomMessages = messages[roomId] ?? [];
-                  final roomDecrypted = messagesDecrypted[roomId] ?? [];
-
-                  final undecrypted = roomMessages.where((msg) => roomDecrypted.contains(msg)).toList();
-
-                  final decrypted = await store.dispatch(decryptMessages(
-                    room,
-                    undecrypted,
-                  )) as List<Message>;
-
-                  return await store.dispatch(addMessagesDecrypted(
-                    room: room,
-                    messages: decrypted,
-                  ));
-                } catch (error) {
-                  debugPrint('[syncDevice] parsing $error');
-                }
+                backfillDecryptMessages(roomId);
               }
             } catch (error) {
               debugPrint('[decryptKeyEvent|error] $error');

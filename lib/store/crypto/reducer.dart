@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:syphon/global/print.dart';
+
 import './actions.dart';
 import './state.dart';
 
@@ -32,38 +36,36 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       return state.copyWith(
         oneTimeKeysClaimed: action.oneTimeKeys,
       );
-    case AddOutboundKeySession:
-      final _action = action as AddOutboundKeySession;
-      final outboundSessions = Map<String, String>.from(
-        state.outboundKeySessions,
+    case SaveKeySession:
+      final _action = action as SaveKeySession;
+
+      final keySessions = Map<String, Map<String, String>>.from(
+        state.keySessions,
       );
 
-      outboundSessions.addAll({_action.identityKey: _action.session});
+      if (_action.session.isNotEmpty) {
+        print('[SaveKeySession] UPDATING ${_action.identityKey}, ${_action.session.substring(0, 16)}');
+      }
 
-      return state.copyWith(
-        outboundKeySessions: outboundSessions,
-      );
-    case AddInboundKeySession:
-      final _action = action as AddInboundKeySession;
-      final inboundKeySessions = Map<String, String>.from(
-        state.inboundKeySessions,
-      );
+      final sessionId = _action.sessionId;
+      final sessionNew = _action.session;
 
-      final inboundKeySessionsAll = Map<String, List<String>>.from(
-        state.inboundKeySessionsAll,
-      );
-
-      inboundKeySessions.addAll({_action.identityKey: _action.session});
-
-      inboundKeySessionsAll.update(
+      keySessions.update(
         _action.identityKey,
-        (value) => [...value, _action.session],
-        ifAbsent: () => [_action.session],
+        (session) => session
+          ..update(
+            sessionId,
+            (value) => sessionNew,
+            ifAbsent: () => sessionNew,
+          ),
+        ifAbsent: () => {sessionId: sessionNew},
       );
 
+      print('[SaveKeySession] CURRENT ${_action.identityKey}');
+      printJson(json.decode(json.encode(keySessions)));
+
       return state.copyWith(
-        inboundKeySessions: inboundKeySessions,
-        inboundKeySessionsAll: inboundKeySessionsAll,
+        keySessions: keySessions,
       );
     case AddOutboundMessageSession:
       final _action = action as AddOutboundMessageSession;

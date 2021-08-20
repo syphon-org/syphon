@@ -1,7 +1,9 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 extension Chunked on String {
   String chunk(int size) {
@@ -19,7 +21,7 @@ extension Chunked on String {
   }
 }
 
-String selectCurrentSessionKey(Store<AppState> store) {
+String selectCurrentUserSessionKey(Store<AppState> store) {
   final curretnDeviceId = store.state.authStore.user.deviceId;
   final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
 
@@ -33,4 +35,134 @@ String selectCurrentSessionKey(Store<AppState> store) {
   }
 
   return Values.UNKNOWN;
+}
+
+List<String> selectKeySessions(Store<AppState> store, String identityKey) {
+  final keySessions = store.state.cryptoStore.keySessions;
+
+  final keySessionsIdentity = keySessions[identityKey] ?? {};
+
+  return keySessionsIdentity.values.toList();
+}
+
+List<DeviceKey> filterDevicesWithoutMessageSessions(Store<AppState> store, Room room) {
+  final roomUserIds = room.userIds;
+  final currentUser = store.state.authStore.user;
+  final deviceKeys = store.state.cryptoStore.deviceKeys;
+  final messageSessionsInbound = store.state.cryptoStore.inboundMessageSessions;
+  final messageSessionsOutbound = store.state.cryptoStore.outboundMessageSessions;
+
+  // get deviceKeys for every user present in the chat
+  final List<DeviceKey> roomDeviceKeys = List.from(
+    roomUserIds.map((userId) => (deviceKeys[userId] ?? {}).values).expand((x) => x),
+  );
+
+  final devieKeysWithMessageSession = roomDeviceKeys.where(
+    (deviceKey) {
+      // the currentUser device will always create a message session for itself
+      if (deviceKey.deviceId == currentUser.deviceId) return false;
+
+      print(
+        '[filterDevicesWithoutMessageSessions] checking room ID does not exist ${!messageSessionsOutbound.containsKey(room.id)}',
+      );
+
+      // has no outbound sessions, so every device in the chat is without a message session
+      if (!messageSessionsOutbound.containsKey(room.id)) return true;
+
+      // find the identityKey for the device
+      final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
+      final identityKey = deviceKey.keys![identityKeyId];
+
+      final hasMessageSession = !messageSessionsInbound.containsKey(identityKey);
+
+      print(
+        '[filterDevicesWithoutMessageSessions] checking keySessions for $identityKey, ${hasMessageSession.toString()}',
+      );
+
+      messageSessionsInbound.keys.toList().forEach((key) {
+        print('[filterDevicesWithoutMessageSessions] key ${key.toString()}');
+      });
+
+      // Key Session / Olm session already established
+      if (!hasMessageSession) return true;
+
+      return false;
+    },
+  );
+
+  return devieKeysWithMessageSession.toList();
+}
+
+List<DeviceKey> filterDevicesWithKeySessions(Store<AppState> store, Room room) {
+  final roomUserIds = room.userIds;
+  final currentUser = store.state.authStore.user;
+  final deviceKeys = store.state.cryptoStore.deviceKeys;
+  final keySessions = store.state.cryptoStore.keySessions;
+
+  // get deviceKeys for every user present in the chat
+  final List<DeviceKey> roomDeviceKeys = List.from(
+    roomUserIds.map((userId) => (deviceKeys[userId] ?? {}).values).expand((x) => x),
+  );
+
+  final devieKeysWithSession = roomDeviceKeys.where(
+    (deviceKey) {
+      if (deviceKey.deviceId == currentUser.deviceId) return false;
+
+      // find the identityKey for the device
+      final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
+      final identityKey = deviceKey.keys![identityKeyId];
+
+      print(
+        '[filterDeviceKeyWithSessions] checking keySessions for $identityKey, ${keySessions.containsKey(identityKey).toString()}',
+      );
+
+      keySessions.keys.toList().forEach((key) {
+        print('[filterDeviceKeyWithSessions] key ${key.toString()}');
+      });
+
+      // Key Session / Olm session already established
+      if (keySessions.containsKey(identityKey)) return true;
+
+      return false;
+    },
+  );
+
+  return devieKeysWithSession.toList();
+}
+
+List<DeviceKey> filterDevicesWithoutKeySessions(Store<AppState> store, Room room) {
+  final roomUserIds = room.userIds;
+  final currentUser = store.state.authStore.user;
+  final deviceKeys = store.state.cryptoStore.deviceKeys;
+  final keySessions = store.state.cryptoStore.keySessions;
+
+  // get deviceKeys for every user present in the chat
+  final List<DeviceKey> roomDeviceKeys = List.from(
+    roomUserIds.map((userId) => (deviceKeys[userId] ?? {}).values).expand((x) => x),
+  );
+
+  final devieKeysWithSession = roomDeviceKeys.where(
+    (deviceKey) {
+      if (deviceKey.deviceId == currentUser.deviceId) return false;
+
+      // find the identityKey for the device
+      final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
+      final identityKey = deviceKey.keys![identityKeyId];
+
+      print(
+        '[filterDeviceKeyWithSessions] checking keySessions for $identityKey, ${keySessions.containsKey(identityKey).toString()}',
+      );
+
+      keySessions.keys.toList().forEach((key) {
+        print('[filterDeviceKeyWithSessions] key ${key.toString()}');
+      });
+
+      // Key Session / Olm session already established
+      if (keySessions.containsKey(identityKey)) return false;
+
+      return true;
+    },
+  );
+
+  return devieKeysWithSession.toList();
 }
