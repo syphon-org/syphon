@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:syphon/global/print.dart';
-
 import './actions.dart';
 import './state.dart';
 
@@ -43,13 +39,10 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
         state.keySessions,
       );
 
-      if (_action.session.isNotEmpty) {
-        print('[SaveKeySession] UPDATING ${_action.identityKey}, ${_action.session.substring(0, 16)}');
-      }
-
       final sessionId = _action.sessionId;
       final sessionNew = _action.session;
 
+      // Update sessions by their ID for a certain identityKey (sender_key)
       keySessions.update(
         _action.identityKey,
         (session) => session
@@ -60,9 +53,6 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
           ),
         ifAbsent: () => {sessionId: sessionNew},
       );
-
-      print('[SaveKeySession] CURRENT ${_action.identityKey}');
-      printJson(json.decode(json.encode(keySessions)));
 
       return state.copyWith(
         keySessions: keySessions,

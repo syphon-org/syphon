@@ -1,4 +1,3 @@
-import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/selectors.dart';

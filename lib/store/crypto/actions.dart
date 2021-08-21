@@ -307,9 +307,6 @@ ThunkAction<AppState> generateIdentityKeys() {
         deviceKeysPayload['device_keys'],
       );
 
-      print('[generateIdentityKeys] ADDING FOLLOWING DEVICE KEYS OWNED');
-      printJson({authUser.deviceId!: deviceKeysOwned});
-
       await store.dispatch(SetDeviceKeysOwned(
         deviceKeysOwned: {authUser.deviceId!: deviceKeysOwned},
       ));
@@ -481,9 +478,6 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         'one_time_keys': newOneTimeKeys,
       };
 
-      printDebug('[updateOneTimeKeys] UPDATING TO FOLLOWING');
-      printJson(payload);
-
       final data = await MatrixApi.uploadKeys(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -497,7 +491,6 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       }
 
       printInfo('[updateOneTimeKeys] successfully uploaded oneTimeKeys');
-      printJson(data);
 
       // save account state after successful upload
       olmAccount.mark_keys_as_published();
@@ -778,7 +771,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
       final deviceId = store.state.authStore.user.deviceId!;
       final keySessions = selectKeySessions(store, identityKey);
 
-      print('loadKeySessionOutbound checking outbound for $identityKey');
+      printInfo('[loadKeySessionOutbound] checking outbounds for $identityKey');
 
       for (final session in keySessions.reversed) {
         try {
@@ -789,16 +782,16 @@ ThunkAction<AppState> loadKeySessionOutbound({
 
           final keySessionType = keySession.encrypt_message_type();
 
-          print('loadKeySessionOutbound found $keySessionId for $identityKey of type $keySessionType');
+          printInfo('[loadKeySessionOutbound] found $keySessionId for $identityKey of type $keySessionType');
           return keySession;
         } catch (error) {
           printInfo('[loadKeySessionOutbound] unsuccessful $identityKey $error');
         }
       }
 
-      return null;
+      throw 'No valid sessions found $identityKey';
     } catch (error) {
-      printError('[loadKeySessionOutbound] error $identityKey $error');
+      printError('[loadKeySessionOutbound] failure $identityKey $error');
       return null;
     }
   };

@@ -255,9 +255,6 @@ ThunkAction<AppState> encryptKeyContent({
     final currentIdentityKeys = await json.decode(userOlmAccount.identity_keys());
     final currentFingerprint = currentIdentityKeys[Algorithms.ed25519];
 
-    print('[encryptKeyContent] CURRENT IDENTITY KEYS');
-    printJson(currentIdentityKeys);
-
     // pull recipient key data and id
     final fingerprintId = Keys.fingerprintId(deviceId: recipientKey!.deviceId);
     final identityKeyId = Keys.identityKeyId(deviceId: recipientKey.deviceId);
@@ -425,9 +422,6 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
         switch (eventType) {
           case EventTypes.encrypted:
             try {
-              print('[TESTING] Olm Recovery');
-              printJson(toDeviceRaw); // TODO: test olm recovery
-
               final Map eventDecrypted = await store.dispatch(
                 decryptKeyEvent(event: event),
               );

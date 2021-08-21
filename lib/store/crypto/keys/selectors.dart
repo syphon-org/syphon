@@ -62,28 +62,15 @@ List<DeviceKey> filterDevicesWithoutMessageSessions(Store<AppState> store, Room 
       // the currentUser device will always create a message session for itself
       if (deviceKey.deviceId == currentUser.deviceId) return false;
 
-      print(
-        '[filterDevicesWithoutMessageSessions] checking room ID does not exist ${!messageSessionsOutbound.containsKey(room.id)}',
-      );
-
       // has no outbound sessions, so every device in the chat is without a message session
       if (!messageSessionsOutbound.containsKey(room.id)) return true;
 
       // find the identityKey for the device
       final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
       final identityKey = deviceKey.keys![identityKeyId];
-
       final hasMessageSession = !messageSessionsInbound.containsKey(identityKey);
 
-      print(
-        '[filterDevicesWithoutMessageSessions] checking keySessions for $identityKey, ${hasMessageSession.toString()}',
-      );
-
-      messageSessionsInbound.keys.toList().forEach((key) {
-        print('[filterDevicesWithoutMessageSessions] key ${key.toString()}');
-      });
-
-      // Key Session / Olm session already established
+      // key Session / Olm session already established
       if (!hasMessageSession) return true;
 
       return false;
@@ -106,19 +93,12 @@ List<DeviceKey> filterDevicesWithKeySessions(Store<AppState> store, Room room) {
 
   final devieKeysWithSession = roomDeviceKeys.where(
     (deviceKey) {
+      // the currentUser device doesn't need a key session for itself
       if (deviceKey.deviceId == currentUser.deviceId) return false;
 
       // find the identityKey for the device
       final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
       final identityKey = deviceKey.keys![identityKeyId];
-
-      print(
-        '[filterDevicesWithKeySessions] checking keySessions for $identityKey, ${keySessions.containsKey(identityKey).toString()}',
-      );
-
-      keySessions.keys.toList().forEach((key) {
-        print('[filterDevicesWithKeySessions] key ${key.toString()}');
-      });
 
       // Key Session / Olm session already established
       if (keySessions.containsKey(identityKey)) return true;
@@ -143,19 +123,12 @@ List<DeviceKey> filterDevicesWithoutKeySessions(Store<AppState> store, Room room
 
   final devieKeysWithSession = roomDeviceKeys.where(
     (deviceKey) {
+      // the currentUser device doesn't need a key session for itself
       if (deviceKey.deviceId == currentUser.deviceId) return false;
 
       // find the identityKey for the device
       final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
       final identityKey = deviceKey.keys![identityKeyId];
-
-      print(
-        '[filterDevicesWithoutKeySessions] checking keySessions for $identityKey, ${keySessions.containsKey(identityKey).toString()}',
-      );
-
-      keySessions.keys.toList().forEach((key) {
-        print('[filterDevicesWithoutKeySessions] key ${key.toString()}');
-      });
 
       // Key Session / Olm session already established
       if (keySessions.containsKey(identityKey)) return false;
