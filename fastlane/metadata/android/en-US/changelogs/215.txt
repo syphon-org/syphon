@@ -1,0 +1,17 @@
+0.1.12
+
+🔮 New Features:
+- Multi-Account Support 🎉
+- Advanced Color Customization
+- Customizable FAB Settings
+- Manual Verification Data Exposed
+- New and Improved Languages Through Weblate!
+  - German, Portuguese, Dutch, Czech, Slovak, and more!
+
+🐛 Bug Fixes
+- Issue with profile preview modal loading indefinitely
+- Issue with decrypting events for new chats
+- Issue with completing multi step onboarding flows
+
+📐 Refactoring
+- Lots!
