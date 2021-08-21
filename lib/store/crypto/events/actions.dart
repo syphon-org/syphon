@@ -76,13 +76,12 @@ ThunkAction<AppState> backfillDecryptMessages(
   String roomId,
 ) {
   return (Store<AppState> store) async {
-    final room = store.state.roomStore.rooms[roomId];
-
-    if (room == null) {
-      throw 'No room found for room ID $roomId';
-    }
-
     try {
+      final rooms = store.state.roomStore.rooms;
+
+      if (!rooms.containsKey(roomId)) {
+        throw 'No room found for room ID $roomId';
+      }
       // redecrypt events in the room with new key
       final messages = store.state.eventStore.messages;
 
@@ -91,6 +90,7 @@ ThunkAction<AppState> backfillDecryptMessages(
       }
 
       // grab room messages and attempt decrypting ones that have not been
+      final room = rooms[roomId]!;
       final messagesDecrypted = store.state.eventStore.messagesDecrypted;
       final roomMessages = messages[roomId] ?? [];
       final roomDecrypted = messagesDecrypted[roomId] ?? [];
@@ -107,9 +107,7 @@ ThunkAction<AppState> backfillDecryptMessages(
         messages: decrypted,
       ));
     } catch (error) {
-      debugPrint('[syncDevice] parsing $error');
-    } finally {
-      store.dispatch(UpdateRoom(id: room.id, syncing: false));
+      printError('[syncDevice] error $error');
     }
   };
 }
@@ -426,14 +424,16 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 decryptKeyEvent(event: event),
               );
 
-              if (EventTypes.roomKey == eventDecrypted['type']) {
+              final eventType = eventDecrypted['type'] as String;
+
+              if (EventTypes.roomKey == eventType) {
+                final roomId = eventDecrypted['content']['room_id'] as String;
+
                 // save decrepted user session key under roomId
                 await store.dispatch(saveSessionKey(
                   event: eventDecrypted,
                   identityKey: identityKeySender,
                 ));
-
-                final roomId = eventDecrypted['content']['room_id'];
 
                 backfillDecryptMessages(roomId);
               }
