@@ -1,2 +1,2 @@
-versionName=0.1.11
-versionCode=210
+versionName=0.1.12
+versionCode=215
