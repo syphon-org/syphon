@@ -60,3 +60,6 @@ Flutter.podspec
 
 # flutter version mgmt
 .fvm/flutter_sdk
+
+# example payloads
+*.example.json

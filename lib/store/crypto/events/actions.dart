@@ -243,16 +243,20 @@ ThunkAction<AppState> decryptMessage({
 /// https://matrix.org/docs/spec/client_server/latest#m-room-encrypted
 ThunkAction<AppState> encryptKeyContent({
   String? roomId,
+  Map? content,
   DeviceKey? recipientKey,
   String eventType = EventTypes.roomKey,
-  Map? content,
 }) {
   return (Store<AppState> store) async {
     // pull current user identity keys out of olm account
     final userCurrent = store.state.authStore.user;
+    final deviceId = userCurrent.deviceId!;
     final userOlmAccount = store.state.cryptoStore.olmAccount!;
     final currentIdentityKeys = await json.decode(userOlmAccount.identity_keys());
     final currentFingerprint = currentIdentityKeys[Algorithms.ed25519];
+
+    print('[encryptKeyContent] CURRENT IDENTITY KEYS');
+    printJson(currentIdentityKeys);
 
     // pull recipient key data and id
     final fingerprintId = Keys.fingerprintId(deviceId: recipientKey!.deviceId);
@@ -294,7 +298,7 @@ ThunkAction<AppState> encryptKeyContent({
     store.dispatch(saveKeySession(
       identityKey: identityKey,
       sessionId: keySession.session_id(),
-      session: keySession.pickle(identityKey),
+      session: keySession.pickle(deviceId),
     ));
 
     // return the content to be sent or processed
@@ -302,7 +306,7 @@ ThunkAction<AppState> encryptKeyContent({
       'algorithm': Algorithms.olmv1,
       'sender_key': currentIdentityKeys[Algorithms.curve25591],
       'ciphertext': {
-        // receiver identity key
+        // recipient identity key
         identityKey: {
           'body': payloadEncrypted.body,
           'type': payloadEncrypted.type,
@@ -336,28 +340,27 @@ ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
 
     // Extract the payload meant for this device by identity
     final Map content = event['content'];
+    final Map ciphertextContent = content['ciphertext'][identityKey];
+    final int type = ciphertextContent['type'] as int;
+    final String body = ciphertextContent['body'] as String;
     final identityKeySender = content['sender_key'];
-    final ciphertextContent = content['ciphertext'][identityKey];
 
     // Load and deserialize or create session
     final olm.Session keySession = await store.dispatch(
       loadKeySessionInbound(
         identityKey: identityKeySender,
-        type: ciphertextContent['type'] as int,
-        body: ciphertextContent['body'] as String,
+        type: type,
+        body: body,
       ),
     );
 
     // Decrypt the payload with the session for device identity
-    final decryptedPayload = keySession.decrypt(
-      ciphertextContent['type'],
-      ciphertextContent['body'],
-    );
+    final decryptedPayload = keySession.decrypt(type, body);
 
     await store.dispatch(saveKeySession(
       identityKey: identityKeySender,
       sessionId: keySession.session_id(),
-      session: keySession.pickle(identityKeySender),
+      session: keySession.pickle(deviceId),
     ));
 
     // Return the content to be sent or processed
@@ -422,6 +425,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
         switch (eventType) {
           case EventTypes.encrypted:
             try {
+              print('[TESTING] Olm Recovery');
               printJson(toDeviceRaw); // TODO: test olm recovery
 
               final Map eventDecrypted = await store.dispatch(
@@ -440,7 +444,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 backfillDecryptMessages(roomId);
               }
             } catch (error) {
-              debugPrint('[decryptKeyEvent|error] $error');
+              printError('[decryptKeyEvent] [ERROR] $error');
             }
 
             break;

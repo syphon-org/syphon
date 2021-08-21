@@ -223,6 +223,7 @@ ThunkAction<AppState> startAuthObserver() {
     onAuthStateChanged(User? user) async {
       if (user != null && user.accessToken != null) {
         await store.dispatch(fetchAuthUserProfile());
+        await store.dispatch(fetchDevices());
 
         // init encryption for E2EE
         await store.dispatch(initKeyEncryption(user));

@@ -22,12 +22,12 @@ extension Chunked on String {
 }
 
 String selectCurrentUserSessionKey(Store<AppState> store) {
-  final curretnDeviceId = store.state.authStore.user.deviceId;
+  final currentDeviceId = store.state.authStore.user.deviceId;
   final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
 
-  if (deviceKeysOwned.containsKey(curretnDeviceId)) {
-    final currentDeviceKey = deviceKeysOwned[curretnDeviceId];
-    final fingerprintId = Keys.fingerprintId(deviceId: curretnDeviceId);
+  if (deviceKeysOwned.containsKey(currentDeviceId)) {
+    final currentDeviceKey = deviceKeysOwned[currentDeviceId];
+    final fingerprintId = Keys.fingerprintId(deviceId: currentDeviceId);
 
     final String fingerprint = currentDeviceKey?.keys?[fingerprintId] ?? Values.UNKNOWN;
 
@@ -113,11 +113,11 @@ List<DeviceKey> filterDevicesWithKeySessions(Store<AppState> store, Room room) {
       final identityKey = deviceKey.keys![identityKeyId];
 
       print(
-        '[filterDeviceKeyWithSessions] checking keySessions for $identityKey, ${keySessions.containsKey(identityKey).toString()}',
+        '[filterDevicesWithKeySessions] checking keySessions for $identityKey, ${keySessions.containsKey(identityKey).toString()}',
       );
 
       keySessions.keys.toList().forEach((key) {
-        print('[filterDeviceKeyWithSessions] key ${key.toString()}');
+        print('[filterDevicesWithKeySessions] key ${key.toString()}');
       });
 
       // Key Session / Olm session already established
@@ -150,11 +150,11 @@ List<DeviceKey> filterDevicesWithoutKeySessions(Store<AppState> store, Room room
       final identityKey = deviceKey.keys![identityKeyId];
 
       print(
-        '[filterDeviceKeyWithSessions] checking keySessions for $identityKey, ${keySessions.containsKey(identityKey).toString()}',
+        '[filterDevicesWithoutKeySessions] checking keySessions for $identityKey, ${keySessions.containsKey(identityKey).toString()}',
       );
 
       keySessions.keys.toList().forEach((key) {
-        print('[filterDeviceKeyWithSessions] key ${key.toString()}');
+        print('[filterDevicesWithoutKeySessions] key ${key.toString()}');
       });
 
       // Key Session / Olm session already established

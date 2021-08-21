@@ -189,20 +189,20 @@ ThunkAction<AppState> initOlmEncryption(User user) {
       await olm.init();
       final olmAccount = olm.Account();
 
-      final deviceId = store.state.authStore.user.deviceId;
+      final deviceId = store.state.authStore.user.deviceId!;
       final olmAccountKey = store.state.cryptoStore.olmAccountKey;
 
       // create new olm account since none exists
       if (olmAccountKey == null) {
         olmAccount.create();
-        final olmAccountKey = olmAccount.pickle(deviceId!);
+        final olmAccountKey = olmAccount.pickle(deviceId);
 
         store.dispatch(SetOlmAccountBackup(olmAccountKey: olmAccountKey));
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
         await store.dispatch(saveOlmAccount());
       } else {
         // deserialize stored account since one exists
-        olmAccount.unpickle(deviceId!, olmAccountKey);
+        olmAccount.unpickle(deviceId, olmAccountKey);
 
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
       }
@@ -307,6 +307,9 @@ ThunkAction<AppState> generateIdentityKeys() {
         deviceKeysPayload['device_keys'],
       );
 
+      print('[generateIdentityKeys] ADDING FOLLOWING DEVICE KEYS OWNED');
+      printJson({authUser.deviceId!: deviceKeysOwned});
+
       await store.dispatch(SetDeviceKeysOwned(
         deviceKeysOwned: {authUser.deviceId!: deviceKeysOwned},
       ));
@@ -367,8 +370,8 @@ ThunkAction<AppState> generateOneTimeKeys({DeviceKey? deviceKey}) {
 
 ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
   return (Store<AppState> store) async {
-    final olmAccount = store.state.cryptoStore.olmAccount;
     final authUser = store.state.authStore.user;
+    final olmAccount = store.state.cryptoStore.olmAccount!;
 
     final oneTimeKeysSignedAll = {};
 
@@ -379,11 +382,11 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
       // sign one time keys
       final oneTimeKeyEncoded = canonicalJson.encode(oneTimeKey);
       final oneTimeKeySerialized = utf8.decode(oneTimeKeyEncoded);
-      final oneTimeKeySigned = olmAccount!.sign(oneTimeKeySerialized);
+      final oneTimeKeySigned = olmAccount.sign(oneTimeKeySerialized);
 
       // add one time key in new keys map only
       final keyId = key.split(':')[0];
-      final oneTimeKeyId = '${Algorithms.signedcurve25519}:$keyId';
+      final oneTimeKeyId = Keys.oneTimeKeyId(keyId: keyId);
       oneTimeKeysSignedAll[oneTimeKeyId] = {'key': value};
 
       final fingerprintKeyId = Keys.fingerprintId(deviceId: authUser.deviceId);
@@ -409,7 +412,9 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
 ///
 ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeysCounts) {
   return (Store<AppState> store) async {
-    printDebug('[updateOneTimeKeyCounts] $oneTimeKeysCounts');
+    final currentKeyCounts = store.state.cryptoStore.oneTimeKeysCounts;
+
+    printDebug('[updateOneTimeKeyCounts] $oneTimeKeysCounts, current $currentKeyCounts');
 
     // Confirm user has access token
     final accessToken = store.state.authStore.user.accessToken;
@@ -423,20 +428,21 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeysCounts)
       return;
     }
 
-    final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned.isEmpty;
-    if (deviceKeysOwned) {
+    // dont attempt to update before deviceKeys are populated
+    final noDeviceKeysOwned = store.state.cryptoStore.deviceKeysOwned.isEmpty;
+    if (noDeviceKeysOwned) {
       return;
     }
+
+    final currentCurveKeyCount = currentKeyCounts[Algorithms.signedcurve25519] ?? 0;
+    final updatedCurveKeyCount = oneTimeKeysCounts[Algorithms.signedcurve25519] ?? 0;
 
     // if the key count hasn't changed, don't update it
-    final currentKeyCount = store.state.cryptoStore.oneTimeKeysCounts;
-
-    if (currentKeyCount[Algorithms.signedcurve25519] == oneTimeKeysCounts[Algorithms.signedcurve25519] &&
-        currentKeyCount.isNotEmpty) {
+    if (currentKeyCounts.isNotEmpty && currentCurveKeyCount == updatedCurveKeyCount) {
       return;
     }
 
-    printInfo('[updateOneTimeKeyCounts] Updating $currentKeyCount, $oneTimeKeysCounts');
+    printInfo('[updateOneTimeKeyCounts] Updating $oneTimeKeysCounts, current $currentKeyCounts');
 
     store.dispatch(SetOneTimeKeysCounts(
       oneTimeKeysCounts: oneTimeKeysCounts,
@@ -475,6 +481,9 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         'one_time_keys': newOneTimeKeys,
       };
 
+      printDebug('[updateOneTimeKeys] UPDATING TO FOLLOWING');
+      printJson(payload);
+
       final data = await MatrixApi.uploadKeys(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -486,6 +495,9 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
       if (data['errcode'] != null) {
         throw data['error'];
       }
+
+      printInfo('[updateOneTimeKeys] successfully uploaded oneTimeKeys');
+      printJson(data);
 
       // save account state after successful upload
       olmAccount.mark_keys_as_published();
@@ -528,6 +540,11 @@ ThunkAction<AppState> updateKeySessions({
         store,
         room,
       );
+
+      if (devicesWithoutMessageSessions.isEmpty) {
+        printInfo('[updateKeySessions] all device sessions have a message session for room');
+        return;
+      }
 
       // Create payload of megolm session keys for message decryption
       final messageSession = await store.dispatch(
@@ -738,6 +755,7 @@ ThunkAction<AppState> createKeySessionOutbound({
     final outboundKeySession = olm.Session();
 
     final account = store.state.cryptoStore.olmAccount!;
+    final deviceId = store.state.authStore.user.deviceId!;
 
     outboundKeySession.create_outbound(account, identityKey!, oneTimeKey!);
 
@@ -745,7 +763,7 @@ ThunkAction<AppState> createKeySessionOutbound({
     await store.dispatch(SaveKeySession(
       identityKey: identityKey,
       sessionId: outboundKeySession.session_id(),
-      session: outboundKeySession.pickle(identityKey),
+      session: outboundKeySession.pickle(deviceId),
     ));
 
     await store.dispatch(saveOlmAccount());
@@ -757,6 +775,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
 }) {
   return (Store<AppState> store) async {
     try {
+      final deviceId = store.state.authStore.user.deviceId!;
       final keySessions = selectKeySessions(store, identityKey);
 
       print('loadKeySessionOutbound checking outbound for $identityKey');
@@ -764,7 +783,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
       for (final session in keySessions.reversed) {
         try {
           // type 1 - attempt to decrypt with an existing sessions
-          final keySession = olm.Session()..unpickle(identityKey, session);
+          final keySession = olm.Session()..unpickle(deviceId, session);
 
           final keySessionId = keySession.session_id();
 
@@ -773,13 +792,13 @@ ThunkAction<AppState> loadKeySessionOutbound({
           print('loadKeySessionOutbound found $keySessionId for $identityKey of type $keySessionType');
           return keySession;
         } catch (error) {
-          printDebug('[loadKeySessionOutbound] in keySessions error $identityKey $error');
+          printInfo('[loadKeySessionOutbound] unsuccessful $identityKey $error');
         }
       }
 
       return null;
     } catch (error) {
-      printDebug('[loadKeySessionOutbound] error $identityKey $error');
+      printError('[loadKeySessionOutbound] error $identityKey $error');
       return null;
     }
   };
@@ -792,42 +811,51 @@ ThunkAction<AppState> loadKeySessionOutbound({
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#molmv1curve25519-aes-sha2
 ///
-/// TODO:  find the Type 1 Olm key session issue
-///
 ThunkAction<AppState> loadKeySessionInbound({
   required int type,
   required String body,
   required String identityKey, // sender_key
 }) {
   return (Store<AppState> store) async {
-    // TEST:
-    printJson({
-      'type': type,
-      'body': body,
-      'identityKey': identityKey,
-    });
+    final deviceId = store.state.authStore.user.deviceId!;
 
+    // filter all key session saved under a certain identityKey
     final keySessions = selectKeySessions(store, identityKey);
 
+    printInfo('[loadKeySessionInbound] checking known sessions for sender $identityKey');
+
+    // reverse the list to attempt the latest first (LinkedHashMap will know)
     for (final session in keySessions.reversed) {
       try {
-        // type 1 - attempt to decrypt with an existing sessions
-        final keySession = olm.Session()..unpickle(identityKey, session);
+        // attempt to decrypt with any existing sessions
+        final keySession = olm.Session()..unpickle(deviceId, session);
+        final keySessionId = keySession.session_id();
 
-        // This returns a flag indicating whether the message was encrypted using that session.
-        final keySessionMatch = keySession.matches_inbound_from(identityKey, body);
+        // this returns a flag indicating whether the message was encrypted using that session
+        final keySessionMatch = keySession.matches_inbound(body);
 
-        print('loadKeySessionInbound, $keySessionMatch, $identityKey');
+        printInfo('[loadKeySessionInbound] $keySessionId session matched $keySessionMatch');
 
         if (keySessionMatch) {
           return keySession;
         }
+
+        printInfo('[loadKeySessionInbound] $keySessionId attempting decryption');
+
+        // attempt decryption in case its not a locally known inbound session state
+        keySession.decrypt(type, body);
+
+        printInfo('[loadKeySessionInbound] $keySessionId successfully decrypted');
+
+        // Return a fresh key session having not decrypted the payload
+        return olm.Session()..unpickle(deviceId, session);
       } catch (error) {
-        debugPrint('[loadKeySessionInboundTesting] error $error');
+        debugPrint('[loadKeySessionInbound] unsuccessful $error');
       }
     }
 
     try {
+      // if type zero, and no other known sessions can decrypt, create a new one
       if (type == 0) {
         final newKeySession = olm.Session();
         final account = store.state.cryptoStore.olmAccount!;
@@ -843,7 +871,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         await store.dispatch(saveKeySession(
           identityKey: identityKey,
           sessionId: newKeySession.session_id(),
-          session: newKeySession.pickle(identityKey),
+          session: newKeySession.pickle(deviceId),
         ));
 
         // Return new key session
@@ -891,9 +919,9 @@ ThunkAction<AppState> loadMessageSessionInbound({
       throw 'Unable to find inbound message session for decryption';
     }
 
-    final session = olm.InboundGroupSession();
-    session.unpickle(roomId, messageSessions[identityKey]!);
-    return session;
+    final messageSession = olm.InboundGroupSession();
+    messageSession.unpickle(roomId, messageSessions[identityKey]!);
+    return messageSession;
   };
 }
 
@@ -981,9 +1009,9 @@ ThunkAction<AppState> loadMessageSessionOutbound({String? roomId}) {
       );
     }
 
-    final session = olm.OutboundGroupSession();
-    session.unpickle(roomId, outboundMessageSessionSerialized!);
-    return session;
+    final messageSession = olm.OutboundGroupSession();
+    messageSession.unpickle(roomId, outboundMessageSessionSerialized!);
+    return messageSession;
   };
 }
 

@@ -32,7 +32,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
         availableUsers: availableUsers,
       );
     case SetSession:
-      return state.copyWith(authSession: action.authSession);
+      final _action = action as SetSession;
+      return state.copyWith(authSession: _action.session);
     case SetClientSecret:
       return state.copyWith(clientSecret: action.clientSecret);
     case SetCompleted:
