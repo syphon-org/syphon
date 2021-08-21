@@ -124,11 +124,10 @@ storageMiddleware(Database storage) {
       case SetDeviceKeys:
       case SetOneTimeKeysCounts:
       case SetOneTimeKeysClaimed:
-      case AddInboundKeySession:
       case AddInboundMessageSession:
-      case AddOutboundKeySession:
       case AddOutboundMessageSession:
       case UpdateMessageSessionOutbound:
+      case SaveKeySession:
       case ResetCrypto:
         saveCrypto(store.state.cryptoStore, storage: storage);
         break;

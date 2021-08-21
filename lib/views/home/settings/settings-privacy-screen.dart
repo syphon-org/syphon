@@ -431,7 +431,7 @@ class _Props extends Equatable {
         readReceipts: store.state.settingsStore.readReceiptsEnabled,
         sessionId: store.state.authStore.user.deviceId ?? Values.EMPTY,
         sessionName: selectCurrentDeviceName(store),
-        sessionKey: selectCurrentSessionKey(store),
+        sessionKey: selectCurrentUserSessionKey(store),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onDeactivateAccount: (BuildContext context) async {

@@ -153,18 +153,19 @@ class Message extends Event {
 
   factory Message.fromEvent(Event event) {
     try {
-      var body = event.content['body'] ?? '';
-      var msgtype = event.content['msgtype'];
+      final content = event.content ?? {};
+      var body = content['body'] ?? '';
+      var msgtype = content['msgtype'];
       var replacement = false;
       var relatedEventId;
 
-      final relatesTo = event.content['m.relates_to'];
+      final relatesTo = content['m.relates_to'];
 
       if (relatesTo != null && relatesTo['rel_type'] == 'm.replace') {
         replacement = true;
         relatedEventId = relatesTo['event_id'];
-        body = event.content['m.new_content']['body'];
-        msgtype = event.content['m.new_content']['msgtype'];
+        body = content['m.new_content']['body'];
+        msgtype = content['m.new_content']['msgtype'];
       }
 
       return Message(
@@ -176,17 +177,17 @@ class Message extends Event {
         sender: event.sender,
         stateKey: event.stateKey,
         timestamp: event.timestamp,
-        content: event.content,
+        content: content,
         body: body,
         msgtype: msgtype,
-        format: event.content['format'],
-        filename: event.content['filename'],
-        formattedBody: event.content['formatted_body'],
-        ciphertext: event.content['ciphertext'] ?? '',
-        algorithm: event.content['algorithm'],
-        senderKey: event.content['sender_key'],
-        sessionId: event.content['session_id'],
-        deviceId: event.content['device_id'],
+        format: content['format'],
+        filename: content['filename'],
+        formattedBody: content['formatted_body'],
+        ciphertext: content['ciphertext'] ?? '',
+        algorithm: content['algorithm'],
+        senderKey: content['sender_key'],
+        sessionId: content['session_id'],
+        deviceId: content['device_id'],
         replacement: replacement,
         relatedEventId: relatedEventId,
         received: DateTime.now().millisecondsSinceEpoch,

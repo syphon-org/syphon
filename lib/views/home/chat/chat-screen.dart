@@ -147,14 +147,10 @@ class ChatScreenState extends State<ChatScreen> {
 
   onCheatCode(_Props props) async {
     final store = StoreProvider.of<AppState>(context);
-    final keys = store.state.cryptoStore.inboundKeySessions;
-    final keys2 = store.state.cryptoStore.outboundKeySessions;
-    final keys3 = store.state.cryptoStore.inboundKeySessionsAll;
+    final keySessions = store.state.cryptoStore.keySessions;
 
     try {
-      printJson(jsonDecode(jsonEncode(keys)));
-      printJson(jsonDecode(jsonEncode(keys2)));
-      printJson(jsonDecode(jsonEncode(keys3)));
+      printJson(jsonDecode(jsonEncode(keySessions)));
     } catch (error) {
       printDebug(error.toString());
     }
@@ -169,7 +165,10 @@ class ChatScreenState extends State<ChatScreen> {
       return;
     }
 
-    final hasDecryptable = selectHasDecryptableMessages(store, props.room.id);
+    final hasDecryptable = selectHasDecryptableMessages(
+      store,
+      props.room.id,
+    );
 
     // dont attempt to decrypt if all messages are already decrypted
     if (!hasDecryptable) {

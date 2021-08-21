@@ -32,38 +32,30 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       return state.copyWith(
         oneTimeKeysClaimed: action.oneTimeKeys,
       );
-    case AddOutboundKeySession:
-      final _action = action as AddOutboundKeySession;
-      final outboundSessions = Map<String, String>.from(
-        state.outboundKeySessions,
+    case SaveKeySession:
+      final _action = action as SaveKeySession;
+
+      final keySessions = Map<String, Map<String, String>>.from(
+        state.keySessions,
       );
 
-      outboundSessions.addAll({_action.identityKey: _action.session});
+      final sessionId = _action.sessionId;
+      final sessionNew = _action.session;
 
-      return state.copyWith(
-        outboundKeySessions: outboundSessions,
-      );
-    case AddInboundKeySession:
-      final _action = action as AddInboundKeySession;
-      final inboundKeySessions = Map<String, String>.from(
-        state.inboundKeySessions,
-      );
-
-      final inboundKeySessionsAll = Map<String, List<String>>.from(
-        state.inboundKeySessionsAll,
-      );
-
-      inboundKeySessions.addAll({_action.identityKey: _action.session});
-
-      inboundKeySessionsAll.update(
+      // Update sessions by their ID for a certain identityKey (sender_key)
+      keySessions.update(
         _action.identityKey,
-        (value) => [...value, _action.session],
-        ifAbsent: () => [_action.session],
+        (session) => session
+          ..update(
+            sessionId,
+            (value) => sessionNew,
+            ifAbsent: () => sessionNew,
+          ),
+        ifAbsent: () => {sessionId: sessionNew},
       );
 
       return state.copyWith(
-        inboundKeySessions: inboundKeySessions,
-        inboundKeySessionsAll: inboundKeySessionsAll,
+        keySessions: keySessions,
       );
     case AddOutboundMessageSession:
       final _action = action as AddOutboundMessageSession;
