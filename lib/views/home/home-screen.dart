@@ -55,25 +55,59 @@ class HomeState extends State<HomeScreen> {
   final fabKeyCircle = GlobalKey<FabBarContainerState>();
   final fabKeyBar = GlobalKey<FabBarContainerState>();
 
-  Room? selectedRoom;
+  Map<String, Room> selectedChats = {};
   Map<String, Color> roomColorDefaults = {};
 
   @protected
-  onToggleRoomOptions({Room? room}) {
-    setState(() {
-      selectedRoom = room;
-    });
+  onToggleRoomOptions({required Room room}) {
+    if (!selectedChats.containsKey(room.id)) {
+      setState(() {
+        selectedChats.addAll({room.id: room});
+      });
+    } else {
+      setState(() {
+        selectedChats.remove(room.id);
+      });
+    }
   }
 
   @protected
   onDismissMessageOptions() {
     setState(() {
-      selectedRoom = null;
+      selectedChats = {};
+    });
+  }
+
+  onArchiveChats(_Props props) async {
+    await Future.forEach(selectedChats.values, (room) async {
+      await props.onArchiveChat(room: room);
+    });
+    setState(() {
+      selectedChats = {};
+    });
+  }
+
+  onLeaveChats(_Props props) async {
+    await Future.forEach<Room>(selectedChats.values, (Room room) async {
+      await props.onLeaveChat(room: room);
+      onToggleRoomOptions(room: room);
+    });
+    setState(() {
+      selectedChats = {};
+    });
+  }
+
+  onDeleteChats(_Props props) async {
+    await Future.forEach(selectedChats.values, (room) async {
+      await props.onDeleteChat(room: room);
+    });
+    setState(() {
+      selectedChats = {};
     });
   }
 
   @protected
-  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) => AppBar(
+  Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -86,39 +120,37 @@ class HomeState extends State<HomeScreen> {
                 icon: Icon(Icons.close),
                 color: Colors.white,
                 iconSize: Dimensions.buttonAppBarSize,
-                onPressed: onDismissMessageOptions,
+                onPressed: () => onDismissMessageOptions(),
               ),
             ),
           ],
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.info_outline),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Chat Details',
-            color: Colors.white,
-            onPressed: () {
-              Navigator.pushNamed(
-                context!,
-                NavigationPaths.chatDetails,
-                arguments: ChatDetailsArguments(
-                  roomId: selectedRoom!.id,
-                  title: selectedRoom!.name,
-                ),
-              );
-            },
+          Visibility(
+            visible: selectedChats.length == 1,
+            child: IconButton(
+              icon: Icon(Icons.info_outline),
+              iconSize: Dimensions.buttonAppBarSize,
+              tooltip: 'Chat Details',
+              color: Colors.white,
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  NavigationPaths.chatDetails,
+                  arguments: ChatDetailsArguments(
+                    roomId: selectedChats.values.first.id,
+                    title: selectedChats.values.first.name,
+                  ),
+                );
+              },
+            ),
           ),
           IconButton(
             icon: Icon(Icons.archive),
             iconSize: Dimensions.buttonAppBarSize,
             tooltip: 'Archive Room',
             color: Colors.white,
-            onPressed: () async {
-              await props!.onArchiveRoom(room: selectedRoom);
-              setState(() {
-                selectedRoom = null;
-              });
-            },
+            onPressed: () => onArchiveChats(props),
           ),
           Visibility(
             visible: true,
@@ -127,27 +159,17 @@ class HomeState extends State<HomeScreen> {
               iconSize: Dimensions.buttonAppBarSize,
               tooltip: 'Leave Chat',
               color: Colors.white,
-              onPressed: () async {
-                await props!.onLeaveChat(room: selectedRoom);
-                setState(() {
-                  selectedRoom = null;
-                });
-              },
+              onPressed: () => onLeaveChats(props),
             ),
           ),
           Visibility(
-            visible: selectedRoom!.direct,
+            visible: selectedChats.length == 1 && selectedChats.values.first.direct,
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
               tooltip: 'Delete Chat',
               color: Colors.white,
-              onPressed: () async {
-                await props!.onDeleteChat(room: selectedRoom);
-                setState(() {
-                  selectedRoom = null;
-                });
-              },
+              onPressed: () => onDeleteChats(props),
             ),
           ),
           IconButton(
@@ -217,26 +239,26 @@ class HomeState extends State<HomeScreen> {
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.newGroup,
-                child: Text('New Group'),
+                child: Text(Strings.buttonTextCreateGroup),
               ),
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.markAllRead,
-                child: Text('Mark All Read'),
+                child: Text(Strings.buttonTextMarkAllRead),
               ),
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.inviteFriends,
                 enabled: false,
-                child: Text('Invite Friends'),
+                child: Text(Strings.buttonTextInvite),
               ),
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.settings,
-                child: Text('Settings'),
+                child: Text(Strings.buttonTextSettings),
               ),
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.help,
-                child: Text('Help'),
+                child: Text(Strings.buttonTextSupport),
               ),
             ],
           )
@@ -246,7 +268,6 @@ class HomeState extends State<HomeScreen> {
   @protected
   Widget buildChatList(BuildContext context, _Props props) {
     final rooms = props.rooms;
-
     final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
 
     if (rooms.isEmpty) {
@@ -314,8 +335,8 @@ class HomeState extends State<HomeScreen> {
         }
 
         // highlight selected rooms if necessary
-        if (selectedRoom != null) {
-          if (selectedRoom!.id != room.id) {
+        if (selectedChats.isNotEmpty) {
+          if (!selectedChats.containsKey(room.id)) {
             backgroundColor = Theme.of(context).scaffoldBackgroundColor;
           } else {
             backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
@@ -349,8 +370,8 @@ class HomeState extends State<HomeScreen> {
         // GestureDetector w/ animation
         return InkWell(
           onTap: () {
-            if (selectedRoom != null) {
-              onDismissMessageOptions();
+            if (selectedChats.isNotEmpty) {
+              onToggleRoomOptions(room: room);
             } else {
               Navigator.pushNamed(
                 context,
@@ -574,7 +595,7 @@ class HomeState extends State<HomeScreen> {
             context: context,
           );
 
-          if (selectedRoom != null) {
+          if (selectedChats.isNotEmpty) {
             currentAppBar = buildAppBarRoomOptions(
               props: props,
               context: context,
@@ -633,8 +654,8 @@ class _Props extends Equatable {
   final Function onDebug;
   final Function onLeaveChat;
   final Function onDeleteChat;
+  final Function onArchiveChat;
   final Function onSelectHelp;
-  final Function onArchiveRoom;
   final Function onMarkAllRead;
   final Function onFetchSyncForced;
 
@@ -655,7 +676,7 @@ class _Props extends Equatable {
     required this.onLeaveChat,
     required this.onDeleteChat,
     required this.onSelectHelp,
-    required this.onArchiveRoom,
+    required this.onArchiveChat,
     required this.onMarkAllRead,
     required this.onFetchSyncForced,
   });
@@ -730,7 +751,13 @@ class _Props extends Equatable {
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());
         },
-        onArchiveRoom: ({Room? room}) async {
+        onLeaveChat: ({Room? room}) {
+          return store.dispatch(leaveRoom(room: room));
+        },
+        onDeleteChat: ({Room? room}) {
+          return store.dispatch(removeRoom(room: room));
+        },
+        onArchiveChat: ({Room? room}) async {
           store.dispatch(archiveRoom(room: room));
         },
         onFetchSyncForced: () async {
@@ -738,12 +765,6 @@ class _Props extends Equatable {
             fetchSync(since: store.state.syncStore.lastSince),
           );
           return Future(() => true);
-        },
-        onLeaveChat: ({Room? room}) {
-          return store.dispatch(leaveRoom(room: room));
-        },
-        onDeleteChat: ({Room? room}) {
-          return store.dispatch(removeRoom(room: room));
         },
         onSelectHelp: () async {
           try {

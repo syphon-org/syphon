@@ -100,6 +100,13 @@ class Strings {
   static final buttonTextConfirmed = tr('button-text-confirmed');
   static final buttonTextDeleteKeys = tr('button-delete-keys'); //  'delete keys';
 
+  // Buttons (Options)
+  static final buttonTextCreateGroup = tr('button-text-create-group');
+  static final buttonTextMarkAllRead = tr('button-text-mark-all-read');
+  static final buttonTextInvite = tr('button-text-invite');
+  static final buttonTextSettings = tr('button-text-settings');
+  static final buttonTextSupport = tr('button-text-support');
+
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');
   static final placeholderMatrixEncrypted = tr('label-message-matrix');
