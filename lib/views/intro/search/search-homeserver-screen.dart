@@ -72,7 +72,6 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
               title: Strings.titleHomeserverSearch,
               label: Strings.labelSearchHomeservers,
               tooltip: 'Search Homeservers',
-              brightness: Brightness.dark,
               focusNode: searchInputFocusNode,
               throttle: Duration(milliseconds: 500),
               forceFocus: true,

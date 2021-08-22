@@ -37,7 +37,6 @@ class GroupSearchState extends State<GroupSearchScreen> {
 
   GroupSearchState();
 
-  // componentDidMount(){}
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -140,7 +139,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.grey,
-                            boxShadow: [
+                            boxShadow: const [
                               BoxShadow(
                                 color: Colors.red,
                                 offset: Offset(8.0, 8.0),
@@ -349,7 +348,6 @@ class GroupSearchState extends State<GroupSearchScreen> {
             title: Strings.titleSearchGroups,
             label: 'Search a topic...',
             tooltip: 'Search topics',
-            brightness: Brightness.dark,
             forceFocus: true,
             focusNode: searchInputFocusNode,
             onSearch: (String text) {

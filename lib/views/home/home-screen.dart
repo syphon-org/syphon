@@ -11,7 +11,9 @@ import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/store/sync/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -51,10 +53,13 @@ class HomeScreen extends StatefulWidget {
 class HomeState extends State<HomeScreen> {
   HomeState() : super();
 
+  final searchInputFocusNode = FocusNode();
+
+  final fabKeyBar = GlobalKey<FabBarContainerState>();
   final fabKeyRing = GlobalKey<FabCircularMenuState>();
   final fabKeyCircle = GlobalKey<FabBarContainerState>();
-  final fabKeyBar = GlobalKey<FabBarContainerState>();
 
+  bool searching = false;
   Map<String, Room> selectedChats = {};
   Map<String, Color> roomColorDefaults = {};
 
@@ -105,6 +110,14 @@ class HomeState extends State<HomeScreen> {
       selectedChats = {};
     });
   }
+
+  onToggleSearch(_Props props) {
+    setState(() {
+      searching = !searching;
+    });
+  }
+
+  onSearch(_Props props, String text) {}
 
   @protected
   Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
@@ -214,9 +227,7 @@ class HomeState extends State<HomeScreen> {
             color: Colors.white,
             icon: Icon(Icons.search),
             tooltip: 'Search Chats',
-            onPressed: () {
-              Navigator.pushNamed(context, NavigationPaths.searchAll);
-            },
+            onPressed: () => onToggleSearch(props),
           ),
           RoundedPopupMenu<Options>(
             icon: Icon(Icons.more_vert, color: Colors.white),
@@ -564,13 +575,6 @@ class HomeState extends State<HomeScreen> {
       );
     }
 
-    // if (fabType == MainFabType.Circle) {
-    //   return FabCircleExpanding(
-    //     fabKey: fabKeyCircle,
-    //     alignment: selectActionAlignment(props),
-    //   );
-    // }
-
     return FabRing(
       fabKey: fabKeyRing,
       alignment: selectActionAlignment(props),
@@ -602,6 +606,21 @@ class HomeState extends State<HomeScreen> {
             );
           }
 
+          if (searching) {
+            currentAppBar = AppBarSearch(
+              title: 'Search Unencrypted',
+              label: 'Search Unencrypted',
+              tooltip: 'Search Unencrypted',
+              forceFocus: true,
+              navigate: false,
+              startFocused: true,
+              focusNode: searchInputFocusNode,
+              onBack: () => onToggleSearch(props),
+              onToggleSearch: () => onToggleSearch(props),
+              onSearch: (String text) => onSearch(props, text),
+            );
+          }
+
           return Scaffold(
             appBar: currentAppBar as PreferredSizeWidget?,
             floatingActionButton: buildActionFab(props),
@@ -613,9 +632,7 @@ class HomeState extends State<HomeScreen> {
                 children: <Widget>[
                   Expanded(
                     child: RefreshIndicator(
-                      onRefresh: () {
-                        return props.onFetchSyncForced();
-                      },
+                      onRefresh: () => props.onFetchSyncForced(),
                       child: Stack(
                         children: [
                           GestureDetector(
@@ -708,46 +725,10 @@ class _Props extends Equatable {
         offline: store.state.syncStore.offline,
         fabType: store.state.settingsStore.themeSettings.mainFabType,
         fabLocation: store.state.settingsStore.themeSettings.mainFabLocation,
-        syncing: () {
-          final synced = store.state.syncStore.synced;
-          final syncing = store.state.syncStore.syncing;
-          final offline = store.state.syncStore.offline;
-          final backgrounded = store.state.syncStore.backgrounded;
-          final loadingRooms = store.state.roomStore.loading;
-
-          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(store.state.syncStore.lastAttempt ?? 0);
-
-          // See if the last attempted sy nc is older than 60 seconds
-          final isLastAttemptOld = DateTime.now().difference(lastAttempt).compareTo(Duration(seconds: 90));
-
-          // syncing for the first time
-          if (syncing && !synced) {
-            return true;
-          }
-
-          // syncing for the first time since going offline
-          if (syncing && offline) {
-            return true;
-          }
-
-          // joining or removing a room
-          if (loadingRooms) {
-            return true;
-          }
-
-          // syncing for the first time in a while or restarting the app
-          if (syncing && (0 < isLastAttemptOld || backgrounded)) {
-            return true;
-          }
-
-          return false;
-        }(),
+        syncing: selectSyncingStatus(store.state),
         currentUser: store.state.authStore.user,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         chatSettings: store.state.settingsStore.chatSettings,
-        onDebug: () async {
-          debugPrint('[onDebug] trigged debug function @ home');
-        },
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());
         },
@@ -774,6 +755,9 @@ class _Props extends Equatable {
               throw 'Could not launch ${Values.openHelpUrl}';
             }
           } catch (error) {}
+        },
+        onDebug: () async {
+          debugPrint('[onDebug] trigged debug function @ home');
         },
       );
 }

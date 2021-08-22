@@ -131,7 +131,6 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
           title: Strings.titleChatUsers,
           label: Strings.labelSearchUser,
           tooltip: 'Search users',
-          brightness: Brightness.dark,
           focusNode: searchInputFocusNode,
           onChange: (text) {
             props.onSearch(text);

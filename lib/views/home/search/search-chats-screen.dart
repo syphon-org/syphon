@@ -320,7 +320,6 @@ class ChatSearchState extends State<ChatSearchScreen> {
             title: '${Strings.titleInvite} ${formatUsername(arguments.user!)}',
             label: 'Search any room info...',
             tooltip: 'Search Joined Rooms',
-            brightness: Brightness.dark,
             forceFocus: true,
             focusNode: searchInputFocusNode,
             onSearch: (text) {

@@ -304,7 +304,6 @@ class SearchUserState extends State<SearchUserScreen> {
             title: Strings.titleSearchUsers,
             label: 'Search for a user...',
             tooltip: 'Search users',
-            brightness: Brightness.dark,
             forceFocus: true,
             focusNode: searchInputFocusNode,
             onChange: (text) => setState(() {
