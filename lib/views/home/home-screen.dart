@@ -93,7 +93,8 @@ class HomeState extends State<HomeScreen> {
   }
 
   onLeaveChats(_Props props) async {
-    await Future.forEach<Room>(selectedChats.values, (Room room) async {
+    final _selectedChats = Map<String, Room>.from(selectedChats);
+    await Future.forEach<Room>(_selectedChats.values, (Room room) async {
       await props.onLeaveChat(room: room);
       onToggleRoomOptions(room: room);
     });
@@ -103,7 +104,8 @@ class HomeState extends State<HomeScreen> {
   }
 
   onDeleteChats(_Props props) async {
-    await Future.forEach(selectedChats.values, (room) async {
+    final _selectedChats = Map<String, Room>.from(selectedChats);
+    await Future.forEach(_selectedChats.values, (room) async {
       await props.onDeleteChat(room: room);
     });
     setState(() {

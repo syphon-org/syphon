@@ -564,7 +564,11 @@ ThunkAction<AppState> markRoomsReadAll() {
 ///
 /// Fetch the direct rooms list and recalculate it without the
 /// given alias
-ThunkAction<AppState> toggleDirectRoom({Room? room, bool enabled = false}) {
+ThunkAction<AppState> toggleDirectRoom({
+  required Room room,
+  bool enabled = false,
+  bool remove = true,
+}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -585,7 +589,7 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool enabled = false}) {
       final currentUser = store.state.authStore.user;
 
       // only the other user id, and not the user object, is needed here
-      final otherUserId = room!.userIds.firstWhereOrNull(
+      final otherUserId = room.userIds.firstWhereOrNull(
         (userId) => userId != currentUser.userId,
       );
 
@@ -594,10 +598,10 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool enabled = false}) {
       }
 
       // Pull the direct room for that specific user
-      Map directRoomUsers = data as Map<String, dynamic>;
+      var directRoomUsers = data as Map<String, dynamic>;
       final usersDirectRooms = directRoomUsers[otherUserId] ?? [];
 
-      if (usersDirectRooms.isEmpty && enabled) {
+      if (usersDirectRooms.isEmpty && otherUserId != null && enabled) {
         directRoomUsers[otherUserId] = [room.id];
       }
 
@@ -637,10 +641,12 @@ ThunkAction<AppState> toggleDirectRoom({Room? room, bool enabled = false}) {
         throw saveData['error'];
       }
 
-      await store.dispatch(SetRoom(room: room.copyWith(direct: enabled)));
+      if (remove) {
+        await store.dispatch(SetRoom(room: room.copyWith(direct: enabled)));
+      }
 
       // Refresh room information with toggle enabled
-      await store.dispatch(fetchRoom(room.id, direct: true));
+      await store.dispatch(fetchRoom(room.id, direct: enabled));
     } catch (error) {
       debugPrint('[toggleDirectRoom] $error');
     } finally {
@@ -831,7 +837,11 @@ ThunkAction<AppState> removeRoom({Room? room}) {
       store.dispatch(SetLoading(loading: true));
 
       if (room!.direct) {
-        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
+        await store.dispatch(toggleDirectRoom(
+          room: room,
+          enabled: false,
+          remove: false,
+        ));
       }
 
       // submit a leave room request
@@ -889,7 +899,11 @@ ThunkAction<AppState> leaveRoom({Room? room}) {
       store.dispatch(SetLoading(loading: true));
 
       if (room!.direct) {
-        await store.dispatch(toggleDirectRoom(room: room, enabled: false));
+        await store.dispatch(toggleDirectRoom(
+          room: room,
+          enabled: false,
+          remove: false,
+        ));
       }
 
       final deleteData = await MatrixApi.leaveRoom(

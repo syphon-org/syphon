@@ -41,9 +41,7 @@ Map<String, User> messageUsers({required AppState state, String? roomId}) {
     messages,
     key: (msg) => msg.sender,
     value: (msg) => state.userStore.users[msg.sender] ?? User(),
-  )..removeWhere(
-      (key, value) => value.userId == null,
-    );
+  );
 }
 
 /*
