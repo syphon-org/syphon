@@ -19,6 +19,7 @@ description: a privacy focused matrix client
 
 # release commands
 # flutter build android --release
+# flutter build ipa  --release # ios
 # flutter build macos --release
 
 # mobile development commands
