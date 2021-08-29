@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 
 class SearchStore extends Equatable {
   final bool loading;
@@ -9,6 +10,7 @@ class SearchStore extends Equatable {
   final String? searchText;
   final List<dynamic> searchResults;
   final List<dynamic> homeservers;
+  final List<Message> searchMessages;
 
   const SearchStore({
     this.since,
@@ -16,6 +18,7 @@ class SearchStore extends Equatable {
     this.loading = false,
     this.homeservers = const [],
     this.searchResults = const [],
+    this.searchMessages = const [],
     this.searchText,
     this.hasMore,
   });
@@ -27,6 +30,7 @@ class SearchStore extends Equatable {
         homeservers,
         totalResults,
         searchResults,
+        searchMessages,
         searchText,
         hasMore,
       ];
@@ -36,7 +40,8 @@ class SearchStore extends Equatable {
     since,
     totalResults,
     homeservers,
-    searchResults,
+    List<dynamic>? searchResults,
+    List<Message>? searchMessages,
     searchText,
     hasMore,
   }) =>
@@ -46,6 +51,7 @@ class SearchStore extends Equatable {
         totalResults: totalResults ?? this.totalResults,
         homeservers: homeservers ?? this.homeservers,
         searchResults: searchResults ?? this.searchResults,
+        searchMessages: searchMessages ?? this.searchMessages,
         searchText: searchText ?? this.searchText,
         hasMore: hasMore ?? this.hasMore,
       );

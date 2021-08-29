@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/search/actions.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/events/selectors.dart';
@@ -16,6 +19,7 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -60,11 +64,18 @@ class HomeState extends State<HomeScreen> {
   final fabKeyCircle = GlobalKey<FabBarContainerState>();
 
   bool searching = false;
+  String searchText = '';
   Map<String, Room> selectedChats = {};
   Map<String, Color> roomColorDefaults = {};
 
+  @override
+  void dispose() {}
+
   @protected
   onToggleRoomOptions({required Room room}) {
+    if (searching) {
+      onToggleSearch();
+    }
     if (!selectedChats.containsKey(room.id)) {
       setState(() {
         selectedChats.addAll({room.id: room});
@@ -113,13 +124,51 @@ class HomeState extends State<HomeScreen> {
     });
   }
 
-  onToggleSearch(_Props props) {
+  onToggleSearch() {
     setState(() {
       searching = !searching;
+      searchText = '';
     });
   }
 
-  onSearch(_Props props, String text) {}
+  onSearch(_Props props, String text) {
+    final store = StoreProvider.of<AppState>(context);
+    setState(() {
+      searchText = text;
+    });
+
+    if (text.isEmpty) {
+      return store.dispatch(clearSearchResults());
+    }
+
+    store.dispatch(searchMessages(text));
+  }
+
+  onSelectChat(Room room, String chatName) {
+    final store = StoreProvider.of<AppState>(context);
+
+    if (selectedChats.isNotEmpty) {
+      return onToggleRoomOptions(room: room);
+    }
+
+    Navigator.pushNamed(
+      context,
+      NavigationPaths.chat,
+      arguments: ChatScreenArguments(roomId: room.id, title: chatName),
+    );
+
+    Timer(Duration(milliseconds: 500), () {
+      setState(() {
+        searching = false;
+        selectedChats = {};
+      });
+      store.dispatch(clearSearchResults());
+    });
+  }
+
+  bool isAllDirect(Map<String, Room> selectedChats) {
+    return selectedChats.values.every((chat) => chat.direct);
+  }
 
   @protected
   Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
@@ -178,7 +227,7 @@ class HomeState extends State<HomeScreen> {
             ),
           ),
           Visibility(
-            visible: selectedChats.length == 1 && selectedChats.values.first.direct,
+            visible: isAllDirect(selectedChats),
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
@@ -229,7 +278,7 @@ class HomeState extends State<HomeScreen> {
             color: Colors.white,
             icon: Icon(Icons.search),
             tooltip: 'Search Chats',
-            onPressed: () => onToggleSearch(props),
+            onPressed: () => onToggleSearch(),
           ),
           RoundedPopupMenu<Options>(
             icon: Icon(Icons.more_vert, color: Colors.white),
@@ -282,6 +331,7 @@ class HomeState extends State<HomeScreen> {
   Widget buildChatList(BuildContext context, _Props props) {
     final rooms = props.rooms;
     final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
+    final noSearchResults = searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
 
     if (rooms.isEmpty) {
       return Center(
@@ -315,7 +365,7 @@ class HomeState extends State<HomeScreen> {
 
     return ListView.builder(
       scrollDirection: Axis.vertical,
-      itemCount: rooms.length,
+      itemCount: noSearchResults ? 0 : rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
@@ -382,17 +432,7 @@ class HomeState extends State<HomeScreen> {
 
         // GestureDetector w/ animation
         return InkWell(
-          onTap: () {
-            if (selectedChats.isNotEmpty) {
-              onToggleRoomOptions(room: room);
-            } else {
-              Navigator.pushNamed(
-                context,
-                NavigationPaths.chat,
-                arguments: ChatScreenArguments(roomId: room.id, title: chatName),
-              );
-            }
-          },
+          onTap: () => onSelectChat(room, chatName),
           onLongPress: () => onToggleRoomOptions(room: room),
           child: Container(
             decoration: BoxDecoration(
@@ -617,8 +657,8 @@ class HomeState extends State<HomeScreen> {
               navigate: false,
               startFocused: true,
               focusNode: searchInputFocusNode,
-              onBack: () => onToggleSearch(props),
-              onToggleSearch: () => onToggleSearch(props),
+              onBack: () => onToggleSearch(),
+              onToggleSearch: () => onToggleSearch(),
               onSearch: (String text) => onSearch(props, text),
             );
           }
@@ -637,6 +677,11 @@ class HomeState extends State<HomeScreen> {
                       onRefresh: () => props.onFetchSyncForced(),
                       child: Stack(
                         children: [
+                          Positioned(
+                            child: Loader(
+                              loading: props.searching,
+                            ),
+                          ),
                           GestureDetector(
                             onTap: onDismissMessageOptions,
                             child: buildChatList(
@@ -663,9 +708,12 @@ class _Props extends Equatable {
   final bool unauthed;
   final bool roomTypeBadgesEnabled;
   final User currentUser;
+  final bool searching;
+
   final ThemeType themeType;
   final MainFabType fabType;
   final MainFabLocation fabLocation;
+  final List<Message> searchMessages;
   final Map<String, ChatSetting> chatSettings;
   final Map<String, List<Message>> messages;
   final Map<String, List<Message>> decrypted;
@@ -683,11 +731,13 @@ class _Props extends Equatable {
     required this.themeType,
     required this.offline,
     required this.syncing,
+    required this.searching,
     required this.unauthed,
     required this.messages,
     required this.decrypted,
     required this.currentUser,
     required this.chatSettings,
+    required this.searchMessages,
     required this.fabType,
     required this.fabLocation,
     required this.roomTypeBadgesEnabled,
@@ -706,6 +756,7 @@ class _Props extends Equatable {
         messages,
         themeType,
         syncing,
+        searching,
         offline,
         unauthed,
         currentUser,
@@ -717,9 +768,12 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         themeType: store.state.settingsStore.themeSettings.themeType,
-        rooms: availableRooms(sortPrioritizedRooms(filterBlockedRooms(
-          store.state.roomStore.rooms.values.toList(),
-          store.state.userStore.blocked,
+        rooms: availableRooms(sortPrioritizedRooms(filterSearches(
+          filterBlockedRooms(
+            store.state.roomStore.rooms.values.toList(),
+            store.state.userStore.blocked,
+          ),
+          store.state.searchStore.searchMessages,
         ))),
         messages: store.state.eventStore.messages,
         decrypted: store.state.eventStore.messagesDecrypted,
@@ -728,6 +782,8 @@ class _Props extends Equatable {
         fabType: store.state.settingsStore.themeSettings.mainFabType,
         fabLocation: store.state.settingsStore.themeSettings.mainFabLocation,
         syncing: selectSyncingStatus(store.state),
+        searching: store.state.searchStore.loading,
+        searchMessages: store.state.searchStore.searchMessages,
         currentUser: store.state.authStore.user,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         chatSettings: store.state.settingsStore.chatSettings,

@@ -10,6 +10,7 @@ import 'package:syphon/cache/middleware.dart';
 import 'package:syphon/cache/storage.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/middleware.dart';
+import 'package:syphon/storage/moor/database.dart';
 import 'package:syphon/store/alerts/middleware.dart';
 
 import 'package:syphon/store/alerts/model.dart';
@@ -21,6 +22,7 @@ import 'package:syphon/store/events/reducer.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/media/reducer.dart';
 import 'package:syphon/cache/serializer.dart';
+import 'package:syphon/store/search/middleware.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/reducer.dart';
@@ -142,7 +144,8 @@ AppState appReducer(AppState state, action) => AppState(
 ///
 Future<Store<AppState>> initStore(
   Database? cache,
-  Database? storage, {
+  Database? storage,
+  StorageDatabase? coldStorage, {
   AppState? existingState,
   bool existingUser = false,
 }) async {
@@ -185,7 +188,8 @@ Future<Store<AppState>> initStore(
       thunkMiddleware,
       authMiddleware,
       persistor.createMiddleware(),
-      storageMiddleware(storage!),
+      storageMiddleware(storage, coldStorage),
+      searchMiddleware(coldStorage),
       alertMiddleware,
     ],
   );

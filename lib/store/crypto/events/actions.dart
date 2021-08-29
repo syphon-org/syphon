@@ -219,7 +219,7 @@ ThunkAction<AppState> decryptMessage({
     final combinedMessage = message.copyWith(
       body: decryptedMessage.body,
       msgtype: decryptedMessage.msgtype,
-      typeAlt: decryptedMessage.type,
+      typeDecrypted: decryptedMessage.type,
     );
 
     await store.dispatch(saveMessageSessionInbound(

@@ -15,6 +15,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/index.dart';
+import 'package:syphon/storage/moor/database.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -32,12 +33,14 @@ import 'package:syphon/views/navigation.dart';
 class Syphon extends StatefulWidget {
   final Database? cache;
   final Database? storage;
+  final StorageDatabase? storageCold;
   final Store<AppState> store;
 
   const Syphon(
     this.store,
     this.cache,
     this.storage,
+    this.storageCold,
   );
 
   @override
@@ -45,13 +48,16 @@ class Syphon extends StatefulWidget {
         store,
         cache,
         storage,
+        storageCold,
       );
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
+  Store<AppState> store;
   Database? cache;
   Database? storage;
-  Store<AppState> store;
+  StorageDatabase? storageCold;
+
   final globalScaffold = GlobalKey<ScaffoldMessengerState>();
 
   Widget defaultHome = HomeScreen();
@@ -60,6 +66,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     this.store,
     this.cache,
     this.storage,
+    this.storageCold,
   );
 
   @override
@@ -167,6 +174,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // Stop saving to existing context databases
     await closeCache(cache);
     await closeStorage(storage);
+    await closeColdStorage(storageCold);
 
     // final context switches
     final contextOld = await loadCurrentContext();
@@ -184,6 +192,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     final cacheNew = await initCache(context: contextNew);
     final storageNew = await initStorage(context: contextNew);
+    final storageColdNew = await initColdStorage(context: contextNew);
 
     final storeExisting = AppState(
       authStore: store.state.authStore.copyWith(user: user),
@@ -208,6 +217,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final storeNew = await initStore(
       cacheNew,
       storageNew,
+      storageColdNew,
       existingUser: existingUser,
       existingState: storeExisting,
     );
@@ -251,6 +261,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
     await deleteCache(context: context.current);
     await deleteStorage(context: context.current);
+    await deleteColdStorage(context: context.current);
   }
 
   // Reset contexts if the current user has no accessToken (unrecoverable state)

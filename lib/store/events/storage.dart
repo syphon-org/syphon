@@ -172,60 +172,6 @@ Future<Map<String, List<Reaction>>> loadReactions(
 }
 
 ///
-/// Save Messages (Cold Storage)
-///
-/// In storage, messages are indexed by eventId
-/// In redux, they're indexed by RoomID and placed in a list
-///
-Future<void> saveMessages(
-  List<Message> messages, {
-  required Database storage,
-}) async {
-  final store = StoreRef<String?, String>(StorageKeys.MESSAGES);
-
-  return storage.transaction((txn) async {
-    for (final Message message in messages) {
-      final record = store.record(message.id);
-      await record.put(txn, json.encode(message));
-    }
-  });
-}
-
-///
-/// Load Messages (Cold Storage)
-///
-/// In storage, messages are indexed by eventId
-/// In redux, they're indexed by RoomID and placed in a list
-Future<List<Message>> loadMessages(
-  List<String> eventIds, {
-  required Database storage,
-  int offset = 0,
-  int limit = 20, // default amount loaded
-}) async {
-  final List<Message> messages = [];
-
-  try {
-    final store = StoreRef<String?, String>(StorageKeys.MESSAGES);
-
-    // TODO: properly paginate through cold storage messages instead of loading all
-    final messageIds = eventIds; //.skip(offset).take(limit).toList();
-
-    final messagesPaginated = await store.records(messageIds).get(storage);
-
-    for (final String? message in messagesPaginated) {
-      if (message != null) {
-        messages.add(Message.fromJson(json.decode(message)));
-      }
-    }
-
-    return messages;
-  } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
-    return [];
-  }
-}
-
-///
 /// Save Decrypted (Cold Storage)
 ///
 /// In storage, messages are indexed by eventId
@@ -286,7 +232,7 @@ Future<List<Message>> loadDecrypted(
 
     return messages;
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    printError(error.toString(), title: 'loadDecrypted');
     return [];
   }
 }

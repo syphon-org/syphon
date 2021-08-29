@@ -64,24 +64,14 @@ PODS:
   - sqflite (0.0.2):
     - Flutter
     - FMDB (>= 2.7.5)
-  - sqlite3 (3.32.3):
-    - sqlite3/common (= 3.32.3)
-  - sqlite3/common (3.32.3)
-  - sqlite3/fts5 (3.32.3):
-    - sqlite3/common
-  - sqlite3/json1 (3.32.3):
-    - sqlite3/common
-  - sqlite3/perf-threadsafe (3.32.3):
-    - sqlite3/common
-  - sqlite3/rtree (3.32.3):
-    - sqlite3/common
-  - sqlite3_flutter_libs (0.0.1):
+  - SQLCipher (4.4.3):
+    - SQLCipher/standard (= 4.4.3)
+  - SQLCipher/common (4.4.3)
+  - SQLCipher/standard (4.4.3):
+    - SQLCipher/common
+  - sqlcipher_flutter_libs (0.0.1):
     - Flutter
-    - sqlite3 (~> 3.32.3)
-    - sqlite3/fts5
-    - sqlite3/json1
-    - sqlite3/perf-threadsafe
-    - sqlite3/rtree
+    - SQLCipher (~> 4.4.3)
   - SwiftyGif (5.3.0)
   - uni_links (0.0.1):
     - Flutter
@@ -103,7 +93,7 @@ DEPENDENCIES:
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
-  - sqlite3_flutter_libs (from `.symlinks/plugins/sqlite3_flutter_libs/ios`)
+  - sqlcipher_flutter_libs (from `.symlinks/plugins/sqlcipher_flutter_libs/ios`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
   - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
@@ -115,7 +105,7 @@ SPEC REPOS:
     - FMDB
     - OLMKit
     - SDWebImage
-    - sqlite3
+    - SQLCipher
     - SwiftyGif
 
 EXTERNAL SOURCES:
@@ -141,8 +131,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
-  sqlite3_flutter_libs:
-    :path: ".symlinks/plugins/sqlite3_flutter_libs/ios"
+  sqlcipher_flutter_libs:
+    :path: ".symlinks/plugins/sqlcipher_flutter_libs/ios"
   uni_links:
     :path: ".symlinks/plugins/uni_links/ios"
   url_launcher:
@@ -167,8 +157,8 @@ SPEC CHECKSUMS:
   SDWebImage: 9169792e9eec3e45bba2a0c02f74bf8bd922d1ee
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
-  sqlite3: 8f7d2078ae27778699a622a94b853285793422a2
-  sqlite3_flutter_libs: 5651f8ff48e3b44d910863c4ea5916085b1b245f
+  SQLCipher: 155ffeafc9ac102e5c9b68e3e9a1297a98a27096
+  sqlcipher_flutter_libs: eae301083f1a44f7afea4c4593dd546ca6f16651
   SwiftyGif: e466e86c660d343357ab944a819a101c4127cb40
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef

@@ -79,7 +79,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
         scrollDirection: Axis.vertical,
         itemCount: props.usersFiltered.length,
         itemBuilder: (BuildContext context, int index) {
-          final user = (props.usersFiltered[index] as User);
+          final user = props.usersFiltered[index] as User;
 
           return GestureDetector(
             onTap: () => onShowUserDetails(

@@ -25,8 +25,11 @@ void main() async {
   // init cold storage
   final storage = await initStorage(context: context.current);
 
+  // init cold storage - NEW MOOR
+  final storageCold = await initColdStorage(context: context.current);
+
   // init redux store
-  final store = await initStore(cache, storage);
+  final store = await initStore(cache, storage, storageCold);
 
   // init app
   runApp(
@@ -35,6 +38,7 @@ void main() async {
         store,
         cache,
         storage,
+        storageCold,
       ),
     ),
   );

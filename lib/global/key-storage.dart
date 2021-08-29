@@ -15,8 +15,8 @@ Future<bool> checkKey(String keyId) async {
   }
 }
 
-Future<String?> loadKey(String keyId) async {
-  var key;
+Future<String> loadKey(String keyId) async {
+  String? key;
 
   // try to read key
   try {

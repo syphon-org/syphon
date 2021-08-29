@@ -1,3 +1,4 @@
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 import './room/model.dart';
 
@@ -15,6 +16,22 @@ List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {
           (userId) => blocked.contains(userId),
         ))
     ..toList();
+}
+
+List<Room> filterSearches(List<Room> rooms, List<Message> searchMessages) {
+  final List<Room> roomList = rooms;
+
+  if (searchMessages.isEmpty) {
+    return rooms;
+  }
+
+  final roomIds = Map<String, String>.fromIterable(
+    searchMessages,
+    key: (msg) => msg.roomId ?? msg.id,
+    value: (msg) => msg.id,
+  );
+
+  return roomList.where((room) => roomIds.containsKey(room.id)).toList();
 }
 
 List<Room> sortPrioritizedRooms(List<Room> rooms) {

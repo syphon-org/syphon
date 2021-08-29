@@ -54,7 +54,7 @@ description: a privacy focused matrix client
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
-version: 0.1.13+230
+version: 0.1.14+240
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -76,6 +76,7 @@ dependencies:
   redux_persist_flutter: ^0.9.0
   flutter_redux: ^0.8.2
   mime: ^1.0.0
+  path: ^1.8.0
   path_provider: ^2.0.1
   package_info: ^2.0.0
 
@@ -89,12 +90,12 @@ dependencies:
   sembast: ^3.0.1
   sqflite: ^2.0.0+3
   sqlite3: ^1.0.0
-  sqlite3_flutter_libs: ^0.4.1
   sembast_sqflite: ^2.0.0+1
   sqflite_common_ffi: ^2.0.0
+  # sqflite_sqlcipher: 1.1.2 TODO: figure out if these are needed still
+  sqlcipher_flutter_libs: ^0.5.0
   flutter_secure_storage: ^4.1.0
-  # checked_yaml: ^2.0.1
-  # sqflite_sqlcipher: 1.1.2
+  moor: ^4.5.0
 
   # services
   http: ^0.13.1
@@ -134,7 +135,8 @@ dependencies:
       ref: 867b117f15f51404e31597d8ab9d5325f6b52938
 
   # data
-  json_annotation: 4.0.1
+  uuid: ^3.0.4
+  json_annotation: ^4.0.0
   collection: ^1.15.0-nullsafety.4
 
   # UNSOUND NULL-SAFTEY
@@ -144,7 +146,8 @@ dependencies:
 dev_dependencies:
   lint: ^1.5.3
   build_runner: ^2.0.2
-  json_serializable: ^4.1.0
+  moor_generator: ^4.4.0
+  json_serializable: ^4.0.0
   flutter_launcher_icons: ^0.9.0
   test: any
 
