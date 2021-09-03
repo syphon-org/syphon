@@ -55,25 +55,41 @@ class HomeState extends State<HomeScreen> {
   final fabKeyCircle = GlobalKey<FabBarContainerState>();
   final fabKeyBar = GlobalKey<FabBarContainerState>();
 
-  Room? selectedRoom;
+  Set<Room> selectedRooms = {};
   Map<String, Color> roomColorDefaults = {};
 
   @protected
-  onToggleRoomOptions({Room? room}) {
+  onDismissRoomOptions() {
     setState(() {
-      selectedRoom = room;
+      selectedRooms = {};
     });
   }
 
   @protected
-  onDismissMessageOptions() {
-    setState(() {
-      selectedRoom = null;
-    });
+  onToggleRoomOptions({required Room room}) {
+    if (selectedRooms.contains(room)) {
+      setState(() {
+        selectedRooms.remove(room);
+      });
+    } else {
+      setState(() {
+        selectedRooms.add(room);
+      });
+    }
   }
 
   @protected
-  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) => AppBar(
+  bool selectedRoomsOnlyDirect() {
+    if (selectedRooms.where((element) => !element.direct).isEmpty) {
+      return true;
+    }
+    return false;
+  }
+
+  @protected
+  Widget buildAppBarRoomOptions(
+          {required BuildContext context, required _Props props}) =>
+      AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -86,82 +102,171 @@ class HomeState extends State<HomeScreen> {
                 icon: Icon(Icons.close),
                 color: Colors.white,
                 iconSize: Dimensions.buttonAppBarSize,
-                onPressed: onDismissMessageOptions,
+                onPressed: onDismissRoomOptions,
               ),
             ),
           ],
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.info_outline),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Chat Details',
-            color: Colors.white,
-            onPressed: () {
-              Navigator.pushNamed(
-                context!,
-                NavigationPaths.chatDetails,
-                arguments: ChatDetailsArguments(
-                  roomId: selectedRoom!.id,
-                  title: selectedRoom!.name,
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.archive),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Archive Room',
-            color: Colors.white,
-            onPressed: () async {
-              await props!.onArchiveRoom(room: selectedRoom);
-              setState(() {
-                selectedRoom = null;
-              });
-            },
-          ),
           Visibility(
-            visible: true,
+            visible: selectedRooms.length == 1,
             child: IconButton(
-              icon: Icon(Icons.exit_to_app),
+              icon: Icon(Icons.info_outline),
               iconSize: Dimensions.buttonAppBarSize,
-              tooltip: 'Leave Chat',
+              tooltip: Strings.buttonRoomDetails.capitalize(),
               color: Colors.white,
-              onPressed: () async {
-                await props!.onLeaveChat(room: selectedRoom);
-                setState(() {
-                  selectedRoom = null;
-                });
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  NavigationPaths.chatDetails,
+                  arguments: ChatDetailsArguments(
+                    roomId: selectedRooms.first.id,
+                    title: selectedRooms.first.name,
+                  ),
+                );
               },
             ),
           ),
+          IconButton(
+            icon: Icon(Icons.archive_outlined),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: Strings.buttonArchiveChat.capitalize(),
+            color: Colors.white,
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(Strings.buttonArchiveChat.capitalize()),
+                content: Text(Strings.confirmArchiveRooms(rooms: selectedRooms)),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(Strings.buttonCancel.capitalize()),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      for (final Room r in selectedRooms) {
+                        await props.onArchiveRoom(room: r);
+                      }
+                      setState(() {
+                        selectedRooms = {};
+                      });
+                    },
+                    child: Text(
+                      Strings.buttonConfirmFormal.capitalize(),
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: Strings.buttonLeaveChat.capitalize(),
+            color: Colors.white,
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(Strings.buttonLeaveChat.capitalize()),
+                content: Text(Strings.confirmLeaveRooms(rooms: selectedRooms)),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(Strings.buttonCancel.capitalize()),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      for (final Room r in selectedRooms) {
+                        await props.onLeaveChat(room: r);
+                      }
+                      setState(() {
+                        selectedRooms = {};
+                      });
+                    },
+                    child: Text(
+                      Strings.buttonConfirmFormal.capitalize(),
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Visibility(
-            visible: selectedRoom!.direct,
+            visible: selectedRoomsOnlyDirect(),
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
-              tooltip: 'Delete Chat',
+              tooltip: Strings.buttonDeleteChat.capitalize(),
               color: Colors.white,
-              onPressed: () async {
-                await props!.onDeleteChat(room: selectedRoom);
-                setState(() {
-                  selectedRoom = null;
-                });
-              },
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(Strings.buttonDeleteChat.capitalize()),
+                  content: Text(Strings.confirmDeleteRooms(rooms: selectedRooms)),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(Strings.buttonCancel.capitalize()),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        for (final Room r in selectedRooms) {
+                          await props.onDeleteChat(room: r);
+                        }
+                        setState(() {
+                          selectedRooms = {};
+                        });
+                      },
+                      child: Text(
+                        Strings.buttonConfirmFormal.capitalize(),
+                        style: TextStyle(
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           IconButton(
             icon: Icon(Icons.select_all),
             iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Select All',
+            tooltip: Strings.buttonSelectAll.capitalize(),
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () {
+              if (selectedRooms.containsAll(props.rooms)) {
+                setState(() {
+                  selectedRooms = {};
+                });
+              } else {
+                setState(() {
+                  selectedRooms.addAll(props.rooms);
+                });
+              }
+            },
           ),
         ],
       );
 
   @protected
-  Widget buildAppBar({required BuildContext context, required _Props props}) => AppBar(
+  Widget buildAppBar({required BuildContext context, required _Props props}) =>
+      AppBar(
         automaticallyImplyLeading: false,
         brightness: Brightness.dark,
         titleSpacing: 16.00,
@@ -314,12 +419,10 @@ class HomeState extends State<HomeScreen> {
         }
 
         // highlight selected rooms if necessary
-        if (selectedRoom != null) {
-          if (selectedRoom!.id != room.id) {
-            backgroundColor = Theme.of(context).scaffoldBackgroundColor;
-          } else {
-            backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
-          }
+        if (selectedRooms.contains(room)) {
+          backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
+        } else {
+          backgroundColor = Theme.of(context).scaffoldBackgroundColor;
         }
 
         // show draft inidicator if it's an empty room
@@ -329,7 +432,8 @@ class HomeState extends State<HomeScreen> {
 
         if (messages.isNotEmpty && messageLatest != null) {
           // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
+          if (messageLatest.type == EventTypes.encrypted &&
+              messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
@@ -349,8 +453,8 @@ class HomeState extends State<HomeScreen> {
         // GestureDetector w/ animation
         return InkWell(
           onTap: () {
-            if (selectedRoom != null) {
-              onDismissMessageOptions();
+            if (selectedRooms.isNotEmpty) {
+              onToggleRoomOptions(room: room);
             } else {
               Navigator.pushNamed(
                 context,
@@ -440,7 +544,9 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.type == 'group' &&
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -460,7 +566,9 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.type == 'public' &&
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -503,7 +611,8 @@ class HomeState extends State<HomeScreen> {
                           ),
                           Text(
                             formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w100),
                           ),
                         ],
                       ),
@@ -569,17 +678,15 @@ class HomeState extends State<HomeScreen> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          var currentAppBar = buildAppBar(
-            props: props,
-            context: context,
-          );
-
-          if (selectedRoom != null) {
-            currentAppBar = buildAppBarRoomOptions(
-              props: props,
-              context: context,
-            );
-          }
+          final currentAppBar = selectedRooms.isEmpty
+              ? buildAppBar(
+                  props: props,
+                  context: context,
+                )
+              : buildAppBarRoomOptions(
+                  props: props,
+                  context: context,
+                );
 
           return Scaffold(
             appBar: currentAppBar as PreferredSizeWidget?,
@@ -598,7 +705,7 @@ class HomeState extends State<HomeScreen> {
                       child: Stack(
                         children: [
                           GestureDetector(
-                            onTap: onDismissMessageOptions,
+                            onTap: onDismissRoomOptions,
                             child: buildChatList(
                               context,
                               props,
@@ -694,10 +801,13 @@ class _Props extends Equatable {
           final backgrounded = store.state.syncStore.backgrounded;
           final loadingRooms = store.state.roomStore.loading;
 
-          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(store.state.syncStore.lastAttempt ?? 0);
+          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
+              store.state.syncStore.lastAttempt ?? 0);
 
           // See if the last attempted sy nc is older than 60 seconds
-          final isLastAttemptOld = DateTime.now().difference(lastAttempt).compareTo(Duration(seconds: 90));
+          final isLastAttemptOld = DateTime.now()
+              .difference(lastAttempt)
+              .compareTo(Duration(seconds: 90));
 
           // syncing for the first time
           if (syncing && !synced) {
