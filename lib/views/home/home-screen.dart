@@ -246,6 +246,19 @@ class HomeState extends State<HomeScreen> {
     });
   }
 
+  onSelectAll(_Props props) {
+    if (selectedChats.values.toSet().containsAll(props.rooms)) {
+      setState(() {
+        selectedChats = {};
+      });
+    } else {
+      setState(() {
+        selectedChats.addAll(Map.fromEntries(
+            props.rooms.map((e) => MapEntry(e.id, e))));
+      });
+    }
+  },
+
   bool isAllDirect(Map<String, Room> selectedChats) {
     return selectedChats.values.every((chat) => chat.direct);
   }
@@ -320,18 +333,7 @@ class HomeState extends State<HomeScreen> {
             iconSize: Dimensions.buttonAppBarSize,
             tooltip: Strings.buttonSelectAll.capitalize(),
             color: Colors.white,
-            onPressed: () {
-              if (selectedChats.values.toSet().containsAll(props.rooms)) {
-                setState(() {
-                  selectedChats = {};
-                });
-              } else {
-                setState(() {
-                  selectedChats.addAll(Map.fromEntries(
-                      props.rooms.map((e) => MapEntry(e.id, e))));
-                });
-              }
-            },
+            onPressed: () => onSelectAll(props),
           ),
         ],
       );
