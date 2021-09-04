@@ -95,33 +95,113 @@ class HomeState extends State<HomeScreen> {
   }
 
   onArchiveChats(_Props props) async {
-    await Future.forEach(selectedChats.values, (room) async {
-      await props.onArchiveChat(room: room);
-    });
-    setState(() {
-      selectedChats = {};
-    });
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(Strings.buttonArchiveChat.capitalize()),
+        content: Text(Strings.confirmArchiveRooms(rooms: selectedChats.values)),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(Strings.buttonCancel.capitalize()),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await Future.forEach(selectedChats.values, (room) async {
+                await props.onArchiveChat(room: room);
+              });
+              setState(() {
+                selectedChats = {};
+              });
+            },
+            child: Text(
+              Strings.buttonConfirmFormal.capitalize(),
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   onLeaveChats(_Props props) async {
-    final _selectedChats = Map<String, Room>.from(selectedChats);
-    await Future.forEach<Room>(_selectedChats.values, (Room room) async {
-      await props.onLeaveChat(room: room);
-      onToggleRoomOptions(room: room);
-    });
-    setState(() {
-      selectedChats = {};
-    });
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(Strings.buttonLeaveChat.capitalize()),
+        content: Text(Strings.confirmLeaveRooms(rooms: selectedChats.values)),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(Strings.buttonCancel.capitalize()),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              final _selectedChats = Map<String, Room>.from(selectedChats);
+              await Future.forEach<Room>(_selectedChats.values,
+                  (Room room) async {
+                await props.onLeaveChat(room: room);
+                onToggleRoomOptions(room: room);
+              });
+              setState(() {
+                selectedChats = {};
+              });
+            },
+            child: Text(
+              Strings.buttonConfirmFormal.capitalize(),
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   onDeleteChats(_Props props) async {
-    final _selectedChats = Map<String, Room>.from(selectedChats);
-    await Future.forEach(_selectedChats.values, (room) async {
-      await props.onDeleteChat(room: room);
-    });
-    setState(() {
-      selectedChats = {};
-    });
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(Strings.buttonDeleteChat.capitalize()),
+        content: Text(Strings.confirmDeleteRooms(rooms: selectedChats.values)),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(Strings.buttonCancel.capitalize()),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+
+              final _selectedChats = Map<String, Room>.from(selectedChats);
+              await Future.forEach(_selectedChats.values, (room) async {
+                await props.onDeleteChat(room: room);
+              });
+              setState(() {
+                selectedChats = {};
+              });
+            },
+            child: Text(
+              Strings.buttonConfirmFormal.capitalize(),
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   onToggleSearch() {
@@ -171,7 +251,9 @@ class HomeState extends State<HomeScreen> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
+  Widget buildAppBarRoomOptions(
+          {required BuildContext context, required _Props props}) =>
+      AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -195,7 +277,7 @@ class HomeState extends State<HomeScreen> {
             child: IconButton(
               icon: Icon(Icons.info_outline),
               iconSize: Dimensions.buttonAppBarSize,
-              tooltip: 'Chat Details',
+              tooltip: Strings.buttonRoomDetails.capitalize(),
               color: Colors.white,
               onPressed: () {
                 Navigator.pushNamed(
@@ -210,28 +292,25 @@ class HomeState extends State<HomeScreen> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.archive),
+            icon: Icon(Icons.archive_outlined),
             iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Archive Room',
+            tooltip: Strings.buttonArchiveChat.capitalize(),
             color: Colors.white,
             onPressed: () => onArchiveChats(props),
           ),
-          Visibility(
-            visible: true,
-            child: IconButton(
-              icon: Icon(Icons.exit_to_app),
-              iconSize: Dimensions.buttonAppBarSize,
-              tooltip: 'Leave Chat',
-              color: Colors.white,
-              onPressed: () => onLeaveChats(props),
-            ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: Strings.buttonLeaveChat.capitalize(),
+            color: Colors.white,
+            onPressed: () => onLeaveChats(props),
           ),
           Visibility(
             visible: isAllDirect(selectedChats),
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
-              tooltip: 'Delete Chat',
+              tooltip: Strings.buttonDeleteChat.capitalize(),
               color: Colors.white,
               onPressed: () => onDeleteChats(props),
             ),
@@ -239,15 +318,27 @@ class HomeState extends State<HomeScreen> {
           IconButton(
             icon: Icon(Icons.select_all),
             iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Select All',
+            tooltip: Strings.buttonSelectAll.capitalize(),
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () {
+              if (selectedChats.values.toSet().containsAll(props.rooms)) {
+                setState(() {
+                  selectedChats = {};
+                });
+              } else {
+                setState(() {
+                  selectedChats.addAll(Map.fromEntries(
+                      props.rooms.map((e) => MapEntry(e.id, e))));
+                });
+              }
+            },
           ),
         ],
       );
 
   @protected
-  Widget buildAppBar({required BuildContext context, required _Props props}) => AppBar(
+  Widget buildAppBar({required BuildContext context, required _Props props}) =>
+      AppBar(
         automaticallyImplyLeading: false,
         brightness: Brightness.dark,
         titleSpacing: 16.00,
@@ -330,8 +421,10 @@ class HomeState extends State<HomeScreen> {
   @protected
   Widget buildChatList(BuildContext context, _Props props) {
     final rooms = props.rooms;
-    final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
-    final noSearchResults = searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
+    final label =
+        props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
+    final noSearchResults =
+        searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
 
     if (rooms.isEmpty) {
       return Center(
@@ -372,7 +465,8 @@ class HomeState extends State<HomeScreen> {
         final decrypted = props.decrypted[room.id] ?? const [];
         final chatSettings = props.chatSettings[room.id];
 
-        final messageLatest = latestMessage(messages, room: room, decrypted: decrypted);
+        final messageLatest =
+            latestMessage(messages, room: room, decrypted: decrypted);
         final preview = formatPreview(room: room, message: messageLatest);
         final chatName = room.name ?? '';
         final newMessage = messageLatest != null &&
@@ -413,7 +507,8 @@ class HomeState extends State<HomeScreen> {
 
         if (messages.isNotEmpty && messageLatest != null) {
           // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
+          if (messageLatest.type == EventTypes.encrypted &&
+              messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
@@ -514,7 +609,9 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.type == 'group' &&
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -534,7 +631,9 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.type == 'public' &&
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -577,7 +676,8 @@ class HomeState extends State<HomeScreen> {
                           ),
                           Text(
                             formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w100),
                           ),
                         ],
                       ),
