@@ -257,7 +257,7 @@ class HomeState extends State<HomeScreen> {
             props.rooms.map((e) => MapEntry(e.id, e))));
       });
     }
-  },
+  }
 
   bool isAllDirect(Map<String, Room> selectedChats) {
     return selectedChats.values.every((chat) => chat.direct);
