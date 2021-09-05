@@ -1,5 +1,5 @@
 {
-    "title-intro": "Bem-vindo(a) a",
+    "title-intro": "Bem-vindo(a) a {}",
     "semantics-image-send-unencrypted": "Enviar mensagem não encriptada",
     "warning-deactivate-account-final": "Não há nenhuma maneira de recuperar esta conta após a mesma ser deletada. Você sairá imediatamente da sua conta e a mesma ficará indisponível.\n\nEste é o aviso final sobre desativação. Se tiver certeza, aperte desativar abaixo.",
     "warning-deactivate-account": "ISTO EXCLUIRÁ PERMANENTEMENTE A SUA CONTA\n\nVocê perderá a possibilidade de recuperar quaisquer dados ou acessar esta conta depois de sua desativação.\nPor favor tenha isso em mente antes de realizar este processo!",
@@ -94,5 +94,9 @@
     "title-view-invite-users": "Convidar Usuários",
     "title-view-delete-devices": "Confirme a Remoção do Dispositivo",
     "header-signup-username": "Crie um nome de usuário",
-    "header-intro": "Privacidade e liberdade\nsem a trabalheira."
+    "header-intro": "Privacidade e liberdade\nsem a trabalheira.",
+    "button-finish": "finalizar",
+    "button-next": "continuar",
+    "button-save": "salvar",
+    "button-login": "entrar"
 }
