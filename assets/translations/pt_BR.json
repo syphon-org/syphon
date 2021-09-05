@@ -134,5 +134,6 @@
     "label-on": "Habilitado",
     "title-dialog-email-requirement": "Requisito de email",
     "title-verification": "Verificação",
-    "header-login": "retome o controle de seus bate-papos"
+    "header-login": "retome o controle de seus bate-papos",
+    "button-login-sso": "entrar através de terceiros"
 }
