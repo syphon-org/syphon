@@ -7,7 +7,12 @@
 <p align='center'>
 a privacy centric matrix client - now in open alpha*
 </p>
- 
+
+<p align='center'>
+join group chat at <a href="https://matrix.to/#/#syphon:matrix.org">#syphon:matrix.org</a>
+</p>
+
+
 <p align='center'>
     <a href='https://play.google.com/store/apps/details?id=org.tether.tether'>
         <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='assets/external/en_badge_web_generic.png' />
@@ -170,6 +175,8 @@ decoration: BoxDecoration(
 
 
 ## 📝 contributing
+- join [#syphon:matrix.org](https://matrix.to/#/#syphon:matrix.org) to discuss questions or ideas
+- translate Syphon at https://hosted.weblate.org/projects/syphon/syphon/
 - email hello@syphon.org if you'd like to get involved. there's a lot to do.
 - donations are welcome, but not required. Syphon will always be a not for profit, community driven application not owned or sold by a corporation.
 
