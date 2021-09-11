@@ -134,5 +134,6 @@
     "content-sync-interval": "Synchronizacja działa poprzez wysyłanie zapytania z długim czasem oczekiwania do serwera Matrix. Interwał synchronizacji nie oznacza czasu pomiędzy pobieraniem wiadomości z serwera, ale czas pomiędzy zapytaniami do serwera.",
     "content-password-requirements": "Każdy serwer może mieć inne wymagania odnośnie hasła.\n\nJeśli masz problemy z utworzeniem hasła, spróbuj zastosować małe i duże litery, cyfry i znaki specjalne, i upewnij się że hasło ma co najmniej 8 znaków",
     "content-confirm-password-reset": "Kliknij link wysłany do twojej skrzynki email. Po otwarciu linku, kliknij przycisk poniżej by kontynuować do zmiany hasła.",
-    "button-login-sso": "logowanie single sign on"
+    "button-login-sso": "logowanie single sign on",
+    "title-verification": "Weryfikacja"
 }

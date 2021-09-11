@@ -96,5 +96,11 @@
     "title-view-delete-devices": "Eszköz törlésének megerősítése",
     "header-signup-username": "Felhasználónév regisztrálása",
     "header-intro": "Magánszféra és szabadság\nbonyodalmak nélkül.",
-    "title-intro": "Üdvözöl a {}"
+    "title-intro": "Üdvözöl a {}",
+    "button-text-see-users": "Összes felhasználó megtekintése",
+    "button-start-chat": "beszélgessünk",
+    "button-login-sso": "single sign on",
+    "title-confirm-email": "Email megerősítése",
+    "title-verification": "Ellenőrzés",
+    "header-login": "foglald vissza a beszélgetéseidet"
 }
