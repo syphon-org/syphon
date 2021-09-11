@@ -79,7 +79,7 @@ Syphon will always be a not for profit, community driven application.
 - [ ] allow transfering user data from one homeserver to another, or from local to remote servers 
 - [ ] cli client using ncurses and the same redux store contained here (common)
  
-## 🌙 Nightlys
+## 🌙 Nightlies
 - Nightly dev builds - per pushed commit builds - can be found under our [Gitea Releases](https://git.syphon.org/syphon-org/syphon/releases)
 
 
