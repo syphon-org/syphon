@@ -192,7 +192,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                         ListTile(
                           contentPadding: Dimensions.listPadding,
                           title: Text(
-                            'Room Type Badges',
+                            'Chat Type Badges',
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Switch(

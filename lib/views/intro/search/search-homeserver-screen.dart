@@ -109,7 +109,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                             theme: ExpandableThemeData(
                               hasIcon: false,
                               tapBodyToCollapse: true,
-                              tapHeaderToExpand: false,
+                              tapHeaderToExpand: true,
                             ),
                             header: ListTile(
                               leading: Avatar(
@@ -169,7 +169,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                     child: Column(
                                       children: <Widget>[
                                         Text(
-                                          'Rooms',
+                                          'Chats',
                                           style: Theme.of(context).textTheme.caption,
                                           softWrap: true,
                                         ),
