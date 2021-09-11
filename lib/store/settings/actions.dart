@@ -385,7 +385,7 @@ ThunkAction<AppState> incrementFabLocation() {
 
 ThunkAction<AppState> incrementLanguage(context) {
   return (Store<AppState> store) async {
-    final languages = Languages.all;
+    final languages = SupportedLanguages.all;
     final languageIndex = languages.indexWhere(
       (name) => name == store.state.settingsStore.language,
     );

@@ -13,7 +13,7 @@ String formatUserId(String displayName, {String homeserver = Values.homeserverDe
 // TODO: remoove after switching to Locale / LanguageCode as source of truth
 String formatLocale(String? language) {
   if (language!.length > 3) {
-    return Languages.english;
+    return SupportedLanguages.english;
   }
 
   return language;

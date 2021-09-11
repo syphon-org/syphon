@@ -72,25 +72,26 @@ class Values {
 // ignore: non_constant_identifier_names
 final bool DEBUG_MODE = !kReleaseMode;
 
-class Languages {
-  static const english = 'en';
-  static const german = 'de';
-  static const polish = 'pl';
-  static const russian = 'ru';
-  static const dutch = 'nl';
-  static const czech = 'cs';
-  static const slovak = 'sk';
-  static const portuguese = 'pt';
+class SupportedLanguages {
+  static const defaultLang = 'en';
 
+  // Follow alphabetical order in assets/translations
   static const all = [
-    english,
-    german,
-    polish,
-    russian,
-    dutch,
-    czech,
-    slovak,
-    portuguese,
+    'ar',
+    'cs',
+    'de',
+    'en',
+    'es',
+    'fr',
+    'hi',
+    'hu',
+    'ja',
+    'nl',
+    'pl',
+    'pt',
+    'ru',
+    'si',
+    'sk',
   ];
 
   static final list = all.map((locale) => Locale(locale)).toList();
