@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 ///
 /// Strings
@@ -86,7 +87,12 @@ class Strings {
   static final buttonConfirm = tr('button-confirm'); //  'got it';
   static final buttonConfirmFormal = tr('button-confirm-formal'); // 'confirm';
   static final buttonConfirmAlt = tr('button-confirm-alt'); //  'ok';
-  static final buttonBlocKUser = tr('button-block-user'); //  'block user';
+  static final buttonBlockUser = tr('button-block-user'); //  'block user';
+  static final buttonLeaveChat = tr('button-leave-chat'); // 'leave chat';
+  static final buttonDeleteChat = tr('button-delete-chat');
+  static final buttonArchiveChat = tr('button-archive-chat');
+  static final buttonSelectAll = tr('button-select-all');
+  static final buttonRoomDetails = tr('button-room-details');
   static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
 
   // Buttons (Text)
@@ -165,6 +171,25 @@ class Strings {
   static final confirmAlphaWarningAlt = tr('confirm-alpha-warning-alt');
   static final confirmAppTermsOfService = tr('confirm-terms-of-service', args: [Values.appName]);
   static final confirmTermsOfServiceConclusion = tr('confirm-terms-of-service-alt');
+
+  static String confirmArchiveRooms({required Iterable<Room> rooms}) => rooms.length == 1
+        ? tr('confirm-archive-chat-single', args: ['${rooms.first.name}', Values.appName])
+        : tr('confirm-archive-chat-multi', args: ['${rooms.length}', Values.appName]);
+
+  static String confirmDeleteRooms({required Iterable<Room> rooms}) => rooms.length == 1
+      ? tr('confirm-delete-chat-single', args: ['${rooms.first.name}', Values.appName])
+      : tr('confirm-delete-chat-multi', args: ['${rooms.length}', Values.appName]);
+
+  static String confirmLeaveRooms({required Iterable<Room> rooms}) {
+    final singleOrMulti = rooms.length == 1 ? 'single' : 'multi';
+    String s = tr('confirm-leave-chat-$singleOrMulti', args: [rooms.length == 1 ? '${rooms.first.name}' : '${rooms.length}']);
+    if (rooms.where((element) => element.type != 'public').isNotEmpty) {
+      s += '\n${tr('confirm-leave-chat-$singleOrMulti-nonpublic')}';
+    }
+    return s;
+  }
+
+  static String confirmBlockUser({String? name}) => tr('confirm-block-user', args: ['$name']);
 
   // Accessibility
   static final semanticsImageIntro = tr('semnatics-image-intro');

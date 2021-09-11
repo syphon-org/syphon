@@ -21,6 +21,7 @@ import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -106,9 +107,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
-        title: 'Block User',
-        content:
-            'If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.',
+        title: Strings.buttonBlockUser,
+        content: Strings.confirmBlockUser(name: user?.displayName),
         onConfirm: () async {
           await props.onBlockUser(user);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -135,8 +135,33 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
 
   @protected
   onLeaveChat(_Props props) async {
-    props.onLeaveChat();
-    Navigator.popUntil(context, (route) => route.isFirst);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(Strings.buttonLeaveChat.capitalize()),
+        content: Text(Strings.confirmLeaveRooms(rooms: [props.room])),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(Strings.buttonCancel.capitalize()),
+          ),
+          TextButton(
+            onPressed: () async {
+              props.onLeaveChat();
+              Navigator.popUntil(context, (route) => route.isFirst);
+            },
+            child: Text(
+              Strings.buttonConfirmFormal.capitalize(),
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
