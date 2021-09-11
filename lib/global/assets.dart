@@ -44,4 +44,6 @@ class Assets {
 
   // chat
   static const heroChatNotFound = 'assets/graphics/undraw_not_found.svg';
+
+  static const captchaHTML = 'assets/recaptcha.html';
 }
