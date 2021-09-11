@@ -369,7 +369,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           path: 'assets/translations',
           useOnlyLangCode: true,
           startLocale: Locale(formatLocale(store.state.settingsStore.language)),
-          fallbackLocale: Locale(SupportedLanguages.english),
+          fallbackLocale: Locale(SupportedLanguages.defaultLang),
           useFallbackTranslations: true,
           supportedLocales: SupportedLanguages.list,
           child: StoreConnector<AppState, ThemeSettings>(
