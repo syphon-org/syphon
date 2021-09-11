@@ -84,9 +84,9 @@ Syphon will always be a not for profit, community driven application.
 - Donations are always welcome! The best way to donate is through the [Syphon creator's Pateron](https://patreon.com/ereio).
 - Coming soon, we'll have a merch store! If you'd like to support the project but want a little something in return, this is the way to do it!
 
-## 🌙 Nightlys (Official)
+## 🌙 nightlys (official)
 
-- Nightly builds (per commit) can be found at [https://git.syphon.org/syphon-org/syphon/releases](https://git.syphon.org/syphon-org/syphon/releases)
+- Nightly dev builds - per pushed commit - can be found at [https://git.syphon.org/syphon-org/syphon/releases](https://git.syphon.org/syphon-org/syphon/releases)
 
 
 ## 🏗️ Building
