@@ -9,13 +9,15 @@ We have a code of conduct, please follow it in all your interactions with the pr
 Syphon has a [Code of Conduct](https://github.com/syphon-org/syphon/main/blob/HEAD/code-of-conduct.md) to which all contributors must adhere. 
 Please first read through the [Standards](https://github.com/syphon-org/syphon/main/blob/HEAD/code-of-conduct.md#standards) section before continuing through this document.
 
-## 2. Syphon Dev Chat
+## 2. Join the Syphon Chat or Contact Us
 
 Join the Syphon General chat on Matrix and let us know you'd like to start contributing to the project!
 
 [Syphon Chat - General](https://matrix.to/#/#syphon:matrix.org)
 
 We'll invite you to the dev room and chat about how you'd like to get started! This way we can coordinate tasks together so no one duplicates work.
+
+If you'd prefer to reach out through email, you can always reach us at hello@syphon.org
 
 Alternatively, you can message the creator of Syphon at (https://matrix.to/#/@ereio:matrix.org) and they will help you get started.
 
