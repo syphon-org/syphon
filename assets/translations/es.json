@@ -1,0 +1,10 @@
+{
+    "alert-message-failed": "El mensaje no se ha podido enviar",
+    "alert-feature-in-progress": "🛠 Esta función estará disponible próximamente",
+    "button-login-sso": "single sign on",
+    "label-search-homeservers": "Buscar servidores bases…",
+    "title-dialog-terms-alpha": "Confirmar las condiciones de servicio de Open Alpha",
+    "title-view-homeserver-search": "Encontrar Su Servidor base",
+    "title-view-settings-chat": "Conversaciones",
+    "title-intro": "Bienvenido a {}"
+}
