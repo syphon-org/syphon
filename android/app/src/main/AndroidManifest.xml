@@ -12,7 +12,6 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Syphon"
-        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher">
         <service
             android:name="io.flutter.plugins.androidalarmmanager.AlarmService"
