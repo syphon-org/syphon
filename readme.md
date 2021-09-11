@@ -79,15 +79,14 @@ Syphon will always be a not for profit, community driven application.
 - [ ] allow transfering user data from one homeserver to another, or from local to remote servers 
 - [ ] cli client using ncurses and the same redux store contained here (common)
  
-## 📝 contributing
+## 🌙 Nightlys
+- Nightly dev builds - per pushed commit builds - can be found under our [Gitea Releases](https://git.syphon.org/syphon-org/syphon/releases)
+
+
+## 📝 Contributing
 - Instructions can be found under our [contributing.md](./contributing.md). Please fully read the document before beginning to write code or produce any material contribution for Syphon.
 - Donations are always welcome! The best way to donate is through the [Syphon creator's Pateron](https://patreon.com/ereio).
 - Coming soon, we'll have a merch store! If you'd like to support the project but want a little something in return, this is the way to do it!
-
-## 🌙 nightlys (official)
-
-- Nightly dev builds - per pushed commit - can be found at [https://git.syphon.org/syphon-org/syphon/releases](https://git.syphon.org/syphon-org/syphon/releases)
-
 
 ## 🏗️ Building
 You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster one can get people contributing, the easier it will be for others to maintain or oversee a tool that does not exploit the user.
