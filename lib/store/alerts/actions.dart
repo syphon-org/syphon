@@ -100,13 +100,15 @@ ThunkAction<AppState> addConfirmation({
 }
 
 ThunkAction<AppState> addAlert({
-  type = 'warning',
   required String origin,
+  type = 'warning',
   String message = '',
   error,
 }) {
   return (Store<AppState> store) async {
     printError('[$origin] [ERROR] ${error.toString()}');
+
+    if (message.isEmpty && error == null) return;
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert =

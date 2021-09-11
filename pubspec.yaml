@@ -190,6 +190,8 @@ flutter:
   # On release, change .env.debug to .env
   assets:
     - assets/translations/
+    - assets/payloads/servers.json
+    - assets/payloads/recaptcha.html
     - assets/graphics/undraw_avatar_male.svg
     - assets/graphics/undraw_avatar_female.svg
     - assets/graphics/undraw_sync_files.svg

@@ -12,7 +12,7 @@ import 'package:device_info/device_info.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/libs/jack/index.dart';
+import 'package:syphon/global/assets.dart';
 
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
@@ -1091,48 +1091,55 @@ ThunkAction<AppState> fetchHomeservers() {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: true));
 
-    final homeserversJson = await JackApi.fetchPublicServers();
+    try {
+      final jsonData = await rootBundle.loadString(Assets.homeserversJSON);
+      final homeserversJson = await json.decode(jsonData);
 
-    // parse homeserver data
-    final List<Homeserver> homserverData = homeserversJson.map((data) {
-      final hostname = data['hostname'].toString().split('.');
-      final hostnameBase = hostname.length > 1
-          ? '${hostname[hostname.length - 2]}.${hostname[hostname.length - 1]}'
-          : hostname[0];
+      // parse homeserver data
+      final homserversList = List<Homeserver>.from(homeserversJson.map((data) {
+        final hostname = data['hostname'].toString().split('.');
+        final hostnameBase = hostname.length > 1
+            ? '${hostname[hostname.length - 2]}.${hostname[hostname.length - 1]}'
+            : hostname[0];
 
-      return Homeserver(
-        hostname: hostnameBase,
-        location: data['location'] ?? '',
-        description: data['description'] ?? '',
-        usersActive: data['users_active'] != null ? data['users_active'].toString() : null,
-        roomsTotal: data['public_room_count'] != null ? data['public_room_count'].toString() : null,
-        founded: data['online_since'] != null ? data['online_since'].toString() : '',
-        responseTime: data['last_response_time'] != null ? data['last_response_time'].toString() : '',
+        return Homeserver(
+          hostname: hostnameBase,
+          location: data['location'] ?? '',
+          description: data['description'] ?? '',
+          usersActive: data['users_active']?.toString() ?? '',
+          roomsTotal: data['public_room_count']?.toString() ?? '',
+          founded: data['online_since']?.toString() ?? '',
+          responseTime: data['last_response_time']?.toString() ?? '',
+        );
+      }));
+
+      // set homeservers without cached photo url
+      await store.dispatch(SetHomeservers(
+        homeservers: homserversList,
+      ));
+
+      // find favicons for all the homeservers
+      final homeserversWithAvatars = await Future.wait(
+        homserversList.map((homeserver) async {
+          final url = await fetchFavicon(url: homeserver.hostname);
+          try {
+            final uri = Uri.parse(url!);
+            final response = await http.get(uri);
+
+            if (response.statusCode == 200) {
+              return homeserver.copyWith(photoUrl: url);
+            }
+          } catch (error) {/* noop */}
+
+          return homeserver;
+        }),
       );
-    }).toList();
 
-    // set homeservers without cached photo url
-    await store.dispatch(SetHomeservers(homeservers: homserverData));
-
-    // find favicons for all the homeservers
-    final homeservers = await Future.wait(
-      homserverData.map((homeserver) async {
-        final url = await fetchFavicon(url: homeserver.hostname);
-        try {
-          final uri = Uri.parse(url!);
-          final response = await http.get(uri);
-
-          if (response.statusCode == 200) {
-            return homeserver.copyWith(photoUrl: url);
-          }
-        } catch (error) {/* noop */}
-
-        return homeserver;
-      }),
-    );
-
-    // set the homeservers and finish loading
-    await store.dispatch(SetHomeservers(homeservers: homeservers));
+      // set the homeservers and finish loading
+      await store.dispatch(SetHomeservers(homeservers: homeserversWithAvatars));
+    } catch (error) {
+      addAlert(origin: 'fetchHomeservers', error: error);
+    }
     store.dispatch(SetLoading(loading: false));
   };
 }

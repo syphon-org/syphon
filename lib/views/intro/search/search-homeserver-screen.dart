@@ -139,46 +139,40 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                         softWrap: true,
                                       ),
                                       Text(
-                                        homeserver.location ?? '',
+                                        homeserver.location ?? 'N/A',
                                         softWrap: true,
                                       )
                                     ],
                                   ),
                                 ),
-                                Visibility(
-                                  visible: homeserver.usersActive != null,
-                                  child: Expanded(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text(
-                                          'Users',
-                                          style: Theme.of(context).textTheme.caption,
-                                          softWrap: true,
-                                        ),
-                                        Text(
-                                          homeserver.usersActive ?? '',
-                                          softWrap: true,
-                                        )
-                                      ],
-                                    ),
+                                Expanded(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Text(
+                                        'Users',
+                                        style: Theme.of(context).textTheme.caption,
+                                        softWrap: true,
+                                      ),
+                                      Text(
+                                        homeserver.usersActive ?? 'N/A',
+                                        softWrap: true,
+                                      )
+                                    ],
                                   ),
                                 ),
-                                Visibility(
-                                  visible: homeserver.roomsTotal != null && homeserver.usersActive == null,
-                                  child: Expanded(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text(
-                                          'Chats',
-                                          style: Theme.of(context).textTheme.caption,
-                                          softWrap: true,
-                                        ),
-                                        Text(
-                                          homeserver.roomsTotal ?? '',
-                                          softWrap: true,
-                                        )
-                                      ],
-                                    ),
+                                Expanded(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Text(
+                                        'Chats',
+                                        style: Theme.of(context).textTheme.caption,
+                                        softWrap: true,
+                                      ),
+                                      Text(
+                                        homeserver.roomsTotal ?? 'N/A',
+                                        softWrap: true,
+                                      )
+                                    ],
                                   ),
                                 ),
                                 Expanded(
@@ -191,21 +185,6 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
                                       ),
                                       Text(
                                         homeserver.founded.toString(),
-                                        softWrap: true,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    children: <Widget>[
-                                      Text(
-                                        'Avg Speed',
-                                        style: Theme.of(context).textTheme.caption,
-                                        softWrap: true,
-                                      ),
-                                      Text(
-                                        '${homeserver.responseTime ?? '0'}ms',
                                         softWrap: true,
                                       ),
                                     ],
