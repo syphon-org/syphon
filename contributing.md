@@ -23,7 +23,7 @@ Alternatively, you can message the creator of Syphon at (https://matrix.to/#/@er
 
 ## 3. Build Syphon
 
-If you're righting code, make sure to fully read the [Building](./readme.md#Building) section of the readme and confirm you can build Syphon on your platform of choice. If you're having trouble, it's worth taking a look at our [CI pipeline scripts](./drone.yml) for instructions on building per platform.
+If you're writing code, make sure to fully read the [Building](./readme.md#Building) section of the readme and confirm you can build Syphon on your platform of choice. If you're having trouble, it's worth taking a look at our [CI pipeline scripts](./drone.yml) for instructions on building per platform.
 
 ## 4. Writing Code
 
