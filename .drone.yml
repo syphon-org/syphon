@@ -64,8 +64,11 @@ steps:
       # Modify package and app name to allow for installing alongside normal Syphon
       - sed -i 's/android:label="Syphon"/android:label="Syphon Nightly"/g' android/app/src/main/AndroidManifest.xml
       - sed -i 's/applicationId "org.tether.tether"/applicationId "org.syphon.syphon.nightly"/g' android/app/build.gradle
+      # Modify the default ic_launcher to the nightly version
+      - sed -i 's/ic_launcher_background">#34C7B5/ic_launcher_background">#161616/g' android/app/src/main/res/values/colors.xml
       # Build the APK
-      - flutter build apk --split-per-abi
+      - flutter build apk
+      - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.android.apk
 
   - name: release android
     image: golang:1.13
@@ -73,12 +76,11 @@ steps:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
-      # Create a build timestamp for the release title
-      - echo $(date -Iseconds) > BUILD_START_TIME
+      # Modify the existing release and add the android apk
       - go get code.gitea.io/tea
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
-      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.linux.x64.tar.gz
+      - tea release edit --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.android.apk
 ---
 kind: pipeline
 type: docker
