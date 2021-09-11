@@ -1,8 +1,8 @@
 # Contributing To Syphon
 
-When contributing to this repository, please first read this document fully before beginning to produce any material work for Syphon.
+When contributing to this repository, first read and agree with the contents of this document fully before beginning to produce any material work for Syphon.
 
-Please note we have a code of conduct, please follow it in all your interactions with the project.
+We have a code of conduct, please follow it in all your interactions with the project.
 
 ## 1. [Code of Conduct](./docs/code-of-conduct.md)
 
