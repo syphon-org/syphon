@@ -1,41 +1,5 @@
 kind: pipeline
 type: docker
-name: android build dev
-trigger:
-  branch:
-    - dev
-    - main
-  event:
-    - push
-steps:
-  - name: build android
-    image: cirrusci/flutter:2.2.2
-    commands:
-      # Keep track of the time when build was started
-      - echo $(date -Iseconds) > BUILD_START_TIME
-      # Environment variables
-      - export DEBIAN_FRONTEND=noninteractive
-      - export ANDROID_NDK_HOME=/opt/android-sdk-linux/ndk-bundle/
-      # Install dependencies (git should be pre-installed)
-      - apt-get update && apt-get install --no-install-recommends -y cmake ninja-build
-      - git submodule update --init --recursive
-      - sdkmanager "ndk-bundle"
-      # Set up flutter
-      - flutter config --no-analytics
-      - flutter pub get
-      - flutter pub run build_runner build --delete-conflicting-outputs
-      # Modify gradle build script (remove/change parts which don't work in this environment)
-      - sed -i '/keystoreProperties\[/d' android/app/build.gradle
-      - sed -i 's/version "3.10.2"/version "3.7.0+"/g' android/app/build.gradle
-      - sed -i 's/signingConfig signingConfigs.release/signingConfig signingConfigs.debug/g' android/app/build.gradle
-      # Modify package and app name to allow for installing alongside normal Syphon
-      - sed -i 's/android:label="Syphon"/android:label="Syphon Nightly"/g' android/app/src/main/AndroidManifest.xml
-      - sed -i 's/applicationId "org.tether.tether"/applicationId "org.syphon.syphon.nightly"/g' android/app/build.gradle
-      # Build the APK
-      - flutter build apk --split-per-abi
----
-kind: pipeline
-type: docker
 name: linux build dev
 trigger:
   event:
@@ -69,7 +33,52 @@ steps:
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.linux.x64.tar.gz
+---
+kind: pipeline
+type: docker
+name: android build dev
+trigger:
+  event:
+    - push
+steps:
+  - name: build android
+    image: cirrusci/flutter:2.2.2
+    commands:
+      # Keep track of the time when build was started
+      - echo $(date -Iseconds) > BUILD_START_TIME
+      # Environment variables
+      - export DEBIAN_FRONTEND=noninteractive
+      - export ANDROID_NDK_HOME=/opt/android-sdk-linux/ndk-bundle/
+      # Install dependencies (git should be pre-installed)
+      - apt-get update && apt-get install --no-install-recommends -y cmake ninja-build
+      - git submodule update --init --recursive
+      - sdkmanager "ndk-bundle"
+      # Set up flutter
+      - flutter config --no-analytics
+      - flutter pub get
+      - flutter pub run build_runner build --delete-conflicting-outputs
+      # Modify gradle build script (remove/change parts which don't work in this environment)
+      - sed -i '/keystoreProperties\[/d' android/app/build.gradle
+      - sed -i 's/version "3.10.2"/version "3.7.0+"/g' android/app/build.gradle
+      - sed -i 's/signingConfig signingConfigs.release/signingConfig signingConfigs.debug/g' android/app/build.gradle
+      # Modify package and app name to allow for installing alongside normal Syphon
+      - sed -i 's/android:label="Syphon"/android:label="Syphon Nightly"/g' android/app/src/main/AndroidManifest.xml
+      - sed -i 's/applicationId "org.tether.tether"/applicationId "org.syphon.syphon.nightly"/g' android/app/build.gradle
+      # Build the APK
+      - flutter build apk --split-per-abi
 
+  - name: release android
+    image: golang:1.13
+    environment:
+      GITEA_SERVER_TOKEN:
+        from_secret: GITEA_API_TOKEN
+    commands:
+      # Create a build timestamp for the release title
+      - echo $(date -Iseconds) > BUILD_START_TIME
+      - go get code.gitea.io/tea
+      - go install code.gitea.io/tea
+      - tea login add -u https://git.syphon.org
+      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.linux.x64.tar.gz
 ---
 kind: pipeline
 type: docker
