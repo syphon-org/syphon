@@ -133,6 +133,7 @@ class Strings {
   static const alertBackgroundService = 'Background connection enabled';
 
   // Content
+  static final contentCaptchaWarning = tr('content-captcha-warning');
   static final contentPasswordRecommendation = tr('content-password-recommendation');
   static final contentDeleteDevices = tr('content-dialog-devices-delete');
   static final contentKeyExportWarning = tr('content-dialog-devices-key-export');
@@ -173,8 +174,8 @@ class Strings {
   static final confirmTermsOfServiceConclusion = tr('confirm-terms-of-service-alt');
 
   static String confirmArchiveRooms({required Iterable<Room> rooms}) => rooms.length == 1
-        ? tr('confirm-archive-chat-single', args: ['${rooms.first.name}', Values.appName])
-        : tr('confirm-archive-chat-multi', args: ['${rooms.length}', Values.appName]);
+      ? tr('confirm-archive-chat-single', args: ['${rooms.first.name}', Values.appName])
+      : tr('confirm-archive-chat-multi', args: ['${rooms.length}', Values.appName]);
 
   static String confirmDeleteRooms({required Iterable<Room> rooms}) => rooms.length == 1
       ? tr('confirm-delete-chat-single', args: ['${rooms.first.name}', Values.appName])
@@ -182,7 +183,8 @@ class Strings {
 
   static String confirmLeaveRooms({required Iterable<Room> rooms}) {
     final singleOrMulti = rooms.length == 1 ? 'single' : 'multi';
-    String s = tr('confirm-leave-chat-$singleOrMulti', args: [rooms.length == 1 ? '${rooms.first.name}' : '${rooms.length}']);
+    String s = tr('confirm-leave-chat-$singleOrMulti',
+        args: [rooms.length == 1 ? '${rooms.first.name}' : '${rooms.length}']);
     if (rooms.where((element) => element.type != 'public').isNotEmpty) {
       s += '\n${tr('confirm-leave-chat-$singleOrMulti-nonpublic')}';
     }

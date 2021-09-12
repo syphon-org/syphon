@@ -14,6 +14,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
 class CaptchaStep extends StatefulWidget {
   const CaptchaStep({Key? key}) : super(key: key);
@@ -89,6 +90,15 @@ class CaptchaStepState extends State<CaptchaStep> {
                         right: 0,
                         child: GestureDetector(
                           onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (dialogContext) => DialogConfirm(
+                                title: Strings.titleDialogCaptcha,
+                                content: Strings.contentCaptchaWarning,
+                                onConfirm: () => Navigator.pop(dialogContext),
+                                onDismiss: () => Navigator.pop(dialogContext),
+                              ),
+                            );
                             // TODO: show captcha explaination dialog
                           },
                           child: Container(
@@ -96,7 +106,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                             width: 20,
                             child: Icon(
                               Icons.info_outline,
-                              color: Colors.white,
+                              color: Colors.red,
                               size: 20,
                             ),
                           ),

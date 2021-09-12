@@ -2,6 +2,7 @@
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="text/javascript">
     var captchaCallback = function (response) {
       if (typeof Captcha !== "undefined") {
@@ -15,7 +16,7 @@
   </script>
 </head>
 
-<body>
+<body style="width: 304px;">
   <div id="recaptcha_widget"></div>
   <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
 </body>

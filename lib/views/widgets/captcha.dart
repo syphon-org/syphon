@@ -1,12 +1,9 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
+import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -38,6 +35,8 @@ class Captcha extends StatefulWidget {
 class CaptchaState extends State<Captcha> with Lifecycle<Captcha> {
   WebViewController? controller;
 
+  bool loading = true;
+
   CaptchaState();
 
   loadLocalHtml() async {
@@ -47,31 +46,49 @@ class CaptchaState extends State<Captcha> with Lifecycle<Captcha> {
       widget.publicKey ?? Values.captchaMatrixSiteKey,
     );
 
-    controller?.loadHtml(recaptchaWithSiteKeyHTML);
+    await controller?.loadHtml(recaptchaWithSiteKeyHTML);
   }
 
   // Matrix Public Key
   @override
   Widget build(BuildContext context) {
-    return WebView(
-      baseUrl: widget.baseUrl != null ? 'https://${widget.baseUrl}' : 'https://matrix.org',
-      javascriptMode: JavascriptMode.unrestricted,
-      javascriptChannels: {
-        JavascriptChannel(
-          name: 'Captcha',
-          onMessageReceived: (JavascriptMessage message) {
-            String token = message.message;
-            if (token.contains('verify')) {
-              token = token.substring(7);
-            }
-            widget.onVerified(token);
+    return Stack(
+      children: [
+        WebView(
+          baseUrl: widget.baseUrl != null ? 'https://${widget.baseUrl}' : 'https://matrix.org',
+          javascriptMode: JavascriptMode.unrestricted,
+          javascriptChannels: {
+            JavascriptChannel(
+              name: 'Captcha',
+              onMessageReceived: (JavascriptMessage message) {
+                String token = message.message;
+                if (token.contains('verify')) {
+                  token = token.substring(7);
+                }
+                widget.onVerified(token);
+              },
+            ),
+          },
+          onPageFinished: (_) {
+            setState(() {
+              loading = false;
+            });
+          },
+          onWebViewCreated: (WebViewController webViewController) {
+            setState(() {
+              loading = true;
+            });
+            controller = webViewController;
+            loadLocalHtml();
           },
         ),
-      },
-      onWebViewCreated: (WebViewController webViewController) {
-        controller = webViewController;
-        loadLocalHtml();
-      },
+        Visibility(
+          visible: loading,
+          child: Center(
+            child: LoadingIndicator(loading: loading),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -179,8 +179,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
       builder: (BuildContext context) => DialogInviteUsers(
         users: invites,
         title: 'Invite To ${room!.name}',
-        content: Strings.confirmInvites +
-            '\n\nSend ${invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?',
+        content:
+            '${Strings.confirmInvites}${'\n\nSend ${invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?'}',
         action: 'send ${invitePlurialized.toLowerCase()}',
         onInviteUsers: () async {
           await Future.wait(invites.map((user) async {

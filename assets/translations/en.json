@@ -108,6 +108,7 @@
     "content-intro-section-two-part-three": "where the\nmessages are stored",
     "content-intro-section-three": "Both Matrix and {} are developed\nopenly by organizations and people,\nnot corporations",
     "content-intro-section-four": "By using {} and other Matrix clients\nwe can make private messaging \naccessible to everyone",
+    "content-captcha-warning": "Some Matrix servers required captcha confirmation provided by Google through ReCaptcha. \n\nIf you'd prefer not to complete this captcha, you may need to go back to sever select and choose a different server for account creation.",
     "content-dialog-devices-delete": "You will have to sign in again on these devices if you remove them.",
     "content-dialog-devices-key-export": "Are you sure you want to export this devices encryption key? It may make it available to others if you're not careful!",
     "content-notification-background": "Background connection enabled",

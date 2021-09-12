@@ -134,7 +134,7 @@ dependencies:
   fab_circular_menu:
     git:
       url: https://github.com/ereio/fab-circular-menu.git
-      ref: master
+      ref: 623b65c0d8f392065f41a4628c0278563a809644
   swipeable:
     git:
       url: https://github.com/ereio/swipeable.git
