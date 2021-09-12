@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -32,32 +32,11 @@ class Captcha extends StatefulWidget {
       );
 }
 
-class CaptchaState extends State<Captcha> {
+class CaptchaState extends State<Captcha> with Lifecycle<Captcha> {
   final String? publickey;
   final Function? onVerified;
 
   final Completer<WebViewController> controller = Completer<WebViewController>();
-
-  @override
-  void initState() {
-    super.initState();
-
-    // NOTE: SchedulerBinding still needed in screen child views
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
-      onMounted();
-    });
-  }
-
-  @protected
-  void onMounted() {
-    // Confirm public key is correct
-    // debugPrint('[captcha wrapper] ${this.publickey}');
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   CaptchaState({
     this.publickey,

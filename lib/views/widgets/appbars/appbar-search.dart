@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -49,7 +49,7 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => AppBar().preferredSize;
 }
 
-class AppBarSearchState extends State<AppBarSearch> {
+class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch> {
   final focusNode = FocusNode();
 
   bool searching = false;
@@ -60,19 +60,15 @@ class AppBarSearchState extends State<AppBarSearch> {
     super.initState();
 
     searching = widget.startFocused;
+  }
 
-    // NOTE: still needed to have navigator context in dialogs
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
-      if (searching) {
-        FocusScope.of(context).requestFocus(
-          widget.focusNode ?? focusNode,
-        );
-      }
-
-      // if (widget.forceFocus) {
-      //   onToggleSearch(context: context);
-      // }
-    });
+  @override
+  void onMounted() {
+    if (searching) {
+      FocusScope.of(context).requestFocus(
+        widget.focusNode ?? focusNode,
+      );
+    }
   }
 
   @protected

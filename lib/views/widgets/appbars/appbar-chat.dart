@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -22,6 +21,7 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-container.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 
 enum ChatOptions {
   search,
@@ -76,22 +76,17 @@ class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => AppBar().preferredSize;
 }
 
-class AppBarChatState extends State<AppBarChat> {
+class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
   final focusNode = FocusNode();
 
   bool searching = false;
   Timer? searchTimeout;
 
   @override
-  void initState() {
-    super.initState();
-
-    // NOTE: still needed to have navigator context in dialogs
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
-      if (widget.forceFocus) {
-        // TODO: implement chat searching
-      }
-    });
+  void onMounted() {
+    if (widget.forceFocus) {
+      // TODO: implement chat searching
+    }
   }
 
   onBack() {

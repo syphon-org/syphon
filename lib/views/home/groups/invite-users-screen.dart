@@ -27,6 +27,7 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-invite-users.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/lists/list-item-user.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
@@ -44,7 +45,7 @@ class InviteUsersScreen extends StatefulWidget {
   InviteUsersState createState() => InviteUsersState();
 }
 
-class InviteUsersState extends State<InviteUsersScreen> {
+class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUsersScreen> {
   InviteUsersState();
 
   final searchInputFocusNode = FocusNode();
@@ -55,12 +56,6 @@ class InviteUsersState extends State<InviteUsersScreen> {
   String? creatingRoomDisplayName;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
 

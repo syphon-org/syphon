@@ -48,9 +48,6 @@ class MessageListState extends State<MessageList> {
   final TextEditingController controller = TextEditingController();
 
   @protected
-  onMounted(_Props props) {}
-
-  @protected
   onInputReaction({Message? message, _Props? props}) async {
     final height = MediaQuery.of(context).size.height;
     await showModalBottomSheet(
@@ -99,7 +96,6 @@ class MessageListState extends State<MessageList> {
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
-        onInitialBuild: onMounted,
         builder: (context, props) {
           return GestureDetector(
             onTap: () => widget.onToggleSelectedMessage!(null),

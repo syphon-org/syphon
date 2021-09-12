@@ -23,6 +23,7 @@ import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class ChatSearchArguments {
@@ -37,7 +38,7 @@ class ChatSearchScreen extends StatefulWidget {
   ChatSearchState createState() => ChatSearchState();
 }
 
-class ChatSearchState extends State<ChatSearchScreen> {
+class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchScreen> {
   final searchInputFocusNode = FocusNode();
 
   ChatSearchState();
@@ -50,15 +51,8 @@ class ChatSearchState extends State<ChatSearchScreen> {
     roomColorDefaults = {};
   }
 
-  // componentDidMount(){}
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
-  void onMounted() async {
+  onMounted() async {
     final store = StoreProvider.of<AppState>(context);
     final searchResults = store.state.searchStore.searchResults;
 

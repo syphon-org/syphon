@@ -7,6 +7,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
@@ -32,7 +33,7 @@ class ChatUsersDetailScreen extends StatefulWidget {
   ChatUsersDetailState createState() => ChatUsersDetailState();
 }
 
-class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
+class ChatUsersDetailState extends State<ChatUsersDetailScreen> with Lifecycle<ChatUsersDetailScreen> {
   final searchInputFocusNode = FocusNode();
 
   bool loading = false;
@@ -40,12 +41,6 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> {
   ChatUsersDetailState();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
 
