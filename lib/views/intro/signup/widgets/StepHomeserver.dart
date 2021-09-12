@@ -39,7 +39,6 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
     homeserverController.text = homeserver.hostname ?? hostname;
   }
 
-  @override
   buildContinueSSO(_Props props) => Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         child: ListTile(

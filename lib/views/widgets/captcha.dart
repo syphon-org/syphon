@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
@@ -14,11 +18,13 @@ import 'package:syphon/global/values.dart';
  * by certain matrix servers -_-
  */
 class Captcha extends StatefulWidget {
+  final String? baseUrl;
   final String? publicKey;
   final Function onVerified;
 
   const Captcha({
     Key? key,
+    required this.baseUrl,
     required this.publicKey,
     required this.onVerified,
   }) : super(
@@ -26,47 +32,45 @@ class Captcha extends StatefulWidget {
         );
 
   @override
-  CaptchaState createState() => CaptchaState(
-        publickey: publicKey,
-        onVerified: onVerified,
-      );
+  CaptchaState createState() => CaptchaState();
 }
 
 class CaptchaState extends State<Captcha> with Lifecycle<Captcha> {
-  final String? publickey;
-  final Function? onVerified;
+  WebViewController? controller;
 
-  final Completer<WebViewController> controller = Completer<WebViewController>();
+  CaptchaState();
 
-  CaptchaState({
-    this.publickey,
-    this.onVerified,
-  });
+  loadLocalHtml() async {
+    final recaptchaHTML = await rootBundle.loadString(Assets.captchaHTML);
+    final recaptchaWithSiteKeyHTML = recaptchaHTML.replaceFirst(
+      's%',
+      widget.publicKey ?? Values.captchaMatrixSiteKey,
+    );
+
+    controller?.loadHtml(recaptchaWithSiteKeyHTML);
+  }
 
   // Matrix Public Key
   @override
   Widget build(BuildContext context) {
-    final captchaUrl = '${Values.captchaUrl}$publickey';
-
     return WebView(
-      initialUrl: captchaUrl,
+      baseUrl: widget.baseUrl != null ? 'https://${widget.baseUrl}' : 'https://matrix.org',
       javascriptMode: JavascriptMode.unrestricted,
       javascriptChannels: {
         JavascriptChannel(
-          name: 'RecaptchaFlutterChannel',
-          onMessageReceived: (JavascriptMessage receiver) {
-            String token = receiver.message;
+          name: 'Captcha',
+          onMessageReceived: (JavascriptMessage message) {
+            String token = message.message;
             if (token.contains('verify')) {
               token = token.substring(7);
             }
-            if (onVerified != null) {
-              onVerified!(token);
-            }
+            widget.onVerified(token);
           },
         ),
       },
       onWebViewCreated: (WebViewController webViewController) {
-        controller.complete(webViewController);
+        controller = webViewController;
+        loadLocalHtml();
       },
     );
   }

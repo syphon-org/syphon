@@ -33,7 +33,7 @@ class Values {
 
   static const captchaUrl = 'https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=';
 
-  static const captchaMatrixPublicKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
+  static const captchaMatrixSiteKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
 
   static const supportEmail = 'hello@syphon.org';
 

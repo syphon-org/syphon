@@ -1,6 +1,7 @@
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
+///
 /// Widget Lifecycle Mixin
 ///
 /// Adds more familar and unavailable lifecycle methods for StatefulWidgets in Flutter

@@ -117,7 +117,13 @@ dependencies:
   flutter_svg: ^0.22.0
   file_picker: ^3.0.1
   image_picker: ^0.7.4
-  webview_flutter: ^2.0.4
+  # TODO: convert back when similar functionality is merged
+  # webview_flutter: ^2.0.13
+  webview_flutter:
+    git:
+      url: https://github.com/ereio/plugins.git
+      path: packages/webview_flutter/webview_flutter
+      ref: 38b28d35733993761d295a73f68c9c1e2e22752b
   touchable_opacity: ^1.2.0
   smooth_page_indicator: ^0.3.0-nullsafety.0
   flutter_local_notifications: ^5.0.0+1

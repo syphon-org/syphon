@@ -59,6 +59,7 @@ class DialogCaptcha extends StatelessWidget {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: Captcha(
+                    baseUrl: props.hostname,
                     publicKey: props.publicKey,
                     onVerified: (token) => props.onCompleteCaptcha(token, context: context),
                   ),
@@ -86,11 +87,13 @@ class DialogCaptcha extends StatelessWidget {
 
 class Props extends Equatable {
   final bool completed;
+  final String? hostname;
   final String? publicKey;
 
   final Function onCompleteCaptcha;
 
   const Props({
+    required this.hostname,
     required this.completed,
     required this.publicKey,
     required this.onCompleteCaptcha,
@@ -98,11 +101,13 @@ class Props extends Equatable {
 
   @override
   List<Object?> get props => [
+        hostname,
         completed,
         publicKey,
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
+        hostname: store.state.authStore.hostname,
         completed: store.state.authStore.captcha,
         publicKey: () {
           return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'];

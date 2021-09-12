@@ -18,6 +18,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class SearchHomeserverScreen extends StatefulWidget {
@@ -27,7 +28,8 @@ class SearchHomeserverScreen extends StatefulWidget {
   SearchHomeserverScreenState createState() => SearchHomeserverScreenState();
 }
 
-class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
+class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
+    with Lifecycle<SearchHomeserverScreen> {
   final searchInputFocusNode = FocusNode();
 
   bool searching = false;
@@ -35,13 +37,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen> {
   SearchHomeserverScreenState();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
-  void onMounted() {
+  onMounted() {
     final store = StoreProvider.of<AppState>(context);
 
     if (!searching) {

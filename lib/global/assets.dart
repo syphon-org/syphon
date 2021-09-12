@@ -49,5 +49,5 @@ class Assets {
   static const homeserversJSON = 'assets/payloads/servers.json';
 
   // embedded HTML - WebViews
-  static const captchaHTML = 'assets/recaptcha.html';
+  static const captchaHTML = 'assets/payloads/recaptcha.html';
 }
