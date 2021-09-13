@@ -13,6 +13,7 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class ChatsSettingsScreen extends StatelessWidget {
@@ -63,7 +64,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                             GestureDetector(
                               onTap: () => props.onDisabled(),
                               child: ListTile(
-                                onTap: () => props.onIncrementLanguage(),
+                                onTap: () => Navigator.pushNamed(context, NavigationPaths.settingsLanguages),
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
                                   'Language',
