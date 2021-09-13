@@ -20,6 +20,7 @@ class Values {
   static const EMPTY_CHAT = 'Empty Chat';
   static const EMPTY = '';
   static const UNKNOWN = 'Unknown';
+  static const DEFAULT_PROTOCOL = 'https://';
 
   // Notifications and Background service
   static const channel_id = '${appLabel}_notifications';
@@ -30,8 +31,6 @@ class Values {
   static const channel_name_messages = 'Messages';
   static const channel_name_background_service = 'Background Sync';
   static const channel_description = '$appName messaging client message and status notifications';
-
-  static const captchaUrl = 'https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=';
 
   static const captchaMatrixSiteKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
 

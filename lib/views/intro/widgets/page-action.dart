@@ -7,7 +7,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
 
 class ActionPage extends StatelessWidget {
-  ActionPage({Key? key, this.title}) : super(key: key);
+  const ActionPage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 

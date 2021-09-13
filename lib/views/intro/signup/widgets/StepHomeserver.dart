@@ -39,6 +39,16 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
     homeserverController.text = homeserver.hostname ?? hostname;
   }
 
+  onDidChange(_Props? oldProps, _Props props) {
+    final baseUrlChanged = props.homeserver.hostname != oldProps?.homeserver.hostname;
+
+    if (baseUrlChanged) {
+      final hostname = props.hostname;
+      final homeserver = props.homeserver;
+      homeserverController.text = homeserver.hostname ?? hostname;
+    }
+  }
+
   buildContinueSSO(_Props props) => Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         child: ListTile(
@@ -96,7 +106,8 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
       );
 
   buildContinue(_Props props) {
-    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+    if (props.homeserver.loginTypes.contains(MatrixAuthTypes.SSO) &&
+        !props.homeserver.loginTypes.contains(MatrixAuthTypes.PASSWORD)) {
       return buildContinueSSO(props);
     }
     return buildContinueNormal(props);
@@ -105,9 +116,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
-      onDidChange: (props, _) {
-        homeserverController.text = props?.homeserver.hostname ?? props?.hostname ?? '';
-      },
+      onWillChange: onDidChange,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         final double height = MediaQuery.of(context).size.height;

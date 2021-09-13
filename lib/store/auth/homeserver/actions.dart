@@ -63,7 +63,7 @@ ThunkAction<AppState> fetchKnownServers() {
       // set the homeservers and finish loading
       await store.dispatch(SetHomeservers(homeservers: homeserversWithAvatars));
     } catch (error) {
-      addAlert(origin: 'fetchHomeservers', error: error);
+      store.dispatch(addAlert(origin: 'fetchHomeservers', error: error));
     }
     store.dispatch(setAuthLoading(false));
   };
