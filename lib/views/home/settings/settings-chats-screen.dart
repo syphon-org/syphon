@@ -25,7 +25,7 @@ class ChatsSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStateToProps(store, context),
+        converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
 
@@ -305,7 +305,7 @@ class Props extends Equatable {
         dismissKeyboard,
       ];
 
-  static Props mapStateToProps(Store<AppState> store, BuildContext context) => Props(
+  static Props mapStateToProps(Store<AppState> store) => Props(
         language: DisplayName(Locale(store.state.settingsStore.language)).toDisplayName(),
         enterSend: store.state.settingsStore.enterSendEnabled,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
@@ -315,7 +315,7 @@ class Props extends Equatable {
             message: Strings.alertAppRestartEffect,
             action: 'Dismiss',
           ));
-          store.dispatch(incrementLanguage(context));
+          store.dispatch(incrementLanguage());
         },
         onToggleDismissKeyboard: () => store.dispatch(toggleDismissKeyboard()),
         onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),

@@ -289,9 +289,9 @@ extension DisplayName on Locale {
 
   String toDisplayName() {
     if (isoLangs.containsKey(languageCode)) {
-      return isoLangs[languageCode]!['name'] ?? 'english';
+      return isoLangs[languageCode]!['name'] ?? 'English';
     } else {
-      return 'english';
+      return 'English';
     }
   }
 }
