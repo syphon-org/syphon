@@ -24,6 +24,17 @@ Color selectAccentColor(ThemeSettings themeSettings) {
   return Color(themeSettings.accentColor);
 }
 
+int selectRowHighlightColor(ThemeType themeType) {
+  switch (themeType) {
+    case ThemeType.Light:
+      return Colours.greyLightest;
+    case ThemeType.Night:
+      return Colours.greyDarkest;
+    default:
+      return Colours.greyDark;
+  }
+}
+
 int selectSystemUiColor(ThemeType themeType) {
   switch (themeType) {
     case ThemeType.Light:
