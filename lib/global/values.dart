@@ -1,12 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-
-extension Capitalize on String {
-  String capitalize() {
-    return '${this[0].toUpperCase()}${substring(1)}';
-  }
-}
+import 'package:syphon/global/strings.dart';
 
 /// Constants that cannot be localized
 /// taken as a convention from Android

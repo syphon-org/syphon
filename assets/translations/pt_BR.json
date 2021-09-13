@@ -1,6 +1,6 @@
 {
     "title-intro": "Bem-vindo(a) a {}",
-    "semantics-image-send-unencrypted": "Enviar mensagem não encriptada",
+    "label-send-unencrypted": "Enviar mensagem não encriptada",
     "warning-deactivate-account-final": "Não há nenhuma maneira de recuperar esta conta após a mesma ser deletada. Você sairá imediatamente da sua conta e a mesma ficará indisponível.\n\nEste é o aviso final sobre desativação. Se tiver certeza, aperte desativar abaixo.",
     "warning-deactivate-account": "ISTO EXCLUIRÁ PERMANENTEMENTE A SUA CONTA\n\nVocê perderá a possibilidade de recuperar quaisquer dados ou acessar esta conta depois de sua desativação.\nPor favor tenha isso em mente antes de realizar este processo!",
     "confirm-advanced-colors": "Tem certeza que deseja usar a seleção de cor avançada?\n\nSelecionar a mesma cor do fundo\npode te prevenir de ver partes do app!",
@@ -107,7 +107,7 @@
     "semnatics-image-intro-section-third": "Pessoas descansando e trocando mensagens entre si",
     "semnatics-image-private-message": "Uma pessoa segurando uma bolha de mensagens privadas",
     "semnatics-image-intro": "Usuário relaxado e descansado",
-    "semantics-image-send-arrow": "Seta direita solicita para enviar uma mensagem",
+    "label-send-encrypted": "Seta direita solicita para enviar uma mensagem",
     "confirm-terms-of-service": "Este software ({}) é fornecido pelo autor ''como está'' e quaisquer garantias expressas ou implícitas, incluindo, mas não se limitando a, garantias implícitas de comercialização e adequação a um determinado fim são rejeitadas. em nenhuma hipótese o autor será responsável por quaisquer danos diretos, indiretos, incidentais, especiais, exemplares ou consequenciais (incluindo, mas não se limitando a, aquisição de bens ou serviços substitutos; perda de uso, dados ou lucros; ou interrupção de negócios; ou interrupção de negócios) no entanto, causado e sobre qualquer teoria de responsabilidade, seja em contrato, responsabilidade estrita ou delito (incluindo negligência ou outro) decorrente de qualquer forma do uso deste software, mesmo se avisado da possibilidade de tais danos.",
     "content-sync-interval": "A sincronização funciona enviando uma solicitação de pesquisa longa a um servidor matrix. O intervalo de sincronização não é com que frequência ele irá sincronizar, mas com que frequência ele tentará uma nova solicitação de pesquisa longa.",
     "content-intro-section-two-part-three": "onde as\nmensagens são armazenadas",

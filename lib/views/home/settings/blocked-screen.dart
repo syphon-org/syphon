@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
@@ -98,12 +99,8 @@ class BlockedScreenState extends State<BlockedScreen> {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
-        appBar: AppBar(
-          title: Text('Blocked users'),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context, false),
-          ),
+        appBar: AppBarNormal(
+          title: 'Blocked users',
         ),
         body: Stack(
           children: [

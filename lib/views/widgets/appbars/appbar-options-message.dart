@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -73,6 +74,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                   Icons.close,
                   color: Colors.white,
                 ),
+                tooltip: Strings.labelBack,
                 onPressed: () {
                   if (widget.onDismiss != null) {
                     widget.onDismiss!();

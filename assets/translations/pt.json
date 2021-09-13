@@ -1,6 +1,6 @@
 {
     "title-intro": "Bem-vindo(a) ao {}",
-    "semantics-image-send-unencrypted": "Enviar mensagem não encriptada",
+    "label-send-unencrypted": "Enviar mensagem não encriptada",
     "warning-deactivate-account-final": "Não há nenhuma forma de recuperar esta conta após esta ser eliminada. Será imediatamente desconectado da sua conta e a mesma ficará indisponível.\n\nEste é o aviso final sobre a desativação. Se tiver a certeza, pressione o botão abaixo.",
     "warning-deactivate-account": "ISTO ELIMINARÁ PERMANENTEMENTE A SUA CONTA\n\nIrá perder a possibilidade de recuperar quaisquer dados ou aceder a esta conta depois da sua desativação.\nPor favor esteja ciente disso antes de fazer isto!",
     "confirm-advanced-colors": "Tem a certeza que quer usar a seleção de cor avançada?\n\nSelecionar a mesma cor do fundo\npode impedi-lo de ver partes da aplicação!",
@@ -105,7 +105,7 @@
     "semantics-image-empty-chat-list": "Vários monstros minúsculos e fofos a espreitarem por trás da folhagem.",
     "semnatics-image-intro-section-four": "Duas pessoas diferentes sentindo-se confiantes e com bom aspecto",
     "semnatics-image-intro-section-third": "Pessoas a relaxar e trocar mensagens entre elas",
-    "semantics-image-send-arrow": "Seta direita pergunta se quer enviar uma mensagem",
+    "label-send-encrypted": "Seta direita pergunta se quer enviar uma mensagem",
     "confirm-terms-of-service": "Este software ({}) é fornecido pelo autor ''tal como está'' e quaisquer garantias expressas ou implícitas, incluindo, mas não limitadas a, as garantias implícitas de comerciabilidade e adequação a um determinado fim são renunciadas. Em nenhuma caso o autor será responsável por quaisquer danos diretos, indiretos, incidentais, especiais, exemplares ou consequentes (incluindo, mas não se limitando à aquisição de bens ou serviços substitutos; perda de uso, dados ou lucros; ou interrupção de negócios) causados por qualquer forma e sobre qualquer teoria de responsabilidade, seja em contrato, responsabilidade estrita, ou ato ilícito (incluindo negligência ou de outra forma) decorrente de qualquer forma do uso deste software, mesmo se avisado da possibilidade de tais danos.",
     "content-sync-interval": "A sincronização funciona enviando uma solicitação de pesquisa longa para um servidor matrix. O intervalo de sincronização não é a frequência com que ele será sincronizado, mas com que frequência ele tentará uma nova solicitação de pesquisa longa.",
     "content-intro-section-two-part-three": "onde as\nmensagens são armazenadas",

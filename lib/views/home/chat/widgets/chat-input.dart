@@ -186,25 +186,11 @@ class ChatInputState extends State<ChatInput> {
             sendButtonColor = Color(Colours.greyDisabled);
           }
 
-          var sendButton = InkWell(
-            borderRadius: BorderRadius.circular(48),
-            onLongPress: widget.onChangeMethod as void Function()?,
-            onTap: !isSendable ? null : onSubmit,
-            child: CircleAvatar(
-              backgroundColor: sendButtonColor,
-              child: Container(
-                margin: EdgeInsets.only(left: 2, top: 3),
-                child: SvgPicture.asset(
-                  Assets.iconSendUnlockBeing,
-                  color: Colors.white,
-                  semanticsLabel: Strings.semanticsSendArrow,
-                ),
-              ),
-            ),
-          );
-
-          if (widget.mediumType == MediumType.encryption) {
-            sendButton = InkWell(
+          var sendButton = Semantics(
+            button: true,
+            enabled: true,
+            label: Strings.labelSendUnencrypted,
+            child: InkWell(
               borderRadius: BorderRadius.circular(48),
               onLongPress: widget.onChangeMethod as void Function()?,
               onTap: !isSendable ? null : onSubmit,
@@ -213,9 +199,33 @@ class ChatInputState extends State<ChatInput> {
                 child: Container(
                   margin: EdgeInsets.only(left: 2, top: 3),
                   child: SvgPicture.asset(
-                    Assets.iconSendLockSolidBeing,
+                    Assets.iconSendUnlockBeing,
                     color: Colors.white,
-                    semanticsLabel: Strings.semanticsSendArrow,
+                    semanticsLabel: Strings.labelSendUnencrypted,
+                  ),
+                ),
+              ),
+            ),
+          );
+
+          if (widget.mediumType == MediumType.encryption) {
+            sendButton = Semantics(
+              button: true,
+              enabled: true,
+              label: Strings.labelSendEncrypted,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(48),
+                onLongPress: widget.onChangeMethod as void Function()?,
+                onTap: !isSendable ? null : onSubmit,
+                child: CircleAvatar(
+                  backgroundColor: sendButtonColor,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 2, top: 3),
+                    child: SvgPicture.asset(
+                      Assets.iconSendLockSolidBeing,
+                      color: Colors.white,
+                      semanticsLabel: Strings.labelSendEncrypted,
+                    ),
                   ),
                 ),
               ),
@@ -291,6 +301,7 @@ class ChatInputState extends State<ChatInput> {
                               Icons.close,
                               size: Dimensions.iconSize,
                             ),
+                            tooltip: 'Cancel Reply',
                           ),
                         ),
                       ],

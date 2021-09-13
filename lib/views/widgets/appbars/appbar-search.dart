@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 import 'package:touchable_opacity/touchable_opacity.dart';
@@ -121,6 +122,7 @@ class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch>
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => onBack(),
+          tooltip: Strings.labelBack,
         ),
         title: Stack(
           children: [

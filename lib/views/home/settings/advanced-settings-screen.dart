@@ -21,6 +21,7 @@ import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
 class AdvancedSettingsScreen extends StatefulWidget {
@@ -57,15 +58,8 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                Strings.titleAdvanced,
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
-              ),
+            appBar: AppBarNormal(
+              title: Strings.titleAdvanced,
             ),
             body: SingleChildScrollView(
                 child: Column(

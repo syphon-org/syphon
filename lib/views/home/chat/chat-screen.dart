@@ -356,7 +356,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
                         color: Colors.white,
-                        semanticsLabel: Strings.semanticsSendArrow,
+                        semanticsLabel: 'Switch to ${Strings.labelSendUnencrypted}',
                       ),
                     ),
                   ),
@@ -389,7 +389,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendLockSolidBeing,
                         color: Colors.white,
-                        semanticsLabel: Strings.semanticsSendArrow,
+                        semanticsLabel: 'Switch to ${Strings.labelSendEncrypted}',
                       ),
                     ),
                   ),

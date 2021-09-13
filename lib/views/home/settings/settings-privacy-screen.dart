@@ -17,6 +17,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
@@ -107,19 +108,7 @@ class PrivacySettingsScreen extends StatelessWidget {
           final double width = MediaQuery.of(context).size.width;
 
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                Strings.titlePrivacy,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w100,
-                ),
-              ),
-            ),
+            appBar: AppBarNormal(title: Strings.titlePrivacy),
             body: SingleChildScrollView(
                 padding: Dimensions.scrollviewPadding,
                 child: Column(

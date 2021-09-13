@@ -18,6 +18,7 @@ import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/remote/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class NotificationSettingsScreen extends StatelessWidget {
@@ -54,19 +55,7 @@ class NotificationSettingsScreen extends StatelessWidget {
           }
 
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                'Notifications',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w100,
-                ),
-              ),
-            ),
+            appBar: AppBarNormal(title: 'Notifications'),
             body: Column(
               children: <Widget>[
                 Visibility(

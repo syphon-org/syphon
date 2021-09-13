@@ -2,6 +2,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
+extension Capitalize on String {
+  String capitalize() {
+    return '${this[0].toUpperCase()}${substring(1)}';
+  }
+}
+
 ///
 /// Strings
 ///
@@ -45,8 +51,11 @@ class Strings {
   static final headerSignupUsername = tr('header-signup-username');
 
   // Labels
+  static final labelBack = tr('label-back');
+  static final labelSend = tr('label-send');
   static final labelUsers = tr('label-users');
   static final labelEmail = tr('label-email');
+  static final labelClose = tr('label-close');
   static final labelSyncing = tr('label-syncing');
   static final labelSearchUser = tr('label-search-user');
   static final labelUsersRecent = tr('label-users-recent');
@@ -55,6 +64,8 @@ class Strings {
   static final labelGroupsEmpty = tr('label-groups-empty');
   static final labelUsersResults = tr('label-users-results');
   static final labelMessagesEmpty = tr('label-messages-empty');
+  static final labelSendEncrypted = tr('label-send-encrypted');
+  static final labelSendUnencrypted = tr('label-send-unencrypted');
   static final labelSearchHomeservers = tr('label-search-homeservers');
   static final labelSearchResults = tr('label-search-results'); // 'Search Results'
   static final labelRoomNameDefault = tr('label-chat-default'); // 'New Chat'
@@ -196,7 +207,6 @@ class Strings {
   // Accessibility
   static final semanticsImageIntro = tr('semnatics-image-intro');
   static final semanticsPrivateMessage = tr('semnatics-image-private-message');
-  static final semanticsSendArrow = tr('semantics-image-send-arrow');
   static final semanticsIntroFinal = tr('semnatics-image-intro-section-four');
   static final semanticsIntroThird = tr('semnatics-image-intro-section-third');
   static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');

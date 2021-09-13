@@ -272,6 +272,7 @@ class HomeState extends State<HomeScreen> {
                 icon: Icon(Icons.close),
                 color: Colors.white,
                 iconSize: Dimensions.buttonAppBarSize,
+                tooltip: Strings.labelClose.capitalize(),
                 onPressed: () => onDismissMessageOptions(),
               ),
             ),

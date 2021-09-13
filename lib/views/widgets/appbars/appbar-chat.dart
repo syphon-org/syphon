@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -227,6 +228,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                 child: IconButton(
                   icon: Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => widget.onBack!(),
+                  tooltip: Strings.labelBack,
                 ),
               ),
               GestureDetector(

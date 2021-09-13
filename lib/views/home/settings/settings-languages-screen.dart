@@ -10,6 +10,7 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 
 class LanguageSettingsScreen extends StatelessWidget {
   const LanguageSettingsScreen({Key? key}) : super(key: key);
@@ -19,22 +20,8 @@ class LanguageSettingsScreen extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
-          final double width = MediaQuery.of(context).size.width;
-
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                Strings.titleChatSettings,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w100,
-                ),
-              ),
-            ),
+            appBar: AppBarNormal(title: Strings.titleChatSettings),
             body: Center(
               child: ListView.builder(
                   scrollDirection: Axis.vertical,

@@ -14,6 +14,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class ChatsSettingsScreen extends StatelessWidget {
@@ -31,18 +32,8 @@ class ChatsSettingsScreen extends StatelessWidget {
           final double width = MediaQuery.of(context).size.width;
 
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                Strings.titleChatSettings,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w100,
-                ),
-              ),
+            appBar: AppBarNormal(
+              title: Strings.titleChatSettings,
             ),
             body: SingleChildScrollView(
               child: Container(
