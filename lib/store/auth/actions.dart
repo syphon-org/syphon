@@ -823,7 +823,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       store.dispatch(SetLoading(loading: true));
       store.dispatch(SetCreating(creating: true));
 
-      final homeserver = store.state.authStore.homeserver.baseUrl;
+      final baseUrl = store.state.authStore.homeserver.baseUrl;
       final credential = store.state.authStore.credential;
       final session = store.state.authStore.authSession;
       final authType = session != null ? credential!.type : MatrixAuthTypes.DUMMY;
@@ -835,7 +835,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       ));
 
       final data = await MatrixApi.registerUser(
-        homeserver: homeserver,
+        homeserver: baseUrl,
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         session: session,
@@ -867,7 +867,10 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
 
         return completedAll;
       }
-      final user = User.fromMatrix(data);
+
+      final user = User.fromMatrix(data).copyWith(
+        homeserver: baseUrl,
+      );
 
       await store.dispatch(SetUser(user: user));
       await store.dispatch(addAvailableUser(user));
