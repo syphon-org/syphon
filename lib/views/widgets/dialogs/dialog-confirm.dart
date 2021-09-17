@@ -58,7 +58,9 @@ class DialogConfirm extends StatelessWidget {
                   onPressed: () => onDismiss!(),
                   textWidget: Text(
                     Strings.buttonCancel.capitalize(),
-                    style: Theme.of(context).textTheme.subtitle1?.merge(dismissStyle),
+                    style: Theme.of(context).textTheme.subtitle1?.merge(dismissStyle).copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
                   ),
                 ),
                 ButtonText(
@@ -66,7 +68,10 @@ class DialogConfirm extends StatelessWidget {
                   onPressed: () => onConfirm!(),
                   textWidget: Text(
                     confirmText ?? Strings.buttonConfirm.capitalize(),
-                    style: Theme.of(context).textTheme.subtitle1?.merge(confirmStyle),
+                    style: Theme.of(context).textTheme.subtitle1?.merge(confirmStyle).copyWith(
+                          color: Theme.of(context).accentColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                   ),
                 ),
               ],

@@ -34,7 +34,7 @@ class NotificationSettingsScreen extends StatelessWidget {
     }
   }
 
-  onConfirmNotificationsIOS({required BuildContext context, required _Props props}) async {
+  onConfirmNotifications({required BuildContext context, required _Props props}) async {
     // If the platform is iOS, we'll want to confirm they
     // understand the native notification prompt first
     if (Platform.isIOS && !props.notificationsEnabled) {
@@ -44,7 +44,7 @@ class NotificationSettingsScreen extends StatelessWidget {
           title: 'Confirm Notifications Prompt',
           content: Strings.confirmEnableNotifications,
           confirmText: Strings.buttonConfirmAlt.capitalize(),
-          confirmStyle: TextStyle(color: Colors.red),
+          confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
             await props.onToggleRemoteNotifications();
@@ -159,7 +159,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                       ListTile(
                         enabled: Platform.isIOS,
                         dense: true,
-                        onTap: () => props.onToggleRemoteNotifications(context),
+                        onTap: () => onConfirmNotifications(context: context, props: props),
                         contentPadding: Dimensions.listPadding,
                         title: Text(
                           'Notifications',
@@ -169,9 +169,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                           value: props.remoteNotificationsEnabled,
                           onChanged: !Platform.isIOS
                               ? null
-                              : (value) => props.onToggleRemoteNotifications(
-                                    context,
-                                  ),
+                              : (value) => onConfirmNotifications(context: context, props: props),
                         ),
                       ),
                       ListTile(

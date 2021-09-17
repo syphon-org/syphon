@@ -79,7 +79,7 @@ class PrivacySettingsScreen extends StatelessWidget {
         content: Strings.contentKeyExportWarning,
         loading: props.loading,
         confirmText: 'Export Keys',
-        confirmStyle: TextStyle(color: Colors.red),
+        confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           await store.dispatch(exportDeviceKeysOwned());
