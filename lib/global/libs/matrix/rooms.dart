@@ -44,7 +44,7 @@ abstract class Rooms {
       headers: headers,
     );
 
-    return await json.decode(response.body);
+    return await json.decode(utf8.decode(response.bodyBytes));
   }
 
   /// Sync (Background Isolate) (main functionality)
@@ -81,7 +81,7 @@ abstract class Rooms {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
     // Params
-    url += '?filter={\"room\":{\"rooms\":["$roomId"]}}';
+    url += '?filter={"room":{"rooms":["$roomId"]}}';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -92,7 +92,7 @@ abstract class Rooms {
       headers: headers,
     );
 
-    return await json.decode(response.body);
+    return await json.decode(utf8.decode(response.bodyBytes));
   }
 
   static Future<dynamic> fetchRoomIds({
@@ -121,8 +121,7 @@ abstract class Rooms {
     String? accessToken,
     String? userId,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
+    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -152,8 +151,7 @@ abstract class Rooms {
     final serverName = parts.isNotEmpty ? parts[1] : homeserver;
     final roomIdFormatted = Uri.encodeComponent(roomId);
 
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/join/$roomIdFormatted?server_name=$serverName';
+    final String url = '$protocol$homeserver/_matrix/client/r0/join/$roomIdFormatted?server_name=$serverName';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -242,8 +240,7 @@ abstract class Rooms {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -279,8 +276,7 @@ abstract class Rooms {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -313,8 +309,7 @@ abstract class Rooms {
     String? accessToken,
     String? roomAlias,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/directory/room/$roomAlias';
+    final String url = '$protocol$homeserver/_matrix/client/r0/directory/room/$roomAlias';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -345,8 +340,7 @@ abstract class Rooms {
     bool lazyLoading = false,
     Map? filters,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/user/$userId/filter';
+    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/filter';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -385,8 +379,7 @@ abstract class Rooms {
     String? filterId,
     String? userId,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/user/$userId/filter/$filterId';
+    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/filter/$filterId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -415,8 +408,7 @@ abstract class Rooms {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/aliases';
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/aliases';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
