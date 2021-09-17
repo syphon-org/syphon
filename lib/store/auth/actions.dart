@@ -805,10 +805,6 @@ ThunkAction<AppState> fetchSignupStages() {
 
       store.dispatch(SetHomeserver(homeserver: homeserverUpdated));
     } catch (error) {
-      store.dispatch(addAlert(
-        origin: 'fetchSignupFlows',
-        message: 'No signup types found for this server, try another one',
-      ));
       final homeserver = store.state.authStore.homeserver;
       store.dispatch(SetHomeserver(homeserver: homeserver.copyWith(signupTypes: [])));
     }
@@ -1074,6 +1070,13 @@ ThunkAction<AppState> selectHomeserver({String? hostname}) {
     await store.dispatch(setHomeserver(homeserver: homeserver));
     await store.dispatch(setHostname(hostname: hostname));
     await store.dispatch(fetchSignupStages());
+
+    if (homeserver.signupTypes.isEmpty && !homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+      store.dispatch(addInfo(
+        origin: 'selectHomeserver',
+        message: 'No new signups allowed on this server, try another if creating an account',
+      ));
+    }
 
     return homeserver.valid;
   };
