@@ -10,7 +10,7 @@ import 'package:syphon/global/values.dart';
 ///
 class StoreContext {
   static const DEFAULT = '';
-  static const STORAGE_KEY = '${Values.appLabel}@context';
+  static const ACCESS_KEY = '${Values.appLabel}@context';
 
   final String current;
   final String pinHash;

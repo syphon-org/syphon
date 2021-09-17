@@ -17,9 +17,13 @@ class StorageKeys {
   static const String RECEIPTS = 'receipts';
   static const String REACTIONS = 'reactions';
   static const String REDACTIONS = 'redactions';
+
+  // internal
+  static const String CHECK = 'check';
 }
 
 enum StorageKey {
+  check,
   auth,
   rooms,
   users,

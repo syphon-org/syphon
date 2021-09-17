@@ -19,8 +19,8 @@ enum ListItemUserType {
 ///
 /// TODO: rename because user specific, use this to wrap ListTile styling
 ///
-class ListItem extends StatelessWidget {
-  const ListItem({
+class ListItemAccount extends StatelessWidget {
+  const ListItemAccount({
     Key? key,
     required this.user,
     this.type = ListItemUserType.Selectable,

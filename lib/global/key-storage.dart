@@ -40,6 +40,6 @@ Future deleteKey(String keyId) async {
   try {
     await SecureStorage().delete(key: keyId);
   } catch (error) {
-    printError('[loadKey] $error');
+    printError('[deleteKey] $error');
   }
 }

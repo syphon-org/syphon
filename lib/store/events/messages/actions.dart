@@ -224,7 +224,7 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       // Save unsent message to outbox
       final tempId = Random.secure().nextInt(1 << 32).toString();
-      final reply = store.state.roomStore.rooms[room.id]!.reply;
+      final reply = room.reply;
 
       // trim trailing whitespace
       message = message.copyWith(body: message.body!.trimRight());
@@ -248,12 +248,13 @@ ThunkAction<AppState> sendMessageEncrypted({
       final unencryptedData = {};
 
       if (reply != null && reply.body != null) {
+        unencryptedData['m.relates_to'] = {
+          'm.in_reply_to': {'event_id': reply.id}
+        };
+
         pending = await store.dispatch(
           formatMessageReply(room, pending, reply),
         );
-        unencryptedData['m.relates_to'] = {
-          'm.in_reply_to': {'event_id': '${reply.id}'}
-        };
       }
 
       store.dispatch(SaveOutboxMessage(

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
+import 'package:syphon/context/index.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
@@ -80,15 +81,18 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
       );
     }
 
-    final codec = getEncryptSembastCodec(password: storageKey);
-
     printInfo('initStorage $storageLocation $storageKey');
 
-    return Storage.instance = await storageFactory.openDatabase(
+    final codec = getEncryptSembastCodec(password: storageKey);
+
+    final openedDatabase = await storageFactory.openDatabase(
       storageLocation,
       codec: codec,
       version: version,
     );
+
+    Storage.instance = openedDatabase;
+    return openedDatabase;
   } catch (error) {
     printDebug('[initStorage] $error');
     return null;

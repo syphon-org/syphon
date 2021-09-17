@@ -29,7 +29,6 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/home-screen.dart';
 import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/navigation.dart';
-import 'package:syphon/views/widgets/lifecycle.dart';
 
 class Syphon extends StatefulWidget {
   final Database? cache;

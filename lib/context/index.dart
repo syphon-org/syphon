@@ -18,21 +18,30 @@ String generateContextId({required String id}) {
 }
 
 Future<StoreContext> loadCurrentContext() async {
-  final contextJson = await SecureStorage().read(key: StoreContext.STORAGE_KEY) ?? '[]';
-  final allContexts = List<String>.from(await json.decode(contextJson));
-  return StoreContext(current: allContexts.isNotEmpty ? allContexts[0] : StoreContext.DEFAULT);
+  try {
+    final contextJson = await SecureStorage().read(key: StoreContext.ACCESS_KEY) ?? '[]';
+    final allContexts = List<String>.from(await json.decode(contextJson));
+    return StoreContext(current: allContexts.isNotEmpty ? allContexts[0] : StoreContext.DEFAULT);
+  } catch (error) {
+    return StoreContext(current: StoreContext.DEFAULT);
+  }
 }
 
 Future<List<StoreContext>> loadContexts() async {
-  final contextJson = await SecureStorage().read(key: StoreContext.STORAGE_KEY) ?? '[]';
-  final allContexts = List<String>.from(await json.decode(contextJson));
-  return allContexts.map((context) => StoreContext(current: context)).toList();
+  try {
+    final contextJson = await SecureStorage().read(key: StoreContext.ACCESS_KEY) ?? '[]';
+    final allContexts = List<String>.from(await json.decode(contextJson));
+    return allContexts.map((context) => StoreContext(current: context)).toList();
+  } catch (error) {
+    SecureStorage().delete(key: StoreContext.ACCESS_KEY);
+    return [StoreContext(current: StoreContext.DEFAULT)];
+  }
 }
 
 Future saveContext(String? current) async {
   if (current == null) return;
 
-  final contextJson = await SecureStorage().read(key: StoreContext.STORAGE_KEY) ?? '[]';
+  final contextJson = await SecureStorage().read(key: StoreContext.ACCESS_KEY) ?? '[]';
   final allContexts = List<String>.from(await json.decode(contextJson));
   final position = allContexts.indexOf(current);
 
@@ -44,16 +53,16 @@ Future saveContext(String? current) async {
     allContexts.insert(0, current);
   }
 
-  return SecureStorage().write(key: StoreContext.STORAGE_KEY, value: json.encode(allContexts));
+  return SecureStorage().write(key: StoreContext.ACCESS_KEY, value: json.encode(allContexts));
 }
 
 Future deleteContext(String? current) async {
   if (current == null || current.isEmpty) return;
 
-  final contextJson = await SecureStorage().read(key: StoreContext.STORAGE_KEY) ?? '[]';
+  final contextJson = await SecureStorage().read(key: StoreContext.ACCESS_KEY) ?? '[]';
   final allContexts = List<String>.from(await json.decode(contextJson));
 
   allContexts.remove(current);
 
-  return SecureStorage().write(key: StoreContext.STORAGE_KEY, value: json.encode(allContexts));
+  return SecureStorage().write(key: StoreContext.ACCESS_KEY, value: json.encode(allContexts));
 }

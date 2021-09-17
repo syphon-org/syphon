@@ -69,10 +69,6 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
       cacheFactory = getDatabaseFactorySqflite(
         sqflite_ffi.databaseFactoryFfi,
       );
-      // TODO: TEMP: remove after 0.1.11 release
-      if (!(await checkKey(Storage.keyLocation))) {
-        await (cacheFactory as DatabaseFactory).deleteDatabase(cacheLocation);
-      }
     }
 
     if (cacheFactory == null) {

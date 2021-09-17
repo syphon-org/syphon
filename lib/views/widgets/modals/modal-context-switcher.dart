@@ -6,18 +6,15 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/navigation.dart';
-import 'package:syphon/views/widgets/lists/list-item.dart';
+import 'package:syphon/views/widgets/lists/list-item-account.dart';
 
 class ModalContextSwitcher extends StatelessWidget {
-  const ModalContextSwitcher() : super();
-
   onNavigateToMultiLogin({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
@@ -43,7 +40,7 @@ class ModalContextSwitcher extends StatelessWidget {
         final user = props.availableUsers[index];
         final selected = props.currentUser.userId == user.userId;
 
-        return ListItem(
+        return ListItemAccount(
           user: user,
           selected: selected,
           enabled: !props.loading && !selected,

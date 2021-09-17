@@ -11,28 +11,17 @@ class SecureStorage {
   static Future<bool> check({required String key}) async {
     // mobile
     if (Platform.isAndroid || Platform.isIOS) {
-      final storage = instance!;
-
       // try to read key
-      try {
-        printError('[SecureStorage.check] checking $key ${await storage.containsKey(key: key)}');
-        return storage.containsKey(key: key);
-      } catch (error) {
-        printError('[SecureStorage.check] $key $error');
-        throw error;
-      }
+      final storage = instance!;
+      printError('[SecureStorage.check] checking $key ${await storage.containsKey(key: key)}');
+      return storage.containsKey(key: key);
     }
 
     // desktop
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       // try to read key
-      try {
-        final directory = await getApplicationSupportDirectory();
-        return await File(join(directory.path, key)).exists();
-      } catch (error) {
-        printError('[SecureStorage.check] $key $error');
-        throw error;
-      }
+      final directory = await getApplicationSupportDirectory();
+      return File(join(directory.path, key)).exists();
     }
 
     return false;
@@ -41,54 +30,32 @@ class SecureStorage {
   Future<String?> read({required String key}) async {
     // mobile
     if (Platform.isAndroid || Platform.isIOS) {
-      final storage = instance!;
-
       // try to read key
-      try {
-        return storage.read(key: key);
-      } catch (error) {
-        printError('[SecureStorage.read] $key $error');
-        throw error;
-      }
+      final storage = instance!;
+      return storage.read(key: key);
     }
 
     // desktop
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       // try to read key
-      try {
-        final directory = await getApplicationSupportDirectory();
-        return await File(join(directory.path, key)).readAsString();
-      } catch (error) {
-        printError('[SecureStorage.read] $key $error');
-        return null;
-      }
+      final directory = await getApplicationSupportDirectory();
+      return File(join(directory.path, key)).readAsString();
     }
 
     return null;
   }
 
-  Future write({required String key, required String? value}) async {
+  Future write({required String key, required String value}) async {
     // mobile
     if (Platform.isAndroid || Platform.isIOS) {
       final storage = instance!;
-
-      try {
-        return storage.write(key: key, value: value);
-      } catch (error) {
-        printError('[SecureStorage.write] $error');
-        throw error;
-      }
+      return storage.write(key: key, value: value);
     }
 
     // desktop
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      try {
-        final directory = await getApplicationSupportDirectory();
-        await File(join(directory.path, key)).writeAsString(key, flush: true);
-      } catch (error) {
-        printError('[SecureStorage.write] $key $error');
-        throw error;
-      }
+      final directory = await getApplicationSupportDirectory();
+      await File(join(directory.path, key)).writeAsString(value, flush: true);
     }
   }
 
@@ -96,24 +63,13 @@ class SecureStorage {
     // mobile
     if (Platform.isAndroid || Platform.isIOS) {
       final storage = instance!;
-
-      try {
-        return storage.delete(key: key);
-      } catch (error) {
-        printError('[SecureStorage.write] $error');
-        throw error;
-      }
+      return storage.delete(key: key);
     }
 
     // desktop
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      try {
-        final directory = await getApplicationSupportDirectory();
-        await File(join(directory.path, key)).delete();
-      } catch (error) {
-        printError('[SecureStorage.write] $key $error');
-        throw error;
-      }
+      final directory = await getApplicationSupportDirectory();
+      await File(join(directory.path, key)).delete();
     }
   }
 }
