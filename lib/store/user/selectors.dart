@@ -35,6 +35,11 @@ List<User> selectKnownUsers(AppState state) {
   return List.from(latestUsers);
 }
 
+List<User?> roomUsers(AppState state, String? roomId) {
+  final room = state.roomStore.rooms[roomId!] ?? Room(id: roomId);
+  return room.userIds.map((userId) => state.userStore.users[userId]).toList();
+}
+
 Map<String, User> messageUsers({required AppState state, String? roomId}) {
   final messages = state.eventStore.messages[roomId] ?? [];
   return Map.fromIterable(
@@ -71,11 +76,6 @@ String formatUserInitials(User? user) {
   }
 
   return formatInitialsLong(user.displayName ?? user.userId);
-}
-
-List<User?> roomUsers(AppState state, String? roomId) {
-  final room = state.roomStore.rooms[roomId!] ?? Room(id: roomId);
-  return room.userIds.map((userId) => state.userStore.users[userId]).toList();
 }
 
 List<User?> searchUsersLocal(

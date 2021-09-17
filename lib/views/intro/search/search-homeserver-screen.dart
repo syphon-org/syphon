@@ -57,6 +57,13 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
     super.dispose();
   }
 
+  onToggleSearch(_Props props) {
+    props.onSearch('');
+    setState(() {
+      searching = !searching;
+    });
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -79,9 +86,6 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                 props.onFetchHomeserverPreview(text);
               }
             },
-            onToggleSearch: () => setState(() {
-              searching = !searching;
-            }),
           ),
           body: Center(
             child: Stack(

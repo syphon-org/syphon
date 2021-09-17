@@ -32,6 +32,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
@@ -477,6 +478,7 @@ class ChatScreenState extends State<ChatScreen> {
                         children: [
                           MessageList(
                             roomId: props.room.id,
+                            showAvatars: props.showAvatars,
                             selectedMessage: selectedMessage,
                             scrollController: messagesController,
                             onSelectReply: props.onSelectReply,
@@ -554,6 +556,7 @@ class _Props extends Equatable {
   final bool loading;
   final int? messagesLength;
   final bool enterSendEnabled;
+  final bool showAvatars;
   final ThemeType themeType;
   final Color chatColorPrimary;
   final bool roomTypeBadgesEnabled;
@@ -578,6 +581,7 @@ class _Props extends Equatable {
     required this.themeType,
     required this.userId,
     required this.loading,
+    required this.showAvatars,
     required this.messagesLength,
     required this.enterSendEnabled,
     required this.chatColorPrimary,
@@ -609,6 +613,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
+        showAvatars: roomUsers(store.state, roomId).length > 2,
         themeType: store.state.settingsStore.themeSettings.themeType,
         userId: store.state.authStore.user.userId,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,

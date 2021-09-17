@@ -21,7 +21,6 @@ import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';

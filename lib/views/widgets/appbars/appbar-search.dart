@@ -16,14 +16,14 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
     this.throttle = const Duration(milliseconds: 400),
     this.elevation,
     this.focusNode,
-    this.onBack,
-    this.onChange,
-    this.onSearch,
-    this.onToggleSearch,
     this.startFocused = false,
     this.navigate = true,
     this.forceFocus = false,
     this.loading = false,
+    this.onBack,
+    this.onChange,
+    this.onSearch,
+    this.onToggleSearch,
   }) : super(key: key);
 
   final bool loading;
@@ -112,6 +112,7 @@ class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch>
         widget.focusNode ?? focusNode,
       );
     } else {
+      onChange(text: ''); // clear search results
       FocusScope.of(context!).unfocus();
     }
   }

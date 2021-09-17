@@ -22,6 +22,7 @@ import 'package:syphon/views/widgets/messages/message.dart';
 
 class MessageList extends StatefulWidget {
   final String? roomId;
+  final bool showAvatars;
   final Message? selectedMessage;
   final ScrollController scrollController;
 
@@ -33,6 +34,7 @@ class MessageList extends StatefulWidget {
     Key? key,
     required this.roomId,
     required this.scrollController,
+    this.showAvatars = true,
     this.selectedMessage,
     this.onSelectReply,
     this.onViewUserDetails,
@@ -141,7 +143,7 @@ class MessageListState extends State<MessageList> {
                       isUserSent: isUserSent,
                       isLastSender: isLastSender,
                       isNextSender: isNextSender,
-                      messageOnly: !isUserSent && props.users.length <= 2,
+                      messageOnly: !isUserSent && !widget.showAvatars,
                       lastRead: props.room.lastRead,
                       selectedMessageId: selectedMessageId,
                       avatarUri: avatarUri,
