@@ -40,16 +40,6 @@
         "total_room_count_estimate": 59
     },
     {
-        "hostname": "chat.weho.st",
-        "description": "chat.weho.st",
-        "url": "https://webchat.weho.st/",
-        "category": "Free (Organization)",
-        "location": "NL",
-        "online_since": 2016,
-        "users_active": null,
-        "total_room_count_estimate": 169
-    },
-    {
         "hostname": "tchncs.de",
         "description": "Yet another tchncs.de service",
         "url": "https://tchncs.de/matrix",
@@ -58,6 +48,26 @@
         "online_since": 2017,
         "users_active": 4410,
         "total_room_count_estimate": 130
+    },
+    {
+        "hostname": "kde.org",
+        "description": "KDE organization open community homeserver",
+        "url": "https://kde.org",
+        "category": "Free (Organization)",
+        "location": "N/A",
+        "online_since": 2021,
+        "users_active": null,
+        "total_room_count_estimate": 83
+    },
+    {
+        "hostname": "chat.weho.st",
+        "description": "chat.weho.st",
+        "url": "https://webchat.weho.st/",
+        "category": "Free (Organization)",
+        "location": "NL",
+        "online_since": 2016,
+        "users_active": null,
+        "total_room_count_estimate": 169
     },
     {
         "hostname": "hackerspaces.be",

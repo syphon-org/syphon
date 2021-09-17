@@ -99,7 +99,6 @@ class CaptchaStepState extends State<CaptchaStep> {
                                 onDismiss: () => Navigator.pop(dialogContext),
                               ),
                             );
-                            // TODO: show captcha explaination dialog
                           },
                           child: Container(
                             height: 20,
@@ -152,6 +151,12 @@ class _Props extends Equatable {
     required this.onShowCaptcha,
   });
 
+  @override
+  List<Object> get props => [
+        loading,
+        completed,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         completed: store.state.authStore.captcha,
@@ -162,15 +167,9 @@ class _Props extends Equatable {
             builder: (context) {
               return DialogCaptcha(
                 key: Key(authSession!),
-                onConfirm: () {},
               );
             },
           );
         },
       );
-
-  @override
-  List<Object> get props => [
-        completed,
-      ];
 }

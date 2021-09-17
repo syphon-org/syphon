@@ -202,7 +202,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
     switch (currentSection.runtimeType) {
       case HomeserverStep:
         return () async {
-          bool? valid = true;
+          bool valid = true;
 
           if (props.hostname != props.homeserver.hostname) {
             valid = await props.onSelectHomeserver(props.hostname);
@@ -213,7 +213,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
             await props.onLoginSSO();
           }
 
-          if (valid!) {
+          if (valid) {
+            props.onClearCompleted();
             onNavigateNextPage(controller);
           }
         };
@@ -223,13 +224,11 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
         };
       case PasswordStep:
         return () async {
-          if (sections.length < 4) {
-            final result = await props.onCreateUser(enableErrors: lastStep);
+          final result = await props.onCreateUser(enableErrors: lastStep);
 
-            // If signup is completed here, just wait for auth redirect
-            if (result) {
-              return;
-            }
+          // If signup is completed here, just wait for auth redirect
+          if (result) {
+            return;
           }
 
           return onNavigateNextPage(controller);
@@ -493,6 +492,7 @@ class _Props extends Equatable {
   final Function onSubmitEmail;
   final Function onResetCredential;
   final Function onSelectHomeserver;
+  final Function onClearCompleted;
 
   const _Props({
     required this.user,
@@ -520,6 +520,7 @@ class _Props extends Equatable {
     required this.onSubmitEmail,
     required this.onResetCredential,
     required this.onSelectHomeserver,
+    required this.onClearCompleted,
   });
 
   @override
@@ -546,42 +547,45 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        user: store.state.authStore.user,
-        completed: store.state.authStore.completed,
-        hostname: store.state.authStore.hostname,
-        homeserver: store.state.authStore.homeserver,
-        isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
-        isSSOLoginAvailable: selectSSOEnabled(store.state),
-        isPasswordLoginAvailable: selectPasswordEnabled(store.state),
-        isSignupAvailable: selectSignupClosed(store.state),
-        username: store.state.authStore.username,
-        isUsernameValid: store.state.authStore.isUsernameValid,
-        isUsernameAvailable: store.state.authStore.isUsernameAvailable,
-        password: store.state.authStore.password,
-        isPasswordValid: store.state.authStore.isPasswordValid,
-        email: store.state.authStore.email,
-        isEmailValid: store.state.authStore.isEmailValid,
-        creating: store.state.authStore.creating,
-        captcha: store.state.authStore.captcha,
-        agreement: store.state.authStore.agreement,
-        loading: store.state.authStore.loading,
-        verificationNeeded: store.state.authStore.verificationNeeded,
-        onSubmitEmail: () async {
-          return await store.dispatch(submitEmail());
-        },
-        onResetCredential: () async {
-          await store.dispatch(updateCredential(
-            type: MatrixAuthTypes.DUMMY,
-          ));
-        },
-        onLoginSSO: () async {
-          return await store.dispatch(loginUserSSO());
-        },
-        onCreateUser: ({bool? enableErrors}) async {
-          return await store.dispatch(createUser(enableErrors: enableErrors));
-        },
-        onSelectHomeserver: (String hostname) async {
-          return await store.dispatch(selectHomeserver(hostname: hostname));
-        },
-      );
+      user: store.state.authStore.user,
+      completed: store.state.authStore.completed,
+      hostname: store.state.authStore.hostname,
+      homeserver: store.state.authStore.homeserver,
+      isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
+      isSSOLoginAvailable: selectSSOEnabled(store.state),
+      isPasswordLoginAvailable: selectPasswordEnabled(store.state),
+      isSignupAvailable: selectSignupClosed(store.state),
+      username: store.state.authStore.username,
+      isUsernameValid: store.state.authStore.isUsernameValid,
+      isUsernameAvailable: store.state.authStore.isUsernameAvailable,
+      password: store.state.authStore.password,
+      isPasswordValid: store.state.authStore.isPasswordValid,
+      email: store.state.authStore.email,
+      isEmailValid: store.state.authStore.isEmailValid,
+      creating: store.state.authStore.creating,
+      captcha: store.state.authStore.captcha,
+      agreement: store.state.authStore.agreement,
+      loading: store.state.authStore.loading,
+      verificationNeeded: store.state.authStore.verificationNeeded,
+      onSubmitEmail: () async {
+        return await store.dispatch(submitEmail());
+      },
+      onResetCredential: () async {
+        await store.dispatch(updateCredential(
+          type: MatrixAuthTypes.DUMMY,
+        ));
+      },
+      onLoginSSO: () async {
+        return await store.dispatch(loginUserSSO());
+      },
+      onCreateUser: ({bool? enableErrors}) async {
+        return await store.dispatch(createUser(enableErrors: enableErrors));
+      },
+      onSelectHomeserver: (String hostname) async {
+        return await store.dispatch(selectHomeserver(hostname: hostname));
+      },
+      onClearCompleted: () async {
+        store.dispatch(setUsername(username: ''));
+        store.dispatch(setPassword(password: ''));
+      });
 }

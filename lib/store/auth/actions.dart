@@ -1071,7 +1071,9 @@ ThunkAction<AppState> selectHomeserver({String? hostname}) {
     await store.dispatch(setHostname(hostname: hostname));
     await store.dispatch(fetchSignupStages());
 
-    if (homeserver.signupTypes.isEmpty && !homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+    final _homeserver = store.state.authStore.homeserver;
+
+    if (_homeserver.signupTypes.isEmpty && !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
       store.dispatch(addInfo(
         origin: 'selectHomeserver',
         message: 'No new signups allowed on this server, try another if creating an account',
