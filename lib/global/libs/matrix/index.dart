@@ -7,6 +7,7 @@ import 'package:syphon/global/libs/matrix/notifications.dart';
 import 'package:syphon/global/libs/matrix/rooms.dart';
 import 'package:syphon/global/libs/matrix/search.dart';
 import 'package:syphon/global/libs/matrix/user.dart';
+import 'package:syphon/global/values.dart';
 
 abstract class MatrixApi {
   static const NEEDS_INTERACTIVE_AUTH = Auth.NEEDS_INTERACTIVE_AUTH;
@@ -87,8 +88,7 @@ abstract class MatrixApi {
 
   // Notifications
   static const fetchNotifications = Notifications.fetchNotifications;
-  static const fetchNotificationPushers =
-      Notifications.fetchNotificationPushers;
+  static const fetchNotificationPushers = Notifications.fetchNotificationPushers;
 
   /// Save Notification Pusher
   ///
