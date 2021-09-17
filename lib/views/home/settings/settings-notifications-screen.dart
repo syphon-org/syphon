@@ -20,17 +20,41 @@ import 'package:syphon/store/settings/notification-settings/remote/actions.dart'
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
 class NotificationSettingsScreen extends StatelessWidget {
   const NotificationSettingsScreen({Key? key}) : super(key: key);
 
-  Future onToggleNotifications(_Props props) async {
+  onToggleNotifications(_Props props) async {
     final enabledPreviously = props.localNotificationsEnabled;
     await props.onToggleLocalNotifications();
     if (enabledPreviously) {
       BackgroundSync.stop();
       dismissAllNotifications(pluginInstance: globalNotificationPluginInstance);
     }
+  }
+
+  onConfirmNotificationsIOS({required BuildContext context, required _Props props}) async {
+    // If the platform is iOS, we'll want to confirm they
+    // understand the native notification prompt first
+    if (Platform.isIOS && !props.notificationsEnabled) {
+      return await showDialog(
+        context: context,
+        builder: (dialogContext) => DialogConfirm(
+          title: 'Confirm Notifications Prompt',
+          content: Strings.confirmEnableNotifications,
+          confirmText: Strings.buttonConfirmAlt.capitalize(),
+          confirmStyle: TextStyle(color: Colors.red),
+          onDismiss: () => Navigator.pop(dialogContext),
+          onConfirm: () async {
+            await props.onToggleRemoteNotifications();
+            Navigator.of(dialogContext).pop();
+          },
+        ),
+      );
+    }
+
+    props.onToggleRemoteNotifications();
   }
 
   @override
@@ -214,6 +238,7 @@ class NotificationSettingsScreen extends StatelessWidget {
 
 class _Props extends Equatable {
   final bool httpPusherEnabled;
+  final bool notificationsEnabled;
   final bool localNotificationsEnabled;
   final bool remoteNotificationsEnabled;
 
@@ -228,6 +253,7 @@ class _Props extends Equatable {
   final Function onTogglePusher;
 
   const _Props({
+    required this.notificationsEnabled,
     required this.localNotificationsEnabled,
     required this.remoteNotificationsEnabled,
     required this.httpPusherEnabled,
@@ -257,6 +283,7 @@ class _Props extends Equatable {
         localNotificationsEnabled:
             Platform.isAndroid && store.state.settingsStore.notificationSettings.enabled,
         remoteNotificationsEnabled: Platform.isIOS && store.state.settingsStore.notificationSettings.enabled,
+        notificationsEnabled: store.state.settingsStore.notificationSettings.enabled,
         styleType: store.state.settingsStore.notificationSettings.styleType,
         toggleType: store.state.settingsStore.notificationSettings.toggleType,
         httpPusherEnabled: store.state.settingsStore.notificationSettings.pushers.isNotEmpty,
@@ -273,45 +300,9 @@ class _Props extends Equatable {
         onIncrementToggleType: () {
           return store.dispatch(incrementToggleType());
         },
-        onToggleRemoteNotifications: (BuildContext context) {
-          try {
-            // If the platform is iOS, we'll want to confirm they understand
-            // the native notification prompt
-            if (Platform.isIOS && !store.state.settingsStore.notificationSettings.enabled) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Confirm Notifications'),
-                  content: Text(
-                    Strings.confirmEnableNotifications,
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('No'),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        await store.dispatch(toggleNotifications());
-                        await store.dispatch(saveNotificationPusher());
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('Sure'),
-                    ),
-                  ],
-                ),
-              );
-              return;
-            }
-
-            // Otherwise, attempt the toggle
-            store.dispatch(saveNotificationPusher(erase: true));
-            store.dispatch(toggleNotifications());
-          } catch (error) {
-            debugPrint('[onToggleRemoteNotifications] $error');
-          }
+        onToggleRemoteNotifications: () {
+          store.dispatch(toggleNotifications());
+          store.dispatch(saveNotificationPusher(erase: true));
         },
       );
 }

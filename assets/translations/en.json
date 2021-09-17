@@ -128,7 +128,7 @@
     "confirm-start-chat": "Even if you don't send a message, the user will still see your invite to chat.",
     "confirm-attempt-chat": "Even if you don't send a message, the user will still see your invite to chat if they exist.\n\nDo you want to try chatting with this username?",
     "confirm-terms-of-service": "THIS SOFTWARE ({}) IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
-    "confirm-enable-notifications": "Your device will prompt you to turn on notifications for {}.\n\nDo you want to turn on message notifications?",
+    "confirm-enable-notifications": "Your device will now prompt you to turn on notifications for {}.\n\nDo you want to turn on message notifications?",
     "confirm-auth-verification": "In order to perform this action, you'll need to enter your password again",
     "confirm-alpha-version": "Please be aware this app is still very much in Alpha.\n",
     "confirm-alpha-warning": "Do not use, nor do I recommend using Syphon, where proven and independently verified security is required.\n",

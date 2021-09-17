@@ -20,7 +20,7 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
-import 'package:syphon/views/widgets/loader/loading-indicator.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
 class PrivacySettingsScreen extends StatelessWidget {
   const PrivacySettingsScreen({Key? key}) : super(key: key);
@@ -31,32 +31,17 @@ class PrivacySettingsScreen extends StatelessWidget {
   }) async {
     await showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('Confirm Deactivate Account'),
-        content: Text(Strings.warningDeactivateAccount),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-            },
-            child: Text(
-              Strings.buttonCancel,
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              props.onResetConfirmAuth();
-              onConfirmDeactivateAccountFinal(props: props, context: context);
-            },
-            child: Text(
-              Strings.buttonConfirm,
-              style: TextStyle(
-                color: Colors.redAccent,
-              ),
-            ),
-          ),
-        ],
+      builder: (dialogContext) => DialogConfirm(
+        title: 'Confirm Deactivate Account',
+        content: Strings.warningDeactivateAccount,
+        confirmText: Strings.buttonDeactivate.capitalize(),
+        confirmStyle: TextStyle(color: Colors.red),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+          props.onResetConfirmAuth();
+          onConfirmDeactivateAccountFinal(props: props, context: context);
+        },
       ),
     );
   }
@@ -67,38 +52,64 @@ class PrivacySettingsScreen extends StatelessWidget {
   }) async {
     await showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('Confirm Deactivate Account'),
-        content: Text(Strings.warrningDeactivateAccountFinal),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-            },
-            child: Text(
-              Strings.buttonCancel,
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await props.onDeactivateAccount(context);
-            },
-            child: props.loading
-                ? LoadingIndicator()
-                : Text(
-                    Strings.buttonDeactivate,
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                    ),
-                  ),
-          ),
-        ],
+      builder: (dialogContext) => DialogConfirm(
+        title: 'Confirm Deactivate Account Final',
+        content: Strings.warrningDeactivateAccountFinal,
+        loading: props.loading,
+        confirmText: Strings.buttonDeactivate.capitalize(),
+        confirmStyle: TextStyle(color: Colors.red),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+          await props.onDeactivateAccount(context);
+        },
       ),
     );
   }
 
-  onConfirmAuth() {}
+  onExportDeviceKey({
+    required _Props props,
+    required BuildContext context,
+  }) async {
+    final store = StoreProvider.of<AppState>(context);
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: 'Confirm Exporting Keys',
+        content: Strings.contentKeyExportWarning,
+        loading: props.loading,
+        confirmText: 'Export Keys',
+        confirmStyle: TextStyle(color: Colors.red),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          await store.dispatch(exportDeviceKeysOwned());
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
+  }
+
+  onDeleteDeviceKey({
+    required _Props props,
+    required BuildContext context,
+  }) async {
+    final store = StoreProvider.of<AppState>(context);
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.titleConfirmDeleteKeys,
+        content: Strings.confirmDeleteKeys,
+        loading: props.loading,
+        confirmText: 'Delete Keys',
+        confirmStyle: TextStyle(color: Colors.red),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          await store.dispatch(deleteDeviceKeys());
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -312,7 +323,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap: () => props.onExportDeviceKey(context),
+                              onTap: () => onExportDeviceKey(context: context, props: props),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Export Keys',
@@ -320,7 +331,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => props.onDeleteDeviceKey(context),
+                            onTap: () => onDeleteDeviceKey(context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Delete Keys',
@@ -380,9 +391,7 @@ class _Props extends Equatable {
 
   final Function onToggleTypingIndicators;
   final Function onToggleReadReceipts;
-  final Function onExportDeviceKey;
   final Function onImportDeviceKey;
-  final Function onDeleteDeviceKey;
   final Function onDisabled;
   final Function onDeactivateAccount;
   final Function onResetConfirmAuth;
@@ -397,9 +406,7 @@ class _Props extends Equatable {
     required this.onDisabled,
     required this.onToggleTypingIndicators,
     required this.onToggleReadReceipts,
-    required this.onExportDeviceKey,
     required this.onImportDeviceKey,
-    required this.onDeleteDeviceKey,
     required this.onDeactivateAccount,
     required this.onResetConfirmAuth,
   });
@@ -423,6 +430,15 @@ class _Props extends Equatable {
         sessionKey: selectCurrentUserSessionKey(store),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
+        onToggleTypingIndicators: () => store.dispatch(
+          toggleTypingIndicators(),
+        ),
+        onToggleReadReceipts: () => store.dispatch(
+          toggleReadReceipts(),
+        ),
+        onImportDeviceKey: () => store.dispatch(
+          importDeviceKeysOwned(),
+        ),
         onDeactivateAccount: (BuildContext context) async {
           // Attempt to deactivate account
           await store.dispatch(deactivateAccount());
@@ -446,76 +462,6 @@ class _Props extends Equatable {
               ),
             );
           }
-        },
-        onToggleTypingIndicators: () => store.dispatch(
-          toggleTypingIndicators(),
-        ),
-        onToggleReadReceipts: () => store.dispatch(
-          toggleReadReceipts(),
-        ),
-        onImportDeviceKey: () {
-          store.dispatch(importDeviceKeysOwned());
-        },
-        onExportDeviceKey: (BuildContext context) async {
-          await showDialog(
-            context: context,
-            builder: (dialogContext) => AlertDialog(
-              title: Text('Confirm Exporting Keys'),
-              content: Text(Strings.contentKeyExportWarning),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(Strings.buttonCancel),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    store.dispatch(exportDeviceKeysOwned());
-                    Navigator.of(dialogContext).pop();
-                  },
-                  child: Text(
-                    'Export Keys',
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-        onDeleteDeviceKey: (BuildContext context) async {
-          await showDialog(
-            context: context,
-            builder: (dialogContext) => AlertDialog(
-              title: Text(Strings.titleConfirmDeleteKeys),
-              content: Text(Strings.confirmDeleteKeys),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                  },
-                  child: Text(
-                    Strings.buttonCancel,
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await store.dispatch(deleteDeviceKeys());
-                    Navigator.of(dialogContext).pop();
-                  },
-                  child: Text(
-                    Strings.buttonTextDeleteKeys,
-                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                          color: Colors.redAccent,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-          );
         },
       );
 }

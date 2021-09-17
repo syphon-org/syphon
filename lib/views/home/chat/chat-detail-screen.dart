@@ -136,29 +136,14 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
   onLeaveChat(_Props props) async {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(Strings.buttonLeaveChat.capitalize()),
-        content: Text(Strings.confirmLeaveRooms(rooms: [props.room])),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(Strings.buttonCancel.capitalize()),
-          ),
-          TextButton(
-            onPressed: () async {
-              props.onLeaveChat();
-              Navigator.popUntil(context, (route) => route.isFirst);
-            },
-            child: Text(
-              Strings.buttonConfirmFormal.capitalize(),
-              style: TextStyle(
-                color: Colors.red,
-              ),
-            ),
-          ),
-        ],
+      builder: (context) => DialogConfirm(
+        title: Strings.buttonLeaveChat.capitalize(),
+        content: Strings.confirmLeaveRooms(rooms: [props.room]),
+        onDismiss: () => Navigator.pop(context),
+        onConfirm: () async {
+          await props.onLeaveChat();
+          Navigator.popUntil(context, (route) => route.isFirst);
+        },
       ),
     );
   }

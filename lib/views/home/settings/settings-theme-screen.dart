@@ -31,7 +31,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
       builder: (dialogContext) => DialogConfirm(
         title: 'Confirm Advanced Colors',
         content: Strings.confirmAdvancedColors,
-        confirm: Strings.buttonEnable,
+        confirmText: Strings.buttonEnable,
         onConfirm: () async {
           Navigator.pop(dialogContext);
           onAdvanced();

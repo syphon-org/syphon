@@ -6,19 +6,35 @@ import 'package:syphon/global/strings.dart';
 
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 
+///
+/// Confirmation Dialog
+///
+/// Use this *instead* of AlertDialog
+/// as they come with desired styling and generally
+/// what is needed for a confirmation layout
+///
 class DialogConfirm extends StatelessWidget {
   const DialogConfirm({
     Key? key,
     this.title = '',
     this.content = '',
-    this.confirm,
+    this.loading = false,
+    this.confirmText,
+    this.confirmStyle,
+    this.dismissStyle,
     this.onConfirm,
     this.onDismiss,
   }) : super(key: key);
 
   final String title;
   final String content;
-  final String? confirm;
+
+  final bool loading;
+  final String? confirmText;
+
+  final TextStyle? confirmStyle;
+  final TextStyle? dismissStyle;
+
   final Function? onConfirm;
   final Function? onDismiss;
 
@@ -38,17 +54,19 @@ class DialogConfirm extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ButtonText(
+                  disabled: loading,
                   onPressed: () => onDismiss!(),
                   textWidget: Text(
-                    Strings.buttonCancel,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    Strings.buttonCancel.capitalize(),
+                    style: Theme.of(context).textTheme.subtitle1?.merge(dismissStyle),
                   ),
                 ),
                 ButtonText(
+                  disabled: loading,
                   onPressed: () => onConfirm!(),
                   textWidget: Text(
-                    confirm ?? Strings.buttonConfirm,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    confirmText ?? Strings.buttonConfirm.capitalize(),
+                    style: Theme.of(context).textTheme.subtitle1?.merge(confirmStyle),
                   ),
                 ),
               ],

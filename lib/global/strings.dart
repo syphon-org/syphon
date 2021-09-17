@@ -194,11 +194,16 @@ class Strings {
 
   static String confirmLeaveRooms({required Iterable<Room> rooms}) {
     final singleOrMulti = rooms.length == 1 ? 'single' : 'multi';
-    String s = tr('confirm-leave-chat-$singleOrMulti',
-        args: [rooms.length == 1 ? '${rooms.first.name}' : '${rooms.length}']);
+
+    var s = tr(
+      'confirm-leave-chat-$singleOrMulti',
+      args: [rooms.length == 1 ? '${rooms.first.name}' : '${rooms.length}'],
+    );
+
     if (rooms.where((element) => element.type != 'public').isNotEmpty) {
       s += '\n${tr('confirm-leave-chat-$singleOrMulti-nonpublic')}';
     }
+
     return s;
   }
 

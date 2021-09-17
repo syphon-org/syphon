@@ -22,6 +22,7 @@ import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
 class AdvancedSettingsScreen extends StatefulWidget {
@@ -89,26 +90,6 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Stop All Services',
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                  ),
-                ),
-                Visibility(
-                  visible: DEBUG_MODE,
-                  child: ListTile(
-                    dense: true,
-                    contentPadding: Dimensions.listPadding,
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text('Fake Dialog'),
-                          content: Text('Testing dialog rendering'),
-                        ),
-                      );
-                    },
-                    title: Text(
-                      'Test Dialog',
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),

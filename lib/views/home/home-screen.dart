@@ -19,6 +19,7 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -94,34 +95,21 @@ class HomeState extends State<HomeScreen> {
   onArchiveChats(_Props props) async {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(Strings.buttonArchiveChat.capitalize()),
-        content: Text(Strings.confirmArchiveRooms(rooms: selectedChats.values)),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(Strings.buttonCancel.capitalize()),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await Future.forEach(selectedChats.values, (room) async {
-                await props.onArchiveChat(room: room);
-              });
-              setState(() {
-                selectedChats = {};
-              });
-            },
-            child: Text(
-              Strings.buttonConfirmFormal.capitalize(),
-              style: TextStyle(
-                color: Colors.red,
-              ),
-            ),
-          ),
-        ],
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.buttonArchiveChat.capitalize(),
+        content: Strings.confirmArchiveRooms(rooms: selectedChats.values),
+        confirmStyle: TextStyle(color: Colors.red),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+          await Future.forEach(selectedChats.values, (room) async {
+            await props.onArchiveChat(room: room);
+          });
+          setState(() {
+            selectedChats = {};
+          });
+        },
       ),
     );
   }
@@ -129,36 +117,23 @@ class HomeState extends State<HomeScreen> {
   onLeaveChats(_Props props) async {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(Strings.buttonLeaveChat.capitalize()),
-        content: Text(Strings.confirmLeaveRooms(rooms: selectedChats.values)),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(Strings.buttonCancel.capitalize()),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              final _selectedChats = Map<String, Room>.from(selectedChats);
-              await Future.forEach<Room>(_selectedChats.values, (Room room) async {
-                await props.onLeaveChat(room: room);
-                onToggleRoomOptions(room: room);
-              });
-              setState(() {
-                selectedChats = {};
-              });
-            },
-            child: Text(
-              Strings.buttonConfirmFormal.capitalize(),
-              style: TextStyle(
-                color: Colors.red,
-              ),
-            ),
-          ),
-        ],
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.buttonLeaveChat.capitalize(),
+        content: Strings.confirmLeaveRooms(rooms: selectedChats.values),
+        confirmStyle: TextStyle(color: Colors.red),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+          final _selectedChats = Map<String, Room>.from(selectedChats);
+          await Future.forEach<Room>(_selectedChats.values, (Room room) async {
+            await props.onLeaveChat(room: room);
+            onToggleRoomOptions(room: room);
+          });
+          setState(() {
+            selectedChats = {};
+          });
+        },
       ),
     );
   }
@@ -166,36 +141,23 @@ class HomeState extends State<HomeScreen> {
   onDeleteChats(_Props props) async {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(Strings.buttonDeleteChat.capitalize()),
-        content: Text(Strings.confirmDeleteRooms(rooms: selectedChats.values)),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(Strings.buttonCancel.capitalize()),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.buttonDeleteChat.capitalize(),
+        content: Strings.confirmDeleteRooms(rooms: selectedChats.values),
+        confirmStyle: TextStyle(color: Colors.red),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
 
-              final _selectedChats = Map<String, Room>.from(selectedChats);
-              await Future.forEach(_selectedChats.values, (room) async {
-                await props.onDeleteChat(room: room);
-              });
-              setState(() {
-                selectedChats = {};
-              });
-            },
-            child: Text(
-              Strings.buttonConfirmFormal.capitalize(),
-              style: TextStyle(
-                color: Colors.red,
-              ),
-            ),
-          ),
-        ],
+          final _selectedChats = Map<String, Room>.from(selectedChats);
+          await Future.forEach(_selectedChats.values, (room) async {
+            await props.onDeleteChat(room: room);
+          });
+          setState(() {
+            selectedChats = {};
+          });
+        },
       ),
     );
   }

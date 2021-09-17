@@ -21,7 +21,7 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
-import 'package:syphon/views/widgets/dialogs/dialog-container.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-rounded.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 enum ChatOptions {
@@ -141,7 +141,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
     final defaultPadding = EdgeInsets.symmetric(horizontal: 10);
     showDialog(
       context: context,
-      builder: (BuildContext context) => DialogContainer(
+      builder: (BuildContext context) => DialogRounded(
         title: 'Mute notifications',
         children: [
           ListTile(
