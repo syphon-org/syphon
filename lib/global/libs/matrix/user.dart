@@ -7,6 +7,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/values.dart';
 
 abstract class Users {
+  ///
   /// Fetch Account Data
   ///
   /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-user-userid-account-data-type
@@ -14,6 +15,7 @@ abstract class Users {
   /// Set some account_data for the client. This config is only visible
   /// to the user that set the account_data. The config will be synced
   /// to clients in the top-level account_data.
+  ///
   static Future<dynamic> fetchAccountData({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
@@ -158,14 +160,12 @@ abstract class Users {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final saveResponse = await http.get(
+    final response = await http.get(
       Uri.parse(url),
       headers: headers,
     );
 
-    return await json.decode(
-      saveResponse.body,
-    );
+    return await json.decode(utf8.decode(response.bodyBytes));
   }
 
   /// Update Display Name
@@ -193,15 +193,13 @@ abstract class Users {
       'displayname': displayName,
     };
 
-    final saveResponse = await http.put(
+    final response = await http.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
     );
 
-    return await json.decode(
-      saveResponse.body,
-    );
+    return await json.decode(response.body);
   }
 
   /// Update Avatar Uri

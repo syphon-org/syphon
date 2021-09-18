@@ -12,11 +12,10 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
-
-class ResetSearchResults {}
 
 class SetLoading {
   final bool? loading;
@@ -59,6 +58,20 @@ class SetSearchResults {
   });
 }
 
+class SearchMessages {
+  final String searchText;
+
+  SearchMessages({required this.searchText});
+}
+
+class SearchMessageResults {
+  final List<Message> results;
+
+  SearchMessageResults({required this.results});
+}
+
+class ResetSearchResults {}
+
 Future<String?> fetchFavicon({String? url}) async {
   try {
     // get the root store
@@ -94,6 +107,18 @@ Future<String?> fetchFavicon({String? url}) async {
   }
 
   return null;
+}
+
+// Delay searching if one has previously just been scheduled
+ThunkAction<AppState> searchMessages(String searchText) {
+  return (Store<AppState> store) async {
+    if (searchText.isEmpty) {
+      return;
+    }
+    store.dispatch(SearchMessages(
+      searchText: searchText,
+    ));
+  };
 }
 
 ThunkAction<AppState> searchHomeservers({String? searchText}) {

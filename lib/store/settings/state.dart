@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/store/settings/chat-settings/chat-lists/model.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/chat-settings/sort-order/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import './chat-settings/model.dart';
@@ -28,8 +28,8 @@ class SettingsStore extends Equatable {
   final int syncInterval;
   final int syncPollTimeout;
 
-  final String sortOrder;
-  final List<String> sortGroups;
+  final SortOrder globalSortOrder;
+  final List<ChatList> chatLists;
 
   final List<Device> devices;
   final Map<String, ChatSetting> chatSettings; // roomId
@@ -46,8 +46,8 @@ class SettingsStore extends Equatable {
     this.language = 'English',
     this.syncInterval = 2000, // millis
     this.syncPollTimeout = 10000, // millis
-    this.sortGroups = const [SortOptions.PINNED],
-    this.sortOrder = SortOrder.LATEST,
+    this.chatLists = const [],
+    this.globalSortOrder = SortOrder.Latest,
     this.enterSendEnabled = false,
     this.smsEnabled = false,
     this.readReceiptsEnabled = false,
@@ -76,6 +76,7 @@ class SettingsStore extends Equatable {
         timeFormat24Enabled,
         dismissKeyboardEnabled,
         chatSettings,
+        chatLists,
         devices,
         loading,
         notificationSettings,
@@ -100,6 +101,7 @@ class SettingsStore extends Equatable {
     NotificationSettings? notificationSettings,
     ThemeSettings? themeSettings,
     List<Device>? devices,
+    List<ChatList>? chatLists,
     bool? loading,
     String? alphaAgreement,
     String? pusherToken, // NOTE: device token for APNS
@@ -109,18 +111,15 @@ class SettingsStore extends Equatable {
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
         readReceiptsEnabled: readReceiptsEnabled ?? this.readReceiptsEnabled,
-        typingIndicatorsEnabled:
-            typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
+        typingIndicatorsEnabled: typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
-        dismissKeyboardEnabled:
-            dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
-        membershipEventsEnabled:
-            membershipEventsEnabled ?? this.membershipEventsEnabled,
-        roomTypeBadgesEnabled:
-            roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
+        dismissKeyboardEnabled: dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
+        membershipEventsEnabled: membershipEventsEnabled ?? this.membershipEventsEnabled,
+        roomTypeBadgesEnabled: roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
         syncInterval: syncInterval ?? this.syncInterval,
         syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
         chatSettings: chatSettings ?? this.chatSettings,
+        chatLists: chatLists ?? this.chatLists,
         notificationSettings: notificationSettings ?? this.notificationSettings,
         themeSettings: themeSettings ?? this.themeSettings,
         devices: devices ?? this.devices,
@@ -131,6 +130,5 @@ class SettingsStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
 
-  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
-      _$SettingsStoreFromJson(json);
+  factory SettingsStore.fromJson(Map<String, dynamic> json) => _$SettingsStoreFromJson(json);
 }

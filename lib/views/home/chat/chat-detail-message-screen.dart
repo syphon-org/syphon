@@ -31,12 +31,10 @@ class MessageDetailsScreen extends StatelessWidget {
 
   @protected
   Widget buildUserReadList(_Props props, double width) {
-    final ReadReceipt readReceipts =
-        props.readReceipts[props.message!.id!] ?? ReadReceipt();
+    final ReadReceipt readReceipts = props.readReceipts[props.message!.id!] ?? ReadReceipt();
     final Map<String, int> userReads = readReceipts.userReads ?? {};
 
-    final List<User?> users =
-        userReads.keys.map((userId) => props.users[userId]).toList();
+    final List<User?> users = userReads.keys.map((userId) => props.users[userId]).toList();
 
     return ListUserBubbles(
       max: 4,
@@ -56,10 +54,10 @@ class MessageDetailsScreen extends StatelessWidget {
           final double width = MediaQuery.of(context).size.width;
           final Message message = props.message!;
 
-          final timestamp =
-              DateTime.fromMillisecondsSinceEpoch(message.timestamp);
+          final timestamp = DateTime.fromMillisecondsSinceEpoch(message.timestamp);
           final received = DateTime.fromMillisecondsSinceEpoch(
-              message.received ?? message.timestamp);
+            message.received == 0 ? message.timestamp : message.received,
+          );
 
           final isUserSent = props.userId == message.sender;
 
@@ -95,8 +93,7 @@ class MessageDetailsScreen extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 1,
                     itemBuilder: (BuildContext context, int index) {
-                      final current =
-                          index == 0 ? message : message.edits[index - 1];
+                      final current = index == 0 ? message : message.edits[index - 1];
                       return MessageWidget(
                         message: current,
                         isUserSent: isUserSent,
@@ -229,8 +226,7 @@ class _Props extends Equatable {
         roomId: args.roomId,
         message: args.message,
         users: store.state.userStore.users,
-        readReceipts: store.state.eventStore.receipts[args.roomId!] ??
-            <String, ReadReceipt>{},
+        readReceipts: store.state.eventStore.receipts[args.roomId!] ?? <String, ReadReceipt>{},
         userId: store.state.authStore.user.userId,
         themeType: store.state.settingsStore.themeSettings.themeType,
       );

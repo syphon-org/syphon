@@ -49,6 +49,9 @@ local.properties
 android/app/.cxx/*
 .hidden*
 
+# Ignore generated files
+android/.*
+
 # ignore olm import for macos
 macos/olm
 
@@ -63,3 +66,4 @@ Flutter.podspec
 
 # example payloads
 *.example.json
+

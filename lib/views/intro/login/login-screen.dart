@@ -22,6 +22,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -47,7 +48,7 @@ class LoginScreen extends StatefulWidget {
   LoginScreenState createState() => LoginScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
   final passwordFocus = FocusNode();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -522,7 +523,6 @@ class _Props extends Equatable {
 
   final Homeserver homeserver;
 
-  final List<String> loginTypes;
   final List<User> availableUsers;
 
   final Function onDebug;
@@ -540,7 +540,6 @@ class _Props extends Equatable {
     required this.userIdHint,
     required this.username,
     required this.password,
-    required this.loginTypes,
     required this.availableUsers,
     required this.isPasswordLoginAvailable,
     required this.isSSOLoginAvailable,
@@ -568,7 +567,6 @@ class _Props extends Equatable {
         onIncrementThemeType,
         isPasswordLoginAttemptable,
         isSSOLoginAttemptable,
-        loginTypes,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -576,7 +574,6 @@ class _Props extends Equatable {
         username: store.state.authStore.username,
         password: store.state.authStore.password,
         homeserver: store.state.authStore.homeserver,
-        loginTypes: store.state.authStore.homeserver.loginTypes,
         availableUsers: store.state.authStore.availableUsers,
         isSSOLoginAvailable: selectSSOEnabled(store.state),
         isPasswordLoginAvailable: selectPasswordEnabled(store.state),

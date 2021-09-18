@@ -1,5 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+
+extension Capitalize on String {
+  String capitalize() {
+    return '${this[0].toUpperCase()}${substring(1)}';
+  }
+}
 
 ///
 /// Strings
@@ -44,8 +51,11 @@ class Strings {
   static final headerSignupUsername = tr('header-signup-username');
 
   // Labels
+  static final labelBack = tr('label-back');
+  static final labelSend = tr('label-send');
   static final labelUsers = tr('label-users');
   static final labelEmail = tr('label-email');
+  static final labelClose = tr('label-close');
   static final labelSyncing = tr('label-syncing');
   static final labelSearchUser = tr('label-search-user');
   static final labelUsersRecent = tr('label-users-recent');
@@ -54,6 +64,8 @@ class Strings {
   static final labelGroupsEmpty = tr('label-groups-empty');
   static final labelUsersResults = tr('label-users-results');
   static final labelMessagesEmpty = tr('label-messages-empty');
+  static final labelSendEncrypted = tr('label-send-encrypted');
+  static final labelSendUnencrypted = tr('label-send-unencrypted');
   static final labelSearchHomeservers = tr('label-search-homeservers');
   static final labelSearchResults = tr('label-search-results'); // 'Search Results'
   static final labelRoomNameDefault = tr('label-chat-default'); // 'New Chat'
@@ -86,7 +98,12 @@ class Strings {
   static final buttonConfirm = tr('button-confirm'); //  'got it';
   static final buttonConfirmFormal = tr('button-confirm-formal'); // 'confirm';
   static final buttonConfirmAlt = tr('button-confirm-alt'); //  'ok';
-  static final buttonBlocKUser = tr('button-block-user'); //  'block user';
+  static final buttonBlockUser = tr('button-block-user'); //  'block user';
+  static final buttonLeaveChat = tr('button-leave-chat'); // 'leave chat';
+  static final buttonDeleteChat = tr('button-delete-chat');
+  static final buttonArchiveChat = tr('button-archive-chat');
+  static final buttonSelectAll = tr('button-select-all');
+  static final buttonRoomDetails = tr('button-room-details');
   static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
 
   // Buttons (Text)
@@ -99,6 +116,13 @@ class Strings {
   static final buttonTextLoadCaptcha = tr('button-text-load-captcha');
   static final buttonTextConfirmed = tr('button-text-confirmed');
   static final buttonTextDeleteKeys = tr('button-delete-keys'); //  'delete keys';
+
+  // Buttons (Options)
+  static final buttonTextCreateGroup = tr('button-text-create-group');
+  static final buttonTextMarkAllRead = tr('button-text-mark-all-read');
+  static final buttonTextInvite = tr('button-text-invite');
+  static final buttonTextSettings = tr('button-text-settings');
+  static final buttonTextSupport = tr('button-text-support');
 
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');
@@ -120,6 +144,7 @@ class Strings {
   static const alertBackgroundService = 'Background connection enabled';
 
   // Content
+  static final contentCaptchaWarning = tr('content-captcha-warning');
   static final contentPasswordRecommendation = tr('content-password-recommendation');
   static final contentDeleteDevices = tr('content-dialog-devices-delete');
   static final contentKeyExportWarning = tr('content-dialog-devices-key-export');
@@ -159,10 +184,34 @@ class Strings {
   static final confirmAppTermsOfService = tr('confirm-terms-of-service', args: [Values.appName]);
   static final confirmTermsOfServiceConclusion = tr('confirm-terms-of-service-alt');
 
+  static String confirmArchiveRooms({required Iterable<Room> rooms}) => rooms.length == 1
+      ? tr('confirm-archive-chat-single', args: ['${rooms.first.name}', Values.appName])
+      : tr('confirm-archive-chat-multi', args: ['${rooms.length}', Values.appName]);
+
+  static String confirmDeleteRooms({required Iterable<Room> rooms}) => rooms.length == 1
+      ? tr('confirm-delete-chat-single', args: ['${rooms.first.name}', Values.appName])
+      : tr('confirm-delete-chat-multi', args: ['${rooms.length}', Values.appName]);
+
+  static String confirmLeaveRooms({required Iterable<Room> rooms}) {
+    final singleOrMulti = rooms.length == 1 ? 'single' : 'multi';
+
+    var s = tr(
+      'confirm-leave-chat-$singleOrMulti',
+      args: [rooms.length == 1 ? '${rooms.first.name}' : '${rooms.length}'],
+    );
+
+    if (rooms.where((element) => element.type != 'public').isNotEmpty) {
+      s += '\n${tr('confirm-leave-chat-$singleOrMulti-nonpublic')}';
+    }
+
+    return s;
+  }
+
+  static String confirmBlockUser({String? name}) => tr('confirm-block-user', args: ['$name']);
+
   // Accessibility
   static final semanticsImageIntro = tr('semnatics-image-intro');
   static final semanticsPrivateMessage = tr('semnatics-image-private-message');
-  static final semanticsSendArrow = tr('semantics-image-send-arrow');
   static final semanticsIntroFinal = tr('semnatics-image-intro-section-four');
   static final semanticsIntroThird = tr('semnatics-image-intro-section-third');
   static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');

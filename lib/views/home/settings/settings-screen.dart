@@ -79,6 +79,7 @@ class SettingsScreen extends StatelessWidget {
             appBar: AppBar(
               leading: IconButton(
                 icon: Icon(Icons.arrow_back, color: Colors.white),
+                tooltip: Strings.labelBack,
                 onPressed: props.authLoading ? null : () => Navigator.pop(context, false),
               ),
               title: Text(

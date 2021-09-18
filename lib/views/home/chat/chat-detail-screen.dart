@@ -106,9 +106,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
-        title: 'Block User',
-        content:
-            'If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.',
+        title: Strings.buttonBlockUser,
+        content: Strings.confirmBlockUser(name: user?.displayName),
         onConfirm: () async {
           await props.onBlockUser(user);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -135,8 +134,18 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
 
   @protected
   onLeaveChat(_Props props) async {
-    props.onLeaveChat();
-    Navigator.popUntil(context, (route) => route.isFirst);
+    showDialog(
+      context: context,
+      builder: (context) => DialogConfirm(
+        title: Strings.buttonLeaveChat.capitalize(),
+        content: Strings.confirmLeaveRooms(rooms: [props.room]),
+        onDismiss: () => Navigator.pop(context),
+        onConfirm: () async {
+          await props.onLeaveChat();
+          Navigator.popUntil(context, (route) => route.isFirst);
+        },
+      ),
+    );
   }
 
   @override

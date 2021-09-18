@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
 
 part 'model.g.dart';
 
@@ -10,15 +9,14 @@ class Homeserver extends Equatable {
   final String? baseUrl;
   final String? photoUrl;
   final String? identityUrl;
-  final String? loginType;
   final List<String> loginTypes;
+  final List<String> signupTypes;
 
   final String? location;
   final String? description;
-  final String? founded;
-  final String? responseTime;
   final String? usersActive;
   final String? roomsTotal;
+  final String? founded;
 
   final bool valid;
 
@@ -27,14 +25,13 @@ class Homeserver extends Equatable {
     this.baseUrl,
     this.photoUrl,
     this.identityUrl,
-    this.loginType,
-    this.loginTypes = const [MatrixAuthTypes.PASSWORD, MatrixAuthTypes.SSO],
+    this.loginTypes = const [],
+    this.signupTypes = const [],
     this.location,
     this.description,
     this.usersActive,
     this.roomsTotal,
     this.founded,
-    this.responseTime,
     this.valid = false,
   });
 
@@ -44,11 +41,9 @@ class Homeserver extends Equatable {
         baseUrl,
         photoUrl,
         identityUrl,
-        loginType,
         location,
         description,
         founded,
-        responseTime,
         usersActive,
         roomsTotal,
         valid,
@@ -61,10 +56,10 @@ class Homeserver extends Equatable {
     String? identityUrl,
     String? loginType,
     List<String>? loginTypes,
+    List<String>? signupTypes,
     String? location,
     String? description,
     String? founded,
-    String? responseTime,
     String? usersActive,
     String? roomsTotal,
     bool? valid,
@@ -74,14 +69,13 @@ class Homeserver extends Equatable {
         baseUrl: baseUrl ?? this.baseUrl,
         photoUrl: photoUrl ?? this.photoUrl,
         identityUrl: identityUrl ?? this.identityUrl,
-        loginType: loginType ?? this.loginType,
         loginTypes: loginTypes ?? this.loginTypes,
+        signupTypes: signupTypes ?? this.signupTypes,
         location: loginType ?? this.location,
         description: description ?? this.description,
         usersActive: usersActive ?? this.usersActive,
         roomsTotal: roomsTotal ?? this.roomsTotal,
         founded: founded ?? this.founded,
-        responseTime: responseTime ?? this.responseTime,
         valid: valid ?? this.valid,
       );
 

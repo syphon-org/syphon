@@ -1,8 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
+import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -14,11 +15,13 @@ import 'package:syphon/global/values.dart';
  * by certain matrix servers -_-
  */
 class Captcha extends StatefulWidget {
+  final String? baseUrl;
   final String? publicKey;
   final Function onVerified;
 
   const Captcha({
     Key? key,
+    required this.baseUrl,
     required this.publicKey,
     required this.onVerified,
   }) : super(
@@ -26,69 +29,66 @@ class Captcha extends StatefulWidget {
         );
 
   @override
-  CaptchaState createState() => CaptchaState(
-        publickey: publicKey,
-        onVerified: onVerified,
-      );
+  CaptchaState createState() => CaptchaState();
 }
 
-class CaptchaState extends State<Captcha> {
-  final String? publickey;
-  final Function? onVerified;
+class CaptchaState extends State<Captcha> with Lifecycle<Captcha> {
+  WebViewController? controller;
 
-  final Completer<WebViewController> controller = Completer<WebViewController>();
+  bool loading = true;
 
-  @override
-  void initState() {
-    super.initState();
+  CaptchaState();
 
-    // NOTE: SchedulerBinding still needed in screen child views
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
-      onMounted();
-    });
+  loadLocalHtml() async {
+    final recaptchaHTML = await rootBundle.loadString(Assets.captchaHTML);
+    final recaptchaWithSiteKeyHTML = recaptchaHTML.replaceFirst(
+      's%',
+      widget.publicKey ?? Values.captchaMatrixSiteKey,
+    );
+
+    await controller?.loadHtml(recaptchaWithSiteKeyHTML);
   }
-
-  @protected
-  void onMounted() {
-    // Confirm public key is correct
-    // debugPrint('[captcha wrapper] ${this.publickey}');
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  CaptchaState({
-    this.publickey,
-    this.onVerified,
-  });
 
   // Matrix Public Key
   @override
   Widget build(BuildContext context) {
-    final captchaUrl = '${Values.captchaUrl}$publickey';
-
-    return WebView(
-      initialUrl: captchaUrl,
-      javascriptMode: JavascriptMode.unrestricted,
-      javascriptChannels: {
-        JavascriptChannel(
-          name: 'RecaptchaFlutterChannel',
-          onMessageReceived: (JavascriptMessage receiver) {
-            String token = receiver.message;
-            if (token.contains('verify')) {
-              token = token.substring(7);
-            }
-            if (onVerified != null) {
-              onVerified!(token);
-            }
+    return Stack(
+      children: [
+        WebView(
+          baseUrl: widget.baseUrl != null ? 'https://${widget.baseUrl}' : 'https://matrix.org',
+          javascriptMode: JavascriptMode.unrestricted,
+          javascriptChannels: {
+            JavascriptChannel(
+              name: 'Captcha',
+              onMessageReceived: (JavascriptMessage message) {
+                String token = message.message;
+                if (token.contains('verify')) {
+                  token = token.substring(7);
+                }
+                widget.onVerified(token);
+              },
+            ),
+          },
+          onPageFinished: (_) {
+            setState(() {
+              loading = false;
+            });
+          },
+          onWebViewCreated: (WebViewController webViewController) {
+            setState(() {
+              loading = true;
+            });
+            controller = webViewController;
+            loadLocalHtml();
           },
         ),
-      },
-      onWebViewCreated: (WebViewController webViewController) {
-        controller.complete(webViewController);
-      },
+        Visibility(
+          visible: loading,
+          child: Center(
+            child: LoadingIndicator(loading: loading),
+          ),
+        ),
+      ],
     );
   }
 }

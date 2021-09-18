@@ -9,6 +9,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 
 class StorageSettingsScreen extends StatelessWidget {
   const StorageSettingsScreen({Key? key}) : super(key: key);
@@ -21,15 +22,8 @@ class StorageSettingsScreen extends StatelessWidget {
           final double width = MediaQuery.of(context).size.width;
 
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                'Storage',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
-              ),
+            appBar: AppBarNormal(
+              title: 'Storage',
             ),
             body: Column(
               children: <Widget>[

@@ -248,7 +248,7 @@ class _Props extends Equatable {
 
   final Function onSetEmail;
 
-  _Props({
+  const _Props({
     required this.email,
     required this.isEmailValid,
     required this.isEmailAvailable,

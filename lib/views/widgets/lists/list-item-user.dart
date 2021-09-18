@@ -5,7 +5,6 @@ import 'package:syphon/global/assets.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
 
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -45,7 +44,11 @@ class ListItemUser extends StatelessWidget {
   final Function? onPress;
   final Function? onPressAvatar;
 
-  Widget buildArrowIcon(context) => GestureDetector(
+  Widget buildArrowIcon(context) => Semantics(
+      button: true,
+      enabled: true,
+      label: 'Start Chat',
+      child: GestureDetector(
         onTap: onPress != null ? () => onPress!() : null,
         child: Container(
           width: Dimensions.iconSizeLite,
@@ -56,10 +59,10 @@ class ListItemUser extends StatelessWidget {
             height: Dimensions.iconSize,
             width: Dimensions.iconSize,
             color: Theme.of(context).iconTheme.color,
-            semanticsLabel: Strings.semanticsSendArrow,
+            semanticsLabel: 'Start Chat',
           ),
         ),
-      );
+      ));
 
   Widget buildTouchType({required Widget child}) {
     switch (type) {

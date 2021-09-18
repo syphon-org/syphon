@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,12 +10,17 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/search/actions.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/store/sync/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -51,29 +58,170 @@ class HomeScreen extends StatefulWidget {
 class HomeState extends State<HomeScreen> {
   HomeState() : super();
 
+  final searchInputFocusNode = FocusNode();
+
+  final fabKeyBar = GlobalKey<FabBarContainerState>();
   final fabKeyRing = GlobalKey<FabCircularMenuState>();
   final fabKeyCircle = GlobalKey<FabBarContainerState>();
-  final fabKeyBar = GlobalKey<FabBarContainerState>();
 
-  Room? selectedRoom;
+  bool searching = false;
+  String searchText = '';
+  Map<String, Room> selectedChats = {};
   Map<String, Color> roomColorDefaults = {};
 
   @protected
-  onToggleRoomOptions({Room? room}) {
-    setState(() {
-      selectedRoom = room;
-    });
+  onToggleRoomOptions({required Room room}) {
+    if (searching) {
+      onToggleSearch();
+    }
+    if (!selectedChats.containsKey(room.id)) {
+      setState(() {
+        selectedChats.addAll({room.id: room});
+      });
+    } else {
+      setState(() {
+        selectedChats.remove(room.id);
+      });
+    }
   }
 
   @protected
   onDismissMessageOptions() {
     setState(() {
-      selectedRoom = null;
+      selectedChats = {};
     });
   }
 
+  onArchiveChats(_Props props) async {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.buttonArchiveChat.capitalize(),
+        content: Strings.confirmArchiveRooms(rooms: selectedChats.values),
+        confirmStyle: TextStyle(color: Colors.red),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+          await Future.forEach(selectedChats.values, (room) async {
+            await props.onArchiveChat(room: room);
+          });
+          setState(() {
+            selectedChats = {};
+          });
+        },
+      ),
+    );
+  }
+
+  onLeaveChats(_Props props) async {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.buttonLeaveChat.capitalize(),
+        content: Strings.confirmLeaveRooms(rooms: selectedChats.values),
+        confirmStyle: TextStyle(color: Colors.red),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+          final _selectedChats = Map<String, Room>.from(selectedChats);
+          await Future.forEach<Room>(_selectedChats.values, (Room room) async {
+            await props.onLeaveChat(room: room);
+            onToggleRoomOptions(room: room);
+          });
+          setState(() {
+            selectedChats = {};
+          });
+        },
+      ),
+    );
+  }
+
+  onDeleteChats(_Props props) async {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.buttonDeleteChat.capitalize(),
+        content: Strings.confirmDeleteRooms(rooms: selectedChats.values),
+        confirmStyle: TextStyle(color: Colors.red),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+
+          final _selectedChats = Map<String, Room>.from(selectedChats);
+          await Future.forEach(_selectedChats.values, (room) async {
+            await props.onDeleteChat(room: room);
+          });
+          setState(() {
+            selectedChats = {};
+          });
+        },
+      ),
+    );
+  }
+
+  onToggleSearch() {
+    setState(() {
+      searching = !searching;
+      searchText = '';
+    });
+  }
+
+  onSearch(_Props props, String text) {
+    final store = StoreProvider.of<AppState>(context);
+    setState(() {
+      searchText = text;
+    });
+
+    if (text.isEmpty) {
+      return store.dispatch(clearSearchResults());
+    }
+
+    store.dispatch(searchMessages(text));
+  }
+
+  onSelectChat(Room room, String chatName) {
+    final store = StoreProvider.of<AppState>(context);
+
+    if (selectedChats.isNotEmpty) {
+      return onToggleRoomOptions(room: room);
+    }
+
+    Navigator.pushNamed(
+      context,
+      NavigationPaths.chat,
+      arguments: ChatScreenArguments(roomId: room.id, title: chatName),
+    );
+
+    Timer(Duration(milliseconds: 500), () {
+      setState(() {
+        searching = false;
+        selectedChats = {};
+      });
+      store.dispatch(clearSearchResults());
+    });
+  }
+
+  onSelectAll(_Props props) {
+    if (selectedChats.values.toSet().containsAll(props.rooms)) {
+      setState(() {
+        selectedChats = {};
+      });
+    } else {
+      setState(() {
+        selectedChats.addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
+      });
+    }
+  }
+
+  bool isAllDirect(Map<String, Room> selectedChats) {
+    return selectedChats.values.every((chat) => chat.direct);
+  }
+
   @protected
-  Widget buildAppBarRoomOptions({BuildContext? context, _Props? props}) => AppBar(
+  Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -86,76 +234,62 @@ class HomeState extends State<HomeScreen> {
                 icon: Icon(Icons.close),
                 color: Colors.white,
                 iconSize: Dimensions.buttonAppBarSize,
-                onPressed: onDismissMessageOptions,
+                tooltip: Strings.labelClose.capitalize(),
+                onPressed: () => onDismissMessageOptions(),
               ),
             ),
           ],
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.info_outline),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Chat Details',
-            color: Colors.white,
-            onPressed: () {
-              Navigator.pushNamed(
-                context!,
-                NavigationPaths.chatDetails,
-                arguments: ChatDetailsArguments(
-                  roomId: selectedRoom!.id,
-                  title: selectedRoom!.name,
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.archive),
-            iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Archive Room',
-            color: Colors.white,
-            onPressed: () async {
-              await props!.onArchiveRoom(room: selectedRoom);
-              setState(() {
-                selectedRoom = null;
-              });
-            },
-          ),
           Visibility(
-            visible: true,
+            visible: selectedChats.length == 1,
             child: IconButton(
-              icon: Icon(Icons.exit_to_app),
+              icon: Icon(Icons.info_outline),
               iconSize: Dimensions.buttonAppBarSize,
-              tooltip: 'Leave Chat',
+              tooltip: Strings.buttonRoomDetails.capitalize(),
               color: Colors.white,
-              onPressed: () async {
-                await props!.onLeaveChat(room: selectedRoom);
-                setState(() {
-                  selectedRoom = null;
-                });
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  NavigationPaths.chatDetails,
+                  arguments: ChatDetailsArguments(
+                    roomId: selectedChats.values.first.id,
+                    title: selectedChats.values.first.name,
+                  ),
+                );
               },
             ),
           ),
+          IconButton(
+            icon: Icon(Icons.archive_outlined),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: Strings.buttonArchiveChat.capitalize(),
+            color: Colors.white,
+            onPressed: () => onArchiveChats(props),
+          ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            iconSize: Dimensions.buttonAppBarSize,
+            tooltip: Strings.buttonLeaveChat.capitalize(),
+            color: Colors.white,
+            onPressed: () => onLeaveChats(props),
+          ),
           Visibility(
-            visible: selectedRoom!.direct,
+            visible: isAllDirect(selectedChats),
             child: IconButton(
               icon: Icon(Icons.delete_outline),
               iconSize: Dimensions.buttonAppBarSize,
-              tooltip: 'Delete Chat',
+              tooltip: Strings.buttonDeleteChat.capitalize(),
               color: Colors.white,
-              onPressed: () async {
-                await props!.onDeleteChat(room: selectedRoom);
-                setState(() {
-                  selectedRoom = null;
-                });
-              },
+              onPressed: () => onDeleteChats(props),
             ),
           ),
           IconButton(
             icon: Icon(Icons.select_all),
             iconSize: Dimensions.buttonAppBarSize,
-            tooltip: 'Select All',
+            tooltip: Strings.buttonSelectAll.capitalize(),
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () => onSelectAll(props),
           ),
         ],
       );
@@ -192,9 +326,7 @@ class HomeState extends State<HomeScreen> {
             color: Colors.white,
             icon: Icon(Icons.search),
             tooltip: 'Search Chats',
-            onPressed: () {
-              Navigator.pushNamed(context, NavigationPaths.searchAll);
-            },
+            onPressed: () => onToggleSearch(),
           ),
           RoundedPopupMenu<Options>(
             icon: Icon(Icons.more_vert, color: Colors.white),
@@ -217,26 +349,26 @@ class HomeState extends State<HomeScreen> {
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<Options>>[
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.newGroup,
-                child: Text('New Group'),
+                child: Text(Strings.buttonTextCreateGroup),
               ),
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.markAllRead,
-                child: Text('Mark All Read'),
+                child: Text(Strings.buttonTextMarkAllRead),
               ),
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.inviteFriends,
                 enabled: false,
-                child: Text('Invite Friends'),
+                child: Text(Strings.buttonTextInvite),
               ),
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.settings,
-                child: Text('Settings'),
+                child: Text(Strings.buttonTextSettings),
               ),
-              const PopupMenuItem<Options>(
+              PopupMenuItem<Options>(
                 value: Options.help,
-                child: Text('Help'),
+                child: Text(Strings.buttonTextSupport),
               ),
             ],
           )
@@ -246,8 +378,8 @@ class HomeState extends State<HomeScreen> {
   @protected
   Widget buildChatList(BuildContext context, _Props props) {
     final rooms = props.rooms;
-
     final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
+    final noSearchResults = searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
 
     if (rooms.isEmpty) {
       return Center(
@@ -281,7 +413,7 @@ class HomeState extends State<HomeScreen> {
 
     return ListView.builder(
       scrollDirection: Axis.vertical,
-      itemCount: rooms.length,
+      itemCount: noSearchResults ? 0 : rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
@@ -314,8 +446,8 @@ class HomeState extends State<HomeScreen> {
         }
 
         // highlight selected rooms if necessary
-        if (selectedRoom != null) {
-          if (selectedRoom!.id != room.id) {
+        if (selectedChats.isNotEmpty) {
+          if (!selectedChats.containsKey(room.id)) {
             backgroundColor = Theme.of(context).scaffoldBackgroundColor;
           } else {
             backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
@@ -348,17 +480,7 @@ class HomeState extends State<HomeScreen> {
 
         // GestureDetector w/ animation
         return InkWell(
-          onTap: () {
-            if (selectedRoom != null) {
-              onDismissMessageOptions();
-            } else {
-              Navigator.pushNamed(
-                context,
-                NavigationPaths.chat,
-                arguments: ChatScreenArguments(roomId: room.id, title: chatName),
-              );
-            }
-          },
+          onTap: () => onSelectChat(room, chatName),
           onLongPress: () => onToggleRoomOptions(room: room),
           child: Container(
             decoration: BoxDecoration(
@@ -543,13 +665,6 @@ class HomeState extends State<HomeScreen> {
       );
     }
 
-    // if (fabType == MainFabType.Circle) {
-    //   return FabCircleExpanding(
-    //     fabKey: fabKeyCircle,
-    //     alignment: selectActionAlignment(props),
-    //   );
-    // }
-
     return FabRing(
       fabKey: fabKeyRing,
       alignment: selectActionAlignment(props),
@@ -574,10 +689,25 @@ class HomeState extends State<HomeScreen> {
             context: context,
           );
 
-          if (selectedRoom != null) {
+          if (selectedChats.isNotEmpty) {
             currentAppBar = buildAppBarRoomOptions(
               props: props,
               context: context,
+            );
+          }
+
+          if (searching) {
+            currentAppBar = AppBarSearch(
+              title: 'Search Unencrypted',
+              label: 'Search Unencrypted',
+              tooltip: 'Search Unencrypted',
+              forceFocus: true,
+              navigate: false,
+              startFocused: true,
+              focusNode: searchInputFocusNode,
+              onBack: () => onToggleSearch(),
+              onToggleSearch: () => onToggleSearch(),
+              onSearch: (String text) => onSearch(props, text),
             );
           }
 
@@ -592,11 +722,14 @@ class HomeState extends State<HomeScreen> {
                 children: <Widget>[
                   Expanded(
                     child: RefreshIndicator(
-                      onRefresh: () {
-                        return props.onFetchSyncForced();
-                      },
+                      onRefresh: () => props.onFetchSyncForced(),
                       child: Stack(
                         children: [
+                          Positioned(
+                            child: Loader(
+                              loading: props.searching,
+                            ),
+                          ),
                           GestureDetector(
                             onTap: onDismissMessageOptions,
                             child: buildChatList(
@@ -623,9 +756,12 @@ class _Props extends Equatable {
   final bool unauthed;
   final bool roomTypeBadgesEnabled;
   final User currentUser;
+  final bool searching;
+
   final ThemeType themeType;
   final MainFabType fabType;
   final MainFabLocation fabLocation;
+  final List<Message> searchMessages;
   final Map<String, ChatSetting> chatSettings;
   final Map<String, List<Message>> messages;
   final Map<String, List<Message>> decrypted;
@@ -633,8 +769,8 @@ class _Props extends Equatable {
   final Function onDebug;
   final Function onLeaveChat;
   final Function onDeleteChat;
+  final Function onArchiveChat;
   final Function onSelectHelp;
-  final Function onArchiveRoom;
   final Function onMarkAllRead;
   final Function onFetchSyncForced;
 
@@ -643,11 +779,13 @@ class _Props extends Equatable {
     required this.themeType,
     required this.offline,
     required this.syncing,
+    required this.searching,
     required this.unauthed,
     required this.messages,
     required this.decrypted,
     required this.currentUser,
     required this.chatSettings,
+    required this.searchMessages,
     required this.fabType,
     required this.fabLocation,
     required this.roomTypeBadgesEnabled,
@@ -655,7 +793,7 @@ class _Props extends Equatable {
     required this.onLeaveChat,
     required this.onDeleteChat,
     required this.onSelectHelp,
-    required this.onArchiveRoom,
+    required this.onArchiveChat,
     required this.onMarkAllRead,
     required this.onFetchSyncForced,
   });
@@ -666,6 +804,7 @@ class _Props extends Equatable {
         messages,
         themeType,
         syncing,
+        searching,
         offline,
         unauthed,
         currentUser,
@@ -677,9 +816,12 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         themeType: store.state.settingsStore.themeSettings.themeType,
-        rooms: availableRooms(sortPrioritizedRooms(filterBlockedRooms(
-          store.state.roomStore.rooms.values.toList(),
-          store.state.userStore.blocked,
+        rooms: availableRooms(sortPrioritizedRooms(filterSearches(
+          filterBlockedRooms(
+            store.state.roomStore.rooms.values.toList(),
+            store.state.userStore.blocked,
+          ),
+          store.state.searchStore.searchMessages,
         ))),
         messages: store.state.eventStore.messages,
         decrypted: store.state.eventStore.messagesDecrypted,
@@ -687,50 +829,22 @@ class _Props extends Equatable {
         offline: store.state.syncStore.offline,
         fabType: store.state.settingsStore.themeSettings.mainFabType,
         fabLocation: store.state.settingsStore.themeSettings.mainFabLocation,
-        syncing: () {
-          final synced = store.state.syncStore.synced;
-          final syncing = store.state.syncStore.syncing;
-          final offline = store.state.syncStore.offline;
-          final backgrounded = store.state.syncStore.backgrounded;
-          final loadingRooms = store.state.roomStore.loading;
-
-          final lastAttempt = DateTime.fromMillisecondsSinceEpoch(store.state.syncStore.lastAttempt ?? 0);
-
-          // See if the last attempted sy nc is older than 60 seconds
-          final isLastAttemptOld = DateTime.now().difference(lastAttempt).compareTo(Duration(seconds: 90));
-
-          // syncing for the first time
-          if (syncing && !synced) {
-            return true;
-          }
-
-          // syncing for the first time since going offline
-          if (syncing && offline) {
-            return true;
-          }
-
-          // joining or removing a room
-          if (loadingRooms) {
-            return true;
-          }
-
-          // syncing for the first time in a while or restarting the app
-          if (syncing && (0 < isLastAttemptOld || backgrounded)) {
-            return true;
-          }
-
-          return false;
-        }(),
+        syncing: selectSyncingStatus(store.state),
+        searching: store.state.searchStore.loading,
+        searchMessages: store.state.searchStore.searchMessages,
         currentUser: store.state.authStore.user,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         chatSettings: store.state.settingsStore.chatSettings,
-        onDebug: () async {
-          debugPrint('[onDebug] trigged debug function @ home');
-        },
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());
         },
-        onArchiveRoom: ({Room? room}) async {
+        onLeaveChat: ({Room? room}) {
+          return store.dispatch(leaveRoom(room: room));
+        },
+        onDeleteChat: ({Room? room}) {
+          return store.dispatch(removeRoom(room: room));
+        },
+        onArchiveChat: ({Room? room}) async {
           store.dispatch(archiveRoom(room: room));
         },
         onFetchSyncForced: () async {
@@ -738,12 +852,6 @@ class _Props extends Equatable {
             fetchSync(since: store.state.syncStore.lastSince),
           );
           return Future(() => true);
-        },
-        onLeaveChat: ({Room? room}) {
-          return store.dispatch(leaveRoom(room: room));
-        },
-        onDeleteChat: ({Room? room}) {
-          return store.dispatch(removeRoom(room: room));
         },
         onSelectHelp: () async {
           try {
@@ -753,6 +861,9 @@ class _Props extends Equatable {
               throw 'Could not launch ${Values.openHelpUrl}';
             }
           } catch (error) {}
+        },
+        onDebug: () async {
+          debugPrint('[onDebug] trigged debug function @ home');
         },
       );
 }

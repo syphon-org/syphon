@@ -2,36 +2,40 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
-  AppBarSearch({
+  const AppBarSearch({
     Key? key,
     this.title = 'title:',
     this.label = 'label:',
     this.tooltip = 'tooltip:',
     this.throttle = const Duration(milliseconds: 400),
-    this.brightness = Brightness.dark,
     this.elevation,
     this.focusNode,
+    this.startFocused = false,
+    this.navigate = true,
+    this.forceFocus = false,
+    this.loading = false,
     this.onBack,
     this.onChange,
     this.onSearch,
     this.onToggleSearch,
-    this.forceFocus = false,
-    this.loading = false,
   }) : super(key: key);
 
   final bool loading;
   final bool forceFocus;
+  final bool startFocused;
+  final bool navigate;
+
   final String title;
   final String label;
   final String tooltip;
   final double? elevation;
   final Duration throttle;
-  final Brightness brightness;
   final FocusNode? focusNode;
 
   final Function? onBack;
@@ -46,11 +50,27 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => AppBar().preferredSize;
 }
 
-class AppBarSearchState extends State<AppBarSearch> {
+class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch> {
   final focusNode = FocusNode();
 
   bool searching = false;
   Timer? searchTimeout;
+
+  @override
+  void initState() {
+    super.initState();
+
+    searching = widget.startFocused;
+  }
+
+  @override
+  void onMounted() {
+    if (searching) {
+      FocusScope.of(context).requestFocus(
+        widget.focusNode ?? focusNode,
+      );
+    }
+  }
 
   @protected
   void onChange({String? text}) {
@@ -66,41 +86,33 @@ class AppBarSearchState extends State<AppBarSearch> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    // NOTE: still needed to have navigator context in dialogs
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
-      if (widget.forceFocus) {
-        onToggleSearch(context: context);
-      }
-    });
-  }
-
   @protected
   void onBack() {
-    if (onBack != null) {
-      onBack();
+    if (widget.onBack != null) {
+      widget.onBack!();
     }
-    Navigator.pop(context);
+    if (widget.navigate) {
+      Navigator.pop(context, false);
+    }
   }
 
   @protected
   void onToggleSearch({BuildContext? context}) {
+    if (widget.onToggleSearch != null && searching) {
+      widget.onToggleSearch!();
+      return;
+    }
+
     setState(() {
       searching = !searching;
     });
-    if (this.searching) {
-      Timer(
-        Duration(milliseconds: 5), // hack to focus after visibility change
-        () => FocusScope.of(
-          context!,
-        ).requestFocus(
-          widget.focusNode ?? focusNode,
-        ),
+
+    if (searching) {
+      FocusScope.of(context!).requestFocus(
+        widget.focusNode ?? focusNode,
       );
     } else {
+      onChange(text: ''); // clear search results
       FocusScope.of(context!).unfocus();
     }
   }
@@ -108,10 +120,10 @@ class AppBarSearchState extends State<AppBarSearch> {
   @override
   Widget build(BuildContext context) => AppBar(
         elevation: widget.elevation,
-        brightness: widget.brightness,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context, false),
+          onPressed: () => onBack(),
+          tooltip: Strings.labelBack,
         ),
         title: Stack(
           children: [
@@ -138,16 +150,16 @@ class AppBarSearchState extends State<AppBarSearch> {
                   enableSuggestions: false,
                   focusNode: widget.focusNode ?? focusNode,
                   onChanged: (text) {
-                    if (this.searchTimeout != null) {
-                      this.searchTimeout!.cancel();
-                      this.searchTimeout = null;
+                    if (searchTimeout != null) {
+                      searchTimeout!.cancel();
+                      searchTimeout = null;
                     }
 
-                    this.onChange(text: text);
+                    onChange(text: text);
 
                     setState(() {
                       searchTimeout = Timer(widget.throttle, () {
-                        this.onSearch(text: text);
+                        onSearch(text: text);
                       });
                     });
                   },
@@ -158,24 +170,11 @@ class AppBarSearchState extends State<AppBarSearch> {
                     fontWeight: FontWeight.w100,
                   ),
                   decoration: InputDecoration(
-                    disabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 0.0,
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    border: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 0.0,
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 0.0,
-                        color: Colors.transparent,
-                      ),
-                    ),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
                     hintText: widget.label,
                     hintStyle: TextStyle(
                       fontSize: 20,

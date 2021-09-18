@@ -36,6 +36,8 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
     final dialogBackgroundColor = selectModalColor(appTheme.themeType);
     final iconColor = selectIconColor(appTheme.themeType);
 
+    final selectedRowColor = selectRowHighlightColor(appTheme.themeType);
+
     final fontFamily = selectFontNameString(appTheme.fontName);
     final titleWeight = selectFontTitleWeight(appTheme.fontName);
     final bodyWeight = selectFontBodyWeight(appTheme.fontName);
@@ -67,6 +69,7 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
         selectionColor: primaryColor.withAlpha(100),
         selectionHandleColor: primaryColor,
       ),
+      selectedRowColor: Color(selectedRowColor),
       iconTheme: IconThemeData(color: iconColor),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
       appBarTheme: AppBarTheme(

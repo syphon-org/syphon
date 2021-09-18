@@ -1,0 +1,162 @@
+[
+    {
+        "hostname": "matrix.org",
+        "description": "Server of the Matrix project",
+        "url": "https://matrix.org/",
+        "category": "Free (Organization)",
+        "location": "GB/NL",
+        "online_since": 2015,
+        "users_active": null,
+        "total_room_count_estimate": 18825
+    },
+    {
+        "hostname": "mozilla.org",
+        "description": "Mozilla's matrix server",
+        "url": "https://mozilla.org/",
+        "category": "Free (Organization)",
+        "location": "N/A",
+        "online_since": 2015,
+        "users_active": null,
+        "total_room_count_estimate": 619
+    },
+    {
+        "hostname": "chat.privacytools.io",
+        "description": "Privacy-centric Matrix Homeserver",
+        "url": "https://www.privacytools.io/",
+        "category": "Free (Organization)",
+        "location": "DE",
+        "online_since": 2019,
+        "users_active": 5193,
+        "total_room_count_estimate": 96
+    },
+    {
+        "hostname": "feneas.org",
+        "description": "Federated Networks Association homeserver",
+        "url": "https://feneas.org/",
+        "category": "Free (Organization)",
+        "location": "FI",
+        "online_since": 2018,
+        "users_active": null,
+        "total_room_count_estimate": 59
+    },
+    {
+        "hostname": "tchncs.de",
+        "description": "Yet another tchncs.de service",
+        "url": "https://tchncs.de/matrix",
+        "category": "Free (Organization)",
+        "location": "DE",
+        "online_since": 2017,
+        "users_active": 4410,
+        "total_room_count_estimate": 130
+    },
+    {
+        "hostname": "kde.org",
+        "description": "KDE organization open community homeserver",
+        "url": "https://kde.org",
+        "category": "Free (Organization)",
+        "location": "N/A",
+        "online_since": 2021,
+        "users_active": null,
+        "total_room_count_estimate": 83
+    },
+    {
+        "hostname": "chat.weho.st",
+        "description": "chat.weho.st",
+        "url": "https://webchat.weho.st/",
+        "category": "Free (Organization)",
+        "location": "NL",
+        "online_since": 2016,
+        "users_active": null,
+        "total_room_count_estimate": 169
+    },
+    {
+        "hostname": "hackerspaces.be",
+        "description": "Belgium Hackerspaces Matrix homeserver",
+        "url": "https://hackerspaces.be/",
+        "category": "Free (Organization)",
+        "location": "BE",
+        "online_since": 2018,
+        "users_active": null,
+        "total_room_count_estimate": 83
+    },
+    {
+        "hostname": "junta.pl",
+        "description": "Public Polish Matrix homeserver",
+        "url": "https://junta.pl/",
+        "category": "Free (Organization)",
+        "location": "PL",
+        "online_since": 2019,
+        "users_active": 69,
+        "total_room_count_estimate": 55
+    },
+    {
+        "hostname": "matrix.allmende.io",
+        "description": "matrix.allmende.io",
+        "url": "http://riot.allmende.io/",
+        "category": "Free (Organization)",
+        "location": "DE",
+        "online_since": 2016,
+        "users_active": null,
+        "total_room_count_estimate": 42
+    },
+    {
+        "hostname": "matrix.tedomum.net",
+        "description": "tedomum.net",
+        "url": "https://matrix.tedomum.net/",
+        "category": "Free (Organization)",
+        "location": "FR",
+        "online_since": 2017,
+        "users_active": null,
+        "total_room_count_estimate": 22
+    },
+    {
+        "hostname": "perthchat.org",
+        "description": "Public server for Perth, Western Australia",
+        "url": "https://perthchat.org/",
+        "category": "Free (Organization)",
+        "location": "SG",
+        "online_since": 2017,
+        "users_active": 24,
+        "total_room_count_estimate": 20
+    },
+    {
+        "hostname": "converser.eu",
+        "description": "Serveur libre et d\u00e9centralis\u00e9 de communication",
+        "url": "https://converser.eu",
+        "category": "Free (Organization)",
+        "location": "FR",
+        "online_since": 2018,
+        "users_active": null,
+        "total_room_count_estimate": 12
+    },
+    {
+        "hostname": "ru-matrix.org",
+        "description": "Public Matrix homeserver from Russian Matrix community",
+        "url": "https://ru-matrix.org",
+        "category": "Free (Organization)",
+        "location": "RU",
+        "online_since": 2018,
+        "users_active": 85,
+        "total_room_count_estimate": 10
+    },
+    {
+        "hostname": "matrix.sibnsk.net",
+        "description": "Linux User Group Novosibirsk",
+        "url": "https://lugnsk.org/page/blog/matrix",
+        "category": "Free (Experimental)",
+        "location": "DE",
+        "online_since": 2016,
+        "users_active": 331,
+        "total_room_count_estimate": 7
+    },
+    {
+        "hostname": "alternanet.fr",
+        "description": "Alternanet Serveur Matrix",
+        "url": "https://alternanet.fr/matrix.html",
+        "category": "Free (Experimental)",
+        "location": "FR",
+        "online_since": 2019,
+        "users_active": null,
+        "total_room_count_estimate": 2
+    }
+]

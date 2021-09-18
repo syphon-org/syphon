@@ -11,6 +11,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
@@ -30,7 +31,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
       builder: (dialogContext) => DialogConfirm(
         title: 'Confirm Advanced Colors',
         content: Strings.confirmAdvancedColors,
-        confirm: Strings.buttonEnable,
+        confirmText: Strings.buttonEnable,
         onConfirm: () async {
           Navigator.pop(dialogContext);
           onAdvanced();
@@ -88,17 +89,8 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
           final double width = MediaQuery.of(context).size.width;
 
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                Strings.titleTheming,
-                style: Theme.of(context).textTheme.headline6!.copyWith(
-                      color: Colors.white,
-                    ),
-              ),
+            appBar: AppBarNormal(
+              title: Strings.titleTheming,
             ),
             body: SingleChildScrollView(
               child: Column(
@@ -192,7 +184,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                         ListTile(
                           contentPadding: Dimensions.listPadding,
                           title: Text(
-                            'Room Type Badges',
+                            'Chat Type Badges',
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Switch(

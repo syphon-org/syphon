@@ -1,4 +1,5 @@
 import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/store/index.dart';
 
 // Preauth
@@ -28,6 +29,11 @@ bool selectSSOLoginAttemptable(AppState state) {
 
 bool isAuthLoading(AppState state) {
   return state.authStore.loading;
+}
+
+bool selectSignupClosed(AppState state) {
+  final signupTypes = state.authStore.homeserver.signupTypes;
+  return signupTypes.contains(MatrixErrors.forbidden);
 }
 
 bool selectPasswordEnabled(AppState state) {

@@ -175,15 +175,13 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                   maxWidth: Dimensions.buttonWidthMax,
                                 ),
                                 child: ButtonSolid(
-                                  text: 'resend email',
+                                  text: 'check verification',
                                   loading: sending || props.loading,
                                   disabled: sending || props.loading,
-                                  onPressed: () {
-                                    props.onResendVerification(
-                                      sendAttempt: sendAttempt + 1,
-                                    );
+                                  onPressed: () async {
+                                    final result = await props.onCreateUser(enableErrors: true);
                                     setState(() {
-                                      sendAttempt = sendAttempt + 1;
+                                      success = result;
                                     });
                                   },
                                 ),
@@ -197,12 +195,14 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                   maxWidth: Dimensions.buttonWidthMax,
                                 ),
                                 child: ButtonText(
-                                  text: 'check verification',
+                                  text: 'resend email',
                                   disabled: sending || props.loading,
-                                  onPressed: () async {
-                                    final result = await props.onCreateUser(enableErrors: true);
+                                  onPressed: () {
+                                    props.onResendVerification(
+                                      sendAttempt: sendAttempt + 1,
+                                    );
                                     setState(() {
-                                      success = result;
+                                      sendAttempt = sendAttempt + 1;
                                     });
                                   },
                                 ),
@@ -235,6 +235,12 @@ class _Props extends Equatable {
     required this.onResendVerification,
   });
 
+  @override
+  List<Object> get props => [
+        loading,
+        verification,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         verification: store.state.authStore.verificationNeeded,
@@ -245,10 +251,4 @@ class _Props extends Equatable {
           return await store.dispatch(createUser(enableErrors: enableErrors));
         },
       );
-
-  @override
-  List<Object> get props => [
-        loading,
-        verification,
-      ];
 }

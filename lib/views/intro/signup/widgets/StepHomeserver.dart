@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
@@ -17,6 +16,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 class HomeserverStep extends StatefulWidget {
@@ -26,26 +26,27 @@ class HomeserverStep extends StatefulWidget {
   HomeserverStepState createState() => HomeserverStepState();
 }
 
-class HomeserverStepState extends State<HomeserverStep> {
+class HomeserverStepState extends State<HomeserverStep> with Lifecycle<HomeserverStep> {
   HomeserverStepState();
 
   final homeserverController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-
-    // NOTE: SchedulerBinding still needed in screen child views
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
-      onMounted();
-    });
-  }
-
   onMounted() {
     final store = StoreProvider.of<AppState>(context);
     final hostname = store.state.authStore.hostname;
     final homeserver = store.state.authStore.homeserver;
     homeserverController.text = homeserver.hostname ?? hostname;
+  }
+
+  onDidChange(_Props? oldProps, _Props props) {
+    final baseUrlChanged = props.homeserver.hostname != oldProps?.homeserver.hostname;
+
+    if (baseUrlChanged) {
+      final hostname = props.hostname;
+      final homeserver = props.homeserver;
+      homeserverController.text = homeserver.hostname ?? hostname;
+    }
   }
 
   buildContinueSSO(_Props props) => Container(
@@ -105,7 +106,8 @@ class HomeserverStepState extends State<HomeserverStep> {
       );
 
   buildContinue(_Props props) {
-    if (props.homeserver.loginType == MatrixAuthTypes.SSO) {
+    if (props.homeserver.loginTypes.contains(MatrixAuthTypes.SSO) &&
+        !props.homeserver.loginTypes.contains(MatrixAuthTypes.PASSWORD)) {
       return buildContinueSSO(props);
     }
     return buildContinueNormal(props);
@@ -114,6 +116,7 @@ class HomeserverStepState extends State<HomeserverStep> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
+      onWillChange: onDidChange,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         final double height = MediaQuery.of(context).size.height;

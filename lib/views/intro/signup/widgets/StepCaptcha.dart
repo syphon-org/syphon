@@ -14,6 +14,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
 class CaptchaStep extends StatefulWidget {
   const CaptchaStep({Key? key}) : super(key: key);
@@ -89,14 +90,22 @@ class CaptchaStepState extends State<CaptchaStep> {
                         right: 0,
                         child: GestureDetector(
                           onTap: () {
-                            // TODO: show captcha explaination dialog
+                            showDialog(
+                              context: context,
+                              builder: (dialogContext) => DialogConfirm(
+                                title: Strings.titleDialogCaptcha,
+                                content: Strings.contentCaptchaWarning,
+                                onConfirm: () => Navigator.pop(dialogContext),
+                                onDismiss: () => Navigator.pop(dialogContext),
+                              ),
+                            );
                           },
                           child: Container(
                             height: 20,
                             width: 20,
                             child: Icon(
                               Icons.info_outline,
-                              color: Colors.white,
+                              color: Colors.red,
                               size: 20,
                             ),
                           ),
@@ -142,6 +151,12 @@ class _Props extends Equatable {
     required this.onShowCaptcha,
   });
 
+  @override
+  List<Object> get props => [
+        loading,
+        completed,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         completed: store.state.authStore.captcha,
@@ -152,15 +167,9 @@ class _Props extends Equatable {
             builder: (context) {
               return DialogCaptcha(
                 key: Key(authSession!),
-                onConfirm: () {},
               );
             },
           );
         },
       );
-
-  @override
-  List<Object> get props => [
-        completed,
-      ];
 }

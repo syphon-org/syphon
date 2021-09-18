@@ -1,20 +1,25 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
+import 'package:syphon/context/index.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
-import 'package:syphon/storage/codec.dart';
+import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/sembast/codec.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
+import 'package:path/path.dart' as path;
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
@@ -31,6 +36,9 @@ class Storage {
   // storage identifiers
   static const databaseLocation = '${Values.appLabel}-main-storage.db';
 
+  // storage identifiers - NEW - MOOR
+  static const sqliteLocation = '${Values.appLabel}_main_storage.db';
+
   // cold storage references
   static Database? instance;
 }
@@ -44,14 +52,10 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
       storageKeyId = '$context-$storageKeyId';
       storageLocation = '$context-$storageLocation';
     }
-    // TODO: TEMP: remove after 0.1.11 release
-    if (!(await checkKey(Storage.keyLocation))) {
-      await deleteStorage();
-    }
 
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
 
-    var version = 1;
+    const version = 2;
     var storageFactory;
 
     // Configure cache encryption/decryption instance
@@ -66,7 +70,6 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
 
     /// Supports Windows/Linux/MacOS for now.
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      version = 2;
       storageFactory = getDatabaseFactorySqflite(
         sqflite_ffi.databaseFactoryFfi,
       );
@@ -78,15 +81,18 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
       );
     }
 
-    final codec = getEncryptSembastCodec(password: storageKey!);
-
     printInfo('initStorage $storageLocation $storageKey');
 
-    return Storage.instance = await storageFactory.openDatabase(
+    final codec = getEncryptSembastCodec(password: storageKey);
+
+    final openedDatabase = await storageFactory.openDatabase(
       storageLocation,
       codec: codec,
       version: version,
     );
+
+    Storage.instance = openedDatabase;
+    return openedDatabase;
   } catch (error) {
     printDebug('[initStorage] $error');
     return null;
@@ -130,6 +136,34 @@ deleteStorage({String? context = StoreContext.DEFAULT}) async {
     await deleteKey(storageKeyId);
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
+  }
+}
+
+Future<StorageDatabase> initColdStorage({String? context = StoreContext.DEFAULT}) {
+  return Future.value(StorageDatabase(context!)); // never null ^
+}
+
+Future closeColdStorage(StorageDatabase? storage) async {
+  if (storage != null) {
+    storage.close();
+  }
+}
+
+Future deleteColdStorage({String? context = StoreContext.DEFAULT}) async {
+  try {
+    var storageLocation = Storage.sqliteLocation;
+
+    if (context!.isNotEmpty) {
+      storageLocation = '$context-$storageLocation';
+    }
+
+    storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
+
+    final appDir = await getApplicationDocumentsDirectory();
+    final file = File(path.join(appDir.path, storageLocation));
+    await file.delete();
+  } catch (error) {
+    printError('[deleteColdStorage] ${error.toString()}');
   }
 }
 

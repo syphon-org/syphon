@@ -157,7 +157,7 @@ abstract class Auth {
   ///
   /// inhibit_login automatically logs in the user after creation
   static Future<dynamic> registerUser({
-    String? protocol,
+    String? protocol = Values.DEFAULT_PROTOCOL,
     String? homeserver,
     String? username,
     String? password,
@@ -171,9 +171,6 @@ abstract class Auth {
     final String url = '$protocol$homeserver/_matrix/client/r0/register';
 
     Map body = {
-      'username': username,
-      'password': password,
-      'inhibit_login': false,
       'auth': {
         'type': MatrixAuthTypes.DUMMY,
       }
@@ -212,6 +209,15 @@ abstract class Auth {
         };
         break;
       case MatrixAuthTypes.DUMMY: // default
+        body = {
+          'username': username,
+          'password': password,
+          'inhibit_login': false,
+          'auth': {
+            'type': MatrixAuthTypes.DUMMY,
+          }
+        };
+        break;
       default:
         break;
     }
@@ -222,7 +228,7 @@ abstract class Auth {
     }
 
     if (deviceId != null) {
-      body['initial_device_display_name'] = '$deviceName';
+      body['initial_device_display_name'] = deviceName;
     }
 
     final response = await http.post(
@@ -289,7 +295,14 @@ abstract class Auth {
 
     url += username != null ? '?username=$username' : '';
 
-    final response = await http.get(Uri.parse(url));
+    // Specified timeout because servers can hang
+    final response = await http.get(Uri.parse(url)).timeout(
+      Duration(seconds: 5),
+      onTimeout: () {
+        // Time has run out, do what you wanted to do.
+        return http.Response('Error', 500); // Replace 500 with your http code.
+      },
+    );
 
     return await json.decode(response.body);
   }

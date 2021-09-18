@@ -6,9 +6,9 @@ class MatrixErrors {
   static const String unknown_token = 'M_UNKNOWN_TOKEN';
   static const String email_in_use = 'M_THREEPID_IN_USE';
   static const String weak_password = 'M_WEAK_PASSWORD';
+  static const String forbidden = 'M_FORBIDDEN';
 }
 
 class MatrixErrorsSoft {
-  static const String terms_and_conditions =
-      'agree to our terms and conditions';
+  static const String terms_and_conditions = 'agree to our terms and conditions';
 }

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -12,11 +11,11 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 
-/**
- * MatrixImage
- * uses the matrix mxc uris and either pulls from cached data or 
- * downloads the image and saves it to cache
- */
+///
+/// MatrixImage
+///
+/// uses the matrix mxc uris and either pulls from cached data or
+/// downloads the image and saves it to cache
 class MatrixImage extends StatefulWidget {
   final String? mxcUri;
   final double width;
@@ -96,8 +95,7 @@ class MatrixImageState extends State<MatrixImage> {
         builder: (context, props) {
           final failed = props.mediaChecks[widget.mxcUri!] != null &&
               props.mediaChecks[widget.mxcUri!] == MediaStatus.FAILURE;
-          final loading =
-              forceLoading || !props.mediaCache.containsKey(widget.mxcUri);
+          final loading = forceLoading || !props.mediaCache.containsKey(widget.mxcUri);
 
           if (failed) {
             return CircleAvatar(

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +23,7 @@ import 'package:syphon/views/intro/signup/widgets/StepTerms.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-outline.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'widgets/StepHomeserver.dart';
 import 'widgets/StepPassword.dart';
 import 'widgets/StepUsername.dart';
@@ -40,17 +39,25 @@ class SignupScreen extends StatefulWidget {
   SignupScreenState createState() => SignupScreenState();
 }
 
-class SignupScreenState extends State<SignupScreen> {
+class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen> {
+  final sectionsPassword = [
+    HomeserverStep(),
+    UsernameStep(),
+    PasswordStep(),
+  ];
+
   int currentStep = 0;
   bool validStep = false;
   bool onboarding = false;
-  late StreamSubscription subscription;
   PageController? pageController;
 
   List<Widget> sections = [
     HomeserverStep(),
     UsernameStep(),
     PasswordStep(),
+    CaptchaStep(),
+    TermsStep(),
+    EmailStep(),
   ];
 
   SignupScreenState();
@@ -65,107 +72,102 @@ class SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  ///
+  /// Update Flows (Signup)
+  ///
+  /// Update the stages and overall flow of signup
+  /// based on the requirements of the homeserver selected
+  ///
+  onUpdateFlows(_Props props) {
+    final signupTypes = props.homeserver.signupTypes;
+
+    if (props.isPasswordLoginAvailable) {
+      setState(() {
+        sections = [...sectionsPassword];
+      });
+    }
+
+    if (props.isSSOLoginAvailable && !props.isPasswordLoginAvailable) {
+      setState(() {
+        sections = [HomeserverStep()];
+      });
+    }
+
+    final sectionsNew = List<Widget>.from(sections);
+
+    signupTypes.forEach((stage) {
+      var stageNew;
+
+      switch (stage) {
+        case MatrixAuthTypes.EMAIL:
+          stageNew = EmailStep();
+          break;
+        case MatrixAuthTypes.RECAPTCHA:
+          stageNew = CaptchaStep();
+          break;
+        case MatrixAuthTypes.TERMS:
+          stageNew = TermsStep();
+          break;
+        default:
+          break;
+      }
+
+      if (!sectionsNew.contains(stageNew) && stageNew != null) {
+        sectionsNew.add(stageNew);
+      }
+    });
+
+    if (sectionsNew.length != sections.length) {
+      setState(() {
+        sections = sectionsNew;
+      });
+    }
+  }
+
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
+  onMounted() {
+    final store = StoreProvider.of<AppState>(context);
+    final props = _Props.mapStateToProps(store);
+
+    if (props.hostname != Values.homeserverDefault) {
+      onUpdateFlows(props);
+    }
   }
 
   @override
   void dispose() {
-    subscription.cancel();
     pageController?.dispose();
     super.dispose();
   }
 
-  onMounted() async {
-    final store = StoreProvider.of<AppState>(context);
-
-    final props = _Props.mapStateToProps(store);
-    final loginTypes = props.homeserver.loginTypes;
-
-    if (loginTypes.contains(MatrixAuthTypes.SSO) && !loginTypes.contains(MatrixAuthTypes.PASSWORD)) {
-      setState(() {
-        sections = sections..removeWhere((step) => step.runtimeType != HomeserverStep);
-      });
-    }
-
-    // Init change listener
-    subscription = store.onChange.listen((state) async {
-      if (state.authStore.interactiveAuths.isNotEmpty && sections.length < 4) {
-        final newSections = List<Widget>.from(sections);
-
-        List<dynamic>? newStages = [];
-
-        try {
-          newStages = state.authStore.interactiveAuths['flows'][0]['stages'];
-        } catch (error) {
-          debugPrint('Failed to parse stages');
-        }
-
-        // dynamically add stages based on homeserver requirements
-        newStages!.forEach((stage) {
-          switch (stage) {
-            case MatrixAuthTypes.EMAIL:
-              newSections.add(EmailStep());
-              break;
-            case MatrixAuthTypes.RECAPTCHA:
-              newSections.add(CaptchaStep());
-              break;
-            case MatrixAuthTypes.TERMS:
-              newSections.add(TermsStep());
-              break;
-            default:
-              break;
-          }
-        });
-
-        setState(() {
-          sections = newSections;
-        });
-      }
-    });
-  }
-
   onDidChange(_Props? oldProps, _Props props) {
-    final loginTypes = props.homeserver.loginTypes;
-    final loginTypesOld = oldProps?.homeserver.loginTypes;
+    final ssoLoginChanged = props.isSSOLoginAvailable != oldProps?.isSSOLoginAvailable;
+    final passwordLoginChanged = props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
 
-    if (loginTypes == loginTypesOld) return;
+    final signupTypesChanged = props.homeserver.signupTypes != oldProps?.homeserver.signupTypes;
 
-    if (loginTypes.contains(MatrixAuthTypes.SSO) && !loginTypes.contains(MatrixAuthTypes.PASSWORD)) {
-      setState(() {
-        sections = sections..removeWhere((step) => step.runtimeType != HomeserverStep);
-      });
-    }
-
-    if (loginTypes.contains(MatrixAuthTypes.PASSWORD)) {
-      setState(() {
-        sections = [
-          HomeserverStep(),
-          UsernameStep(),
-          PasswordStep(),
-        ];
-      });
+    if (passwordLoginChanged || ssoLoginChanged || signupTypesChanged) {
+      onUpdateFlows(props);
     }
   }
 
   onBackStep(BuildContext context) {
     if (currentStep < 1) {
-      Navigator.pop(context, false);
-    } else {
-      setState(() {
-        currentStep = currentStep - 1;
-      });
-      pageController!.animateToPage(
-        currentStep,
-        duration: Duration(milliseconds: 275),
-        curve: Curves.easeInOut,
-      );
+      return Navigator.pop(context, false);
     }
+
+    setState(() {
+      currentStep = currentStep - 1;
+    });
+
+    pageController!.animateToPage(
+      currentStep,
+      duration: Duration(milliseconds: 275),
+      curve: Curves.easeInOut,
+    );
   }
 
-  bool? onCheckStepValid(_Props props, PageController? controller) {
+  onCheckStepValid(_Props props, PageController? controller) {
     final currentSection = sections[currentStep];
 
     switch (currentSection.runtimeType) {
@@ -196,10 +198,11 @@ class SignupScreenState extends State<SignupScreen> {
   onCompleteStep(_Props props, PageController? controller, {bool usingSSO = false}) {
     final currentSection = sections[currentStep];
     final lastStep = (sections.length - 1) == currentStep;
+
     switch (currentSection.runtimeType) {
       case HomeserverStep:
         return () async {
-          bool? valid = true;
+          bool valid = true;
 
           if (props.hostname != props.homeserver.hostname) {
             valid = await props.onSelectHomeserver(props.hostname);
@@ -210,7 +213,8 @@ class SignupScreenState extends State<SignupScreen> {
             await props.onLoginSSO();
           }
 
-          if (valid!) {
+          if (valid) {
+            props.onClearCompleted();
             onNavigateNextPage(controller);
           }
         };
@@ -220,13 +224,11 @@ class SignupScreenState extends State<SignupScreen> {
         };
       case PasswordStep:
         return () async {
-          if (sections.length < 4) {
-            final result = await props.onCreateUser(enableErrors: lastStep);
+          final result = await props.onCreateUser(enableErrors: lastStep);
 
-            // If signup is completed here, just wait for auth redirect
-            if (result) {
-              return;
-            }
+          // If signup is completed here, just wait for auth redirect
+          if (result) {
+            return;
           }
 
           return onNavigateNextPage(controller);
@@ -289,7 +291,7 @@ class SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  String buildButtonString(_Props props) {
+  buildButtonString(_Props props) {
     if (currentStep == sections.length - 1) {
       return Strings.buttonFinish;
     }
@@ -300,7 +302,7 @@ class SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        onDidChange: onDidChange,
+        onWillChange: onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -369,19 +371,22 @@ class SignupScreenState extends State<SignupScreen> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           direction: Axis.vertical,
                           children: <Widget>[
-                            Container(
-                              padding: const EdgeInsets.only(top: 12, bottom: 12),
-                              child: ButtonSolid(
-                                text: buildButtonString(props),
-                                loading: props.creating || props.loading,
-                                disabled: props.creating ||
-                                    !onCheckStepValid(
-                                      props,
-                                      pageController,
-                                    )!,
-                                onPressed: onCompleteStep(
-                                  props,
-                                  pageController,
+                            Visibility(
+                              visible: !(!props.isPasswordLoginAvailable && props.isSSOLoginAvailable),
+                              child: Container(
+                                padding: const EdgeInsets.only(top: 12, bottom: 12),
+                                child: ButtonSolid(
+                                  text: buildButtonString(props),
+                                  loading: props.creating || props.loading,
+                                  disabled: props.creating ||
+                                      !onCheckStepValid(
+                                        props,
+                                        pageController,
+                                      )!,
+                                  onPressed: onCompleteStep(
+                                    props,
+                                    pageController,
+                                  ),
                                 ),
                               ),
                             ),
@@ -389,15 +394,25 @@ class SignupScreenState extends State<SignupScreen> {
                               visible: props.isSSOLoginAvailable && currentStep == 0,
                               child: Container(
                                 padding: const EdgeInsets.only(top: 12, bottom: 12),
-                                child: ButtonOutline(
-                                  text: Strings.buttonLoginSSO,
-                                  disabled: props.loading,
-                                  onPressed: onCompleteStep(
-                                    props,
-                                    pageController,
-                                    usingSSO: true,
-                                  ),
-                                ),
+                                child: props.isPasswordLoginAvailable
+                                    ? ButtonOutline(
+                                        text: Strings.buttonLoginSSO,
+                                        disabled: props.loading,
+                                        onPressed: onCompleteStep(
+                                          props,
+                                          pageController,
+                                          usingSSO: true,
+                                        ),
+                                      )
+                                    : ButtonSolid(
+                                        text: Strings.buttonLoginSSO,
+                                        disabled: props.loading,
+                                        onPressed: onCompleteStep(
+                                          props,
+                                          pageController,
+                                          usingSSO: true,
+                                        ),
+                                      ),
                               ),
                             ),
                           ],
@@ -452,6 +467,7 @@ class _Props extends Equatable {
   final bool isHomeserverValid;
   final bool isSSOLoginAvailable;
   final bool isPasswordLoginAvailable;
+  final bool isSignupAvailable;
 
   final String username;
   final bool isUsernameValid;
@@ -471,13 +487,12 @@ class _Props extends Equatable {
 
   final List<String> completed;
 
-  final Map interactiveAuths;
-
   final Function onLoginSSO;
   final Function onCreateUser;
   final Function onSubmitEmail;
   final Function onResetCredential;
   final Function onSelectHomeserver;
+  final Function onClearCompleted;
 
   const _Props({
     required this.user,
@@ -486,6 +501,7 @@ class _Props extends Equatable {
     required this.isHomeserverValid,
     required this.isPasswordLoginAvailable,
     required this.isSSOLoginAvailable,
+    required this.isSignupAvailable,
     required this.username,
     required this.isUsernameValid,
     required this.isUsernameAvailable,
@@ -498,13 +514,13 @@ class _Props extends Equatable {
     required this.agreement,
     required this.loading,
     required this.verificationNeeded,
-    required this.interactiveAuths,
     required this.completed,
     required this.onLoginSSO,
     required this.onCreateUser,
     required this.onSubmitEmail,
     required this.onResetCredential,
     required this.onSelectHomeserver,
+    required this.onClearCompleted,
   });
 
   @override
@@ -513,6 +529,9 @@ class _Props extends Equatable {
         hostname,
         homeserver,
         isHomeserverValid,
+        isSSOLoginAvailable,
+        isPasswordLoginAvailable,
+        isSignupAvailable,
         username,
         isUsernameValid,
         isUsernameAvailable,
@@ -524,47 +543,49 @@ class _Props extends Equatable {
         captcha,
         agreement,
         loading,
-        interactiveAuths,
         verificationNeeded,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        user: store.state.authStore.user,
-        completed: store.state.authStore.completed,
-        hostname: store.state.authStore.hostname,
-        homeserver: store.state.authStore.homeserver,
-        isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
-        isSSOLoginAvailable: selectSSOEnabled(store.state),
-        isPasswordLoginAvailable: selectPasswordEnabled(store.state),
-        username: store.state.authStore.username,
-        isUsernameValid: store.state.authStore.isUsernameValid,
-        isUsernameAvailable: store.state.authStore.isUsernameAvailable,
-        password: store.state.authStore.password,
-        isPasswordValid: store.state.authStore.isPasswordValid,
-        email: store.state.authStore.email,
-        isEmailValid: store.state.authStore.isEmailValid,
-        creating: store.state.authStore.creating,
-        captcha: store.state.authStore.captcha,
-        agreement: store.state.authStore.agreement,
-        loading: store.state.authStore.loading,
-        interactiveAuths: store.state.authStore.interactiveAuths,
-        verificationNeeded: store.state.authStore.verificationNeeded,
-        onSubmitEmail: () async {
-          return await store.dispatch(submitEmail());
-        },
-        onResetCredential: () async {
-          await store.dispatch(updateCredential(
-            type: MatrixAuthTypes.DUMMY,
-          ));
-        },
-        onLoginSSO: () async {
-          return await store.dispatch(loginUserSSO());
-        },
-        onCreateUser: ({bool? enableErrors}) async {
-          return await store.dispatch(createUser(enableErrors: enableErrors));
-        },
-        onSelectHomeserver: (String hostname) async {
-          return await store.dispatch(selectHomeserver(hostname: hostname));
-        },
-      );
+      user: store.state.authStore.user,
+      completed: store.state.authStore.completed,
+      hostname: store.state.authStore.hostname,
+      homeserver: store.state.authStore.homeserver,
+      isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
+      isSSOLoginAvailable: selectSSOEnabled(store.state),
+      isPasswordLoginAvailable: selectPasswordEnabled(store.state),
+      isSignupAvailable: selectSignupClosed(store.state),
+      username: store.state.authStore.username,
+      isUsernameValid: store.state.authStore.isUsernameValid,
+      isUsernameAvailable: store.state.authStore.isUsernameAvailable,
+      password: store.state.authStore.password,
+      isPasswordValid: store.state.authStore.isPasswordValid,
+      email: store.state.authStore.email,
+      isEmailValid: store.state.authStore.isEmailValid,
+      creating: store.state.authStore.creating,
+      captcha: store.state.authStore.captcha,
+      agreement: store.state.authStore.agreement,
+      loading: store.state.authStore.loading,
+      verificationNeeded: store.state.authStore.verificationNeeded,
+      onSubmitEmail: () async {
+        return await store.dispatch(submitEmail());
+      },
+      onResetCredential: () async {
+        await store.dispatch(updateCredential(
+          type: MatrixAuthTypes.DUMMY,
+        ));
+      },
+      onLoginSSO: () async {
+        return await store.dispatch(loginUserSSO());
+      },
+      onCreateUser: ({bool? enableErrors}) async {
+        return await store.dispatch(createUser(enableErrors: enableErrors));
+      },
+      onSelectHomeserver: (String hostname) async {
+        return await store.dispatch(selectHomeserver(hostname: hostname));
+      },
+      onClearCompleted: () async {
+        store.dispatch(setUsername(username: ''));
+        store.dispatch(setPassword(password: ''));
+      });
 }

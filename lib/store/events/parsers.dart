@@ -67,9 +67,7 @@ Map<String, dynamic> parseMessages({
     // - the oldest hash (lastHash) is non-existant
     // - the previous hash (most recent) is non-existant
     // - the oldest hash equals the previously fetched hash
-    if (room.lastHash == null ||
-        room.prevHash == null ||
-        room.lastHash == room.prevHash) {
+    if (room.lastHash == null || room.prevHash == null || room.lastHash == room.prevHash) {
       limited = false;
     }
   }
@@ -90,8 +88,7 @@ Map<String, dynamic> parseMessages({
   );
 
   // save messages and unique message id updates
-  final messageIdsAll = Set<String>.from(room.messageIds)
-    ..addAll(messagesAllMap.keys);
+  final messageIdsAll = Set<String>.from(room.messageIds)..addAll(messagesAllMap.keys);
 
   return {
     'messages': messages,
@@ -138,29 +135,25 @@ Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
   if (json['state'] != null) {
     final List<dynamic> stateEventsRaw = json['state']['events'];
 
-    stateEvents =
-        stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
   if (json['invite_state'] != null) {
     final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
-    stateEvents =
-        stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
   if (json['ephemeral'] != null) {
     final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
-    ephemeralEvents =
-        ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    ephemeralEvents = ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
   if (json['account_data'] != null) {
     final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
-    accountEvents =
-        accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    accountEvents = accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
   if (json['timeline'] != null) {

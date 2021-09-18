@@ -13,6 +13,8 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class ChatsSettingsScreen extends StatelessWidget {
@@ -25,23 +27,13 @@ class ChatsSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
         distinct: true,
-        converter: (Store<AppState> store) => Props.mapStateToProps(store, context),
+        converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
 
           return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              title: Text(
-                Strings.titleChatSettings,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w100,
-                ),
-              ),
+            appBar: AppBarNormal(
+              title: Strings.titleChatSettings,
             ),
             body: SingleChildScrollView(
               child: Container(
@@ -63,7 +55,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                             GestureDetector(
                               onTap: () => props.onDisabled(),
                               child: ListTile(
-                                onTap: () => props.onIncrementLanguage(),
+                                onTap: () => Navigator.pushNamed(context, NavigationPaths.settingsLanguages),
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
                                   'Language',
@@ -305,7 +297,7 @@ class Props extends Equatable {
         dismissKeyboard,
       ];
 
-  static Props mapStateToProps(Store<AppState> store, BuildContext context) => Props(
+  static Props mapStateToProps(Store<AppState> store) => Props(
         language: DisplayName(Locale(store.state.settingsStore.language)).toDisplayName(),
         enterSend: store.state.settingsStore.enterSendEnabled,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
@@ -315,7 +307,7 @@ class Props extends Equatable {
             message: Strings.alertAppRestartEffect,
             action: 'Dismiss',
           ));
-          store.dispatch(incrementLanguage(context));
+          store.dispatch(incrementLanguage());
         },
         onToggleDismissKeyboard: () => store.dispatch(toggleDismissKeyboard()),
         onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),

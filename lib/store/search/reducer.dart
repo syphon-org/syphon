@@ -1,8 +1,7 @@
 import './actions.dart';
 import './state.dart';
 
-SearchStore searchReducer(
-    [SearchStore state = const SearchStore(), dynamic action]) {
+SearchStore searchReducer([SearchStore state = const SearchStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(
@@ -29,8 +28,21 @@ SearchStore searchReducer(
         searchResults: action.searchResults,
         totalResults: action.totalResults,
       );
+    case SearchMessages:
+      return state.copyWith(
+        loading: true,
+      );
+    case SearchMessageResults:
+      final _action = action as SearchMessageResults;
+      return state.copyWith(
+        loading: false,
+        searchMessages: _action.results,
+      );
     case ResetSearchResults:
-      return state.copyWith(searchResults: []);
+      return state.copyWith(
+        searchResults: [],
+        searchMessages: const [],
+      );
     default:
       return state;
   }

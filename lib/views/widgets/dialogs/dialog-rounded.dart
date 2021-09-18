@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class DialogContainer extends StatefulWidget {
-  const DialogContainer({
+class DialogRounded extends StatefulWidget {
+  const DialogRounded({
     Key? key,
     this.title = '',
     this.content = '',
@@ -17,7 +17,7 @@ class DialogContainer extends StatefulWidget {
   _DialogTextInputState createState() => _DialogTextInputState();
 }
 
-class _DialogTextInputState extends State<DialogContainer> {
+class _DialogTextInputState extends State<DialogRounded> {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;

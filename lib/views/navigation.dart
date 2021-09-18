@@ -18,6 +18,7 @@ import 'package:syphon/views/home/settings/advanced-settings-screen.dart';
 import 'package:syphon/views/home/settings/blocked-screen.dart';
 import 'package:syphon/views/home/settings/settings-chats-screen.dart';
 import 'package:syphon/views/home/settings/settings-devices-screen.dart';
+import 'package:syphon/views/home/settings/settings-languages-screen.dart';
 import 'package:syphon/views/home/settings/settings-screen.dart';
 import 'package:syphon/views/home/settings/settings-notifications-screen.dart';
 import 'package:syphon/views/home/settings/password/password-update-screen.dart';
@@ -94,6 +95,7 @@ class NavigationPaths {
   static const settingsPassword = '/home/settings/password';
   static const settingsAdvanced = '/home/settings/advanced';
   static const settingsNotifications = '/home/settings/notifications';
+  static const settingsLanguages = '/settings/languages';
 
   // Settings (Global)
   static const settingsTheme = '/settings/theming';
@@ -125,6 +127,7 @@ class NavigationProvider {
         NavigationPaths.groupCreatePublic: (BuildContext context) => const CreatePublicGroupScreen(),
         NavigationPaths.settingsProfile: (BuildContext context) => const ProfileScreen(),
         NavigationPaths.settingsNotifications: (BuildContext context) => const NotificationSettingsScreen(),
+        NavigationPaths.settingsLanguages: (BuildContext context) => const LanguageSettingsScreen(),
         NavigationPaths.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),
         NavigationPaths.settingsStorage: (BuildContext context) => const StorageSettingsScreen(),
         NavigationPaths.settingsPassword: (BuildContext context) => const PasswordUpdateScreen(),

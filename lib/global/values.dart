@@ -1,12 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-
-extension Capitalize on String {
-  String capitalize() {
-    return '${this[0].toUpperCase()}${substring(1)}';
-  }
-}
+import 'package:syphon/global/strings.dart';
 
 /// Constants that cannot be localized
 /// taken as a convention from Android
@@ -20,6 +15,7 @@ class Values {
   static const EMPTY_CHAT = 'Empty Chat';
   static const EMPTY = '';
   static const UNKNOWN = 'Unknown';
+  static const DEFAULT_PROTOCOL = 'https://';
 
   // Notifications and Background service
   static const channel_id = '${appLabel}_notifications';
@@ -31,9 +27,7 @@ class Values {
   static const channel_name_background_service = 'Background Sync';
   static const channel_description = '$appName messaging client message and status notifications';
 
-  static const captchaUrl = 'https://recaptcha-flutter-plugin.firebaseapp.com/?api_key=';
-
-  static const captchaMatrixPublicKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
+  static const captchaMatrixSiteKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
 
   static const supportEmail = 'hello@syphon.org';
 
@@ -72,25 +66,26 @@ class Values {
 // ignore: non_constant_identifier_names
 final bool DEBUG_MODE = !kReleaseMode;
 
-class Languages {
-  static const english = 'en';
-  static const german = 'de';
-  static const polish = 'pl';
-  static const russian = 'ru';
-  static const dutch = 'nl';
-  static const czech = 'cs';
-  static const slovak = 'sk';
-  static const portuguese = 'pt';
+class SupportedLanguages {
+  static const defaultLang = 'en';
 
+  // Follow alphabetical order in assets/translations
   static const all = [
-    english,
-    german,
-    polish,
-    russian,
-    dutch,
-    czech,
-    slovak,
-    portuguese,
+    'ar',
+    'cs',
+    'de',
+    'en',
+    'es',
+    'fr',
+    'hi',
+    'hu',
+    'ja',
+    'nl',
+    'pl',
+    'pt',
+    'ru',
+    'si',
+    'sk',
   ];
 
   static final list = all.map((locale) => Locale(locale)).toList();
@@ -289,9 +284,9 @@ extension DisplayName on Locale {
 
   String toDisplayName() {
     if (isoLangs.containsKey(languageCode)) {
-      return isoLangs[languageCode]!['name'] ?? 'english';
+      return isoLangs[languageCode]!['name'] ?? 'English';
     } else {
-      return 'english';
+      return 'English';
     }
   }
 }

@@ -87,8 +87,7 @@ abstract class MatrixApi {
 
   // Notifications
   static const fetchNotifications = Notifications.fetchNotifications;
-  static const fetchNotificationPushers =
-      Notifications.fetchNotificationPushers;
+  static const fetchNotificationPushers = Notifications.fetchNotificationPushers;
 
   /// Save Notification Pusher
   ///

@@ -173,7 +173,11 @@ class ProfileScreenState extends State<ProfileScreen> {
                                       Dimensions.iconSizeLarge,
                                     ),
                                     boxShadow: [
-                                      BoxShadow(blurRadius: 6, offset: Offset(0, 0), color: Colors.black54)
+                                      BoxShadow(
+                                        blurRadius: 6,
+                                        offset: Offset(0, 0),
+                                        color: Colors.black54,
+                                      )
                                     ],
                                   ),
                                   child: Icon(

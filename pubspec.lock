@@ -7,14 +7,21 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "20.0.0"
+    version: "22.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.0"
+    version: "1.7.1"
+  analyzer_plugin:
+    dependency: transitive
+    description:
+      name: analyzer_plugin
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.0"
   android_alarm_manager:
     dependency: "direct main"
     description:
@@ -271,8 +278,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: master
-      resolved-ref: "78f2836a7bbd58ad43461552612e75743e565c8e"
+      ref: "623b65c0d8f392065f41a4628c0278563a809644"
+      resolved-ref: "623b65c0d8f392065f41a4628c0278563a809644"
       url: "https://github.com/ereio/fab-circular-menu.git"
     source: git
     version: "1.0.2"
@@ -536,6 +543,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  moor:
+    dependency: "direct main"
+    description:
+      name: moor
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.5.0"
+  moor_generator:
+    dependency: "direct dev"
+    description:
+      name: moor_generator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.4.1"
   node_preamble:
     dependency: transitive
     description:
@@ -572,7 +593,7 @@ packages:
     source: hosted
     version: "0.3.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       url: "https://pub.dartlang.org"
@@ -690,6 +711,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  recase:
+    dependency: transitive
+    description:
+      name: recase
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.0"
   redux:
     dependency: "direct main"
     description:
@@ -863,6 +891,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  sqlcipher_flutter_libs:
+    dependency: "direct main"
+    description:
+      name: sqlcipher_flutter_libs
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.0"
   sqlite3:
     dependency: "direct main"
     description:
@@ -870,13 +905,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  sqlite3_flutter_libs:
-    dependency: "direct main"
+  sqlparser:
+    dependency: transitive
     description:
-      name: sqlite3_flutter_libs
+      name: sqlparser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.1"
+    version: "0.17.2"
   stack_trace:
     dependency: transitive
     description:
@@ -1047,6 +1082,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  uuid:
+    dependency: "direct main"
+    description:
+      name: uuid
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.4"
   vector_math:
     dependency: transitive
     description:
@@ -1085,10 +1127,12 @@ packages:
   webview_flutter:
     dependency: "direct main"
     description:
-      name: webview_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.4"
+      path: "packages/webview_flutter/webview_flutter"
+      ref: "38b28d35733993761d295a73f68c9c1e2e22752b"
+      resolved-ref: "38b28d35733993761d295a73f68c9c1e2e22752b"
+      url: "https://github.com/ereio/plugins.git"
+    source: git
+    version: "2.0.13+1"
   win32:
     dependency: transitive
     description:
@@ -1118,5 +1162,5 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.12.0 <3.0.0"
+  dart: ">=2.13.0 <3.0.0"
   flutter: ">=2.0.1"

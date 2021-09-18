@@ -19,8 +19,8 @@ enum ListItemUserType {
 ///
 /// TODO: rename because user specific, use this to wrap ListTile styling
 ///
-class ListItem extends StatelessWidget {
-  const ListItem({
+class ListItemAccount extends StatelessWidget {
+  const ListItemAccount({
     Key? key,
     required this.user,
     this.type = ListItemUserType.Selectable,
@@ -60,7 +60,7 @@ class ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Opacity(
-      opacity: enabled ? 1 : 0.7,
+      opacity: enabled || selected ? 1 : 0.7,
       child: Container(
           color: selected ? Theme.of(context).selectedRowColor : Colors.transparent,
           child: ListTile(
@@ -80,13 +80,7 @@ class ListItem extends StatelessWidget {
             title: Text(
               user.userId!,
               overflow: TextOverflow.ellipsis,
-              style: !selected
-                  ? Theme.of(context).textTheme.bodyText2
-                  : Theme.of(context).textTheme.bodyText2?.copyWith(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? Theme.of(context).textTheme.bodyText2?.color
-                            : Colors.black,
-                      ),
+              style: Theme.of(context).textTheme.bodyText2,
             ),
           )));
 }

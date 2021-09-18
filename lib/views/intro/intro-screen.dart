@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -16,6 +15,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 import 'widgets/page-action.dart';
@@ -31,7 +31,7 @@ class IntroScreen extends StatefulWidget {
   IntroScreenState createState() => IntroScreenState();
 }
 
-class IntroScreenState extends State<IntroScreen> {
+class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
   final String title = 'Intro';
 
   int currentStep = 0;
@@ -60,21 +60,9 @@ class IntroScreenState extends State<IntroScreen> {
       keepPage: false,
       viewportFraction: 1.5,
     );
-
-    // NOTE: SchedulerBinding still needed in screen child views
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
-      onMounted();
-    });
   }
 
   @override
-  void dispose() {
-    if (dialogContext != null) {
-      Navigator.pop(dialogContext!);
-    }
-    super.dispose();
-  }
-
   onMounted() {
     final store = StoreProvider.of<AppState>(context);
     final alphaAgreement = store.state.settingsStore.alphaAgreement;
@@ -171,6 +159,14 @@ class IntroScreenState extends State<IntroScreen> {
         },
       );
     }
+  }
+
+  @override
+  void dispose() {
+    if (dialogContext != null) {
+      Navigator.pop(dialogContext!);
+    }
+    super.dispose();
   }
 
   buildButtonString() {
