@@ -1,9 +1,11 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:moor/ffi.dart';
 import 'package:moor/moor.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/open.dart';
 import 'package:syphon/global/key-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
@@ -12,6 +14,26 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
 
 part 'database.g.dart';
+
+void _openOnAndroid() {
+  try {
+    open.overrideFor(OperatingSystem.android, () => DynamicLibrary.open('libsqlcipher.so'));
+  } catch (error) {
+    printError(error.toString());
+  }
+}
+
+void _openOnLinux() {
+  try {
+    final scriptDir = File(Platform.script.toFilePath()).parent;
+    final libraryNextToScript = File('${scriptDir.path}/sqlite3.so');
+    final lib = DynamicLibrary.open(libraryNextToScript.path);
+
+    open.overrideFor(OperatingSystem.linux, () => lib);
+  } catch (error) {
+    printError(error.toString());
+  }
+}
 
 LazyDatabase openDatabase(String context) {
   return LazyDatabase(() async {
@@ -25,15 +47,25 @@ LazyDatabase openDatabase(String context) {
     // prepend with debug mode
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
 
-    // Configure cache encryption/decryption instance
-    final storageKey = await loadKey(storageKeyId);
-
     File? filePath;
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      final dbFolder = await getApplicationDocumentsDirectory();
-      filePath = File(path.join(dbFolder.path, storageLocation));
+    if (Platform.isLinux) {
+      _openOnLinux();
     }
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      if (Platform.isAndroid) {
+        _openOnAndroid();
+      }
+
+      final dbFolder = await getApplicationSupportDirectory();
+      filePath = File(path.join(dbFolder.path, storageLocation));
+
+      printInfo(filePath.absolute.toString());
+    }
+
+    // Configure cache encryption/decryption instance
+    final storageKey = await loadKey(storageKeyId);
 
     printInfo('initColdStorage $storageLocation $storageKey');
 
