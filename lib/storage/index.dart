@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
-import 'package:syphon/context/index.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
@@ -37,13 +36,13 @@ class Storage {
   static const databaseLocation = '${Values.appLabel}-main-storage.db';
 
   // storage identifiers - NEW - MOOR
-  static const sqliteLocation = '${Values.appLabel}_main_storage.db';
+  static const sqliteLocation = '${Values.appLabel}-cold-storage.db';
 
   // cold storage references
   static Database? instance;
 }
 
-Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
+Future<Database?> initStorage({String? context = AppContext.DEFAULT}) async {
   try {
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.databaseLocation;
@@ -81,7 +80,7 @@ Future<Database?> initStorage({String? context = StoreContext.DEFAULT}) async {
       );
     }
 
-    printInfo('initStorage $storageLocation $storageKey');
+    printInfo('[initStorage] $storageLocation $storageKey');
 
     final codec = getEncryptSembastCodec(password: storageKey);
 
@@ -106,7 +105,7 @@ closeStorage(Database? database) async {
   }
 }
 
-deleteStorage({String? context = StoreContext.DEFAULT}) async {
+deleteStorage({String? context = AppContext.DEFAULT}) async {
   try {
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.databaseLocation;
@@ -139,7 +138,7 @@ deleteStorage({String? context = StoreContext.DEFAULT}) async {
   }
 }
 
-Future<StorageDatabase> initColdStorage({String? context = StoreContext.DEFAULT}) {
+Future<StorageDatabase> initColdStorage({String? context = AppContext.DEFAULT}) {
   return Future.value(StorageDatabase(context!)); // never null ^
 }
 
@@ -149,7 +148,7 @@ Future closeColdStorage(StorageDatabase? storage) async {
   }
 }
 
-Future deleteColdStorage({String? context = StoreContext.DEFAULT}) async {
+Future deleteColdStorage({String? context = AppContext.DEFAULT}) async {
   try {
     var storageLocation = Storage.sqliteLocation;
 
@@ -159,7 +158,7 @@ Future deleteColdStorage({String? context = StoreContext.DEFAULT}) async {
 
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
 
-    final appDir = await getApplicationDocumentsDirectory();
+    final appDir = await getApplicationSupportDirectory();
     final file = File(path.join(appDir.path, storageLocation));
     await file.delete();
   } catch (error) {

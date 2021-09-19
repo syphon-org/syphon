@@ -8,14 +8,15 @@ import 'package:syphon/global/values.dart';
 ///
 /// allows multiaccount feature to be domain logic independent
 ///
-class StoreContext {
+class AppContext {
   static const DEFAULT = '';
-  static const ACCESS_KEY = '${Values.appLabel}@context';
+  static const ALL_CONTEXT_KEY = '${Values.appLabel}@context-all';
+  static const CURENT_CONTEXT_KEY = '${Values.appLabel}@context-current';
 
   final String current;
   final String pinHash;
 
-  StoreContext({
+  AppContext({
     this.current = DEFAULT,
     this.pinHash = DEFAULT,
   });

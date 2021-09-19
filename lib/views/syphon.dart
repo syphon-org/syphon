@@ -124,7 +124,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final currentUser = store.state.authStore.user;
 
     // Reset contexts if the current user has no accessToken (unrecoverable state)
-    if (currentUser.accessToken == null && currentContext != StoreContext.DEFAULT) {
+    if (currentUser.accessToken == null && currentContext != AppContext.DEFAULT) {
       return onResetContext();
     }
 
@@ -241,7 +241,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // wipe unauthenticated storage
     if (user != null) {
-      onDeleteContext(StoreContext(current: StoreContext.DEFAULT));
+      onDeleteContext(AppContext(current: AppContext.DEFAULT));
     } else {
       // delete cache data if removing context / account (context is not default)
       onDeleteContext(contextOld);
@@ -250,7 +250,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     storeNew.dispatch(SetGlobalLoading(loading: false));
   }
 
-  onDeleteContext(StoreContext context) async {
+  onDeleteContext(AppContext context) async {
     if (context.current.isEmpty) {
       printInfo('[onContextChanged] DELETING DEFAULT CONTEXT');
     } else {
@@ -268,7 +268,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     await Future.forEach(
       allContexts,
-      (StoreContext context) async {
+      (AppContext context) async {
         await onDeleteContext(context);
       },
     );

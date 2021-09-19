@@ -1128,8 +1128,8 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/webview_flutter/webview_flutter"
-      ref: "38b28d35733993761d295a73f68c9c1e2e22752b"
-      resolved-ref: "38b28d35733993761d295a73f68c9c1e2e22752b"
+      ref: "41e4ce6d17078942f6ceb3e614bb2849aab55760"
+      resolved-ref: "41e4ce6d17078942f6ceb3e614bb2849aab55760"
       url: "https://github.com/ereio/plugins.git"
     source: git
     version: "2.0.13+1"

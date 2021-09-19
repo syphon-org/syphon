@@ -11,7 +11,6 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/key-storage.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
-import 'package:syphon/storage/index.dart';
 
 class Cache {
   // cache key identifiers
@@ -41,7 +40,7 @@ class Cache {
 ///
 /// Init Hot Cache
 ///
-Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
+Future<Database?> initCache({String? context = AppContext.DEFAULT}) async {
   try {
     var cacheKeyId = Cache.keyLocation;
     var cacheLocation = Cache.databaseLocation;
@@ -89,7 +88,7 @@ Future<Database?> initCache({String? context = StoreContext.DEFAULT}) async {
   }
 }
 
-deleteCache({String? context = StoreContext.DEFAULT}) async {
+deleteCache({String? context = AppContext.DEFAULT}) async {
   try {
     late var cacheFactory;
     var cacheKeyId = Cache.keyLocation;
