@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/secure-storage.dart';
+import 'package:syphon/global/libs/storage/secure-storage.dart';
 
 ///
 /// Store Context

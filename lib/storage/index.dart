@@ -6,7 +6,7 @@ import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/key-storage.dart';
+import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/storage/moor/database.dart';
 import 'package:syphon/storage/sembast/codec.dart';
 import 'package:syphon/global/values.dart';

@@ -11,7 +11,7 @@ import 'package:sqlite3/open.dart';
 import 'package:syphon/global/print.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider_linux/path_provider_linux.dart';
-import 'package:syphon/global/secure-storage.dart';
+import 'package:syphon/global/libs/storage/secure-storage.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/sync/background/service.dart';
 

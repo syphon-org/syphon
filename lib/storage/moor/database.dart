@@ -6,7 +6,7 @@ import 'package:moor/moor.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/open.dart';
-import 'package:syphon/global/key-storage.dart';
+import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/index.dart';

@@ -8,7 +8,7 @@ import 'package:sembast/sembast_io.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/key-storage.dart';
+import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/values.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 

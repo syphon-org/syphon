@@ -1,6 +1,6 @@
 import 'package:encrypt/encrypt.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/secure-storage.dart';
+import 'package:syphon/global/libs/storage/secure-storage.dart';
 
 String generateKey() {
   return Key.fromSecureRandom(32).base64;

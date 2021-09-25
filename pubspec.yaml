@@ -92,7 +92,7 @@ dependencies:
   sqlite3: ^1.0.0
   sembast_sqflite: ^2.0.0+1
   sqflite_common_ffi: ^2.0.0
-  # sqflite_sqlcipher: 1.1.2 TODO: figure out if these are needed still
+  # sqflite_sqlcipher: 1.1.2
   sqlcipher_flutter_libs: ^0.5.0
   flutter_secure_storage: ^4.1.0
   moor: ^4.5.0
@@ -115,8 +115,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   url_launcher: ^6.0.3
   flutter_svg: ^0.22.0
-  file_picker: ^3.0.1
+  file_picker: ^4.1.1
   image_picker: ^0.7.4
+  local_image_provider: ^4.0.1
   # TODO: convert back when similar functionality is merged
   # webview_flutter: ^2.0.13
   webview_flutter:

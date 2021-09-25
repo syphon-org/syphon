@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:syphon/global/print.dart';
 
 List<int> fibonacci(int n) {
@@ -33,4 +34,26 @@ Future timeWrapper(
 
 String enumToString(dynamic enumItem) {
   return enumItem.toString().split('.')[1];
+}
+
+Future onFocusSafe({FocusNode? focusNode, required Future<void> Function() onFunction}) async {
+  if (focusNode == null) return Future.value();
+
+  if (!focusNode.hasFocus) {
+    // Unfocus all focus nodes
+    focusNode.unfocus();
+
+    // Disable text field's focus node request
+    focusNode.canRequestFocus = false;
+  }
+
+  // Do your stuff
+  await onFunction();
+
+  if (!focusNode.hasFocus) {
+    //Enable the text field's focus node request after some delay
+    Future.delayed(Duration(milliseconds: 100), () {
+      focusNode.canRequestFocus = true;
+    });
+  }
 }

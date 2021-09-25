@@ -33,14 +33,13 @@ class ProfileScreen extends StatefulWidget {
 class ProfileScreenState extends State<ProfileScreen> {
   ProfileScreenState() : super();
 
-  final String title = Strings.titleProfile;
-
+  final title = Strings.titleProfile;
   final userIdController = TextEditingController();
   final displayNameController = TextEditingController();
 
+  File? avatarFileNew;
   String? userIdNew;
   String? displayNameNew;
-  File? avatarFileNew;
 
   onMounted(_Props props) {
     displayNameController.value = TextEditingValue(
@@ -172,7 +171,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     borderRadius: BorderRadius.circular(
                                       Dimensions.iconSizeLarge,
                                     ),
-                                    boxShadow: [
+                                    boxShadow: const [
                                       BoxShadow(
                                         blurRadius: 6,
                                         offset: Offset(0, 0),
@@ -304,15 +303,22 @@ class _Props extends Equatable {
 
   const _Props({
     required this.user,
-    required this.themeType,
     required this.loading,
+    required this.themeType,
     required this.onSaveProfile,
   });
 
+  @override
+  List<Object> get props => [
+        user,
+        loading,
+        themeType,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
-        themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.authStore.loading,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         onSaveProfile: ({
           File? avatarFileNew,
           String? userIdNew,
@@ -338,10 +344,4 @@ class _Props extends Equatable {
           return true;
         },
       );
-
-  @override
-  List<Object> get props => [
-        user,
-        loading,
-      ];
 }

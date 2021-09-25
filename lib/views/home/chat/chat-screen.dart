@@ -228,7 +228,6 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   onToggleSelectedMessage(Message? message) {
-    printJson(json.decode(json.encode(message)));
     setState(() {
       selectedMessage = message;
     });
@@ -416,6 +415,7 @@ class ChatScreenState extends State<ChatScreen> {
         ),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
+          final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
           final closedInputPadding =
               !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
           final isScrolling = messagesController.hasClients && messagesController.offset != 0;
@@ -537,6 +537,7 @@ class ChatScreenState extends State<ChatScreen> {
                         controller: editorController,
                         quotable: props.room.reply,
                         sending: sending,
+                        inset: keyboardInset,
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onSubmitMessage: () => onSendMessage(props),

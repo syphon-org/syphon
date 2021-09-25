@@ -289,7 +289,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.2"
   file:
     dependency: transitive
     description:
@@ -303,7 +303,7 @@ packages:
       name: file_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.1"
+    version: "4.1.1"
   fixnum:
     dependency: transitive
     description:
@@ -362,7 +362,7 @@ packages:
       name: flutter_plugin_android_lifecycle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.3"
   flutter_redux:
     dependency: "direct main"
     description:
@@ -515,6 +515,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.3"
+  local_image_provider:
+    dependency: "direct main"
+    description:
+      name: local_image_provider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
+  local_image_provider_platform_interface:
+    dependency: transitive
+    description:
+      name: local_image_provider_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   logging:
     dependency: transitive
     description:
