@@ -39,6 +39,7 @@ class SecureStorage {
     if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
       // try to read key
       final directory = await getApplicationSupportDirectory();
+      print(directory.path);
       return File(join(directory.path, key)).readAsString();
     }
 

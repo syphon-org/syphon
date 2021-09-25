@@ -69,8 +69,10 @@ abstract class MatrixApi {
   static const updateBlockedUsers = Users.updateBlockedUsers;
 
   // Media
-  static const fetchThumbnail = Media.fetchThumbnail;
+  static const fetchMedia = Media.fetchMedia;
+  static const fetchMediaMapped = Media.fetchMediaMapped;
   static const uploadMedia = Media.uploadMedia;
+  static const fetchThumbnail = Media.fetchThumbnail;
 
   // Device Management
   static const fetchDevices = Devices.fetchDevices;

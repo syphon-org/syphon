@@ -103,7 +103,7 @@ class MessageListState extends State<MessageList> {
             onTap: () => widget.onToggleSelectedMessage!(null),
             child: ListView(
               reverse: true,
-              padding: EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.only(bottom: 16),
               physics: widget.selectedMessage != null ? const NeverScrollableScrollPhysics() : null,
               controller: widget.scrollController,
               children: [
@@ -116,7 +116,7 @@ class MessageListState extends State<MessageList> {
                 ListView.builder(
                   reverse: true,
                   shrinkWrap: true,
-                  padding: EdgeInsets.only(bottom: 4),
+                  padding: EdgeInsets.only(bottom: 0),
                   addRepaintBoundaries: true,
                   addAutomaticKeepAlives: true,
                   itemCount: props.messages.length,

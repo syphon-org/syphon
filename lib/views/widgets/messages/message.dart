@@ -12,6 +12,7 @@ import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
 
 class MessageWidget extends StatelessWidget {
@@ -199,18 +200,22 @@ class MessageWidget extends StatelessWidget {
     // emoji input button needs space
     final hasReactions = message.reactions.isNotEmpty || selected;
     final isRead = message.timestamp < lastRead;
+    final showAvatar = !isLastSender && !isUserSent && !messageOnly;
+    final isMedia = message.url != null;
 
     var textColor = Colors.white;
     var showSender = !messageOnly; // nearly always show the sender
-    final showAvatar = !isLastSender && !isUserSent && !messageOnly;
+
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
-    Color? bubbleColor = color ?? Colours.hashedColor(message.sender);
+    var bubbleColor = color ?? Colours.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
     var alignmentMessageText = CrossAxisAlignment.start;
-    var bubbleSpacing = EdgeInsets.symmetric(vertical: 8);
+    var bubbleSpacing = EdgeInsets.symmetric(vertical: 4);
+    var showStatus = true;
+
     var fontStyle;
     var opacity = 1.0;
     var zIndex = 1.0;
@@ -233,10 +238,12 @@ class MessageWidget extends StatelessWidget {
           // Message in the middle of a sender messages block
           bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
           bubbleBorder = Styles.bubbleBorderMiddleUser;
+          showStatus = false;
         } else {
           // Message at the beginning of a user sender messages block
           bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
           bubbleBorder = Styles.bubbleBorderTopUser;
+          showStatus = false;
         }
       }
 
@@ -292,6 +299,7 @@ class MessageWidget extends StatelessWidget {
 
     if (message.failed) {
       status = Strings.alertMessageSendingFailed;
+      showStatus = true;
     }
 
     if (message.edited) {
@@ -358,6 +366,11 @@ class MessageWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
+                  constraints: !isMedia
+                      ? null
+                      : BoxConstraints(
+                          maxWidth: Dimensions.mediaSizeMax,
+                        ),
                   margin: bubbleSpacing, // spacing between different user bubbles
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Flex(
@@ -397,7 +410,7 @@ class MessageWidget extends StatelessWidget {
                           children: [
                             Container(
                               padding: EdgeInsets.symmetric(
-                                horizontal: 12,
+                                horizontal: isMedia ? 0 : 12, // make an image span the message width
                                 vertical: 8,
                               ),
                               margin: EdgeInsets.only(
@@ -416,7 +429,11 @@ class MessageWidget extends StatelessWidget {
                                   Visibility(
                                     visible: !isUserSent && showSender,
                                     child: Container(
-                                      margin: EdgeInsets.only(bottom: 4),
+                                      margin: EdgeInsets.only(
+                                        bottom: 4,
+                                        left: isMedia ? 12 : 0,
+                                        right: isMedia ? 12 : 0,
+                                      ), // make an image span the message width
                                       child: Text(
                                         displayName ?? formatSender(message.sender!),
                                         style: TextStyle(
@@ -427,8 +444,23 @@ class MessageWidget extends StatelessWidget {
                                       ),
                                     ),
                                   ),
+                                  Visibility(
+                                    visible: isMedia,
+                                    child: MatrixImage(
+                                      mxcUri: message.url,
+                                      thumbnail: false,
+                                      width: Dimensions.mediaSize,
+                                      height: Dimensions.mediaSize,
+                                      fallbackColor: Colors.transparent,
+                                    ),
+                                  ),
                                   Container(
-                                    margin: EdgeInsets.only(bottom: 5),
+                                    margin: EdgeInsets.only(
+                                      bottom: 6,
+                                      top: isMedia ? 8 : 0,
+                                      left: isMedia ? 12 : 0,
+                                      right: isMedia ? 12 : 0,
+                                    ),
                                     child: Text(
                                       body.trim(),
                                       style: TextStyle(
@@ -459,15 +491,21 @@ class MessageWidget extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      Container(
-                                        // timestamp and error message
-                                        margin: EdgeInsets.only(right: 4),
-                                        child: Text(
-                                          status,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: textColor,
-                                            fontWeight: FontWeight.w100,
+                                      Visibility(
+                                        visible: showStatus,
+                                        child: Container(
+                                          // timestamp and error message
+                                          margin: EdgeInsets.only(
+                                            right: 4,
+                                            left: isMedia ? 12 : 0,
+                                          ),
+                                          child: Text(
+                                            status,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w100,
+                                            ),
                                           ),
                                         ),
                                       ),

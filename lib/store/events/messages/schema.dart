@@ -36,8 +36,9 @@ class Messages extends Table {
   TextColumn get body => text().nullable()();
   TextColumn get msgtype => text().nullable()();
   TextColumn get format => text().nullable()();
-  TextColumn get filename => text().nullable()();
   TextColumn get formattedBody => text().nullable()();
+  TextColumn get file => text().nullable()();
+  TextColumn get url => text().nullable()();
 
   // Encrypted Messages only
   TextColumn get typeDecrypted => text().nullable()(); // inner type of decrypted event

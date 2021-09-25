@@ -33,8 +33,8 @@ class MatrixImage extends StatefulWidget {
   const MatrixImage({
     Key? key,
     required this.mxcUri,
-    this.width = 48,
-    this.height = 48,
+    this.width = Dimensions.avatarSizeMin,
+    this.height = Dimensions.avatarSizeMin,
     this.size,
     this.strokeWidth = Dimensions.defaultStrokeWidthLite,
     this.imageType,
@@ -73,7 +73,11 @@ class MatrixImageState extends State<MatrixImage> {
     final mediaCache = store.state.mediaStore.mediaCache;
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
-      store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
+      if (widget.thumbnail) {
+        store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
+      } else {
+        store.dispatch(fetchMedia(mxcUri: widget.mxcUri));
+      }
     }
 
     // Created in attempts to reduce framerate drop in chat details

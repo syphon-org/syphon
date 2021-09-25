@@ -228,6 +228,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   onToggleSelectedMessage(Message? message) {
+    printJson(json.decode(json.encode(message)));
     setState(() {
       selectedMessage = message;
     });
@@ -460,7 +461,7 @@ class ChatScreenState extends State<ChatScreen> {
           return Scaffold(
             appBar: appBar as PreferredSizeWidget?,
             backgroundColor: selectedMessage != null
-                ? Theme.of(context).scaffoldBackgroundColor.withAlpha(64)
+                ? Theme.of(context).scaffoldBackgroundColor.withAlpha(200)
                 : Theme.of(context).scaffoldBackgroundColor,
             body: Align(
               alignment: Alignment.topRight,

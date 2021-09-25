@@ -13,6 +13,12 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
 
+///
+/// Change imported migration strategy extension on schema change
+///
+// ignore: unused_import
+import 'package:syphon/storage/moor/migrations/update.messages.4.dart';
+
 part 'database.g.dart';
 
 void _openOnAndroid() {
@@ -87,19 +93,5 @@ class StorageDatabase extends _$StorageDatabase {
   // you should bump this number whenever you change or add a table definition. Migrations
   // are covered later in this readme.
   @override
-  int get schemaVersion => 3;
-
-  @override
-  MigrationStrategy get migration => MigrationStrategy(
-      // beforeOpen: (openingDetails) async {
-      //   print("RUNNING BEFORE OPEN $DEBUG_MODE");
-      //   if (DEBUG_MODE) {
-      //     final m = createMigrator(); // changed to this
-      //     for (final table in allTables) {
-      //       await m.deleteTable(table.actualTableName);
-      //       await m.createTable(table);
-      //     }
-      //   }
-      // },
-      );
+  int get schemaVersion => 4;
 }

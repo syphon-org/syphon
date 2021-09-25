@@ -37,8 +37,10 @@ class Message extends Event implements moor.Insertable<Message> {
   final String? body;
   final String? msgtype;
   final String? format;
-  final String? filename;
   final String? formattedBody;
+  final String? file;
+  final String? url;
+  final Map<String, dynamic>? info;
 
   // Encrypted Messages only
   final String? typeDecrypted; // inner type of decrypted event
@@ -69,7 +71,9 @@ class Message extends Event implements moor.Insertable<Message> {
     this.typeDecrypted,
     this.msgtype,
     this.format,
-    this.filename,
+    this.file,
+    this.url,
+    this.info,
     this.formattedBody,
     this.received = 0,
     this.ciphertext,
@@ -117,7 +121,9 @@ class Message extends Event implements moor.Insertable<Message> {
     String? typeDecrypted, // inner type of decrypted event
     String? msgtype,
     String? format,
-    String? filename,
+    String? file,
+    String? url,
+    Map<String, dynamic>? info,
     String? formattedBody,
     String? ciphertext,
     String? senderKey,
@@ -141,7 +147,9 @@ class Message extends Event implements moor.Insertable<Message> {
         formattedBody: formattedBody ?? this.formattedBody,
         msgtype: msgtype ?? this.msgtype,
         format: format ?? this.format,
-        filename: filename ?? this.filename,
+        file: file ?? this.file,
+        url: url ?? this.url,
+        info: info ?? this.info,
         received: received ?? this.received,
         ciphertext: ciphertext ?? this.ciphertext,
         senderKey: senderKey ?? this.senderKey,
@@ -178,7 +186,8 @@ class Message extends Event implements moor.Insertable<Message> {
       body: moor.Value(body),
       msgtype: moor.Value(msgtype),
       format: moor.Value(format),
-      filename: moor.Value(filename),
+      file: moor.Value(file),
+      url: moor.Value(url),
       formattedBody: moor.Value(formattedBody),
       typeDecrypted: moor.Value(typeDecrypted),
       ciphertext: moor.Value(ciphertext),
@@ -212,6 +221,15 @@ class Message extends Event implements moor.Insertable<Message> {
         msgtype = content['m.new_content']['msgtype'];
       }
 
+      var info;
+      if (content['info'] != null) {
+        try {
+          info = Map<String, dynamic>.from(content['info']);
+        } catch (error) {
+          printError('[Message.fromEvent] Info Conversion Failed $error');
+        }
+      }
+
       return Message(
         id: event.id,
         userId: event.userId,
@@ -225,8 +243,10 @@ class Message extends Event implements moor.Insertable<Message> {
         body: body,
         msgtype: msgtype,
         format: content['format'],
-        filename: content['filename'],
         formattedBody: content['formatted_body'],
+        file: content['file'],
+        url: content['url'],
+        info: info,
         ciphertext: content['ciphertext'] ?? '',
         algorithm: content['algorithm'],
         senderKey: content['sender_key'],
