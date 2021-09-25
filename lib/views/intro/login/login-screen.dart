@@ -51,7 +51,6 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
   final passwordFocus = FocusNode();
   final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
   final avatarHash = Random().nextInt(2);
 
   bool visibility = false;
@@ -61,9 +60,6 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
 
   @override
   void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
-    passwordFocus.dispose();
     super.dispose();
   }
 
@@ -172,7 +168,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
               disabled: props.loading,
               controller: usernameController,
               autofillHints: const [AutofillHints.username],
-              formatters: [FilteringTextInputFormatter.deny(RegExp(r'@@'))],
+              formatters: [FilteringTextInputFormatter.deny(RegExp('@@'))],
               onSubmitted: (text) {
                 FocusScope.of(context).requestFocus(passwordFocus);
               },

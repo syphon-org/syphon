@@ -290,6 +290,8 @@ class MessageWidget extends StatelessWidget {
       alignmentMessage = MainAxisAlignment.end;
       alignmentReaction = MainAxisAlignment.start;
       alignmentMessageText = CrossAxisAlignment.end;
+    } else {
+      textColor = bubbleColor.computeLuminance() > 0.6 ? Colors.black : Colors.white;
     }
 
     if (selectedMessageId != null && !selected) {

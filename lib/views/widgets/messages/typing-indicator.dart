@@ -7,14 +7,14 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
-class MessageTypingWidget extends StatefulWidget {
+class TypingIndicator extends StatefulWidget {
   final bool? typing;
   final List<String> usersTyping;
   final Map<String, User> roomUsers;
   final String? selectedMessageId;
   final Function? onPressAvatar;
 
-  const MessageTypingWidget({
+  const TypingIndicator({
     Key? key,
     this.typing,
     this.usersTyping = const [],
@@ -24,7 +24,7 @@ class MessageTypingWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  MessageTypingState createState() => MessageTypingState();
+  TypingIndicatorState createState() => TypingIndicatorState();
 }
 
 ///
@@ -32,7 +32,7 @@ class MessageTypingWidget extends StatefulWidget {
 ///
 /// Mostly an example for myself on how to override styling or other options on
 /// existing components app wide
-class MessageTypingState extends State<MessageTypingWidget> with TickerProviderStateMixin {
+class TypingIndicatorState extends State<TypingIndicator> with TickerProviderStateMixin {
   double fullSize = 1;
 
   @protected

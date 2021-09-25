@@ -17,7 +17,7 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/messages/message-typing.dart';
+import 'package:syphon/views/widgets/messages/typing-indicator.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
 class MessageList extends StatefulWidget {
@@ -107,7 +107,7 @@ class MessageListState extends State<MessageList> {
               physics: widget.selectedMessage != null ? const NeverScrollableScrollPhysics() : null,
               controller: widget.scrollController,
               children: [
-                MessageTypingWidget(
+                TypingIndicator(
                   roomUsers: props.users,
                   typing: props.room.userTyping,
                   usersTyping: props.room.usersTyping,

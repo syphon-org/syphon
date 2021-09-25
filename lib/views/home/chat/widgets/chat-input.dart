@@ -21,6 +21,8 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
+const DEFAULT_BORDER_RADIUS = 24.0;
+
 class ChatInput extends StatefulWidget {
   final String roomId;
   final bool sending;
@@ -58,6 +60,7 @@ class ChatInputState extends State<ChatInput> {
   ChatInputState() : super();
 
   bool sendable = false;
+  bool showAttachments = false;
 
   Timer? typingNotifier;
   Timer? typingNotifierTimeout;
@@ -137,6 +140,16 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
+  onToggleAttachmentOptions() {
+    final willShowAttachments = !showAttachments;
+    if (willShowAttachments) {
+      FocusScope.of(context).unfocus();
+    }
+    setState(() {
+      showAttachments = willShowAttachments;
+    });
+  }
+
   onSubmit() {
     setState(() {
       sendable = false;
@@ -165,7 +178,8 @@ class ChatInputState extends State<ChatInput> {
           // dynamic dimensions
           final double messageInputWidth = width - 72;
           final bool replying = widget.quotable != null && widget.quotable!.sender != null;
-          final double maxHeight = replying ? height * 0.45 : height * 0.5;
+          final double maxInputHeight = replying ? height * 0.45 : height * 0.5;
+          final double maxMediaHeight = height * 0.3;
 
           final isSendable = sendable && !widget.sending;
 
@@ -239,8 +253,8 @@ class ChatInputState extends State<ChatInput> {
                 maintainSize: false,
                 maintainState: false,
                 maintainAnimation: false,
+                //////// REPLY FIELD ////////
                 child: Row(
-                  //////// REPLY FIELD ////////
                   children: <Widget>[
                     Stack(
                       children: [
@@ -309,14 +323,14 @@ class ChatInputState extends State<ChatInput> {
                   ],
                 ),
               ),
+              //////// TEXT FIELD ////////
               Row(
-                //////// ACTUAL INPUT FIELD ////////
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Container(
                     constraints: BoxConstraints(
-                      maxHeight: maxHeight,
+                      maxHeight: maxInputHeight,
                       maxWidth: messageInputWidth,
                     ),
                     child: TextField(
@@ -338,6 +352,17 @@ class ChatInputState extends State<ChatInput> {
                       decoration: InputDecoration(
                         filled: true,
                         hintText: hintText,
+                        suffixIcon: GestureDetector(
+                          onTap: () => onToggleAttachmentOptions(),
+                          child: IconButton(
+                            color: Theme.of(context).iconTheme.color,
+                            onPressed: () => onToggleAttachmentOptions(),
+                            icon: Icon(
+                              Icons.add,
+                              size: Dimensions.iconSizeLarge,
+                            ),
+                          ),
+                        ),
                         fillColor: props.inputColorBackground,
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
@@ -346,10 +371,10 @@ class ChatInputState extends State<ChatInput> {
                               width: 1,
                             ),
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? 24 : 0),
-                              topRight: Radius.circular(!replying ? 24 : 0),
-                              bottomLeft: Radius.circular(24),
-                              bottomRight: Radius.circular(24),
+                              topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                              topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                              bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                              bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
                             )),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -357,10 +382,10 @@ class ChatInputState extends State<ChatInput> {
                               width: 1,
                             ),
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? 24 : 0),
-                              topRight: Radius.circular(!replying ? 24 : 0),
-                              bottomLeft: Radius.circular(24),
-                              bottomRight: Radius.circular(24),
+                              topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                              topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                              bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                              bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
                             )),
                       ),
                     ),
@@ -371,6 +396,63 @@ class ChatInputState extends State<ChatInput> {
                     child: sendButton,
                   ),
                 ],
+              ),
+              //////// MEDIA FIELD ////////
+              Visibility(
+                visible: showAttachments,
+                maintainSize: false,
+                maintainState: false,
+                maintainAnimation: false,
+                //////// REPLY FIELD ////////
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: maxMediaHeight,
+                    maxWidth: messageInputWidth,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      // ListView.builder(
+                      //     shrinkWrap: true,
+                      //     itemCount: 4,
+                      //     scrollDirection: Axis.horizontal,
+                      //     physics: const NeverScrollableScrollPhysics(),
+                      //     itemBuilder: (BuildContext context, int index) {
+                      //       return Container();
+                      //     }),
+                      Row(children: [
+                        InkWell(
+                          onTap: () => null,
+                          onLongPress: () => null,
+                          child: Container(
+                            color: const Color(Colours.greyDefault),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 8, top: 8),
+                                  child: Icon(
+                                    Icons.photo,
+                                    size: Dimensions.iconSize * 1.5,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  'Gallery',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ])
+                    ],
+                  ),
+                ),
               )
             ],
           );
