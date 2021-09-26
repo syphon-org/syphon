@@ -140,7 +140,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
         ),
         trailing: TouchableOpacity(
           onTap: () {
-            Navigator.pushNamed(context, NavigationPaths.searchHomeservers);
+            Navigator.pushNamed(context, Routes.searchHomeservers);
           },
           child: Icon(
             Icons.search_rounded,
@@ -177,7 +177,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
               },
               suffix: TouchableOpacity(
                 onTap: () {
-                  Navigator.pushNamed(context, NavigationPaths.searchHomeservers);
+                  Navigator.pushNamed(context, Routes.searchHomeservers);
                 },
                 child: Icon(
                   Icons.search_rounded,
@@ -225,7 +225,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                 activeOpacity: 0.4,
                 onTap: () async {
                   await props.onResetSession();
-                  Navigator.pushNamed(context, NavigationPaths.forgot);
+                  Navigator.pushNamed(context, Routes.forgot);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -273,7 +273,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                 tooltip: 'General Settings',
                 color: Theme.of(context).scaffoldBackgroundColor,
                 onPressed: () {
-                  Navigator.pushNamed(context, NavigationPaths.settingsTheme);
+                  Navigator.pushNamed(context, Routes.settingsTheme);
                   props.onDebug();
                 },
               ),
@@ -467,7 +467,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                         ),
                         child: TouchableOpacity(
                           activeOpacity: 0.4,
-                          onTap: () => Navigator.pushNamed(context, NavigationPaths.signup),
+                          onTap: () => Navigator.pushNamed(context, Routes.signup),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[

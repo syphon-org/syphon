@@ -133,7 +133,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                                   if (result) {
                                     Navigator.popUntil(
                                       context,
-                                      ModalRoute.withName(NavigationPaths.login),
+                                      ModalRoute.withName(Routes.login),
                                     );
                                   }
                                 },

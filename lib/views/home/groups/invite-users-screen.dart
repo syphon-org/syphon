@@ -252,7 +252,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        final width = MediaQuery.of(context).size.height;
+        final width = MediaQuery.of(context).size.height; // not a mistake!
         final showInvites = invites.isNotEmpty;
 
         final attemptableUser = User(

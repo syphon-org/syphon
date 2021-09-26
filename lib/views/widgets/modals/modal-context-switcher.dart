@@ -18,7 +18,7 @@ class ModalContextSwitcher extends StatelessWidget {
   onNavigateToMultiLogin({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      NavigationPaths.login,
+      Routes.login,
       arguments: LoginScreenArguments(
         multiaccount: true,
       ),

@@ -237,7 +237,7 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
                         }
 
                         if (currentStep == sections.length - 1) {
-                          Navigator.pushNamed(context, NavigationPaths.signup);
+                          Navigator.pushNamed(context, Routes.signup);
                         }
 
                         pageController!.nextPage(
@@ -283,7 +283,7 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
                             )
                           : TouchableOpacity(
                               activeOpacity: 0.4,
-                              onTap: () => Navigator.pushNamed(context, NavigationPaths.login),
+                              onTap: () => Navigator.pushNamed(context, Routes.login),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[

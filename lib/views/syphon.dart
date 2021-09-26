@@ -285,7 +285,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // No user is present and no contexts are availble to jump to
     if (user == null && allContexts.isEmpty && defaultScreen == HomeScreen) {
       defaultHome = IntroScreen();
-      return NavigationService.clearTo(NavigationPaths.intro, context);
+      return NavigationService.clearTo(Routes.intro, context);
     }
 
     // No user is present during auth state change, but other contexts exist
@@ -296,7 +296,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // New user is found and previously was in an unauthenticated state
     if (user != null && user.accessToken != null && defaultScreen == IntroScreen) {
       defaultHome = HomeScreen();
-      return NavigationService.clearTo(NavigationPaths.home, context);
+      return NavigationService.clearTo(Routes.home, context);
     }
 
     // New user has been authenticated during an existing authenticated session
@@ -305,7 +305,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         user.accessToken != null &&
         user.accessToken!.isNotEmpty &&
         defaultScreen == HomeScreen) {
-      return NavigationService.clearTo(NavigationPaths.home, context);
+      return NavigationService.clearTo(Routes.home, context);
     }
   }
 

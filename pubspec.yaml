@@ -118,6 +118,7 @@ dependencies:
   file_picker: ^4.1.1
   image_picker: ^0.7.4
   local_image_provider: ^4.0.1
+  flutter_keyboard_visibility: ^5.0.3
   # TODO: convert back when similar functionality is merged
   # webview_flutter: ^2.0.13
   webview_flutter:

@@ -451,6 +451,7 @@ class MessageWidget extends StatelessWidget {
                                     child: MatrixImage(
                                       mxcUri: message.url,
                                       thumbnail: false,
+                                      fit: BoxFit.cover,
                                       width: Dimensions.mediaSize,
                                       height: Dimensions.mediaSize,
                                       fallbackColor: Colors.transparent,

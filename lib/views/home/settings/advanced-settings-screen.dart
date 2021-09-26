@@ -21,8 +21,7 @@ import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
-import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
-import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart'; 
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
 class AdvancedSettingsScreen extends StatefulWidget {
@@ -121,7 +120,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                 ListTile(
                   dense: true,
                   onTap: () {
-                    Navigator.pushNamed(context, NavigationPaths.licenses);
+                    Navigator.pushNamed(context, Routes.licenses);
                   },
                   contentPadding: Dimensions.listPadding,
                   title: Text(

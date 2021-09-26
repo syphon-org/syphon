@@ -9,6 +9,7 @@ import 'package:path/path.dart' as path;
 
 import 'package:local_image_provider/local_image_provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
@@ -53,10 +54,8 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
     final imageBytes = await imageProvider.imageBytes(image.id!, image.pixelHeight!, image.pixelWidth!);
 
     final directory = await getTemporaryDirectory();
-    final filepath = 'temp-${Random.secure().nextInt(100000)}-${image.fileName}';
+    final filepath = 'temp-${image.fileName}';
     final file = File(path.join(directory.path, filepath));
-
-    print(file);
 
     file.writeAsBytes(imageBytes);
 
@@ -65,27 +64,32 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     if (images.isEmpty) {
-      return Column(
-        children: [
-          Container(
-            padding: EdgeInsets.only(bottom: 8, top: 8),
-            child: Icon(
-              Icons.search,
-              size: Dimensions.iconSize * 1.5,
-              color: Colors.white,
-            ),
-          ),
-          Text(
-            'No Images Found',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.button?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
+      return Container(
+          width: width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.only(bottom: 8, top: 8),
+                child: Icon(
+                  Icons.search,
+                  size: Dimensions.iconSize * 1.5,
+                  color: const Color(Colours.greyDefault),
                 ),
-          ),
-        ],
-      );
+              ),
+              Text(
+                'No Images Found',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.button?.copyWith(
+                      fontWeight: FontWeight.w400,
+                    ),
+              ),
+            ],
+          ));
     }
 
     return ListView.builder(

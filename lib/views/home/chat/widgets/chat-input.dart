@@ -9,6 +9,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
 
 import 'package:syphon/global/colours.dart';
@@ -28,7 +29,10 @@ import 'package:syphon/views/widgets/lists/list-local-images.dart';
 
 const DEFAULT_BORDER_RADIUS = 24.0;
 
-_empty({required File file}) {}
+_empty({
+  required File file,
+  required MessageType type,
+}) {}
 
 class ChatInput extends StatefulWidget {
   final String roomId;
@@ -43,8 +47,11 @@ class ChatInput extends StatefulWidget {
   final Function? onSubmitMessage;
   final Function? onChangeMethod;
   final Function? onUpdateMessage;
-  final Function({required File file}) onAddMedia;
   final Function? onCancelReply;
+  final Function({
+    required File file,
+    required MessageType type,
+  }) onAddMedia;
 
   const ChatInput({
     Key? key,
@@ -84,7 +91,7 @@ class ChatInputState extends State<ChatInput> {
   onMounted(_Props props) {
     final draft = props.room.draft;
 
-    if (draft != null && draft.type == MessageTypes.TEXT) {
+    if (draft != null && draft.type == MatrixMessageTypes.text) {
       setState(() {
         sendable = draft.body != null && draft.body!.isNotEmpty;
       });
@@ -109,7 +116,6 @@ class ChatInputState extends State<ChatInput> {
   void didUpdateWidget(covariant ChatInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     keyboardHeight = widget.inset > 0 ? widget.inset : keyboardHeight;
-    print('updating $keyboardHeight');
   }
 
   @override
@@ -167,15 +173,19 @@ class ChatInputState extends State<ChatInput> {
   }
 
   onToggleMediaOptions() {
+    // HACK: if nothing is focused yet, just open the media options
+    if (!widget.focusNode.hasFocus && !showAttachments) {
+      return onFocusSafe(
+          focusNode: widget.focusNode,
+          onFunction: () async {
+            setState(() {
+              showAttachments = !showAttachments;
+            });
+          });
+    }
+
     widget.focusNode.unfocus();
 
-    if (showAttachments) {
-      return Timer(Duration(milliseconds: 200), () {
-        setState(() {
-          showAttachments = !showAttachments;
-        });
-      });
-    }
     setState(() {
       showAttachments = !showAttachments;
     });
@@ -211,8 +221,8 @@ class ChatInputState extends State<ChatInput> {
 
     if (pickerResult == null) return;
 
-    final imageFile = File(pickerResult.path);
-    widget.onAddMedia(file: imageFile);
+    final file = File(pickerResult.path);
+    widget.onAddMedia(file: file, type: MessageType.image);
   }
 
   onAddFile() async {
@@ -224,7 +234,7 @@ class ChatInputState extends State<ChatInput> {
     if (pickerResult == null) return;
 
     final file = File(pickerResult.paths[0]!);
-    widget.onAddMedia(file: file);
+    widget.onAddMedia(file: file, type: MessageType.file);
   }
 
   @override
@@ -241,7 +251,7 @@ class ChatInputState extends State<ChatInput> {
           final double messageInputWidth = width - 72;
           final bool replying = widget.quotable != null && widget.quotable!.sender != null;
           final double maxInputHeight = replying ? height * 0.45 : height * 0.5;
-          final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight : height * 0.38;
+          final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight - 24 : height * 0.38;
 
           final isSendable = sendable && !widget.sending;
 
@@ -478,7 +488,7 @@ class ChatInputState extends State<ChatInput> {
                         ),
                         child: ListLocalImages(
                           imageSize: imageWidth,
-                          onSelectImage: (file) => widget.onAddMedia(file: file),
+                          onSelectImage: (file) => widget.onAddMedia(file: file, type: MessageType.image),
                         ),
                       ),
                       Row(children: [

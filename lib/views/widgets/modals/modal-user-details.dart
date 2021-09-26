@@ -36,7 +36,7 @@ class ModalUserDetails extends StatelessWidget {
   onNavigateToProfile({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      NavigationPaths.userDetails,
+      Routes.userDetails,
       arguments: UserProfileArguments(
         user: props.user,
       ),
@@ -46,7 +46,7 @@ class ModalUserDetails extends StatelessWidget {
   onNavigateToInvite({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      NavigationPaths.searchChats,
+      Routes.searchChats,
       arguments: ChatSearchArguments(
         user: props.user,
       ),
@@ -74,7 +74,7 @@ class ModalUserDetails extends StatelessWidget {
           if (newRoomId != null) {
             Navigator.popAndPushNamed(
               context,
-              NavigationPaths.chat,
+              Routes.chat,
               arguments: ChatScreenArguments(
                 roomId: newRoomId,
                 title: user.displayName,

@@ -316,48 +316,6 @@ ThunkAction<AppState> selectReply({
 }
 
 ///
-/// Format Message Reply
-///
-/// Format a message as a reply to another
-/// https://matrix.org/docs/spec/client_server/latest#rich-replies
-/// https://github.com/matrix-org/matrix-doc/pull/1767
-///
-///
-ThunkAction<AppState> formatMessageReply(
-  Room? room,
-  Message? message,
-  Message reply,
-) {
-  return (Store<AppState> store) async {
-    try {
-      final body = '''> <${reply.sender}> ${reply.body}\n\n${message!.body}''';
-      final formattedBody =
-          '''<mx-reply><blockquote><a href="https://matrix.to/#/${room!.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
-
-      return message.copyWith(
-        body: body,
-        format: 'org.matrix.custom.html',
-        formattedBody: formattedBody,
-        content: {
-          'body': body,
-          'format': 'org.matrix.custom.html',
-          'formatted_body': formattedBody,
-          // m.relates_to below is not necessary in the unencrypted part of the
-          // message according to the spec but Element web and android seem to
-          // do it so I'm leaving it here
-          'm.relates_to': {
-            'm.in_reply_to': {'event_id': reply.id}
-          },
-          'msgtype': message.type
-        },
-      );
-    } catch (error) {
-      return null;
-    }
-  };
-}
-
-///
 /// Read Message Marker
 ///
 /// Send Fully Read or just Read receipts bundled into

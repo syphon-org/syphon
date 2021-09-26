@@ -68,7 +68,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
           ),
           trailing: TouchableOpacity(
             onTap: () {
-              Navigator.pushNamed(context, NavigationPaths.searchHomeservers);
+              Navigator.pushNamed(context, Routes.searchHomeservers);
             },
             child: Icon(
               Icons.search_rounded,
@@ -100,7 +100,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
               icon: Icon(Icons.search),
               tooltip: 'Find your homeserver',
               onPressed: () {
-                Navigator.pushNamed(context, NavigationPaths.searchHomeservers);
+                Navigator.pushNamed(context, Routes.searchHomeservers);
               }),
         ),
       );

@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 
@@ -18,6 +19,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
+import 'package:syphon/store/media/actions.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -37,6 +39,7 @@ import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
 import 'package:syphon/views/home/chat/widgets/message-list.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
 import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
@@ -117,7 +120,7 @@ class ChatScreenState extends State<ChatScreen> {
       props.onFetchNewest();
     }
 
-    if (draft != null && draft.type == MessageTypes.TEXT) {
+    if (draft != null && draft.type == MatrixMessageTypes.text) {
       editorController.value = TextEditingValue(
         text: draft.body!,
         selection: TextSelection.fromPosition(
@@ -214,10 +217,12 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       sending = true;
     });
+
     props.onSendMessage(
       body: editorController.text,
-      type: MessageTypes.TEXT,
+      type: MatrixMessageTypes.text,
     );
+
     editorController.clear();
     if (props.dismissKeyboardEnabled) {
       FocusScope.of(context).unfocus();
@@ -225,6 +230,50 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       sending = false;
     });
+  }
+
+  onSendMedia(File file, MessageType type, _Props props) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    setState(() {
+      sending = true;
+    });
+
+    final mxcData = await store.dispatch(
+      uploadMedia(localFile: file),
+    );
+
+    final mxcUri = mxcData['content_uri'];
+
+    final message = Message(
+      url: mxcUri,
+      type: type.value, // get matrix type string (m.image)
+      body: path.basename(file.path),
+    );
+
+    if (props.room.encryptionEnabled) {
+      store.dispatch(sendMessageEncrypted(
+        roomId: props.room.id,
+        message: message,
+      ));
+    } else {
+      store.dispatch(sendMessage(
+        roomId: props.room.id,
+        message: message,
+      ));
+    }
+
+    editorController.clear();
+    if (props.dismissKeyboardEnabled) {
+      FocusScope.of(context).unfocus();
+    }
+    setState(() {
+      sending = false;
+    });
+  }
+
+  onAddMedia(File file, MessageType type) async {
+    Navigator.pushNamed(context, Routes.chatMediaPreview);
   }
 
   onToggleSelectedMessage(Message? message) {
@@ -437,7 +486,7 @@ class ChatScreenState extends State<ChatScreen> {
               if (editorController.text.isNotEmpty) {
                 props.onSaveDraftMessage(
                   body: editorController.text,
-                  type: MessageTypes.TEXT,
+                  type: MatrixMessageTypes.text,
                 );
               } else if (props.room.draft != null) {
                 props.onClearDraftMessage();
@@ -541,6 +590,8 @@ class ChatScreenState extends State<ChatScreen> {
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onSubmitMessage: () => onSendMessage(props),
+                        onAddMedia: ({required File file, required MessageType type}) =>
+                            onAddMedia(file, type),
                       ),
                     ),
                   ),
@@ -662,13 +713,13 @@ class _Props extends Equatable {
 
           if (room.encryptionEnabled) {
             return store.dispatch(sendMessageEncrypted(
-              roomId: roomId,
+              roomId: room.id,
               message: message,
             ));
           }
 
           return store.dispatch(sendMessage(
-            room: room,
+            roomId: room.id,
             message: message,
           ));
         },

@@ -263,7 +263,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                     onTap: () {
                                       Navigator.pushNamed(
                                         context,
-                                        NavigationPaths.chatUsers,
+                                        Routes.chatUsers,
                                         arguments: ChatUsersDetailArguments(
                                           roomId: props.room.id,
                                         ),

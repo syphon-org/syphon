@@ -58,7 +58,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
   }
 
   onVerificationConfirmed() {
-    Navigator.pushNamed(context, NavigationPaths.reset);
+    Navigator.pushNamed(context, Routes.reset);
   }
 
   @override

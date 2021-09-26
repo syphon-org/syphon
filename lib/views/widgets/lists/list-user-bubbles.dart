@@ -95,13 +95,13 @@ class ListUserBubbles extends StatelessWidget {
                       if (invite) {
                         Navigator.pushNamed(
                           context,
-                          NavigationPaths.userInvite,
+                          Routes.userInvite,
                           arguments: InviteUsersArguments(roomId: null),
                         );
                       } else {
                         Navigator.pushNamed(
                           context,
-                          NavigationPaths.chatUsers,
+                          Routes.chatUsers,
                           arguments: ChatUsersDetailArguments(roomId: roomId),
                         );
                       }

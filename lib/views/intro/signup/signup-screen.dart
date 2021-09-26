@@ -279,7 +279,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
           // otherwise, send to the verification holding page
           if (!result!) {
             if (lastStep) {
-              return Navigator.pushNamed(context, NavigationPaths.verification);
+              return Navigator.pushNamed(context, Routes.verification);
             }
 
             // or continue if not the last step

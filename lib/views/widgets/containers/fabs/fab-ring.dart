@@ -29,28 +29,28 @@ class FabRing extends StatelessWidget {
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
-    Navigator.pushNamed(context, NavigationPaths.searchGroups);
+    Navigator.pushNamed(context, Routes.searchGroups);
   }
 
   @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
-    Navigator.pushNamed(context, NavigationPaths.searchUsers);
+    Navigator.pushNamed(context, Routes.searchUsers);
   }
 
   @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
-    Navigator.pushNamed(context, NavigationPaths.groupCreate);
+    Navigator.pushNamed(context, Routes.groupCreate);
   }
 
   @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
-    Navigator.pushNamed(context, NavigationPaths.groupCreatePublic);
+    Navigator.pushNamed(context, Routes.groupCreatePublic);
   }
 
   @override

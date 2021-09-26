@@ -183,7 +183,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, NavigationPaths.settingsPassword);
+                              Navigator.pushNamed(context, Routes.settingsPassword);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -196,7 +196,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, NavigationPaths.settingsBlocked);
+                              Navigator.pushNamed(context, Routes.settingsBlocked);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(

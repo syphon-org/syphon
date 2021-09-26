@@ -191,7 +191,7 @@ class HomeState extends State<HomeScreen> {
 
     Navigator.pushNamed(
       context,
-      NavigationPaths.chat,
+      Routes.chat,
       arguments: ChatScreenArguments(roomId: room.id, title: chatName),
     );
 
@@ -251,7 +251,7 @@ class HomeState extends State<HomeScreen> {
               onPressed: () {
                 Navigator.pushNamed(
                   context,
-                  NavigationPaths.chatDetails,
+                  Routes.chatDetails,
                   arguments: ChatDetailsArguments(
                     roomId: selectedChats.values.first.id,
                     title: selectedChats.values.first.name,
@@ -309,7 +309,7 @@ class HomeState extends State<HomeScreen> {
               unauthed: props.unauthed,
               tooltip: 'Profile and Settings',
               onPressed: () {
-                Navigator.pushNamed(context, NavigationPaths.settingsProfile);
+                Navigator.pushNamed(context, Routes.settingsProfile);
               },
             ),
             Text(
@@ -333,13 +333,13 @@ class HomeState extends State<HomeScreen> {
             onSelected: (Options result) {
               switch (result) {
                 case Options.newGroup:
-                  Navigator.pushNamed(context, NavigationPaths.groupCreate);
+                  Navigator.pushNamed(context, Routes.groupCreate);
                   break;
                 case Options.markAllRead:
                   props.onMarkAllRead();
                   break;
                 case Options.settings:
-                  Navigator.pushNamed(context, NavigationPaths.settings);
+                  Navigator.pushNamed(context, Routes.settings);
                   break;
                 case Options.help:
                   props.onSelectHelp();

@@ -208,8 +208,8 @@ List<Message> combineOutbox({List<Message>? messages, List<Message>? outbox}) {
 }
 
 bool isTextMessage({required Message message}) {
-  return message.msgtype == MessageTypes.TEXT ||
-      message.msgtype == MessageTypes.EMOTE ||
-      message.msgtype == MessageTypes.NOTICE ||
+  return message.msgtype == MatrixMessageTypes.text ||
+      message.msgtype == MatrixMessageTypes.emote ||
+      message.msgtype == MatrixMessageTypes.notice ||
       message.type == EventTypes.encrypted;
 }

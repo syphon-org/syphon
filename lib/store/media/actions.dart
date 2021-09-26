@@ -42,7 +42,7 @@ class UpdateMediaCache {
 
 ThunkAction<AppState> uploadMedia({
   File? localFile,
-  String? mediaName = 'photo',
+  String? mediaName = 'profile-photo',
 }) {
   return (Store<AppState> store) async {
     try {
@@ -65,6 +65,7 @@ ThunkAction<AppState> uploadMedia({
         fileLength: fileLength,
         fileStream: fileStream,
       );
+
       // If upload fails, throw an error for the whole update
       if (data['errcode'] != null) {
         throw data['error'];

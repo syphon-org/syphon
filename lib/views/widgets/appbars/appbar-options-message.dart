@@ -92,7 +92,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             onPressed: () {
               Navigator.pushNamed(
                 context,
-                NavigationPaths.messageDetails,
+                Routes.messageDetails,
                 arguments: MessageDetailArguments(
                   roomId: widget.room!.id,
                   message: widget.message,

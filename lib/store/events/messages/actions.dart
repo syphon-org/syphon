@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/messages/formatters.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -111,40 +113,35 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
 
 /// Send Message
 ThunkAction<AppState> sendMessage({
-  required Room room,
+  required String roomId,
   required Message message,
+  File? file,
 }) {
   return (Store<AppState> store) async {
+    final room = store.state.roomStore.rooms[roomId]!;
+
     try {
       store.dispatch(UpdateRoom(id: room.id, sending: true));
 
+      final reply = store.state.roomStore.rooms[room.id]!.reply;
+      final userId = store.state.authStore.user.userId!;
       // if you're incredibly unlucky, and fast, you could have a problem here
       final tempId = Random.secure().nextInt(1 << 32).toString();
-      final reply = store.state.roomStore.rooms[room.id]!.reply;
 
       // trim trailing whitespace
       message = message.copyWith(body: message.body!.trimRight());
 
       // pending outbox message
-      Message pending = Message(
-        id: tempId,
-        body: message.body,
-        type: message.type,
-        content: {
-          'body': message.body,
-          'msgtype': message.type ?? MessageTypes.TEXT,
-        },
-        sender: store.state.authStore.user.userId,
-        roomId: room.id,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-        pending: true,
-        syncing: true,
+      Message pending = await formatMessageContent(
+        tempId: tempId,
+        userId: userId,
+        message: message,
+        room: room,
+        file: file,
       );
 
       if (reply != null && reply.body != null) {
-        pending = await store.dispatch(
-          formatMessageReply(room, pending, reply),
-        );
+        pending = formatMessageReply(room, pending, reply);
       }
 
       // Save unsent message to outbox
@@ -211,10 +208,12 @@ ThunkAction<AppState> sendMessage({
 ThunkAction<AppState> sendMessageEncrypted({
   required String roomId,
   required Message message, // body and type only for now
+  File? file,
 }) {
   return (Store<AppState> store) async {
     try {
       final room = store.state.roomStore.rooms[roomId]!;
+      final userId = store.state.authStore.user.userId!;
 
       store.dispatch(UpdateRoom(id: room.id, sending: true));
 
@@ -230,19 +229,11 @@ ThunkAction<AppState> sendMessageEncrypted({
       message = message.copyWith(body: message.body!.trimRight());
 
       // pending outbox message
-      Message pending = Message(
-        id: tempId,
-        roomId: room.id,
-        body: message.body,
-        type: message.type,
-        content: {
-          'body': message.body,
-          'msgtype': message.type ?? MessageTypes.TEXT,
-        },
-        sender: store.state.authStore.user.userId,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-        pending: true,
-        syncing: true,
+      Message pending = await formatMessageContent(
+        tempId: tempId,
+        userId: userId,
+        message: message,
+        room: room,
       );
 
       final unencryptedData = {};
@@ -252,9 +243,7 @@ ThunkAction<AppState> sendMessageEncrypted({
           'm.in_reply_to': {'event_id': reply.id}
         };
 
-        pending = await store.dispatch(
-          formatMessageReply(room, pending, reply),
-        );
+        pending = formatMessageReply(room, pending, reply);
       }
 
       store.dispatch(SaveOutboxMessage(

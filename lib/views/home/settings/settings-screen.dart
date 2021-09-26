@@ -102,7 +102,7 @@ class SettingsScreen extends StatelessWidget {
                       onTap: props.authLoading
                           ? null
                           : () {
-                              Navigator.pushNamed(context, NavigationPaths.settingsProfile);
+                              Navigator.pushNamed(context, Routes.settingsProfile);
                             },
                       child: Container(
                         padding: Dimensions.heroPadding,
@@ -137,7 +137,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, NavigationPaths.settingsNotifications);
+                            Navigator.pushNamed(context, Routes.settingsNotifications);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -159,7 +159,7 @@ class SettingsScreen extends StatelessWidget {
                           child: ListTile(
                             enabled: !props.authLoading,
                             onTap: () {
-                              Navigator.pushNamed(context, NavigationPaths.settingsPrivacy);
+                              Navigator.pushNamed(context, Routes.settingsPrivacy);
                             },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
@@ -181,7 +181,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, NavigationPaths.settingsTheme);
+                            Navigator.pushNamed(context, Routes.settingsTheme);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -202,7 +202,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, NavigationPaths.settingsChat);
+                            Navigator.pushNamed(context, Routes.settingsChat);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -224,7 +224,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, NavigationPaths.settingsDevices);
+                            Navigator.pushNamed(context, Routes.settingsDevices);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -241,7 +241,7 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, NavigationPaths.settingsAdvanced);
+                            Navigator.pushNamed(context, Routes.settingsAdvanced);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(

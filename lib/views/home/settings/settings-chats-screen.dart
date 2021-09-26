@@ -55,7 +55,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                             GestureDetector(
                               onTap: () => props.onDisabled(),
                               child: ListTile(
-                                onTap: () => Navigator.pushNamed(context, NavigationPaths.settingsLanguages),
+                                onTap: () => Navigator.pushNamed(context, Routes.settingsLanguages),
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
                                   'Language',
