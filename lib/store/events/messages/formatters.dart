@@ -29,7 +29,13 @@ Future<Message> formatMessageContent({
     case MatrixMessageTypes.image:
       {
         // Extension handling
-        final String fileType = lookupMimeType(file!.path)!;
+        String? fileType = lookupMimeType(file!.path);
+
+        if (file.path.contains('HEIC')) {
+          fileType = 'image/heic';
+        } else if (fileType == null) {
+          throw 'Unsupported Media type for a message';
+        }
 
         // Setting up params for upload
         final int fileLength = await file.length();

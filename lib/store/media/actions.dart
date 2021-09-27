@@ -9,6 +9,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -41,13 +42,21 @@ class UpdateMediaCache {
 }
 
 ThunkAction<AppState> uploadMedia({
-  File? localFile,
+  required File localFile,
   String? mediaName = 'profile-photo',
 }) {
   return (Store<AppState> store) async {
     try {
       // Extension handling
-      final String fileType = lookupMimeType(localFile!.path)!;
+      String? mimeType = lookupMimeType(localFile.path);
+
+      if (localFile.path.contains('HEIC')) {
+        mimeType = 'image/heic';
+      } else if (mimeType == null) {
+        throw 'Unsupported Media type for a message';
+      }
+
+      final String fileType = mimeType;
       final String fileExtension = fileType.split('/')[1];
 
       // Setting up params for upload
@@ -66,6 +75,8 @@ ThunkAction<AppState> uploadMedia({
         fileStream: fileStream,
       );
 
+      printJson(data);
+
       // If upload fails, throw an error for the whole update
       if (data['errcode'] != null) {
         throw data['error'];
@@ -73,9 +84,12 @@ ThunkAction<AppState> uploadMedia({
 
       return data;
     } catch (error) {
-      store.dispatch(
-        addAlert(origin: 'uploadMedia', message: error.toString()),
-      );
+      print(error);
+
+      store.dispatch(addAlert(
+        origin: 'uploadMedia',
+        message: error.toString(),
+      ));
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));

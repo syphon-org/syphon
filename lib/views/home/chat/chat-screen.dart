@@ -35,6 +35,7 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
@@ -255,11 +256,13 @@ class ChatScreenState extends State<ChatScreen> {
       store.dispatch(sendMessageEncrypted(
         roomId: props.room.id,
         message: message,
+        file: file,
       ));
     } else {
       store.dispatch(sendMessage(
         roomId: props.room.id,
         message: message,
+        file: file,
       ));
     }
 
@@ -272,8 +275,16 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  onAddMedia(File file, MessageType type) async {
-    Navigator.pushNamed(context, Routes.chatMediaPreview);
+  onAddMedia(File file, MessageType type, _Props props) async {
+    Navigator.pushNamed(
+      context,
+      Routes.chatMediaPreview,
+      arguments: MediaPreviewArguments(
+        roomId: props.room.id,
+        mediaList: [file],
+        onConfirmSend: () => onSendMedia(file, type, props),
+      ),
+    );
   }
 
   onToggleSelectedMessage(Message? message) {
@@ -591,7 +602,7 @@ class ChatScreenState extends State<ChatScreen> {
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onSubmitMessage: () => onSendMessage(props),
                         onAddMedia: ({required File file, required MessageType type}) =>
-                            onAddMedia(file, type),
+                            onAddMedia(file, type, props),
                       ),
                     ),
                   ),

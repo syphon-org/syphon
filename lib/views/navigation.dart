@@ -4,7 +4,7 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
-import 'package:syphon/views/home/chat/chat-media-preview-screen.dart';
+import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/home/groups/group-create-public-screen.dart';
 import 'package:syphon/views/home/groups/group-create-screen.dart';
@@ -118,7 +118,7 @@ class NavigationProvider {
         Routes.home: (BuildContext context) => const HomeScreen(),
         Routes.chat: (BuildContext context) => const ChatScreen(),
         Routes.chatDetails: (BuildContext context) => const ChatDetailsScreen(),
-        Routes.chatMediaPreview: (BuildContext context) => const ChatMediaPreviewScreen(),
+        Routes.chatMediaPreview: (BuildContext context) => const MediaPreviewScreen(),
         Routes.messageDetails: (BuildContext context) => const MessageDetailsScreen(),
         Routes.chatUsers: (BuildContext context) => const ChatUsersDetailScreen(),
         Routes.searchUsers: (BuildContext context) => const SearchUserScreen(),

@@ -990,9 +990,13 @@ ThunkAction<AppState> updateAvatar({File? localFile}) {
       final String? displayName = store.state.authStore.user.displayName;
 
       final data = await store.dispatch(uploadMedia(
-        localFile: localFile,
+        localFile: localFile!,
         mediaName: '${displayName}_profile_photo',
       ));
+
+      if (data == null) {
+        throw 'Failed to upload media';
+      }
 
       await store.dispatch(updateAvatarUri(
         mxcUri: data['content_uri'],

@@ -236,7 +236,10 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                   Navigator.pushNamed(
                     context,
                     Routes.chatDetails,
-                    arguments: ChatDetailsArguments(roomId: widget.room!.id, title: widget.room!.name),
+                    arguments: ChatDetailsArguments(
+                      roomId: widget.room!.id,
+                      title: widget.room!.name,
+                    ),
                   );
                 },
                 child: Container(

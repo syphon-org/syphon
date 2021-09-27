@@ -663,7 +663,7 @@ ThunkAction<AppState> updateRoomAvatar({
   return (Store<AppState> store) async {
     try {
       final data = await store.dispatch(uploadMedia(
-        localFile: localFile,
+        localFile: localFile!,
         mediaName: roomId,
       ));
 
