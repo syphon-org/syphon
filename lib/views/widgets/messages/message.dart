@@ -368,11 +368,6 @@ class MessageWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  constraints: !isMedia
-                      ? null
-                      : BoxConstraints(
-                          maxWidth: Dimensions.mediaSizeMax,
-                        ),
                   margin: bubbleSpacing, // spacing between different user bubbles
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Flex(
