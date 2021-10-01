@@ -794,12 +794,11 @@ ThunkAction<AppState> fetchSignupStages() {
         session: store.state.authStore.authSession,
       );
 
-      printJson(data);
-
       if (data['flows'] == null) {
         throw data['error'];
       }
 
+      // TODO: servers can have multiple perferred flows, need to determine how to chose, largely UX issue
       // "flows": [ { "stages": [ "m.login.recaptcha", "m.login.terms", "m.login.email.identity" ] } ]
       final stages = List<String>.from(data['flows'][0]['stages']?.map((stage) => stage as String));
       final homeserverUpdated = homeserver.copyWith(signupTypes: stages);

@@ -206,7 +206,7 @@ abstract class Auth {
           }
         };
         break;
-      case MatrixAuthTypes.DUMMY: // default
+      case MatrixAuthTypes.DUMMY: // actually password auth, poor spec design
         body = {
           'username': username,
           'password': password,
