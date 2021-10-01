@@ -792,8 +792,9 @@ ThunkAction<AppState> fetchSignupStages() {
       final data = await MatrixApi.registerUser(
         homeserver: homeserver.baseUrl,
         session: store.state.authStore.authSession,
-        authType: 'dummy',
       );
+
+      printJson(data);
 
       if (data['flows'] == null) {
         throw data['error'];
@@ -805,6 +806,7 @@ ThunkAction<AppState> fetchSignupStages() {
 
       store.dispatch(SetHomeserver(homeserver: homeserverUpdated));
     } catch (error) {
+      printError(error.toString());
       final homeserver = store.state.authStore.homeserver;
       store.dispatch(SetHomeserver(homeserver: homeserver.copyWith(signupTypes: [])));
     }

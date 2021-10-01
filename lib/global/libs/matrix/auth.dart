@@ -159,10 +159,10 @@ abstract class Auth {
   static Future<dynamic> registerUser({
     String? protocol = Values.DEFAULT_PROTOCOL,
     String? homeserver,
-    String? username,
-    String? password,
+    String? username = 'check',
+    String? password = 'x',
     String? session,
-    String? authType = MatrixAuthTypes.DUMMY,
+    String? authType,
     String? authValue,
     Map? authParams,
     String? deviceId,
@@ -171,9 +171,7 @@ abstract class Auth {
     final String url = '$protocol$homeserver/_matrix/client/r0/register';
 
     Map body = {
-      'auth': {
-        'type': MatrixAuthTypes.DUMMY,
-      }
+      'type': MatrixAuthTypes.DUMMY,
     };
 
     // Set and configure params for auth types
