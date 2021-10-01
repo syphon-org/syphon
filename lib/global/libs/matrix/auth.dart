@@ -159,8 +159,8 @@ abstract class Auth {
   static Future<dynamic> registerUser({
     String? protocol = Values.DEFAULT_PROTOCOL,
     String? homeserver,
-    String? username = 'check',
-    String? password = 'x',
+    String? username,
+    String? password,
     String? session,
     String? authType,
     String? authValue,
