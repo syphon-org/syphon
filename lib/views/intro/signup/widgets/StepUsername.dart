@@ -53,7 +53,7 @@ class UsernameStepState extends State<UsernameStep> {
 
         Color suffixBackgroundColor = Colors.grey;
         Widget suffixWidget = CircularProgressIndicator(
-          strokeWidth: Dimensions.defaultStrokeWidth,
+          strokeWidth: Dimensions.strokeWidthDefault,
           valueColor: const AlwaysStoppedAnimation<Color>(
             Colors.white,
           ),

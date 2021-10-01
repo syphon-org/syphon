@@ -126,7 +126,7 @@ class Avatar extends StatelessWidget {
                     child: ClipRRect(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Theme.of(context).accentColor,
+                          color: Theme.of(context).colorScheme.secondary,
                           border: Border.all(
                             color: Colors.white,
                           ),

@@ -130,7 +130,7 @@ class PasswordStepState extends State<PasswordStep> {
                               width: 20,
                               child: Icon(
                                 Icons.info_outline,
-                                color: Theme.of(context).accentColor,
+                                color: Theme.of(context).colorScheme.secondary,
                                 size: 20,
                               ),
                             ),

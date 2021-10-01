@@ -57,14 +57,14 @@ class EmailStepState extends State<EmailVerifyStep> {
 
         Color suffixBackgroundColor = Colors.grey;
         Widget suffixWidgetHomeserver = CircularProgressIndicator(
-          strokeWidth: Dimensions.defaultStrokeWidth,
+          strokeWidth: Dimensions.strokeWidthDefault,
           valueColor: const AlwaysStoppedAnimation<Color>(
             Colors.white,
           ),
         );
 
         Widget suffixWidgetEmail = CircularProgressIndicator(
-          strokeWidth: Dimensions.defaultStrokeWidth,
+          strokeWidth: Dimensions.strokeWidthDefault,
           valueColor: const AlwaysStoppedAnimation<Color>(
             Colors.white,
           ),
@@ -160,7 +160,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                                 width: 20,
                                 child: Icon(
                                   Icons.info_outline,
-                                  color: Theme.of(context).accentColor,
+                                  color: Theme.of(context).colorScheme.secondary,
                                   size: 20,
                                 ),
                               ),

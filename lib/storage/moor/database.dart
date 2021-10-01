@@ -77,7 +77,7 @@ LazyDatabase openDatabase(String context) {
 
     return VmDatabase(
       filePath!,
-      logStatements: DEBUG_MODE,
+      logStatements: false, // DEBUG_MODE,
       setup: (rawDb) {
         rawDb.execute("PRAGMA key = '$storageKey';");
       },

@@ -281,7 +281,8 @@ class _Props extends Equatable {
         user: () {
           final users = store.state.userStore.users;
           final loading = store.state.userStore.loading;
-          if (user != null) {
+
+          if (user != null && user.userId != null) {
             return user;
           }
 

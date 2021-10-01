@@ -54,7 +54,7 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
     final imageBytes = await imageProvider.imageBytes(image.id!, image.pixelHeight!, image.pixelWidth!);
 
     final directory = await getTemporaryDirectory();
-    final filepath = 'temp-${image.fileName}';
+    final filepath = image.fileName;
     final file = File(path.join(directory.path, filepath));
 
     file.writeAsBytes(imageBytes);

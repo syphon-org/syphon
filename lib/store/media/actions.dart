@@ -75,8 +75,6 @@ ThunkAction<AppState> uploadMedia({
         fileStream: fileStream,
       );
 
-      printJson(data);
-
       // If upload fails, throw an error for the whole update
       if (data['errcode'] != null) {
         throw data['error'];
@@ -84,7 +82,7 @@ ThunkAction<AppState> uploadMedia({
 
       return data;
     } catch (error) {
-      print(error);
+      printError(error.toString());
 
       store.dispatch(addAlert(
         origin: 'uploadMedia',

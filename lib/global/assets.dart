@@ -3,7 +3,7 @@ class Assets {
   static const appIcon = 'assets/icons/current/app_icon_cyan.svg';
   static const appIconPng = 'assets/icons/current/app_icon_cyan.png';
 
-  // Generic Icons
+  // Generic Icons (Originally, Poorly titled "Being" illustrations)
   static const iconPersonAddBeing = 'assets/icons/global/being-person-add.svg';
   static const iconPublicAddBeing = 'assets/icons/global/being-public-add.svg';
   static const iconGroupAddBeing = 'assets/icons/global/being-group-add.svg';

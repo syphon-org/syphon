@@ -236,6 +236,11 @@ class ChatScreenState extends State<ChatScreen> {
   onSendMedia(File file, MessageType type, _Props props) async {
     final store = StoreProvider.of<AppState>(context);
 
+    // Globally notify other widgets you're sending a message in this room
+    store.dispatch(
+      UpdateRoom(id: props.room.id, sending: true),
+    );
+
     setState(() {
       sending = true;
     });
@@ -245,6 +250,8 @@ class ChatScreenState extends State<ChatScreen> {
     );
 
     final mxcUri = mxcData['content_uri'];
+
+    printInfo('[onSendMedia] $mxcUri}'); // TODO: REMOVE
 
     final message = Message(
       url: mxcUri,
@@ -267,9 +274,11 @@ class ChatScreenState extends State<ChatScreen> {
     }
 
     editorController.clear();
+
     if (props.dismissKeyboardEnabled) {
       FocusScope.of(context).unfocus();
     }
+
     setState(() {
       sending = false;
     });
@@ -355,7 +364,7 @@ class ChatScreenState extends State<ChatScreen> {
         child: EmojiPicker(
             config: Config(
               columns: 9,
-              indicatorColor: Theme.of(context).accentColor,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
               bgColor: Theme.of(context).scaffoldBackgroundColor,
               categoryIcons: CategoryIcons(
                 smileyIcon: Icons.tag_faces_rounded,
