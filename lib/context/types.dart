@@ -11,7 +11,7 @@ import 'package:syphon/global/values.dart';
 class AppContext {
   static const DEFAULT = '';
   static const ALL_CONTEXT_KEY = '${Values.appLabel}@context-all';
-  static const CURENT_CONTEXT_KEY = '${Values.appLabel}@context-current';
+  static const CURRENT_CONTEXT_KEY = '${Values.appLabel}@context-current';
 
   final String current;
   final String pinHash;

@@ -179,7 +179,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // save new user context
     if (user != null) {
-      contextNew = generateContextId(id: user.userId!);
+      contextNew = generateContextId();
       await saveContext(contextNew);
     } else {
       // revert to another user context or default
