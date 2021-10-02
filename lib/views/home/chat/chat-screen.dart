@@ -20,6 +20,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
 import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/encryptor.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -73,11 +74,6 @@ class ChatScreenState extends State<ChatScreen> {
   final editorController = TextEditingController();
   final messagesController = ScrollController();
   final listViewController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -236,21 +232,30 @@ class ChatScreenState extends State<ChatScreen> {
   onSendMedia(File file, MessageType type, _Props props) async {
     final store = StoreProvider.of<AppState>(context);
 
+    setState(() {
+      sending = true;
+    });
+
     // Globally notify other widgets you're sending a message in this room
     store.dispatch(
       UpdateRoom(id: props.room.id, sending: true),
     );
 
-    setState(() {
-      sending = true;
-    });
+    var encryptedFile;
+
+    if (props.room.encryptionEnabled) {
+      encryptedFile = encryptMedia(localFile: file);
+    }
 
     final mxcData = await store.dispatch(
-      uploadMedia(localFile: file),
+      uploadMedia(localFile: encryptedFile ?? file),
     );
 
     final mxcUri = mxcData['content_uri'];
 
+    ///
+    /// TODO:
+    ///
     /// should not have to do this but unfortunately
     /// when navigating back from the preview screen and
     /// submitting a new draft message, a MatrixImage widget

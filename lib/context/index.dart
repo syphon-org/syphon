@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:syphon/context/types.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/libs/storage/secure-storage.dart';
 
@@ -14,11 +15,6 @@ import 'package:syphon/global/libs/storage/secure-storage.dart';
 ///
 /// allows multiaccount feature to be domain logic independent
 ///
-String getRandomString(int length) {
-  const ch = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
-  final r = Random();
-  return String.fromCharCodes(Iterable.generate(length, (_) => ch.codeUnitAt(r.nextInt(ch.length))));
-}
 
 String generateContextId() {
   final shaHash = sha256.convert(utf8.encode(getRandomString(10)));

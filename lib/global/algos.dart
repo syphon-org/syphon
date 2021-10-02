@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:syphon/global/print.dart';
 
@@ -14,6 +16,12 @@ List<int> fibonacci(int n) {
   series.add(series[series.length - 1] + series[series.length - 2]);
 
   return series;
+}
+
+String getRandomString(int length) {
+  const ch = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
+  final r = Random();
+  return String.fromCharCodes(Iterable.generate(length, (_) => ch.codeUnitAt(r.nextInt(ch.length))));
 }
 
 // time functions by wrapping them here - needs testing

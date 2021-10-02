@@ -64,6 +64,7 @@ ThunkAction<AppState> uploadMedia({
       final Stream<List<int>> fileStream = localFile.openRead();
       final String fileName = '$mediaName.$fileExtension';
 
+      // TODO: add encrypted info
       // Create request vars for upload
       final data = await MatrixApi.uploadMedia(
         protocol: store.state.authStore.protocol,
