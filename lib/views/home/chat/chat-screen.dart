@@ -251,6 +251,15 @@ class ChatScreenState extends State<ChatScreen> {
 
     final mxcUri = mxcData['content_uri'];
 
+    /// should not have to do this but unfortunately
+    /// when navigating back from the preview screen and
+    /// submitting a new draft message, a MatrixImage widget
+    /// doesn't fire onMounted or initState. Could potentially
+    /// have something to do with the Visibility widget as well
+    store.dispatch(fetchMedia(
+      mxcUri: mxcUri,
+    ));
+
     printInfo('[onSendMedia] $mxcUri}'); // TODO: REMOVE
 
     final message = Message(

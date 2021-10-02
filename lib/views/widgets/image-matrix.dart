@@ -14,10 +14,11 @@ import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 ///
-/// MatrixImage
+/// Matrix Image
 ///
-/// uses the matrix mxc uris and either pulls from cached data or
-/// downloads the image and saves it to cache
+/// uses the matrix mxc uris and either pulls from cached data
+/// or downloads the image and saves it to cache
+///
 class MatrixImage extends StatefulWidget {
   final String? mxcUri;
   final double width;
@@ -57,26 +58,15 @@ class MatrixImage extends StatefulWidget {
 class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
   Uint8List? finalUriData;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   printInfo('[MatrixImageState] initState ${widget.mxcUri}');
-  // }
-
-  // TODO: potentially revert to didChangeDependencies
   @override
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     final mediaCache = store.state.mediaStore.mediaCache;
 
-    printInfo('[onMounted] checking ${widget.mxcUri}');
-
     if (!mediaCache.containsKey(widget.mxcUri)) {
       if (!widget.thumbnail) {
-        printInfo('[onMounted] fetching media');
         store.dispatch(fetchMedia(mxcUri: widget.mxcUri));
       } else {
-        printInfo('[onMounted] fetching thumbnail');
         store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
       }
     }
@@ -89,25 +79,16 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
     }
   }
 
+  // TODO: potentially revert to didChangeDependencies
   // @override
   // void didChangeDependencies() {
   //   super.didChangeDependencies();
   //   onMounted();
   // }
 
-  // void onDidUpdate(_Props? prev, _Props props) {
-  //   final failed = props.mediaCheck.isNotEmpty && props.mediaCheck == MediaStatus.FAILURE;
-  //   final loading = widget.forceLoading || !props.exists;
-  //   printInfo(
-  //     '[fetchMedia] updated widget failed: ${failed} loading: ${loading} mxc: ${widget.mxcUri}',
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        // onDidChange: onDidUpdate,
-        // onInitialBuild: (props) => onMounted(),
         converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
         builder: (context, props) {
           final failed = props.mediaCheck.isNotEmpty && props.mediaCheck == MediaStatus.FAILURE;

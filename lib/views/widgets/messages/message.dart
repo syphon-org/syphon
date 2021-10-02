@@ -325,10 +325,6 @@ class MessageWidget extends StatelessWidget {
       body = Strings.labelDeletedMessage;
     }
 
-    if (message.url != null) {
-      printInfo('[Message] rendering ${message.url}');
-    }
-
     return Swipeable(
       onSwipeLeft: isUserSent ? () => onSwipeMessage(message) : () => {},
       onSwipeRight: !isUserSent ? () => onSwipeMessage(message) : () => {},
