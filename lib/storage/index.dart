@@ -40,6 +40,37 @@ class Storage {
 
   // cold storage references
   static Database? instance;
+  static StorageDatabase? database;
+}
+
+Future<StorageDatabase> initColdStorage({String? context = AppContext.DEFAULT}) async {
+  final StorageDatabase database = await Future.value(StorageDatabase(context!)); // never null ^
+  Storage.database = database;
+  return database;
+}
+
+Future closeColdStorage(StorageDatabase? storage) async {
+  if (storage != null) {
+    storage.close();
+  }
+}
+
+Future deleteColdStorage({String? context = AppContext.DEFAULT}) async {
+  try {
+    var storageLocation = Storage.sqliteLocation;
+
+    if (context!.isNotEmpty) {
+      storageLocation = '$context-$storageLocation';
+    }
+
+    storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
+
+    final appDir = await getApplicationSupportDirectory();
+    final file = File(path.join(appDir.path, storageLocation));
+    await file.delete();
+  } catch (error) {
+    printError('[deleteColdStorage] ${error.toString()}');
+  }
 }
 
 Future<Database?> initStorage({String? context = AppContext.DEFAULT}) async {
@@ -138,34 +169,6 @@ deleteStorage({String? context = AppContext.DEFAULT}) async {
   }
 }
 
-Future<StorageDatabase> initColdStorage({String? context = AppContext.DEFAULT}) {
-  return Future.value(StorageDatabase(context!)); // never null ^
-}
-
-Future closeColdStorage(StorageDatabase? storage) async {
-  if (storage != null) {
-    storage.close();
-  }
-}
-
-Future deleteColdStorage({String? context = AppContext.DEFAULT}) async {
-  try {
-    var storageLocation = Storage.sqliteLocation;
-
-    if (context!.isNotEmpty) {
-      storageLocation = '$context-$storageLocation';
-    }
-
-    storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
-
-    final appDir = await getApplicationSupportDirectory();
-    final file = File(path.join(appDir.path, storageLocation));
-    await file.delete();
-  } catch (error) {
-    printError('[deleteColdStorage] ${error.toString()}');
-  }
-}
-
 ///
 /// Load Storage
 ///
@@ -176,15 +179,15 @@ Future deleteColdStorage({String? context = AppContext.DEFAULT}) async {
 /// involved in stored messages/events
 ///
 /// TODO: need pagination for pretty much all of these
-Future<Map<String, dynamic>> loadStorage(Database storage) async {
+Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase storage) async {
   try {
-    final auth = await loadAuth(storage: storage);
+    final auth = await loadAuth(storage: storageOld);
     final rooms = await loadRooms(storage: storage);
     final users = await loadUsers(storage: storage);
-    final media = await loadMediaAll(storage: storage);
-    final crypto = await loadCrypto(storage: storage);
-    final settings = await loadSettings(storage: storage);
-    final redactions = await loadRedactions(storage: storage);
+    final media = await loadMediaAll(storage: storageOld);
+    final crypto = await loadCrypto(storage: storageOld);
+    final settings = await loadSettings(storage: storageOld);
+    final redactions = await loadRedactions(storage: storageOld);
 
     final messages = <String, List<Message>>{};
     final decrypted = <String, List<Message>>{};
@@ -204,12 +207,12 @@ Future<Map<String, dynamic>> loadStorage(Database storage) async {
 
       reactions.addAll(await loadReactions(
         room.messageIds,
-        storage: storage,
+        storage: storageOld,
       ));
 
       receipts[room.id] = await loadReceipts(
         room.messageIds,
-        storage: storage,
+        storage: storageOld,
       );
     }
 

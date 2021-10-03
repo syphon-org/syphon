@@ -1,11 +1,14 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:moor/moor.dart' as moor;
+
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/print.dart';
 
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/storage/moor/database.dart';
 
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/model.dart';
@@ -25,7 +28,7 @@ class RoomPresets {
 }
 
 @JsonSerializable()
-class Room {
+class Room implements moor.Insertable<Room> {
   final String id;
   final String? name;
   final String? alias;
@@ -246,7 +249,7 @@ class Room {
         homeserver: (json['room_id'] as String).split(':')[1],
         topic: json['topic'],
         avatarUri: json['avatar_url'],
-        totalJoinedUsers: json['num_joined_members'],
+        totalJoinedUsers: json['num_joined_members'] ?? 0,
         guestEnabled: json['guest_can_join'],
         worldReadable: json['world_readable'],
         syncing: false,
@@ -677,5 +680,40 @@ class Room {
       usersTyping: usersTyping,
       readReceipts: readReceipts,
     );
+  }
+
+  // allows converting to message companion type for saving through moor
+  @override
+  Map<String, moor.Expression> toColumns(bool nullToAbsent) {
+    return RoomsCompanion(
+      id: moor.Value(id),
+      name: moor.Value(name),
+      alias: moor.Value(alias),
+      homeserver: moor.Value(homeserver),
+      avatarUri: moor.Value(avatarUri),
+      topic: moor.Value(topic),
+      joinRule: moor.Value(joinRule),
+      drafting: moor.Value(drafting),
+      direct: moor.Value(direct),
+      sending: moor.Value(sending),
+      invite: moor.Value(invite),
+      guestEnabled: moor.Value(guestEnabled),
+      encryptionEnabled: moor.Value(encryptionEnabled),
+      worldReadable: moor.Value(worldReadable),
+      hidden: moor.Value(hidden),
+      archived: moor.Value(archived),
+      lastHash: moor.Value(lastHash),
+      prevHash: moor.Value(prevHash),
+      nextHash: moor.Value(nextHash),
+      lastRead: moor.Value(lastRead),
+      lastUpdate: moor.Value(lastUpdate),
+      totalJoinedUsers: moor.Value(totalJoinedUsers),
+      namePriority: moor.Value(namePriority),
+      draft: moor.Value(draft),
+      reply: moor.Value(reply),
+      userIds: moor.Value(userIds),
+      messageIds: moor.Value(messageIds),
+      reactionIds: moor.Value(reactionIds),
+    ).toColumns(nullToAbsent);
   }
 }

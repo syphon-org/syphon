@@ -1,11 +1,13 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/storage/moor/database.dart';
+import 'package:moor/moor.dart' as moor;
 
 part 'model.g.dart';
 
 @JsonSerializable()
-class User extends Equatable {
+class User extends Equatable implements moor.Insertable<User> {
   final String? userId;
   final String? deviceId; // current device id
   final String? idserver;
@@ -92,4 +94,19 @@ class User extends Equatable {
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   Map<String, dynamic> toJson() => _$UserToJson(this);
+
+  // allows converting to message companion type for saving through moor
+  @override
+  Map<String, moor.Expression> toColumns(bool nullToAbsent) {
+    return UsersCompanion(
+      userId: moor.Value(userId!),
+      deviceId: moor.Value(deviceId), // current device id
+      idserver: moor.Value(idserver),
+      homeserver: moor.Value(homeserver),
+      homeserverName: moor.Value(homeserverName),
+      accessToken: moor.Value(accessToken),
+      displayName: moor.Value(displayName),
+      avatarUri: moor.Value(avatarUri),
+    ).toColumns(nullToAbsent);
+  }
 }

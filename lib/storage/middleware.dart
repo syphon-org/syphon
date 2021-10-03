@@ -50,7 +50,7 @@ storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
         break;
       case SetUsers:
         final _action = action as SetUsers;
-        saveUsers(_action.users ?? {}, storage: storage);
+        saveUsers(_action.users ?? {}, storage: coldStorage!);
         break;
       case UpdateMediaCache:
         saveMedia(action.mxcUri, action.data, storage: storage);
@@ -66,14 +66,14 @@ storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
         // TODO: extract room event keys to a helper class / object to remove large map copies
         if ((isSending || isDrafting || isLastRead) && rooms.containsKey(_action.id)) {
           final room = rooms[_action.id];
-          saveRoom(room!, storage: storage);
+          saveRoom(room!, storage: coldStorage!);
         }
         break;
       case RemoveRoom:
         final _action = action as RemoveRoom;
         final room = store.state.roomStore.rooms[_action.roomId];
         if (room != null) {
-          deleteRooms({room.id: room}, storage: storage);
+          deleteRooms({room.id: room}, storage: coldStorage!);
         }
         break;
       case SetReactions:
@@ -93,21 +93,15 @@ storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
       case SetRoom:
         final _action = action as SetRoom;
         final room = _action.room;
-        saveRooms({room.id: room}, storage: storage);
+        saveRooms({room.id: room}, storage: coldStorage!);
         break;
       case AddMessages:
         final _action = action as AddMessages;
-        saveMessages(_action.messages, storage: storage);
-        if (coldStorage == null) {
-          printWarning('MOOR STORAGE is null, skipping saving cold storage data!!!',
-              title: 'storageMiddleware');
-          break;
-        }
-        saveMessagesCold(_action.messages, storage: coldStorage);
+        saveMessages(_action.messages, storage: coldStorage!);
         break;
       case AddMessagesDecrypted:
         final _action = action as AddMessagesDecrypted;
-        saveDecrypted(_action.messages, storage: storage);
+        saveDecrypted(_action.messages, storage: coldStorage!);
         break;
       case SetThemeType:
       case SetPrimaryColor:
