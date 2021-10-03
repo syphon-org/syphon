@@ -20,6 +20,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
 import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/encryptor.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -73,11 +74,6 @@ class ChatScreenState extends State<ChatScreen> {
   final editorController = TextEditingController();
   final messagesController = ScrollController();
   final listViewController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -240,11 +236,36 @@ class ChatScreenState extends State<ChatScreen> {
       sending = true;
     });
 
+    // Globally notify other widgets you're sending a message in this room
+    store.dispatch(
+      UpdateRoom(id: props.room.id, sending: true),
+    );
+
+    var encryptedFile;
+
+    if (props.room.encryptionEnabled) {
+      encryptedFile = encryptMedia(localFile: file);
+    }
+
     final mxcData = await store.dispatch(
-      uploadMedia(localFile: file),
+      uploadMedia(localFile: encryptedFile ?? file),
     );
 
     final mxcUri = mxcData['content_uri'];
+
+    ///
+    /// TODO:
+    ///
+    /// should not have to do this but unfortunately
+    /// when navigating back from the preview screen and
+    /// submitting a new draft message, a MatrixImage widget
+    /// doesn't fire onMounted or initState. Could potentially
+    /// have something to do with the Visibility widget as well
+    store.dispatch(fetchMedia(
+      mxcUri: mxcUri,
+    ));
+
+    printInfo('[onSendMedia] $mxcUri}'); // TODO: REMOVE
 
     final message = Message(
       url: mxcUri,
@@ -267,9 +288,11 @@ class ChatScreenState extends State<ChatScreen> {
     }
 
     editorController.clear();
+
     if (props.dismissKeyboardEnabled) {
       FocusScope.of(context).unfocus();
     }
+
     setState(() {
       sending = false;
     });
@@ -355,7 +378,7 @@ class ChatScreenState extends State<ChatScreen> {
         child: EmojiPicker(
             config: Config(
               columns: 9,
-              indicatorColor: Theme.of(context).accentColor,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
               bgColor: Theme.of(context).scaffoldBackgroundColor,
               categoryIcons: CategoryIcons(
                 smileyIcon: Icons.tag_faces_rounded,

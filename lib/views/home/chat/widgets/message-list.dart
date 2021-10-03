@@ -71,7 +71,7 @@ class MessageListState extends State<MessageList> {
         child: EmojiPicker(
             config: Config(
               columns: 9,
-              indicatorColor: Theme.of(context).accentColor,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
               bgColor: Theme.of(context).scaffoldBackgroundColor,
               categoryIcons: CategoryIcons(
                 smileyIcon: Icons.tag_faces_rounded,

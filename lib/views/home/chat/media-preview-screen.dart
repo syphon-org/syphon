@@ -12,7 +12,6 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -77,6 +76,8 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
           (ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments).roomId,
         ),
         builder: (context, props) {
+          final encryptionEnabled = props.room.encryptionEnabled;
+
           return Scaffold(
             appBar: AppBarNormal(
               title: 'Draft Preview',
@@ -108,7 +109,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                       Padding(
                         padding: EdgeInsets.only(right: 8),
                         child: Text(
-                          'Send Media Message',
+                          encryptionEnabled ? 'Send Media Message' : 'Send Media Message (Unencrypted)',
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.subtitle2?.copyWith(
                                 fontWeight: FontWeight.w400,
@@ -127,15 +128,32 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                             borderRadius: BorderRadius.circular(48),
                             onTap: () => onConfirm(props),
                             child: CircleAvatar(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              child: Container(
-                                margin: EdgeInsets.only(left: 2, top: 3),
-                                child: SvgPicture.asset(
-                                  Assets.iconSendLockSolidBeing,
-                                  color: Colors.white,
-                                  semanticsLabel: Strings.labelSendEncrypted,
-                                ),
-                              ),
+                              backgroundColor: props.room.sending
+                                  ? Theme.of(context).colorScheme.secondary
+                                  : Theme.of(context).colorScheme.primary,
+                              child: props.room.sending
+                                  ? Padding(
+                                      padding: EdgeInsets.all(4),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: Dimensions.strokeWidthThin * 1.5,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          Theme.of(context).colorScheme.secondary.computeLuminance() > 0.6
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                        value: null,
+                                      ),
+                                    )
+                                  : Container(
+                                      margin: EdgeInsets.only(left: 2, top: 3),
+                                      child: SvgPicture.asset(
+                                        encryptionEnabled
+                                            ? Assets.iconSendLockSolidBeing
+                                            : Assets.iconSendUnlockBeing,
+                                        color: Colors.white,
+                                        semanticsLabel: Strings.labelSendEncrypted,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),

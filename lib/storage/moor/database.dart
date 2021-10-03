@@ -18,6 +18,10 @@ import 'package:syphon/store/events/messages/schema.dart';
 ///
 // ignore: unused_import
 import 'package:syphon/storage/moor/migrations/update.messages.4.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/room/schema.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/schema.dart';
 
 part 'database.g.dart';
 
@@ -66,18 +70,14 @@ LazyDatabase openDatabase(String context) {
 
       final dbFolder = await getApplicationSupportDirectory();
       filePath = File(path.join(dbFolder.path, storageLocation));
-
-      printInfo(filePath.absolute.toString());
     }
 
     // Configure cache encryption/decryption instance
     final storageKey = await loadKey(storageKeyId);
 
-    printInfo('initColdStorage $storageLocation $storageKey');
-
     return VmDatabase(
       filePath!,
-      logStatements: DEBUG_MODE,
+      logStatements: false, // DEBUG_MODE,
       setup: (rawDb) {
         rawDb.execute("PRAGMA key = '$storageKey';");
       },
@@ -85,7 +85,7 @@ LazyDatabase openDatabase(String context) {
   });
 }
 
-@UseMoor(tables: [Messages])
+@UseMoor(tables: [Messages, Decrypted, Rooms, Users])
 class StorageDatabase extends _$StorageDatabase {
   // we tell the database where to store the data with this constructor
   StorageDatabase(String context) : super(openDatabase(context));

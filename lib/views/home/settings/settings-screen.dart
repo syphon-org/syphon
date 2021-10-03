@@ -277,7 +277,7 @@ class SettingsScreen extends StatelessWidget {
                               child: CircularProgressIndicator(
                                 strokeWidth: 1.5,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).accentColor,
+                                  Theme.of(context).colorScheme.secondary,
                                 ),
                                 value: null,
                               ),

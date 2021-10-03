@@ -348,11 +348,11 @@ class ChatInputState extends State<ChatInput> {
                             decoration: InputDecoration(
                               filled: true,
                               labelText: replying ? widget.quotable!.sender : '',
-                              labelStyle: TextStyle(color: Theme.of(context).accentColor),
+                              labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
                               contentPadding: Dimensions.inputContentPadding.copyWith(right: 36),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Theme.of(context).accentColor,
+                                  color: Theme.of(context).colorScheme.secondary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.only(
@@ -364,7 +364,7 @@ class ChatInputState extends State<ChatInput> {
                               ),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Theme.of(context).accentColor,
+                                  color: Theme.of(context).colorScheme.secondary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.only(
@@ -436,7 +436,7 @@ class ChatInputState extends State<ChatInput> {
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.only(
@@ -447,7 +447,7 @@ class ChatInputState extends State<ChatInput> {
                             )),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.only(

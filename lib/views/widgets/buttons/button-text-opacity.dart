@@ -56,7 +56,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
                     maxWidth: 24,
                   ),
                   child: CircularProgressIndicator(
-                    strokeWidth: Dimensions.defaultStrokeWidth,
+                    strokeWidth: Dimensions.strokeWidthDefault,
                     backgroundColor: Colors.white,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       Colors.grey,

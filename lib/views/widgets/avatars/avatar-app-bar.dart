@@ -102,7 +102,7 @@ class AvatarAppBar extends StatelessWidget {
                     padding: EdgeInsets.all(2),
                     color: selectBackgroundBrightness(themeType),
                     child: CircularProgressIndicator(
-                      strokeWidth: Dimensions.defaultStrokeWidthLite,
+                      strokeWidth: Dimensions.strokeWidthThin,
                     ),
                   ),
                 ),

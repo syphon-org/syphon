@@ -275,8 +275,6 @@ ThunkAction<AppState> encryptKeyContent({
       'content': content,
     };
 
-    printJson(payload);
-
     // all olm sessions should already be created or received
     // before sending a room key event to devices
     // load and deserialize session

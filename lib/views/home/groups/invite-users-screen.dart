@@ -287,7 +287,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
             child: FloatingActionButton(
               heroTag: 'fab5',
               tooltip: 'Add User Invites',
-              backgroundColor: Theme.of(context).accentColor,
+              backgroundColor: Theme.of(context).colorScheme.secondary,
               onPressed: () => onConfirmInvites(props),
               child: Container(
                 padding: EdgeInsets.only(left: 2),

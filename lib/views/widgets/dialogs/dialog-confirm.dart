@@ -66,13 +66,15 @@ class DialogConfirm extends StatelessWidget {
                 ButtonText(
                   disabled: loading,
                   onPressed: () => onConfirm!(),
-                  textWidget: Text(
-                    confirmText ?? Strings.buttonConfirm.capitalize(),
-                    style: Theme.of(context).textTheme.subtitle1?.merge(confirmStyle).copyWith(
-                          color: Theme.of(context).accentColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
+                  textWidget: Text(confirmText ?? Strings.buttonConfirm.capitalize(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .subtitle1
+                          ?.copyWith(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontWeight: FontWeight.w500,
+                          )
+                          .merge(confirmStyle)),
                 ),
               ],
             ),

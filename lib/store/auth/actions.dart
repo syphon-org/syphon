@@ -792,19 +792,20 @@ ThunkAction<AppState> fetchSignupStages() {
       final data = await MatrixApi.registerUser(
         homeserver: homeserver.baseUrl,
         session: store.state.authStore.authSession,
-        authType: 'dummy',
       );
 
       if (data['flows'] == null) {
         throw data['error'];
       }
 
+      // TODO: servers can have multiple perferred flows, need to determine how to chose, largely UX issue
       // "flows": [ { "stages": [ "m.login.recaptcha", "m.login.terms", "m.login.email.identity" ] } ]
       final stages = List<String>.from(data['flows'][0]['stages']?.map((stage) => stage as String));
       final homeserverUpdated = homeserver.copyWith(signupTypes: stages);
 
       store.dispatch(SetHomeserver(homeserver: homeserverUpdated));
     } catch (error) {
+      printError(error.toString());
       final homeserver = store.state.authStore.homeserver;
       store.dispatch(SetHomeserver(homeserver: homeserver.copyWith(signupTypes: [])));
     }

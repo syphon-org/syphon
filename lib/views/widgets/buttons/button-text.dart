@@ -38,7 +38,7 @@ class ButtonText extends StatelessWidget {
                   maxWidth: 24,
                 ),
                 child: CircularProgressIndicator(
-                  strokeWidth: Dimensions.defaultStrokeWidth,
+                  strokeWidth: Dimensions.strokeWidthDefault,
                   backgroundColor: Colors.white,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     Colors.grey,

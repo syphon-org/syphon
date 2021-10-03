@@ -154,7 +154,7 @@ Future<Store<AppState>> initStore(
 
   if (storage != null) {
     // partially load storage to memory to rehydrate cache
-    preloaded = await loadStorage(storage);
+    preloaded = await loadStorage(storage, coldStorage!);
   }
 
   // Configure redux persist instance

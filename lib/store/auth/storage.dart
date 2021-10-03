@@ -11,14 +11,14 @@ Future<void> saveAuth(
 }) async {
   final store = StoreRef<String, String>(StorageKeys.AUTH);
 
-  return await storage.transaction((txn) async {
+  return storage.transaction((txn) async {
     final record = store.record(StorageKeys.AUTH);
     await record.put(txn, json.encode(authStore));
   });
 }
 
 /// Load Messages (Cold Storage)
-/// 
+///
 /// In storage, messages are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 Future<AuthStore?> loadAuth({required Database storage}) async {

@@ -162,7 +162,7 @@ abstract class Auth {
     String? username,
     String? password,
     String? session,
-    String? authType = MatrixAuthTypes.DUMMY,
+    String? authType,
     String? authValue,
     Map? authParams,
     String? deviceId,
@@ -171,9 +171,7 @@ abstract class Auth {
     final String url = '$protocol$homeserver/_matrix/client/r0/register';
 
     Map body = {
-      'auth': {
-        'type': MatrixAuthTypes.DUMMY,
-      }
+      'type': MatrixAuthTypes.DUMMY,
     };
 
     // Set and configure params for auth types
@@ -208,7 +206,7 @@ abstract class Auth {
           }
         };
         break;
-      case MatrixAuthTypes.DUMMY: // default
+      case MatrixAuthTypes.DUMMY: // actually password auth, poor spec design
         body = {
           'username': username,
           'password': password,

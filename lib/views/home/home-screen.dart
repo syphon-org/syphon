@@ -556,7 +556,7 @@ class HomeState extends State<HomeScreen> {
                             child: Container(
                               width: Dimensions.badgeAvatarSizeSmall,
                               height: Dimensions.badgeAvatarSizeSmall,
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         ),
