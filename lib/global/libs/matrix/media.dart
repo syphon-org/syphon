@@ -9,7 +9,7 @@ import 'package:syphon/global/values.dart';
 /// Testing out using a "params map"
 /// as the default to allow calling from
 /// a non-ui thread
-class Media {
+class MatrixMedia {
   static Future<dynamic> fetchThumbnail(Map params) async {
     final String? protocol = params['protocol'];
     final String? homeserver = params['homeserver'];

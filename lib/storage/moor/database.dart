@@ -10,14 +10,15 @@ import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/messages/schema.dart';
 
 ///
 /// Change imported migration strategy extension on schema change
 ///
-// ignore: unused_import
 import 'package:syphon/storage/moor/migrations/update.messages.4.dart';
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/messages/schema.dart';
+import 'package:syphon/store/media/model.dart';
+import 'package:syphon/store/media/schema.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/schema.dart';
 import 'package:syphon/store/user/model.dart';
@@ -85,7 +86,7 @@ LazyDatabase openDatabase(String context) {
   });
 }
 
-@UseMoor(tables: [Messages, Decrypted, Rooms, Users])
+@UseMoor(tables: [Messages, Decrypted, Rooms, Users, Medias])
 class StorageDatabase extends _$StorageDatabase {
   // we tell the database where to store the data with this constructor
   StorageDatabase(String context) : super(openDatabase(context));

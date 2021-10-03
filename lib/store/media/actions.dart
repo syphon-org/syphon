@@ -119,10 +119,10 @@ ThunkAction<AppState> fetchMedia({String? mxcUri, bool force = false}) {
       );
 
       // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.instance!)) {
+      if (await checkMedia(mxcUri, storage: Storage.database!)) {
         final storedData = await loadMedia(
           mxcUri: mxcUri,
-          storage: Storage.instance!,
+          storage: Storage.database!,
         );
 
         if (storedData != null) {
@@ -179,10 +179,10 @@ ThunkAction<AppState> fetchThumbnail({String? mxcUri, double? size, bool force =
       );
 
       // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.instance!)) {
+      if (await checkMedia(mxcUri, storage: Storage.database!)) {
         final storedData = await loadMedia(
           mxcUri: mxcUri,
-          storage: Storage.instance!,
+          storage: Storage.database!,
         );
 
         if (storedData != null) {

@@ -1,32 +1,45 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
-import 'package:sembast/sembast.dart';
+import 'package:moor/moor.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/constants.dart';
+import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/store/media/model.dart';
+
+///
+/// Message Quesies - unencrypted (Cold Storage)
+///
+/// In storage, messages are indexed by eventId
+/// In redux, they're indexed by RoomID and placed in a list
+///
+extension MediaQueries on StorageDatabase {
+  Future<void> insertMedia(Media media) {
+    return into(medias).insertOnConflictUpdate(media);
+  }
+
+  Future<Media?> selectMedia(String mxcUri) {
+    return (select(medias)..where((tbl) => tbl.mxcUri.equals(mxcUri))).getSingleOrNull();
+  }
+
+  Future<List<Media>> selectMediaAll() {
+    return (select(medias)).get();
+  }
+}
 
 Future<bool> checkMedia(
   String? mxcUri, {
-  required Database storage,
+  required StorageDatabase storage,
 }) async {
-  final store = StoreRef<String?, String>(StorageKeys.MEDIA);
-
-  return store.record(mxcUri).exists(storage);
+  if (mxcUri == null) return false;
+  return (await storage.selectMedia(mxcUri)) != null;
 }
 
 Future<void> saveMedia(
   String? mxcUri,
   Uint8List? data, {
-  required Database storage,
+  required StorageDatabase storage,
 }) async {
-  final store = StoreRef<String?, String>(StorageKeys.MEDIA);
-
-  return storage.transaction((txn) async {
-    final record = store.record(mxcUri);
-    await record.put(txn, await compute(jsonEncode, data));
-  });
+  return storage.insertMedia(Media(data: data, mxcUri: mxcUri));
 }
 
 /// Load Media (Cold Storage)
@@ -34,27 +47,10 @@ Future<void> saveMedia(
 /// load one set of media data based on mxc uri
 Future<Uint8List?> loadMedia({
   String? mxcUri,
-  required Database storage,
+  required StorageDatabase storage,
 }) async {
-  try {
-    final store = StoreRef<String?, String>(StorageKeys.MEDIA);
-
-    final mediaData = await store.record(mxcUri).get(storage);
-
-    final dataBytes = json.decode(mediaData!);
-
-    // Convert json decoded List<int> to Uint8List
-    if (dataBytes == null) {
-      return null;
-    }
-
-    return Uint8List.fromList(
-      (dataBytes as List).map((e) => e as int).toList(),
-    );
-  } catch (error) {
-    printError(error.toString(), title: 'loadMedia');
-    return null;
-  }
+  if (mxcUri == null) return null;
+  return (await storage.selectMedia(mxcUri))?.data;
 }
 
 ///
@@ -62,22 +58,18 @@ Future<Uint8List?> loadMedia({
 ///
 /// load all media found within media storage
 Future<Map<String, Uint8List>?> loadMediaAll({
-  required Database storage,
+  required StorageDatabase storage,
 }) async {
   try {
     final Map<String, Uint8List> media = {};
-    final store = StoreRef<String, String>(StorageKeys.MEDIA);
 
-    final mediaDataAll = await store.find(storage);
+    final images = await storage.selectMediaAll();
 
-    for (final record in mediaDataAll) {
-      final data = json.decode(record.value);
+    printInfo('[media] loaded ${images.length.toString()}');
 
-      // TODO: sometimes, a null gets saved to cold storage
-      if (data != null) {
-        media[record.key] = Uint8List.fromList(
-          (data as List).map((e) => e as int).toList(),
-        );
+    for (final image in images) {
+      if (image.mxcUri != null && image.data != null) {
+        media[image.mxcUri!] = image.data!;
       }
     }
 
