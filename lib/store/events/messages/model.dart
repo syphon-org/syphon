@@ -189,7 +189,7 @@ class Message extends Event implements moor.Insertable<Message> {
       msgtype: moor.Value(msgtype),
       format: moor.Value(format),
       url: moor.Value(url),
-      file: moor.Value(json.encode(file)),
+      file: moor.Value(file),
       formattedBody: moor.Value(formattedBody),
       typeDecrypted: moor.Value(typeDecrypted),
       ciphertext: moor.Value(ciphertext),
