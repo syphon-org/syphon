@@ -1,5 +1,21 @@
+import 'dart:convert';
+
 import 'package:moor/moor.dart';
 import 'package:syphon/store/events/messages/model.dart';
+
+class MapToJsonConverter extends TypeConverter<Map<String, dynamic>?, String> {
+  const MapToJsonConverter();
+
+  @override
+  Map<String, dynamic>? mapToDart(String? dbValue) {
+    return json.decode(dbValue!);
+  }
+
+  @override
+  String? mapToSql(Map<String, dynamic>? value) {
+    return json.encode(value);
+  }
+}
 
 ///
 /// Messages Model (Table)
@@ -36,8 +52,8 @@ class Messages extends Table {
   TextColumn get msgtype => text().nullable()();
   TextColumn get format => text().nullable()();
   TextColumn get formattedBody => text().nullable()();
-  TextColumn get file => text().nullable()();
   TextColumn get url => text().nullable()();
+  TextColumn get file => text().map(const MapToJsonConverter()).nullable()();
 
   // Encrypted Messages only
   TextColumn get typeDecrypted => text().nullable()(); // inner type of decrypted event
@@ -90,8 +106,8 @@ class Decrypted extends Table {
   TextColumn get msgtype => text().nullable()();
   TextColumn get format => text().nullable()();
   TextColumn get formattedBody => text().nullable()();
-  TextColumn get file => text().nullable()();
   TextColumn get url => text().nullable()();
+  TextColumn get file => text().nullable()();
 
   // Encrypted Messages only
   TextColumn get typeDecrypted => text().nullable()(); // inner type of decrypted event

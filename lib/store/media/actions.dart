@@ -50,6 +50,7 @@ ThunkAction<AppState> uploadMedia({
       // Extension handling
       String? mimeType = lookupMimeType(localFile.path);
 
+      // HACK: for HEIC images
       if (localFile.path.contains('HEIC')) {
         mimeType = 'image/heic';
       } else if (mimeType == null) {
@@ -64,7 +65,6 @@ ThunkAction<AppState> uploadMedia({
       final Stream<List<int>> fileStream = localFile.openRead();
       final String fileName = '$mediaName.$fileExtension';
 
-      // TODO: add encrypted info
       // Create request vars for upload
       final data = await MatrixApi.uploadMedia(
         protocol: store.state.authStore.protocol,
@@ -119,10 +119,10 @@ ThunkAction<AppState> fetchMedia({String? mxcUri, bool force = false}) {
       );
 
       // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.instance!)) {
+      if (await checkMedia(mxcUri, storage: Storage.database!)) {
         final storedData = await loadMedia(
           mxcUri: mxcUri,
-          storage: Storage.instance!,
+          storage: Storage.database!,
         );
 
         if (storedData != null) {
@@ -179,10 +179,10 @@ ThunkAction<AppState> fetchThumbnail({String? mxcUri, double? size, bool force =
       );
 
       // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.instance!)) {
+      if (await checkMedia(mxcUri, storage: Storage.database!)) {
         final storedData = await loadMedia(
           mxcUri: mxcUri,
-          storage: Storage.instance!,
+          storage: Storage.database!,
         );
 
         if (storedData != null) {

@@ -3,21 +3,20 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/formatters.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/encryptor.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 ///
@@ -128,9 +127,6 @@ ThunkAction<AppState> sendMessage({
       // if you're incredibly unlucky, and fast, you could have a problem here
       final tempId = Random.secure().nextInt(1 << 32).toString();
 
-      // trim trailing whitespace
-      message = message.copyWith(body: message.body!.trimRight());
-
       // pending outbox message
       Message pending = await formatMessageContent(
         tempId: tempId,
@@ -209,6 +205,7 @@ ThunkAction<AppState> sendMessageEncrypted({
   required String roomId,
   required Message message, // body and type only for now
   File? file,
+  EncryptInfo? info,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -225,15 +222,14 @@ ThunkAction<AppState> sendMessageEncrypted({
       final tempId = Random.secure().nextInt(1 << 32).toString();
       final reply = room.reply;
 
-      // trim trailing whitespace
-      message = message.copyWith(body: message.body!.trimRight());
-
       // pending outbox message
       Message pending = await formatMessageContent(
         tempId: tempId,
         userId: userId,
         message: message,
         room: room,
+        file: file,
+        info: info,
       );
 
       final unencryptedData = {};

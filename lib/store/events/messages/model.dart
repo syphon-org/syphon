@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:moor/moor.dart' as moor;
 import 'package:syphon/global/print.dart';
@@ -38,8 +40,8 @@ class Message extends Event implements moor.Insertable<Message> {
   final String? msgtype;
   final String? format;
   final String? formattedBody;
-  final String? file;
   final String? url;
+  final Map<String, dynamic>? file;
   final Map<String, dynamic>? info;
 
   // Encrypted Messages only
@@ -121,8 +123,8 @@ class Message extends Event implements moor.Insertable<Message> {
     String? typeDecrypted, // inner type of decrypted event
     String? msgtype,
     String? format,
-    String? file,
     String? url,
+    Map<String, dynamic>? file,
     Map<String, dynamic>? info,
     String? formattedBody,
     String? ciphertext,
@@ -186,8 +188,8 @@ class Message extends Event implements moor.Insertable<Message> {
       body: moor.Value(body),
       msgtype: moor.Value(msgtype),
       format: moor.Value(format),
-      file: moor.Value(file),
       url: moor.Value(url),
+      file: moor.Value(file),
       formattedBody: moor.Value(formattedBody),
       typeDecrypted: moor.Value(typeDecrypted),
       ciphertext: moor.Value(ciphertext),
@@ -244,8 +246,8 @@ class Message extends Event implements moor.Insertable<Message> {
         msgtype: msgtype,
         format: content['format'],
         formattedBody: content['formatted_body'],
-        file: content['file'],
         url: content['url'],
+        file: content['file'],
         info: info,
         ciphertext: content['ciphertext'] ?? '',
         algorithm: content['algorithm'],

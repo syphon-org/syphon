@@ -1,19 +1,16 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:moor/moor.dart' as moor;
-
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:moor/moor.dart' as moor;
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
-
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/storage/moor/database.dart';
-
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/events/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
@@ -162,7 +159,7 @@ class Room implements moor.Insertable<Room> {
     String? name,
     String? homeserver,
     avatar,
-    avatarUri,
+    String? avatarUri,
     topic,
     bool? invite,
     bool? direct,
@@ -311,7 +308,7 @@ class Room implements moor.Insertable<Room> {
 
       if (limited != null) {
         printInfo(
-          '[fromSync] ${id} limited $limited lastHash ${lastHash != null} prevHash ${prevHash != null}',
+          '[fromSync] $id limited $limited lastHash ${lastHash != null} prevHash ${prevHash != null}',
         );
       }
 
@@ -368,7 +365,7 @@ class Room implements moor.Insertable<Room> {
   Room fromAccountData(List<Event> accountDataEvents) {
     dynamic isDirect;
     try {
-      accountDataEvents.forEach((event) {
+      for (final event in accountDataEvents) {
         switch (event.type) {
           case 'm.direct':
             isDirect = true;
@@ -376,7 +373,7 @@ class Room implements moor.Insertable<Room> {
           default:
             break;
         }
-      });
+      }
     } catch (error) {}
 
     return copyWith(
@@ -409,7 +406,7 @@ class Room implements moor.Insertable<Room> {
     Set<String> userIds = Set<String>.from(this.userIds);
     final List<String> userIdsRemove = [];
 
-    events.forEach((event) {
+    for (final event in events) {
       try {
         final timestamp = event.timestamp;
         if (lastUpdateType == LastUpdateType.State) {
@@ -482,7 +479,7 @@ class Room implements moor.Insertable<Room> {
       } catch (error) {
         debugPrint('[Room.fromStateEvents] $error ${event.type}');
       }
-    });
+    }
 
     userIds = userIds..addAll(usersAdd.keys);
     userIds = userIds..removeWhere((id) => userIdsRemove.contains(id));
@@ -636,7 +633,7 @@ class Room implements moor.Insertable<Room> {
     final readReceipts = Map<String, ReadReceipt>.from(this.readReceipts ?? {});
 
     try {
-      events.forEach((event) {
+      for (final event in events) {
         switch (event.type) {
           case 'm.typing':
             final List<dynamic> usersTypingList = event.content['user_ids'];
@@ -672,7 +669,7 @@ class Room implements moor.Insertable<Room> {
           default:
             break;
         }
-      });
+      }
     } catch (error) {}
 
     return copyWith(

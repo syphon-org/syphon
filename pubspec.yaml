@@ -65,7 +65,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # state
+  ### state
   equatable: ^2.0.0
   expandable: ^5.0.1
   convert: ^3.0.0
@@ -80,13 +80,13 @@ dependencies:
   path_provider: ^2.0.1
   package_info: ^2.0.0
 
-  # encryption
+  ### encryption
   olm: ^2.0.0
   crypto: ^3.0.1
   encrypt: ^5.0.0
   canonical_json: 1.1.0
 
-  # cache/storage
+  ### cache/storage
   sembast: ^3.0.1
   sqflite: ^2.0.0+3
   sqlite3: ^1.0.0
@@ -97,7 +97,7 @@ dependencies:
   flutter_secure_storage: ^4.1.0
   moor: ^4.5.0
 
-  # services
+  ### services
   http: ^0.13.1
   html: ^0.15.0
   intl: ^0.17.0
@@ -108,25 +108,17 @@ dependencies:
   uni_links: ^0.5.0
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
-  # Desktop UI Only - UNCOMMENT FOR BUILDS
-  # window_utils: 1.0.2
-
-  # UI Only
+  ### ui
+  swipeable: ^1.1.0
   cupertino_icons: ^1.0.2
   url_launcher: ^6.0.3
   flutter_svg: ^0.22.0
   file_picker: ^4.1.1
   image_picker: ^0.7.4
   local_image_provider: ^4.0.1
-  flutter_keyboard_visibility: ^5.0.3
-  flutter_markdown: ^0.6.6
-  # TODO: convert back when similar functionality is merged
-  # webview_flutter: ^2.0.13
-  webview_flutter:
-    git:
-      url: https://github.com/ereio/plugins.git
-      path: packages/webview_flutter/webview_flutter
-      ref: 41e4ce6d17078942f6ceb3e614bb2849aab55760
+  flutter_keyboard_visibility: ^5.0.3 
+  flutter_markdown: ^0.6.6 
+  webview_flutter: ^2.0.13 
   touchable_opacity: ^1.2.0
   smooth_page_indicator: ^0.3.0-nullsafety.0
   flutter_local_notifications: ^5.0.0+1
@@ -134,31 +126,47 @@ dependencies:
   palette_generator: ^0.3.0
   emoji_picker_flutter: ^1.0.3
   flutter_speed_dial: ^4.2.0
-  fab_circular_menu:
-    git:
-      url: https://github.com/ereio/fab-circular-menu.git
-      ref: 623b65c0d8f392065f41a4628c0278563a809644
-  swipeable:
-    git:
-      url: https://github.com/ereio/swipeable.git
-      ref: 867b117f15f51404e31597d8ab9d5325f6b52938
+  fab_circular_menu: ^1.0.2
+  # window_utils: 1.0.2 # TODO: desktop only window sizing
 
-  # data
+  ### data
   uuid: ^3.0.4
   json_annotation: ^4.0.0
   collection: ^1.15.0-nullsafety.4
 
-  # UNSOUND NULL-SAFTEY
-  # flutter_material_color_picker: ^1.0.5
-  # swipeable: 1.1.0
-
 dev_dependencies:
   lint: ^1.5.3
   build_runner: ^2.0.2
-  moor_generator: ^4.4.0
-  json_serializable: ^4.0.0
+  moor_generator: ^4.5.1
+  json_serializable: ^5.0.2
   flutter_launcher_icons: ^0.9.0
   test: any
+
+# TODO: remov when similar functionality is merged
+dependency_overrides:
+  moor_generator: # TODO: for moor_generator Uint8List error output
+    git:
+      url: git@github.com:simolus3/moor.git
+      ref: cc7d98d110204acb72d415312a78ed7821382d69
+      path: moor_generator
+  sqlparser: # TODO: for moor_generator Uint8List error output
+    git:
+      url: git@github.com:simolus3/moor.git
+      ref: cc7d98d110204acb72d415312a78ed7821382d69
+      path: sqlparser
+  swipeable: # TODO: null saftey version
+    git:
+      url: https://github.com/ereio/swipeable.git
+      ref: 867b117f15f51404e31597d8ab9d5325f6b52938
+  fab_circular_menu: # TODO: accesibility and color theme issues
+    git:
+      url: https://github.com/ereio/fab-circular-menu.git
+      ref: 623b65c0d8f392065f41a4628c0278563a809644
+  webview_flutter: # TODO: open html as link from as different origins
+    git:
+      url: https://github.com/ereio/plugins.git
+      path: packages/webview_flutter/webview_flutter
+      ref: 41e4ce6d17078942f6ceb3e614bb2849aab55760
 
 flutter_icons:
   android: true

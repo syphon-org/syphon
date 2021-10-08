@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
-import 'package:syphon/context/types.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/libs/storage/key-storage.dart';
-import 'package:syphon/storage/moor/database.dart';
-import 'package:syphon/storage/sembast/codec.dart';
-import 'package:syphon/global/values.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
-import 'package:path/path.dart' as path;
+import 'package:syphon/context/types.dart';
+import 'package:syphon/global/libs/storage/key-storage.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/constants.dart';
+import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/sembast/codec.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
@@ -182,12 +182,13 @@ deleteStorage({String? context = AppContext.DEFAULT}) async {
 Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase storage) async {
   try {
     final auth = await loadAuth(storage: storageOld);
-    final rooms = await loadRooms(storage: storage);
-    final users = await loadUsers(storage: storage);
-    final media = await loadMediaAll(storage: storageOld);
     final crypto = await loadCrypto(storage: storageOld);
     final settings = await loadSettings(storage: storageOld);
     final redactions = await loadRedactions(storage: storageOld);
+
+    final rooms = await loadRooms(storage: storage);
+    final users = await loadUsers(storage: storage);
+    final media = await loadMediaAll(storage: storage);
 
     final messages = <String, List<Message>>{};
     final decrypted = <String, List<Message>>{};

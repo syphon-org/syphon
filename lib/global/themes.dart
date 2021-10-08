@@ -1,8 +1,6 @@
-// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Project imports:
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
@@ -27,9 +25,9 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
   // Generate the ThemeData to return if requested
   if (generateThemeData) {
     final primaryColor = Color(appTheme.primaryColor).withOpacity(1);
-    final accentColor = Color(appTheme.accentColor);
+    final secondaryColor = Color(appTheme.accentColor);
     final brightness = selectThemeBrightness(appTheme.themeType);
-    final invertedPrimaryColor = brightness == Brightness.light ? primaryColor : accentColor;
+    final invertedPrimaryColor = brightness == Brightness.light ? primaryColor : secondaryColor;
 
     final appBarElevation = selectAppBarElevation(appTheme.themeType);
     final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
@@ -53,11 +51,10 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       primaryColorBrightness: brightness,
       primaryColorDark: primaryColor,
       primaryColorLight: primaryColor,
-      accentColor: accentColor,
       brightness: brightness,
       colorScheme: ThemeData().colorScheme.copyWith(
             primary: primaryColor,
-            secondary: accentColor,
+            secondary: secondaryColor,
             brightness: brightness,
           ),
 
@@ -74,7 +71,7 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
       appBarTheme: AppBarTheme(
         elevation: appBarElevation,
-        brightness: Brightness.dark,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         color: Color(appTheme.appBarColor),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -120,7 +117,7 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
           fontSize: subtitleSize,
           fontWeight: bodyWeight,
           letterSpacing: letterSpacing,
-          color: accentColor,
+          color: secondaryColor,
         ),
         caption: TextStyle(
           fontSize: subtitleSize,
