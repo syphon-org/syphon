@@ -1,39 +1,37 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
-import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/media/encryptor.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/encryptor.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/media-preview-screen.dart';
@@ -231,6 +229,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   onSendMedia(File file, MessageType type, _Props props) async {
     final store = StoreProvider.of<AppState>(context);
+    final encryptionEnabled = props.room.encryptionEnabled;
 
     setState(() {
       sending = true;
@@ -241,10 +240,19 @@ class ChatScreenState extends State<ChatScreen> {
       UpdateRoom(id: props.room.id, sending: true),
     );
 
-    var encryptedFile;
+    File? encryptedFile;
+    EncryptInfo? info;
 
-    if (props.room.encryptionEnabled) {
-      encryptedFile = encryptMedia(localFile: file);
+    if (encryptionEnabled) {
+      info = EncryptInfo.generate();
+      encryptedFile = await encryptMedia(localFile: file, info: info);
+      info = info.copyWith(
+        shasum: base64.encode(
+          sha256.convert(encryptedFile!.readAsBytesSync().toList()).bytes,
+        ),
+      );
+
+      printInfo('SHASUM ${info.shasum ?? ''}');
     }
 
     final mxcData = await store.dispatch(
@@ -278,6 +286,7 @@ class ChatScreenState extends State<ChatScreen> {
         roomId: props.room.id,
         message: message,
         file: file,
+        info: info,
       ));
     } else {
       store.dispatch(sendMessage(

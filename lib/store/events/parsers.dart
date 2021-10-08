@@ -1,23 +1,21 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart' show IterableExtension;
-/**
- * 
- * Event Parsers
- * 
- * It's going to be difficult to parse external to room context
- * because so much of the rooms context is gather through the DAG of
- * events. You'd need to pass back both an updated room AND a list of messages
- * to save seperately, or sacrific iterating through the message list again
- * 
- */
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
+///
+/// Event Parsers
+///
+/// It's going to be difficult to parse external to room context
+/// because so much of the rooms context is gather through the DAG of
+/// events. You'd need to pass back both an updated room AND a list of messages
+/// to save seperately, or sacrific iterating through the message list again
+///
 Room parseRoom(Map params) {
   final Map json = params['json'];
   final Room room = params['room'];
@@ -163,7 +161,7 @@ Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
       timelineEventsRaw.map((event) => Event.fromMatrix(event)),
     );
 
-    for (Event event in timelineEvents) {
+    for (final event in timelineEvents) {
       switch (event.type) {
         case EventTypes.message:
         case EventTypes.encrypted:

@@ -10,6 +10,8 @@ import 'package:syphon/store/media/model.dart';
 class Medias extends Table {
   TextColumn get mxcUri => text().customConstraint('UNIQUE')();
   BlobColumn get data => blob().nullable()();
+  TextColumn get key => text().nullable()();
+  TextColumn get iv => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {mxcUri};

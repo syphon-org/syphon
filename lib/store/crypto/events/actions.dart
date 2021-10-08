@@ -2,11 +2,10 @@ import 'dart:convert';
 
 import 'package:canonical_json/canonical_json.dart';
 import 'package:flutter/material.dart';
-
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -17,7 +16,6 @@ import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
@@ -147,7 +145,6 @@ ThunkAction<AppState> decryptMessages(
 
             if (!sentKeyRequest && verified) {
               sentKeyRequest = true;
-              debugPrint('[decryptMessage] SENDING KEY REQUEST');
               store.dispatch(sendKeyRequest(
                 event: message,
                 roomId: room.id,
@@ -213,10 +210,13 @@ ThunkAction<AppState> decryptMessage({
 
     final decryptedJson = json.decode(payloadScrubbed);
 
-    final decryptedMessage = Message.fromEvent(Event.fromMatrix(decryptedJson));
+    final decryptedMessage = Message.fromEvent(
+      Event.fromMatrix(decryptedJson),
+    );
 
     // combine all possible decrypted fields with encrypted version of message
     final combinedMessage = message.copyWith(
+      url: decryptedMessage.url,
       body: decryptedMessage.body,
       msgtype: decryptedMessage.msgtype,
       typeDecrypted: decryptedMessage.type,

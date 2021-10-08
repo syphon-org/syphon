@@ -2,16 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:swipeable/swipeable.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
@@ -416,7 +413,7 @@ class MessageWidget extends StatelessWidget {
                               padding: EdgeInsets.only(
                                 left: isMedia ? 0 : 12, // make an image span the message width
                                 right: isMedia ? 0 : 12, // make an image span the message width
-                                top: isMedia && !showSender ? 16 : 8,
+                                top: isMedia && !showSender ? 0 : 8,
                                 bottom: isMedia ? 12 : 8,
                               ),
                               margin: EdgeInsets.only(
@@ -453,14 +450,20 @@ class MessageWidget extends StatelessWidget {
                                   Visibility(
                                     visible: isMedia,
                                     maintainState: false,
-                                    child: MatrixImage(
-                                      mxcUri: message.url,
-                                      thumbnail: false,
-                                      fit: BoxFit.cover,
-                                      width: Dimensions.mediaSizeMaxMessage,
-                                      height: Dimensions.mediaSizeMaxMessage,
-                                      fallbackColor: Colors.transparent,
-                                      loadingPadding: 32,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: bubbleBorder.topLeft,
+                                        topRight: bubbleBorder.topRight,
+                                      ),
+                                      child: MatrixImage(
+                                        mxcUri: message.url,
+                                        thumbnail: false,
+                                        fit: BoxFit.cover,
+                                        width: Dimensions.mediaSizeMaxMessage,
+                                        height: Dimensions.mediaSizeMaxMessage,
+                                        fallbackColor: Colors.transparent,
+                                        loadingPadding: 32,
+                                      ),
                                     ),
                                   ),
                                   Container(

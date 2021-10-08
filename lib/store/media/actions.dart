@@ -50,6 +50,7 @@ ThunkAction<AppState> uploadMedia({
       // Extension handling
       String? mimeType = lookupMimeType(localFile.path);
 
+      // HACK: for HEIC images
       if (localFile.path.contains('HEIC')) {
         mimeType = 'image/heic';
       } else if (mimeType == null) {
@@ -64,7 +65,6 @@ ThunkAction<AppState> uploadMedia({
       final Stream<List<int>> fileStream = localFile.openRead();
       final String fileName = '$mediaName.$fileExtension';
 
-      // TODO: add encrypted info
       // Create request vars for upload
       final data = await MatrixApi.uploadMedia(
         protocol: store.state.authStore.protocol,

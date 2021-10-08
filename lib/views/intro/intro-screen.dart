@@ -184,7 +184,6 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           elevation: 0,
-          brightness: Brightness.light,
           backgroundColor: Colors.transparent,
         ),
         body: StoreConnector<AppState, AppState>(

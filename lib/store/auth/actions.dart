@@ -2,16 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
 import 'package:crypto/crypto.dart';
-import 'package:flutter/services.dart';
-
-import 'package:flutter/material.dart';
-
 import 'package:device_info/device_info.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -39,6 +36,7 @@ import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../user/model.dart';
 
 class SetLoading {
@@ -319,7 +317,7 @@ ThunkAction<AppState> generateDeviceId({String? salt}) {
         displayName: Values.appDisplayName,
       );
     } catch (error) {
-      debugPrint('[generateDeviceId] $error');
+      printError('[generateDeviceId] $error');
       return Device(
         deviceId: defaultId,
         displayName: Values.appDisplayName,
@@ -571,7 +569,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
         availability: data['available'],
       ));
     } catch (error) {
-      debugPrint('[checkUsernameAvailability] $error');
+      printError('[checkUsernameAvailability] $error');
       store.dispatch(SetUsernameAvailability(availability: false));
     } finally {
       store.dispatch(SetLoading(loading: false));
