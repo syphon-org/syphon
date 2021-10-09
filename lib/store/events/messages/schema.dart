@@ -7,8 +7,8 @@ class MapToJsonConverter extends TypeConverter<Map<String, dynamic>?, String> {
   const MapToJsonConverter();
 
   @override
-  Map<String, dynamic>? mapToDart(String? dbValue) {
-    return json.decode(dbValue!);
+  Map<String, dynamic>? mapToDart(String? fromDb) {
+    return json.decode(fromDb!) as Map<String, dynamic>?;
   }
 
   @override
@@ -107,7 +107,7 @@ class Decrypted extends Table {
   TextColumn get format => text().nullable()();
   TextColumn get formattedBody => text().nullable()();
   TextColumn get url => text().nullable()();
-  TextColumn get file => text().nullable()();
+  TextColumn get file => text().map(const MapToJsonConverter()).nullable()();
 
   // Encrypted Messages only
   TextColumn get typeDecrypted => text().nullable()(); // inner type of decrypted event

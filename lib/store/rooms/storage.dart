@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/moor/database.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -89,7 +91,15 @@ Future<Map<String, Room>> loadRooms({
     rooms = Map<String, Room>.fromIterable(
       loaded,
       key: (room) => room.id,
-      value: (room) => room as Room,
+      value: (room) {
+        try {
+          return room as Room;
+        } catch (error) {
+          printJson(jsonDecode(jsonEncode(room)));
+          printError(error.toString(), title: 'loadRooms');
+          return Room(id: 'FAILED');
+        }
+      },
     );
   } catch (error) {
     printError(error.toString(), title: 'loadRooms');

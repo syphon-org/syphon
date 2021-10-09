@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,11 +10,13 @@ import 'package:syphon/store/rooms/room/model.dart';
 
 /// Format Message Content (Encrypted / Unencrypted)
 ///
-/// It's a real shame the properties has to be fundamentally differen
+/// A real shame the content properties have to be fundamentally different
+/// between encrypted and unencrypted media messages
 /// content -> file -> url
 /// vs.
 /// content -> url
 /// Why not just add another child object instead of changing the root parent?
+/// makes it difficult to encode and decode
 ///
 Future<Message> formatMessageContent({
   required String tempId,
@@ -21,7 +24,7 @@ Future<Message> formatMessageContent({
   required Room room,
   required Message message,
   File? file,
-  EncryptInfo? info,
+  EncryptInfo? info = const EncryptInfo(),
 }) async {
   var formatted = Message(
     id: tempId,
@@ -53,28 +56,39 @@ Future<Message> formatMessageContent({
         }
 
         if (room.encryptionEnabled) {
+          if (info!.key == null || info.iv == null) {
+            throw Exception('Cannot send encrypted media message without providing decryption info');
+          }
+
+          final iv = info.iv!.base64.replaceAll('=', '');
+          final key = base64Url.encode(info.key!.bytes.toList()).replaceAll('=', '');
+          final shasum = info.shasum?.replaceAll('=', '');
+
+          final fileContent = {
+            'url': message.url,
+            'mimetype': message.type,
+            'v': 'v2',
+            'key': {
+              'alg': 'A256CTR',
+              'ext': true,
+              'k': key,
+              'key_ops': ['encrypt', 'decrypt'],
+              'kty': 'oct'
+            },
+            'iv': iv,
+            'hashes': {
+              'sha256': shasum,
+            }
+          };
+
           // Top level content data is fundamentally different
           // with encrypted messages
-          return message.copyWith(
+          return formatted.copyWith(
+            file: fileContent,
             content: {
               'body': message.body,
               'msgtype': message.type,
-              'file': {
-                'url': message.url,
-                'mimetype': message.type,
-                'v': 'v2',
-                'key': {
-                  'alg': 'A256CTR',
-                  'ext': true,
-                  'k': info!.key,
-                  'key_ops': ['encrypt', 'decrypt'],
-                  'kty': 'oct'
-                },
-                'iv': info.iv,
-                'hashes': {
-                  'sha256': info.shasum, // 'fdSLu/YkRx3Wyh3KQabP3rd6+SFiKg5lsJZQHtkSAYA',
-                }
-              },
+              'file': fileContent,
               'info': {
                 'mimetype': 'image/jpeg',
                 'h': fileImage.height,

@@ -31,7 +31,7 @@ class EncryptInfo {
 
   factory EncryptInfo.generate() {
     return EncryptInfo(
-        iv: IV.fromSecureRandom(8), // 64-bit / 8 byte
+        iv: IV.fromSecureRandom(16), // 64-bit / 8 byte
         key: Key.fromSecureRandom(32) // 256-bit / 32 byte
         );
   }
@@ -67,7 +67,7 @@ Future<File?> encryptMedia({
     final String fileExtension = fileType.split('/')[1];
     final String fileName = '$mediaName.$fileExtension';
 
-    final ivUsed = info.iv ?? IV.fromSecureRandom(8); // 64-bit / 8 byte
+    final ivUsed = info.iv ?? IV.fromSecureRandom(16); // 64-bit / 8 byte
     final keyUsed = info.key ?? Key.fromSecureRandom(32); // 256-bit / 32 byte
     final cipher = AES(keyUsed, mode: AESMode.ctr);
 

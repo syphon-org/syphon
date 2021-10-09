@@ -243,16 +243,22 @@ class ChatScreenState extends State<ChatScreen> {
     File? encryptedFile;
     EncryptInfo? info;
 
-    if (encryptionEnabled) {
-      info = EncryptInfo.generate();
-      encryptedFile = await encryptMedia(localFile: file, info: info);
-      info = info.copyWith(
-        shasum: base64.encode(
-          sha256.convert(encryptedFile!.readAsBytesSync().toList()).bytes,
-        ),
+    try {
+      if (encryptionEnabled) {
+        info = EncryptInfo.generate();
+        encryptedFile = await encryptMedia(localFile: file, info: info);
+        info = info.copyWith(
+          shasum: base64.encode(
+            sha256.convert(encryptedFile!.readAsBytesSync().toList()).bytes,
+          ),
+        );
+      }
+    } catch (error) {
+      // Globally notify other widgets you're sending a message in this room
+      store.dispatch(
+        UpdateRoom(id: props.room.id, sending: true),
       );
-
-      printInfo('SHASUM ${info.shasum ?? ''}');
+      rethrow;
     }
 
     final mxcData = await store.dispatch(

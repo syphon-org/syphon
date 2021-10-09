@@ -172,6 +172,7 @@ ThunkAction<AppState> decryptMessages(
 ThunkAction<AppState> decryptMessage({
   required String roomId,
   required Message message,
+  bool forceDecryption = false,
   String eventType = EventTypes.encrypted,
 }) {
   return (Store<AppState> store) async {

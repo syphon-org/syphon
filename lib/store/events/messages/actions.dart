@@ -203,7 +203,7 @@ ThunkAction<AppState> sendMessage({
 /// Specifically for sending encrypted messages using megolm
 ThunkAction<AppState> sendMessageEncrypted({
   required String roomId,
-  required Message message, // body and type only for now
+  required Message message, // temp - contains all unencrypted info being sent
   File? file,
   EncryptInfo? info,
 }) {
