@@ -246,8 +246,6 @@ class ChatScreenState extends State<ChatScreen> {
     try {
       if (encryptionEnabled) {
         info = EncryptInfo.generate();
-        printInfo('iv ${info.iv}');
-        printInfo('key ${info.key}');
         encryptedFile = await encryptMedia(localFile: file, info: info);
         info = info.copyWith(
           shasum: base64.encode(
@@ -278,14 +276,11 @@ class ChatScreenState extends State<ChatScreen> {
     /// doesn't fire onMounted or initState. Could potentially
     /// have something to do with the Visibility widget
     if (mxcUri != null) {
-      printInfo('DECRYPTING FETCH');
       store.dispatch(fetchMedia(
         mxcUri: mxcUri,
         info: info,
       ));
     }
-
-    printInfo('[onSendMedia] $mxcUri}'); // TODO: REMOVE
 
     final message = Message(
       url: mxcUri,
