@@ -246,6 +246,8 @@ class ChatScreenState extends State<ChatScreen> {
     try {
       if (encryptionEnabled) {
         info = EncryptInfo.generate();
+        printInfo('iv ${info.iv}');
+        printInfo('key ${info.key}');
         encryptedFile = await encryptMedia(localFile: file, info: info);
         info = info.copyWith(
           shasum: base64.encode(
@@ -256,7 +258,7 @@ class ChatScreenState extends State<ChatScreen> {
     } catch (error) {
       // Globally notify other widgets you're sending a message in this room
       store.dispatch(
-        UpdateRoom(id: props.room.id, sending: true),
+        UpdateRoom(id: props.room.id, sending: false),
       );
       rethrow;
     }
@@ -265,7 +267,7 @@ class ChatScreenState extends State<ChatScreen> {
       uploadMedia(localFile: encryptedFile ?? file),
     );
 
-    final mxcUri = mxcData['content_uri'];
+    final mxcUri = mxcData['content_uri'] as String?;
 
     ///
     /// TODO: solve mounted issue with back navigation
@@ -275,10 +277,13 @@ class ChatScreenState extends State<ChatScreen> {
     /// submitting a new draft message, a MatrixImage widget
     /// doesn't fire onMounted or initState. Could potentially
     /// have something to do with the Visibility widget
-    store.dispatch(fetchMedia(
-      mxcUri: mxcUri,
-      info: info,
-    ));
+    if (mxcUri != null) {
+      printInfo('DECRYPTING FETCH');
+      store.dispatch(fetchMedia(
+        mxcUri: mxcUri,
+        info: info,
+      ));
+    }
 
     printInfo('[onSendMedia] $mxcUri}'); // TODO: REMOVE
 

@@ -1,18 +1,16 @@
 import 'dart:io';
-import 'dart:ui' as ui show Codec, FrameInfo, Image;
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
@@ -126,10 +124,10 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                           label: Strings.labelSendEncrypted,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(48),
-                            onTap: () => onConfirm(props),
+                            onTap: props.room.sending ? null : () => onConfirm(props),
                             child: CircleAvatar(
                               backgroundColor: props.room.sending
-                                  ? Theme.of(context).colorScheme.secondary
+                                  ? Color(Colours.greyDisabled)
                                   : Theme.of(context).colorScheme.primary,
                               child: props.room.sending
                                   ? Padding(

@@ -44,11 +44,12 @@ Future<bool> checkMedia(
 Future<void> saveMedia(
   String? mxcUri,
   Uint8List? data, {
+  String? type,
   EncryptInfo? info,
   required StorageDatabase storage,
 }) async {
   return storage.insertMedia(
-    Media(data: data, mxcUri: mxcUri, info: info),
+    Media(mxcUri: mxcUri, data: data, info: info, type: type),
   );
 }
 

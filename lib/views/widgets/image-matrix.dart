@@ -9,6 +9,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/model.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 ///
@@ -16,6 +17,9 @@ import 'package:syphon/views/widgets/lifecycle.dart';
 ///
 /// uses the matrix mxc uris and either pulls from cached data
 /// or downloads the image and saves it to cache
+///
+/// TODO: optimize widget rebuilds, the ViewModel equatable updates
+/// too frequently as is but none of the data is changing
 ///
 class MatrixImage extends StatefulWidget {
   final String? mxcUri;
@@ -60,6 +64,8 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     final mediaCache = store.state.mediaStore.mediaCache;
+    final mediaStatuses = store.state.mediaStore.mediaStatus;
+    // final mediaStatus = mediaStatuses[widget.mxcUri];
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
       store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
@@ -85,7 +91,7 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
         builder: (context, props) {
-          final failed = props.mediaCheck.isNotEmpty && props.mediaCheck == MediaStatus.FAILURE;
+          final failed = props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
           final loading = widget.forceLoading || !props.exists;
 
           if (failed) {
@@ -130,26 +136,25 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
 
 class _Props extends Equatable {
   final bool exists;
-  final String mediaCheck;
+  final String? mediaStatus;
   final Uint8List? mediaCache;
 
   const _Props({
     required this.exists,
-    required this.mediaCheck,
+    required this.mediaStatus,
     required this.mediaCache,
   });
 
   @override
   List<Object?> get props => [
         exists,
-        mediaCheck,
+        mediaStatus,
         mediaCache,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? mxcUri) => _Props(
-        exists: store.state.mediaStore.mediaCache[mxcUri] != null &&
-            store.state.mediaStore.mediaStatus[mxcUri] != MediaStatus.DECRYPTING,
+        exists: store.state.mediaStore.mediaCache[mxcUri] != null,
         mediaCache: store.state.mediaStore.mediaCache[mxcUri],
-        mediaCheck: store.state.mediaStore.mediaStatus[mxcUri] ?? '',
+        mediaStatus: store.state.mediaStore.mediaStatus[mxcUri],
       );
 }

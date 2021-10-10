@@ -26,6 +26,7 @@ MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action])
         () => Media(
           mxcUri: _action.mxcUri,
           info: _action.info,
+          type: _action.type,
           // data: _action.data TODO: pull only from the media object itself
         ),
       );
@@ -35,6 +36,7 @@ MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action])
         (value) => Media(
           mxcUri: _action.mxcUri,
           info: value.info ?? _action.info,
+          type: _action.type,
           // data: _action.data TODO: pull only from the media object itself
         ),
       );
@@ -44,8 +46,10 @@ MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action])
         mediaCache: mediaCache,
       );
     case UpdateMediaChecks:
+      final _action = action as UpdateMediaChecks;
       final mediaChecks = Map<String, String>.from(state.mediaStatus);
-      mediaChecks[action.mxcUri] = action.status;
+      // ignore: cast_nullable_to_non_nullable
+      mediaChecks[_action.mxcUri!] = (_action.status as MediaStatus).value;
       return state.copyWith(
         mediaStatus: mediaChecks,
       );

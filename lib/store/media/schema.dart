@@ -9,7 +9,7 @@ class EncryptInfoToJsonConverter extends TypeConverter<EncryptInfo?, String> {
 
   @override
   EncryptInfo? mapToDart(String? fromDb) {
-    return json.decode(fromDb!) as EncryptInfo?;
+    return EncryptInfo.fromJson(json.decode(fromDb ?? '{}') ?? {});
   }
 
   @override

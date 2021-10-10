@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/media/converters.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
@@ -49,13 +50,8 @@ Future<Message> formatMessageContent({
           file.readAsBytesSync(),
         );
 
-        var fileType = lookupMimeType(file.path);
-
-        if (file.path.contains('HEIC')) {
-          fileType = 'image/heic';
-        } else if (fileType == null) {
-          throw 'Unsupported Media type for a message';
-        }
+        final mimeTypeOption = lookupMimeType(file.path);
+        final mimeType = convertMimeTypes(file, mimeTypeOption);
 
         // TODO: handle a thumbnail file and content
         // final thumbnailContent = {
@@ -118,7 +114,7 @@ Future<Message> formatMessageContent({
               'msgtype': message.type,
               'file': fileContent,
               'info': {
-                'mimetype': 'image/jpeg',
+                'mimetype': mimeType,
                 'h': fileImage.height,
                 'w': fileImage.width,
                 'size': fileLength,
@@ -134,7 +130,7 @@ Future<Message> formatMessageContent({
           'msgtype': message.type,
           'info': {
             'size': fileLength,
-            'mimetype': fileType,
+            'mimetype': mimeType,
             'w': fileImage.width,
             'h': fileImage.height,
             // TODO: 'thumbnail_info': thumbnailContent

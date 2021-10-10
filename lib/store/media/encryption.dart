@@ -47,6 +47,10 @@ class EncryptInfo {
   List<int> keyToBytes() {
     return Key.fromBase64(key!).bytes.toList();
   }
+
+  Map<String, dynamic> toJson() => _$EncryptInfoToJson(this);
+
+  factory EncryptInfo.fromJson(Map<String, dynamic> json) => _$EncryptInfoFromJson(json);
 }
 
 ///
@@ -76,7 +80,7 @@ Future<File?> encryptMedia({
 
     final ivUsed = IV.fromBase64(info.iv!);
     final keyUsed = Key.fromBase64(info.key!);
-    final cipher = AES(keyUsed, mode: AESMode.ctr);
+    final cipher = AES(keyUsed, mode: AESMode.ctr, padding: null);
 
     final encryptedMedia = cipher.encrypt(await localFile.readAsBytes(), iv: ivUsed);
     final directory = await getTemporaryDirectory();
@@ -94,13 +98,16 @@ Future<Uint8List?> decryptMediaData({
   EncryptInfo? info = const EncryptInfo(),
 }) async {
   try {
-    final ivUsed = IV.fromBase64(info!.iv!);
-    final keyUsed = Key.fromBase64(info.key!);
-    final cipher = AES(keyUsed, mode: AESMode.ctr);
+    final iv = info?.iv;
+    final key = info?.key;
+
+    final ivUsed = IV.fromBase64(base64.normalize(iv!));
+    final keyUsed = Key.fromBase64(base64.normalize(key!));
+    final cipher = AES(keyUsed, mode: AESMode.ctr, padding: null);
 
     return cipher.decrypt(Encrypted.fromBase64(base64.encode(localData)), iv: ivUsed);
   } catch (error) {
     printError(error.toString());
-    return null;
+    rethrow;
   }
 }

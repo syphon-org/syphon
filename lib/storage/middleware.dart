@@ -13,6 +13,7 @@ import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/model.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/storage.dart';
@@ -53,7 +54,13 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
         saveUsers(_action.users ?? {}, storage: storage!);
         break;
       case UpdateMediaCache:
-        saveMedia(action.mxcUri, action.data, storage: storage!);
+        final _action = action as UpdateMediaCache;
+
+        // dont save decrypted images
+        final decrypting = store.state.mediaStore.mediaStatus[_action.mxcUri] != MediaStatus.DECRYPTING.value;
+        if (decrypting) return;
+
+        saveMedia(_action.mxcUri, _action.data, info: _action.info, type: _action.type, storage: storage!);
         break;
       case UpdateRoom:
         final _action = action as UpdateRoom;

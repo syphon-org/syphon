@@ -4,6 +4,48 @@ import 'package:moor/moor.dart' as moor;
 import 'package:syphon/storage/moor/database.dart';
 import 'package:syphon/store/media/encryption.dart';
 
+enum MediaType {
+  encrypted,
+  decrypted,
+}
+
+extension MediaTypeValue on MediaType {
+  static String _value(MediaType val) {
+    switch (val) {
+      case MediaType.encrypted:
+        return 'encrypted';
+      case MediaType.decrypted:
+        return 'decrypted';
+    }
+  }
+
+  String get value => _value(this);
+}
+
+enum MediaStatus {
+  SUCCESS,
+  FAILURE,
+  CHECKING,
+  DECRYPTING,
+}
+
+extension MediaStatusValue on MediaStatus {
+  static String _value(MediaStatus val) {
+    switch (val) {
+      case MediaStatus.SUCCESS:
+        return 'success';
+      case MediaStatus.FAILURE:
+        return 'failure';
+      case MediaStatus.CHECKING:
+        return 'checking';
+      case MediaStatus.DECRYPTING:
+        return 'decrypting';
+    }
+  }
+
+  String get value => _value(this);
+}
+
 ///
 /// Media Class
 ///
@@ -21,6 +63,19 @@ class Media implements moor.Insertable<Media> {
     this.data,
     this.info,
   });
+
+  Media copyWith({
+    String? mxcUri,
+    String? type,
+    Uint8List? data,
+    EncryptInfo? info,
+  }) =>
+      Media(
+        mxcUri: mxcUri ?? this.mxcUri,
+        type: type ?? this.type,
+        data: data ?? this.data,
+        info: info ?? this.info,
+      );
 
   @override
   Map<String, moor.Expression> toColumns(bool nullToAbsent) {
