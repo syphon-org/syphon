@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:syphon/global/print.dart';
+
 ///
 /// Overrides mimetypes
 ///
@@ -12,9 +14,11 @@ String convertMimeTypes(
   File file,
   String? mimeType,
 ) {
-  if (file.path.contains('HEIC')) {
+  if (file.path.toLowerCase().contains('heic')) {
     return 'image/heic';
   }
+
+  // printInfo('$mimeType ${file.path}');
 
   if (mimeType == null) {
     throw 'Unsupported Media type for a message';

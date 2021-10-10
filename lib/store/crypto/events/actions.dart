@@ -177,7 +177,7 @@ ThunkAction<AppState> decryptMessages(
 ThunkAction<AppState> decryptMessage({
   required String roomId,
   required Message message,
-  bool forceDecryption = false,
+  bool forceDecryption = true,
   String eventType = EventTypes.encrypted,
 }) {
   return (Store<AppState> store) async {
@@ -210,12 +210,13 @@ ThunkAction<AppState> decryptMessage({
     final messageIndexNew = payloadDecrypted.message_index;
 
     // protection against replay attacks
-    if (messageIndexNew <= identityMessageIndex && identityMessageIndex != 0) {
+    if ((messageIndexNew <= identityMessageIndex && identityMessageIndex != 0) && !forceDecryption) {
       throw '[decryptMessage] messageIndex invalid $messageIndexNew <= $identityMessageIndex';
     }
 
     final decryptedJson = json.decode(payloadScrubbed);
 
+    printJson(decryptedJson);
     final decryptedMessage = Message.fromEvent(
       Event.fromMatrix(decryptedJson),
     );
@@ -234,13 +235,14 @@ ThunkAction<AppState> decryptMessage({
 
     // update media store with iv, keys for decrypting said media
     if (MessageType.image.value == decryptedMessage.msgtype) {
+      final mxcUri = combinedMessage.file?['url']; // encrypted image only
+      final iv = combinedMessage.file?['iv'];
+      final key = combinedMessage.file?['key']['k'];
+      final shasum = combinedMessage.file?['hashes']['sha256'];
+
       store.dispatch(UpdateMediaCache(
-        mxcUri: decryptedMessage.url,
-        info: EncryptInfo(
-          iv: decryptedMessage.file?['iv'],
-          key: decryptedMessage.file?['key']['k'],
-          shasum: decryptedMessage.file?['hashes']['sha256'],
-        ),
+        mxcUri: mxcUri,
+        info: EncryptInfo(iv: iv, key: key, shasum: shasum),
       ));
     }
 

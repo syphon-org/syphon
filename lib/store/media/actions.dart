@@ -177,7 +177,7 @@ ThunkAction<AppState> fetchMedia({
       }
 
       store.dispatch(
-        UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes),
+        UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes, info: info),
       );
 
       store.dispatch(

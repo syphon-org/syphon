@@ -27,7 +27,7 @@ class MessageToJsonConverter extends TypeConverter<Message?, String> {
 
   @override
   Message? mapToDart(String? fromDb) {
-    return json.decode(fromDb!);
+    return Message.fromJson(jsonDecode(fromDb ?? '{}') ?? {});
   }
 
   @override

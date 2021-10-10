@@ -116,7 +116,7 @@ Future<Map<String, Uint8List>?> loadMediaRelative({
 
     return media;
   } catch (error) {
-    printError(error.toString(), title: 'loadMediaAll');
+    printError(error.toString(), title: 'loadMediaRelative');
     return null;
   }
 }

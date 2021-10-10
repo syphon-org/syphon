@@ -92,13 +92,7 @@ Future<Map<String, Room>> loadRooms({
       loaded,
       key: (room) => room.id,
       value: (room) {
-        try {
-          return room as Room;
-        } catch (error) {
-          printJson(jsonDecode(jsonEncode(room)));
-          printError(error.toString(), title: 'loadRooms');
-          return Room(id: 'FAILED');
-        }
+        return room as Room;
       },
     );
   } catch (error) {
