@@ -5,6 +5,7 @@ import 'package:moor/ffi.dart';
 import 'package:moor/moor.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlcipher_library_windows/sqlcipher_library_windows.dart';
 import 'package:sqlite3/open.dart';
 import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/print.dart';
@@ -80,6 +81,10 @@ LazyDatabase openDatabase(String context) {
       // TODO: confirm this works on windows?
       final dbFolder = await getApplicationSupportDirectory();
       filePath = File(path.join(dbFolder.path, storageLocation));
+    }
+
+    if (Platform.isWindows) {
+      openSQLCipherOnWindows();
     }
 
     if (Platform.isIOS || Platform.isMacOS) {
