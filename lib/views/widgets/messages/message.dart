@@ -474,13 +474,16 @@ class MessageWidget extends StatelessWidget {
                                       left: isMedia ? 12 : 0,
                                       right: isMedia ? 12 : 0,
                                     ),
-                                    child: MarkdownBody(data: body.trim(),
-                                      styleSheet: MarkdownStyleSheet(p: TextStyle(
-                                        color: textColor,
-                                        fontStyle: fontStyle,
-                                        fontWeight: FontWeight.w300,
-                                        fontSize: Theme.of(context).textTheme.subtitle2!.fontSize,
-                                      ),),
+                                    child: MarkdownBody(
+                                      data: body.trim(),
+                                      styleSheet: MarkdownStyleSheet(
+                                        p: TextStyle(
+                                          color: textColor,
+                                          fontStyle: fontStyle,
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: Theme.of(context).textTheme.subtitle2!.fontSize,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   Padding(
