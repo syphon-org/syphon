@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:swipeable/swipeable.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -473,14 +474,13 @@ class MessageWidget extends StatelessWidget {
                                       left: isMedia ? 12 : 0,
                                       right: isMedia ? 12 : 0,
                                     ),
-                                    child: Text(
-                                      body.trim(),
-                                      style: TextStyle(
+                                    child: MarkdownBody(data: body.trim(),
+                                      styleSheet: MarkdownStyleSheet(p: TextStyle(
                                         color: textColor,
                                         fontStyle: fontStyle,
                                         fontWeight: FontWeight.w300,
                                         fontSize: Theme.of(context).textTheme.subtitle2!.fontSize,
-                                      ),
+                                      ),),
                                     ),
                                   ),
                                   Padding(
