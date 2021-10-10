@@ -23,6 +23,16 @@ import 'package:syphon/store/user/schema.dart';
 
 part 'database.g.dart';
 
+// TODO: move to platform.dart
+
+void _openOnIOS() {
+  try {
+    open.overrideFor(OperatingSystem.iOS, () => DynamicLibrary.process());
+  } catch (error) {
+    printError(error.toString());
+  }
+}
+
 void _openOnAndroid() {
   try {
     open.overrideFor(OperatingSystem.android, () => DynamicLibrary.open('libsqlcipher.so'));
@@ -33,13 +43,20 @@ void _openOnAndroid() {
 
 void _openOnLinux() {
   try {
-    final scriptDir = File(Platform.script.toFilePath()).parent;
-    final libraryNextToScript = File('${scriptDir.path}/sqlite3.so');
-    final lib = DynamicLibrary.open(libraryNextToScript.path);
+    open.overrideFor(OperatingSystem.linux, () => DynamicLibrary.open('libsqlcipher.so'));
+    return;
+  } catch (_) {
+    try {
+      // fallback to sqlite if unavailable
+      final scriptDir = File(Platform.script.toFilePath()).parent;
+      final libraryNextToScript = File('${scriptDir.path}/sqlite3.so');
+      final lib = DynamicLibrary.open(libraryNextToScript.path);
 
-    open.overrideFor(OperatingSystem.linux, () => lib);
-  } catch (error) {
-    printError(error.toString());
+      open.overrideFor(OperatingSystem.linux, () => lib);
+    } catch (error) {
+      printError(error.toString());
+      rethrow;
+    }
   }
 }
 
@@ -55,26 +72,33 @@ LazyDatabase openDatabase(String context) {
     // prepend with debug mode
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
 
-    File? filePath;
+    // get application support directory for all platforms
+
+    var filePath;
+
+    if (!Platform.isWindows) {
+      // TODO: confirm this works on windows?
+      final dbFolder = await getApplicationSupportDirectory();
+      filePath = File(path.join(dbFolder.path, storageLocation));
+    }
+
+    if (Platform.isIOS || Platform.isMacOS) {
+      _openOnIOS();
+    }
 
     if (Platform.isLinux) {
       _openOnLinux();
     }
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      if (Platform.isAndroid) {
-        _openOnAndroid();
-      }
-
-      final dbFolder = await getApplicationSupportDirectory();
-      filePath = File(path.join(dbFolder.path, storageLocation));
+    if (Platform.isAndroid) {
+      _openOnAndroid();
     }
 
     // Configure cache encryption/decryption instance
     final storageKey = await loadKey(storageKeyId);
 
     return VmDatabase(
-      filePath!,
+      filePath,
       logStatements: false, // DEBUG_MODE,
       setup: (rawDb) {
         rawDb.execute("PRAGMA key = '$storageKey';");

@@ -222,7 +222,7 @@ ThunkAction<AppState> decryptMessage({
     );
 
     // combine all possible decrypted fields with encrypted version of message
-    final combinedMessage = message.copyWith(
+    var combinedMessage = message.copyWith(
       url: decryptedMessage.url,
       body: decryptedMessage.body,
       format: decryptedMessage.format,
@@ -244,6 +244,11 @@ ThunkAction<AppState> decryptMessage({
         mxcUri: mxcUri,
         info: EncryptInfo(iv: iv, key: key, shasum: shasum),
       ));
+
+      // unfortunately, decrypted images have urls under the file property
+      combinedMessage = combinedMessage.copyWith(
+        url: mxcUri,
+      );
     }
 
     await store.dispatch(saveMessageSessionInbound(
