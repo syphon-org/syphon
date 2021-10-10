@@ -115,9 +115,9 @@ dependencies:
   file_picker: ^4.1.1
   image_picker: ^0.7.4
   local_image_provider: ^4.0.1
-  flutter_keyboard_visibility: ^5.0.3 
-  flutter_markdown: ^0.6.6 
-  webview_flutter: ^2.0.13 
+  flutter_keyboard_visibility: ^5.0.3
+  flutter_markdown: ^0.6.6
+  webview_flutter: ^2.0.13
   touchable_opacity: ^1.2.0
   smooth_page_indicator: ^0.3.0-nullsafety.0
   flutter_local_notifications: ^5.0.0+1
@@ -145,12 +145,12 @@ dev_dependencies:
 dependency_overrides:
   moor_generator: # TODO: for moor_generator Uint8List error output
     git:
-      url: git@github.com:simolus3/moor.git
+      url: https://github.com/simolus3/moor.git
       ref: cc7d98d110204acb72d415312a78ed7821382d69
       path: moor_generator
   sqlparser: # TODO: for moor_generator Uint8List error output
     git:
-      url: git@github.com:simolus3/moor.git
+      url: https://github.com/simolus3/moor.git
       ref: cc7d98d110204acb72d415312a78ed7821382d69
       path: sqlparser
   swipeable: # TODO: null saftey version

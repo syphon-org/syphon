@@ -605,7 +605,7 @@ packages:
       path: moor_generator
       ref: cc7d98d110204acb72d415312a78ed7821382d69
       resolved-ref: cc7d98d110204acb72d415312a78ed7821382d69
-      url: "git@github.com:simolus3/moor.git"
+      url: "https://github.com/simolus3/moor.git"
     source: git
     version: "4.5.1"
   node_preamble:
@@ -976,7 +976,7 @@ packages:
       path: sqlparser
       ref: cc7d98d110204acb72d415312a78ed7821382d69
       resolved-ref: cc7d98d110204acb72d415312a78ed7821382d69
-      url: "git@github.com:simolus3/moor.git"
+      url: "https://github.com/simolus3/moor.git"
     source: git
     version: "0.17.2"
   stack_trace:
