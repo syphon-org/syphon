@@ -11,12 +11,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -505,7 +503,7 @@ class ChatInputState extends State<ChatInput> {
                           child: MediaCard(
                             text: 'File',
                             icon: Icons.note_add,
-                            onPress: () => onAddFile(),
+                            onPress: () => onAddInProgress(),
                           ),
                         ),
                         Padding(

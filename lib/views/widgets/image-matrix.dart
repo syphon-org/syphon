@@ -64,8 +64,6 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     final mediaCache = store.state.mediaStore.mediaCache;
-    final mediaStatuses = store.state.mediaStore.mediaStatus;
-    // final mediaStatus = mediaStatuses[widget.mxcUri];
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
       store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
