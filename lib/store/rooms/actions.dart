@@ -167,8 +167,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         // fetch avatar if a uri was found
         if (room.avatarUri != null) {
-          store.dispatch(fetchThumbnail(
+          store.dispatch(fetchMedia(
             mxcUri: room.avatarUri,
+            thumbnail: true,
           ));
         }
 
@@ -540,7 +541,7 @@ ThunkAction<AppState> markRoomsReadAll() {
 
       final rooms = store.state.roomStore.roomList;
 
-      for (var room in rooms) {
+      for (final room in rooms) {
         store.dispatch(markRoomRead(roomId: room.id));
       }
     } catch (error) {

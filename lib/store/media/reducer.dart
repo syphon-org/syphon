@@ -3,8 +3,7 @@ import 'dart:typed_data';
 import './actions.dart';
 import './state.dart';
 
-MediaStore mediaReducer(
-    [MediaStore state = const MediaStore(), dynamic action]) {
+MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action]) {
   switch (action.runtimeType) {
     case UpdateMediaCache:
       final mediaCache = Map<String, Uint8List>.from(state.mediaCache);
@@ -13,10 +12,10 @@ MediaStore mediaReducer(
         mediaCache: mediaCache,
       );
     case UpdateMediaChecks:
-      final mediaChecks = Map<String, String>.from(state.mediaChecks);
+      final mediaChecks = Map<String, String>.from(state.mediaStatus);
       mediaChecks[action.mxcUri] = action.status;
       return state.copyWith(
-        mediaChecks: mediaChecks,
+        mediaStatus: mediaChecks,
       );
     default:
       return state;

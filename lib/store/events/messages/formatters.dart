@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/media/encryptor.dart';
+import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 /// Format Message Content (Encrypted / Unencrypted)
@@ -18,6 +18,8 @@ import 'package:syphon/store/rooms/room/model.dart';
 /// Why not just add another child object instead of changing the root parent?
 /// makes it difficult to encode and decode
 ///
+/// https://matrix.org/docs/spec/client_server/latest#sending-encrypted-attachments
+///
 Future<Message> formatMessageContent({
   required String tempId,
   required String userId,
@@ -26,7 +28,7 @@ Future<Message> formatMessageContent({
   File? file,
   EncryptInfo? info = const EncryptInfo(),
 }) async {
-  var formatted = Message(
+  final formatted = Message(
     id: tempId,
     url: message.url,
     body: message.body?.trimRight(),
@@ -55,14 +57,23 @@ Future<Message> formatMessageContent({
           throw 'Unsupported Media type for a message';
         }
 
+        // TODO: handle a thumbnail file and content
+        // final thumbnailContent = {
+        //   'w': 746,
+        //   'h': 600,
+        //   'mimetype': fileType,
+        //   'size': 56168,
+        // };
+
         if (room.encryptionEnabled) {
           if (info!.key == null || info.iv == null) {
             throw Exception('Cannot send encrypted media message without providing decryption info');
           }
 
-          final iv = info.iv!.base64.replaceAll('=', '');
-          final key = base64Url.encode(info.key!.bytes.toList()).replaceAll('=', '');
+          // must be unpadded url safe per spec, so replacing the pad with nothing
+          final iv = info.iv!.replaceAll('=', '');
           final shasum = info.shasum?.replaceAll('=', '');
+          final key = base64Url.encode(info.keyToBytes()).replaceAll('=', '');
 
           final fileContent = {
             'url': message.url,
@@ -81,6 +92,23 @@ Future<Message> formatMessageContent({
             }
           };
 
+          final thumbnailContent = {
+            // 'thumbnail_file': {
+            //   'hashes': {'sha256': '/NogKqW5bz/m8xHgFiH5haFGjCNVmUIPLzfvOhHdrxY'},
+            //   'iv': 'U+k7PfwLr6UAAAAAAAAAAA',
+            //   'key': {
+            //     'alg': 'A256CTR',
+            //     'ext': true,
+            //     'k': 'RMyd6zhlbifsACM1DXkCbioZ2u0SywGljTH8JmGcylg',
+            //     'key_ops': ['encrypt', 'decrypt'],
+            //     'kty': 'oct'
+            //   },
+            //   'mimetype': 'image/jpeg',
+            //   'url': 'mxc://example.org/pmVJxyxGlmxHposwVSlOaEOv',
+            //   'v': 'v2'
+            // },
+          };
+
           // Top level content data is fundamentally different
           // with encrypted messages
           return formatted.copyWith(
@@ -94,32 +122,13 @@ Future<Message> formatMessageContent({
                 'h': fileImage.height,
                 'w': fileImage.width,
                 'size': fileLength,
-                // 'thumbnail_file': {
-                //   'hashes': {'sha256': '/NogKqW5bz/m8xHgFiH5haFGjCNVmUIPLzfvOhHdrxY'},
-                //   'iv': 'U+k7PfwLr6UAAAAAAAAAAA',
-                //   'key': {
-                //     'alg': 'A256CTR',
-                //     'ext': true,
-                //     'k': 'RMyd6zhlbifsACM1DXkCbioZ2u0SywGljTH8JmGcylg',
-                //     'key_ops': ['encrypt', 'decrypt'],
-                //     'kty': 'oct'
-                //   },
-                //   'mimetype': 'image/jpeg',
-                //   'url': 'mxc://example.org/pmVJxyxGlmxHposwVSlOaEOv',
-                //   'v': 'v2'
-                // },
-                // 'thumbnail_info': {
-                //   'h': 768,
-                //   'mimetype': 'image/jpeg',
-                //   'size': 211009,
-                //   'w': 432,
-                // },
+                ...thumbnailContent,
               }
             },
           );
         }
 
-        formatted = formatted.copyWith(content: {
+        return formatted.copyWith(content: {
           'url': message.url,
           'body': message.body,
           'msgtype': message.type,
@@ -128,29 +137,21 @@ Future<Message> formatMessageContent({
             'mimetype': fileType,
             'w': fileImage.width,
             'h': fileImage.height,
-            // 'thumbnail_info': { // TODO: handle thumbnails correctly
-            //   'w': 746,
-            //   'h': 600,
-            //   'mimetype': fileType,
-            //   'size': 56168,
-            // },
+            // TODO: 'thumbnail_info': thumbnailContent
             // 'xyz.amorgan.blurhash': 'LYRg0Ls:}uNaxaayNHj[^8WU9@s:',
             // 'thumbnail_url': 'mxc://matrix.org/dYEziAIojXCEoHtbwIRkKBKE'
           },
         });
-        break;
       }
     case MatrixMessageTypes.text:
     default:
       {
-        formatted = formatted.copyWith(content: {
+        return formatted.copyWith(content: {
           'body': message.body,
           'msgtype': message.type ?? MatrixMessageTypes.text,
         });
       }
   }
-
-  return formatted;
 }
 
 ///

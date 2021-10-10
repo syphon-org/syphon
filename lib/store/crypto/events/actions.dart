@@ -16,12 +16,16 @@ import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
+///
 /// Encrypt event content with loaded outbound session for room
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
+///
 ThunkAction<AppState> encryptMessageContent({
   required String roomId,
   Map? content,
@@ -80,6 +84,7 @@ ThunkAction<AppState> backfillDecryptMessages(
       if (!rooms.containsKey(roomId)) {
         throw 'No room found for room ID $roomId';
       }
+
       // redecrypt events in the room with new key
       final messages = store.state.eventStore.messages;
 
@@ -219,9 +224,25 @@ ThunkAction<AppState> decryptMessage({
     final combinedMessage = message.copyWith(
       url: decryptedMessage.url,
       body: decryptedMessage.body,
+      format: decryptedMessage.format,
+      formattedBody: decryptedMessage.formattedBody,
       msgtype: decryptedMessage.msgtype,
       typeDecrypted: decryptedMessage.type,
+      file: decryptedMessage.file,
+      info: decryptedMessage.info,
     );
+
+    // update media store with iv, keys for decrypting said media
+    if (MessageType.image.value == decryptedMessage.msgtype) {
+      store.dispatch(UpdateMediaCache(
+        mxcUri: decryptedMessage.url,
+        info: EncryptInfo(
+          iv: decryptedMessage.file?['iv'],
+          key: decryptedMessage.file?['key']['k'],
+          shasum: decryptedMessage.file?['hashes']['sha256'],
+        ),
+      ));
+    }
 
     await store.dispatch(saveMessageSessionInbound(
       roomId: roomId,

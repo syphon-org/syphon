@@ -62,11 +62,7 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
     final mediaCache = store.state.mediaStore.mediaCache;
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
-      if (!widget.thumbnail) {
-        store.dispatch(fetchMedia(mxcUri: widget.mxcUri));
-      } else {
-        store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
-      }
+      store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
     }
 
     // Created in attempts to reduce framerate drop in chat details
@@ -151,8 +147,9 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? mxcUri) => _Props(
-        exists: store.state.mediaStore.mediaCache[mxcUri] != null,
+        exists: store.state.mediaStore.mediaCache[mxcUri] != null &&
+            store.state.mediaStore.mediaStatus[mxcUri] != MediaStatus.DECRYPTING,
         mediaCache: store.state.mediaStore.mediaCache[mxcUri],
-        mediaCheck: store.state.mediaStore.mediaChecks[mxcUri] ?? '',
+        mediaCheck: store.state.mediaStore.mediaStatus[mxcUri] ?? '',
       );
 }

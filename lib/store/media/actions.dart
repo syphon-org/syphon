@@ -13,12 +13,15 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/converters.dart';
+import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/media/storage.dart';
 
 class MediaStatus {
+  static const SUCCESS = 'success';
   static const FAILURE = 'failure';
   static const CHECKING = 'checking';
-  static const SUCCESS = 'success';
+  static const DECRYPTING = 'decrypting';
 }
 
 class UpdateMediaChecks {
@@ -33,11 +36,15 @@ class UpdateMediaChecks {
 
 class UpdateMediaCache {
   final String? mxcUri;
+  final String? type;
   final Uint8List? data;
+  final EncryptInfo? info;
 
   UpdateMediaCache({
     this.mxcUri,
+    this.type,
     this.data,
+    this.info,
   });
 }
 
@@ -48,14 +55,8 @@ ThunkAction<AppState> uploadMedia({
   return (Store<AppState> store) async {
     try {
       // Extension handling
-      String? mimeType = lookupMimeType(localFile.path);
-
-      // HACK: for HEIC images
-      if (localFile.path.contains('HEIC')) {
-        mimeType = 'image/heic';
-      } else if (mimeType == null) {
-        throw 'Unsupported Media type for a message';
-      }
+      final mimeTypeOption = lookupMimeType(localFile.path);
+      final mimeType = convertMimeTypes(localFile, mimeTypeOption);
 
       final String fileType = mimeType;
       final String fileExtension = fileType.split('/')[1];
@@ -96,23 +97,35 @@ ThunkAction<AppState> uploadMedia({
   };
 }
 
-ThunkAction<AppState> fetchMedia({String? mxcUri, bool force = false}) {
+ThunkAction<AppState> fetchMedia({
+  String? mxcUri,
+  double? size,
+  EncryptInfo? info, // allows quicker local provided media decryption
+  bool force = false,
+  bool thumbnail = false,
+}) {
   return (Store<AppState> store) async {
     try {
       final mediaCache = store.state.mediaStore.mediaCache;
-      final mediaChecks = store.state.mediaStore.mediaChecks;
+      final mediaStatus = store.state.mediaStore.mediaStatus;
+      final medias = store.state.mediaStore.media;
 
       // Noop if already cached data
       if (mediaCache.containsKey(mxcUri) && !force) {
         return;
       }
 
-      // Noop if currently checking or failed
-      if (mediaChecks.containsKey(mxcUri) &&
-          (mediaChecks[mxcUri!] == MediaStatus.CHECKING || mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
+      final currentStatus = mediaStatus[mxcUri!];
+      // Noop if currently checking, failed, or decrypting
+      if (mediaStatus.containsKey(mxcUri) &&
+          (currentStatus == MediaStatus.CHECKING ||
+              currentStatus == MediaStatus.FAILURE ||
+              currentStatus == MediaStatus.DECRYPTING) &&
           !force) {
         return;
       }
+
+      final currentMedia = medias[mxcUri];
 
       store.dispatch(
         UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.CHECKING),
@@ -120,90 +133,53 @@ ThunkAction<AppState> fetchMedia({String? mxcUri, bool force = false}) {
 
       // check if the media is only located in cold storage
       if (await checkMedia(mxcUri, storage: Storage.database!)) {
-        final storedData = await loadMedia(
+        final media = await loadMedia(
           mxcUri: mxcUri,
           storage: Storage.database!,
         );
 
-        if (storedData != null) {
-          store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: storedData));
-          return;
+        if (media != null) {
+          return store.dispatch(
+            UpdateMediaCache(mxcUri: mxcUri, data: media.data, info: media.info),
+          );
         }
       }
 
-      final data = await compute(MatrixApi.fetchMediaMapped, {
-        'protocol': store.state.authStore.protocol,
-        'accessToken': store.state.authStore.user.accessToken,
-        'homeserver': store.state.authStore.currentUser.homeserver,
-        'mediaUri': mxcUri,
-      });
+      var data;
 
-      final bodyBytes = data['bodyBytes'];
-
-      store.dispatch(
-        UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes),
-      );
-      store.dispatch(
-        UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.SUCCESS),
-      );
-    } catch (error) {
-      debugPrint('[fetchThumbnail] $mxcUri $error');
-      store.dispatch(UpdateMediaChecks(
-        mxcUri: mxcUri,
-        status: MediaStatus.FAILURE,
-      ));
-    }
-  };
-}
-
-ThunkAction<AppState> fetchThumbnail({String? mxcUri, double? size, bool force = false}) {
-  return (Store<AppState> store) async {
-    try {
-      final mediaCache = store.state.mediaStore.mediaCache;
-      final mediaChecks = store.state.mediaStore.mediaChecks;
-
-      // Noop if already cached data
-      if (mediaCache.containsKey(mxcUri) && !force) {
-        return;
+      if (thumbnail) {
+        data = await compute(MatrixApi.fetchThumbnail, {
+          'protocol': store.state.authStore.protocol,
+          'accessToken': store.state.authStore.user.accessToken,
+          'homeserver': store.state.authStore.currentUser.homeserver,
+          'mediaUri': mxcUri,
+          'size': size,
+        });
+      } else {
+        data = await compute(MatrixApi.fetchMediaMapped, {
+          'protocol': store.state.authStore.protocol,
+          'accessToken': store.state.authStore.user.accessToken,
+          'homeserver': store.state.authStore.currentUser.homeserver,
+          'mediaUri': mxcUri,
+        });
       }
 
-      // Noop if currently checking or failed
-      if (mediaChecks.containsKey(mxcUri) &&
-          (mediaChecks[mxcUri!] == MediaStatus.CHECKING || mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
-          !force) {
-        return;
-      }
+      var bodyBytes = data['bodyBytes'] as Uint8List?;
 
-      store.dispatch(
-        UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.CHECKING),
-      );
-
-      // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.database!)) {
-        final storedData = await loadMedia(
-          mxcUri: mxcUri,
-          storage: Storage.database!,
+      // Resolve encrypted info for media message based on available sources
+      final currentInfo = info ?? currentMedia?.info ?? const EncryptInfo();
+      if (currentInfo.key != null && bodyBytes != null) {
+        store.dispatch(
+          UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.DECRYPTING),
         );
 
-        if (storedData != null) {
-          store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: storedData));
-          return;
-        }
+        bodyBytes = await decryptMediaData(localData: bodyBytes, info: currentMedia?.info);
       }
-
-      final data = await compute(MatrixApi.fetchThumbnail, {
-        'protocol': store.state.authStore.protocol,
-        'accessToken': store.state.authStore.user.accessToken,
-        'homeserver': store.state.authStore.currentUser.homeserver,
-        'mediaUri': mxcUri,
-        'sizee': size,
-      });
-
-      final bodyBytes = data['bodyBytes'];
 
       store.dispatch(
         UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes),
       );
+
       store.dispatch(
         UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.SUCCESS),
       );

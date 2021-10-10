@@ -26,7 +26,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/media/encryptor.dart';
+import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
@@ -268,15 +268,16 @@ class ChatScreenState extends State<ChatScreen> {
     final mxcUri = mxcData['content_uri'];
 
     ///
-    /// TODO:
+    /// TODO: solve mounted issue with back navigation
     ///
     /// should not have to do this but unfortunately
     /// when navigating back from the preview screen and
     /// submitting a new draft message, a MatrixImage widget
     /// doesn't fire onMounted or initState. Could potentially
-    /// have something to do with the Visibility widget as well
+    /// have something to do with the Visibility widget
     store.dispatch(fetchMedia(
       mxcUri: mxcUri,
+      info: info,
     ));
 
     printInfo('[onSendMedia] $mxcUri}'); // TODO: REMOVE

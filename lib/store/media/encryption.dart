@@ -1,14 +1,21 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:encrypt/encrypt.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:mime/mime.dart';
+import 'package:moor/moor.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/store/media/converters.dart';
 
+part 'encryption.g.dart';
+
+@JsonSerializable()
 class EncryptInfo {
-  final IV? iv;
-  final Key? key;
+  final String? iv; // base64
+  final String? key; // base64
   final String? shasum;
 
   const EncryptInfo({
@@ -18,8 +25,8 @@ class EncryptInfo {
   });
 
   EncryptInfo copyWith({
-    IV? iv,
-    Key? key,
+    String? iv,
+    String? key,
     String? shasum,
   }) {
     return EncryptInfo(
@@ -31,9 +38,14 @@ class EncryptInfo {
 
   factory EncryptInfo.generate() {
     return EncryptInfo(
-        iv: IV.fromSecureRandom(16), // 64-bit / 8 byte
-        key: Key.fromSecureRandom(32) // 256-bit / 32 byte
-        );
+      // 64-bit / 8 byte + counter (not doing this, just another 8 bytes)
+      iv: IV.fromSecureRandom(16).base64,
+      key: Key.fromSecureRandom(32).base64, // 256-bit / 32 byte
+    );
+  }
+
+  List<int> keyToBytes() {
+    return Key.fromBase64(key!).bytes.toList();
   }
 }
 
@@ -54,29 +66,39 @@ Future<File?> encryptMedia({
 }) async {
   try {
     // Extension handling
-    String? mimeType = lookupMimeType(localFile.path);
-
-    if (localFile.path.contains('HEIC')) {
-      mimeType = 'image/heic';
-    } else if (mimeType == null) {
-      throw 'Unsupported Media type for a message';
-    }
+    final mimeTypeOption = lookupMimeType(localFile.path);
+    final mimeType = convertMimeTypes(localFile, mimeTypeOption);
 
     // Setting up params for saving encrypted file
     final String fileType = mimeType;
     final String fileExtension = fileType.split('/')[1];
     final String fileName = '$mediaName.$fileExtension';
 
-    final ivUsed = info.iv ?? IV.fromSecureRandom(16); // 64-bit / 8 byte
-    final keyUsed = info.key ?? Key.fromSecureRandom(32); // 256-bit / 32 byte
+    final ivUsed = IV.fromBase64(info.iv!);
+    final keyUsed = Key.fromBase64(info.key!);
     final cipher = AES(keyUsed, mode: AESMode.ctr);
 
     final encryptedMedia = cipher.encrypt(await localFile.readAsBytes(), iv: ivUsed);
-
     final directory = await getTemporaryDirectory();
     final encryptFile = File(path.join(directory.path, fileName));
 
     return await encryptFile.writeAsBytes(encryptedMedia.bytes, flush: true);
+  } catch (error) {
+    printError(error.toString());
+    return null;
+  }
+}
+
+Future<Uint8List?> decryptMediaData({
+  required Uint8List localData,
+  EncryptInfo? info = const EncryptInfo(),
+}) async {
+  try {
+    final ivUsed = IV.fromBase64(info!.iv!);
+    final keyUsed = Key.fromBase64(info.key!);
+    final cipher = AES(keyUsed, mode: AESMode.ctr);
+
+    return cipher.decrypt(Encrypted.fromBase64(base64.encode(localData)), iv: ivUsed);
   } catch (error) {
     printError(error.toString());
     return null;

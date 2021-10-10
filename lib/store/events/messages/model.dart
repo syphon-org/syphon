@@ -242,7 +242,7 @@ class Message extends Event implements moor.Insertable<Message> {
         content: content,
         body: body,
         msgtype: msgtype,
-        format: content['format'],
+        format: content['format'], // "org.matrix.custom.html"
         formattedBody: content['formatted_body'],
         url: content['url'],
         file: content['file'],

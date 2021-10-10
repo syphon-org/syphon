@@ -1,21 +1,8 @@
 import 'dart:convert';
 
 import 'package:moor/moor.dart';
+import 'package:syphon/storage/moor/converters.dart';
 import 'package:syphon/store/events/messages/model.dart';
-
-class MapToJsonConverter extends TypeConverter<Map<String, dynamic>?, String> {
-  const MapToJsonConverter();
-
-  @override
-  Map<String, dynamic>? mapToDart(String? fromDb) {
-    return json.decode(fromDb!) as Map<String, dynamic>?;
-  }
-
-  @override
-  String? mapToSql(Map<String, dynamic>? value) {
-    return json.encode(value);
-  }
-}
 
 ///
 /// Messages Model (Table)

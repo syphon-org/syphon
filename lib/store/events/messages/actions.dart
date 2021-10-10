@@ -15,7 +15,7 @@ import 'package:syphon/store/events/messages/formatters.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/media/encryptor.dart';
+import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
