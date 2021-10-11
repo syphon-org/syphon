@@ -81,7 +81,7 @@ Syphon will always be a not for profit, community driven application.
  
 ## 🌙 Nightlies
 - Nightly dev builds - per pushed commit builds - can be found under our [Gitea Releases](https://git.syphon.org/syphon-org/syphon/releases)
-
+- Windows builds are on the horizon!
 
 ## 📝 Contributing
 - Instructions can be found under our [contributing.md](./contributing.md). Please fully read the document before beginning to write code or produce any material contribution for Syphon.
@@ -98,9 +98,11 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
     - install cmake version for workstation platform (for olm/megolm)
         - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 
         - [linux](https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh)
+        - [windows](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
     - install libs needed for cmake
         - macos -> ```brew install ninja```
         - linux -> ```sudo apt install ninja-build```
+        - windows -> ```choco install ninja```
     - clone repo and init submodules
         - ```git submodule update --init --recursive```
     - run the following prebuild commands
@@ -130,8 +132,10 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 5. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
 
 ### windows
-- not currently supported, feel free to reach out if you can support making builds!
-
+1. ```flutter doctor``` should give you warnings for anything missing
+2. ```flutter config --enable-windows-desktop```
+3. Compile olm & move `olm.dll` to `libolm.dll` in the executable directory
+4. Fetch sqlite's **Precompiled Binaries for Windows** dll [from the website](https://www.sqlite.org/download.html)
 
 ## 📐 Architecture
 
