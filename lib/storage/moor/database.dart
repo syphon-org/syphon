@@ -77,11 +77,8 @@ LazyDatabase openDatabase(String context) {
 
     var filePath;
 
-    if (!Platform.isWindows) {
-      // TODO: confirm this works on windows?
-      final dbFolder = await getApplicationSupportDirectory();
-      filePath = File(path.join(dbFolder.path, storageLocation));
-    }
+    final dbFolder = await getApplicationSupportDirectory();
+    filePath = File(path.join(dbFolder.path, storageLocation));
 
     if (Platform.isWindows) {
       openSQLCipherOnWindows();
