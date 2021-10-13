@@ -23,6 +23,7 @@ abstract class MatrixApi {
   static const checkUsernameAvailability = Auth.checkUsernameAvailability;
   static const sendPasswordResetEmail = Auth.sendPasswordResetEmail;
   static const checkHomeserver = Auth.checkHomeserver;
+  static const checkHomeserverAlt = Auth.checkHomeserverAlt;
   static const checkVersion = Auth.checkVersion;
 
   // Search

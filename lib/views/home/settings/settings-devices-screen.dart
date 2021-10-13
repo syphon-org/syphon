@@ -1,16 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-
 import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -78,7 +73,7 @@ class DeviceViewState extends State<DevicesScreen> {
   }
 
   @protected
-  Widget buildDeviceOptionsBar({BuildContext? context, _Props? props}) {
+  Widget buildDeviceOptionsBar(BuildContext context,{ _Props? props}) {
     var selfSelectedDevice;
 
     if (selectedDevices != null) {
@@ -88,7 +83,7 @@ class DeviceViewState extends State<DevicesScreen> {
     }
 
     return AppBar(
-      brightness: Brightness.dark, // TOOD: this should inherit from theme
+      systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
       backgroundColor: Color(Colours.greyDefault),
       automaticallyImplyLeading: false,
       titleSpacing: 0.0,
@@ -167,8 +162,8 @@ class DeviceViewState extends State<DevicesScreen> {
 
           if (selectedDevices != null) {
             currentAppBar = buildDeviceOptionsBar(
+              context,
               props: props,
-              context: context,
             );
           }
 

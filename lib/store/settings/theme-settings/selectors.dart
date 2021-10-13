@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:syphon/global/algos.dart';
 
 import 'package:syphon/global/colours.dart';
@@ -22,6 +23,16 @@ Color selectPrimaryColor(ThemeSettings themeSettings) {
 
 Color selectAccentColor(ThemeSettings themeSettings) {
   return Color(themeSettings.accentColor);
+}
+
+Color computeContrastColorText(Color? color, {double ratio = 0.5}) {
+  return (color ?? Colors.white).computeLuminance() < ratio ? Colors.white : Colors.black;
+}
+
+SystemUiOverlayStyle computeSystemUIColor(BuildContext context, {double ratio = 0.5}) {
+  return Theme.of(context).scaffoldBackgroundColor.computeLuminance() < ratio
+      ? SystemUiOverlayStyle.light
+      : SystemUiOverlayStyle.dark;
 }
 
 int selectRowHighlightColor(ThemeType themeType) {

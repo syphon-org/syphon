@@ -1,16 +1,14 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
-import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PagePasswordReset.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
@@ -55,7 +53,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
 
           return Scaffold(
             appBar: AppBar(
-              brightness: Brightness.light,
+              systemOverlayStyle: computeSystemUIColor(context),
               elevation: 0,
               backgroundColor: Colors.transparent,
               leading: IconButton(

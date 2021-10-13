@@ -321,6 +321,22 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
+  ///  https://matrix.org/docs/spec/client_server/latest#id211
+  ///
+  ///  Check Username Availability
+  ///
+  ///  Used to check what types of logins are available on the server
+  static Future<dynamic> checkHomeserverAlt({
+    String protocol = 'https://',
+    String homeserver = Values.homeserverDefault,
+  }) async {
+    final String url = '$protocol$homeserver/.well-known/matrix/server';
+
+    final response = await http.get(Uri.parse(url));
+
+    return await json.decode(response.body);
+  }
+
   static Future<dynamic> checkVersion({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,

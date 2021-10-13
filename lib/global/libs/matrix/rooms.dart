@@ -39,10 +39,14 @@ abstract class Rooms {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
-      Uri.parse(url),
-      headers: headers,
-    );
+    final response = await http
+        .get(
+          Uri.parse(url),
+          headers: headers,
+        )
+        .timeout(
+          const Duration(seconds: 60),
+        );
 
     return await json.decode(utf8.decode(response.bodyBytes));
   }

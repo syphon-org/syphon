@@ -1,39 +1,36 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/auth/selectors.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
-
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/views/behaviors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 class LoginScreenArguments {
   final bool multiaccount;
@@ -262,7 +259,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           elevation: 0,
-          brightness: Theme.of(context).brightness,
+          systemOverlayStyle: computeSystemUIColor(context),
           backgroundColor: Colors.transparent,
           actions: <Widget>[
             Visibility(

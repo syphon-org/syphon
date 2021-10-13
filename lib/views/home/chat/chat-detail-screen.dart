@@ -1,36 +1,33 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/options/types.dart';
 import 'package:syphon/store/user/actions.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
-
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/selectors.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/selectors.dart';
-import 'package:syphon/store/settings/chat-settings/actions.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/widgets/avatars/avatar.dart';
-import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 
 class ChatDetailsArguments {
   final String? roomId;
@@ -136,10 +133,12 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
   onLeaveChat(_Props props) async {
     showDialog(
       context: context,
-      builder: (context) => DialogConfirm(
+      builder: (dialogContext) => DialogConfirm(
         title: Strings.buttonLeaveChat.capitalize(),
+        confirmText: Strings.buttonLeaveChat.capitalize(),
+        confirmStyle: TextStyle(color: Colors.red),
         content: Strings.confirmLeaveRooms(rooms: [props.room]),
-        onDismiss: () => Navigator.pop(context),
+        onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           await props.onLeaveChat();
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -185,7 +184,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
               SliverAppBar(
                 pinned: true,
                 expandedHeight: height * 0.3,
-                brightness: Theme.of(context).appBarTheme.brightness,
+                systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
                 automaticallyImplyLeading: false,
                 titleSpacing: 0.0,
                 title: Row(

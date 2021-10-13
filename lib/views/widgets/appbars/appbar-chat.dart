@@ -220,7 +220,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
         builder: (context, props) => AppBar(
           titleSpacing: 0.0,
           automaticallyImplyLeading: false,
-          brightness: Theme.of(context).appBarTheme.brightness,
+          systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
           title: Row(
             children: <Widget>[
               Container(

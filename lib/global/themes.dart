@@ -59,6 +59,13 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
           ),
 
       // Core UI
+      appBarTheme: AppBarTheme(
+        elevation: appBarElevation,
+        color: Color(appTheme.appBarColor),
+        systemOverlayStyle: Color(appTheme.appBarColor).computeLuminance() < 0.5
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
+      ),
       dialogBackgroundColor: dialogBackgroundColor,
       focusColor: primaryColor,
       textSelectionTheme: TextSelectionThemeData(
@@ -69,11 +76,6 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       selectedRowColor: Color(selectedRowColor),
       iconTheme: IconThemeData(color: iconColor),
       scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
-      appBarTheme: AppBarTheme(
-        elevation: appBarElevation,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        color: Color(appTheme.appBarColor),
-      ),
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
           color: invertedPrimaryColor,
