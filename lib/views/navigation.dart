@@ -1,38 +1,37 @@
 import 'package:flutter/material.dart';
-
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
-import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
-import 'package:syphon/views/home/chat/media-preview-screen.dart';
+import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/groups/group-create-public-screen.dart';
 import 'package:syphon/views/home/groups/group-create-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
 import 'package:syphon/views/home/home-screen.dart';
-import 'package:syphon/views/home/profile/profile-user-screen.dart';
 import 'package:syphon/views/home/profile/profile-screen.dart';
-import 'package:syphon/views/home/search/search-groups-screen.dart';
+import 'package:syphon/views/home/profile/profile-user-screen.dart';
 import 'package:syphon/views/home/search/search-chats-screen.dart';
+import 'package:syphon/views/home/search/search-groups-screen.dart';
 import 'package:syphon/views/home/search/search-users-screen.dart';
 import 'package:syphon/views/home/settings/advanced-settings-screen.dart';
 import 'package:syphon/views/home/settings/blocked-screen.dart';
+import 'package:syphon/views/home/settings/password/password-update-screen.dart';
 import 'package:syphon/views/home/settings/settings-chats-screen.dart';
 import 'package:syphon/views/home/settings/settings-devices-screen.dart';
 import 'package:syphon/views/home/settings/settings-languages-screen.dart';
-import 'package:syphon/views/home/settings/settings-screen.dart';
 import 'package:syphon/views/home/settings/settings-notifications-screen.dart';
-import 'package:syphon/views/home/settings/password/password-update-screen.dart';
 import 'package:syphon/views/home/settings/settings-privacy-screen.dart';
+import 'package:syphon/views/home/settings/settings-screen.dart';
 import 'package:syphon/views/home/settings/settings-storage-screen.dart';
 import 'package:syphon/views/home/settings/settings-theme-screen.dart';
+import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
-import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
-import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
-import 'package:syphon/views/intro/signup/signup-screen.dart';
+import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
 import 'package:syphon/views/intro/signup/loading-screen.dart';
+import 'package:syphon/views/intro/signup/signup-screen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
 class NavigationService {

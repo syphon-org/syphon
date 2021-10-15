@@ -68,7 +68,7 @@ ThunkAction<AppState> addInfo({
   Function? onAction,
 }) {
   return (Store<AppState> store) async {
-    printInfo('[$origin] [INFO] $message');
+    printInfo('[INFO] [$origin] $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert = Alert(
@@ -90,7 +90,7 @@ ThunkAction<AppState> addConfirmation({
   error,
 }) {
   return (Store<AppState> store) async {
-    printInfo('[$origin] [CONFIRMATION] $message');
+    printInfo('[CONFIRMATION] [$origin] $message');
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert = Alert(type: type, message: message, error: error.toString());
@@ -106,7 +106,7 @@ ThunkAction<AppState> addAlert({
   error,
 }) {
   return (Store<AppState> store) async {
-    printError('[$origin] [ERROR] ${error.toString()}');
+    printError('[ERROR] [$origin] ${error.toString()}');
 
     if (message.isEmpty && error == null) return;
 

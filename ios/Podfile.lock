@@ -1,4 +1,7 @@
 PODS:
+  - connectivity_plus (0.0.1):
+    - Flutter
+    - Reachability
   - device_info (0.0.1):
     - Flutter
   - DKImagePickerController/Core (4.3.2):
@@ -60,6 +63,7 @@ PODS:
     - Flutter
   - path_provider (0.0.1):
     - Flutter
+  - Reachability (3.2)
   - SDWebImage (5.10.0):
     - SDWebImage/Core (= 5.10.0)
   - SDWebImage/Core (5.10.0)
@@ -85,6 +89,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
@@ -110,11 +115,14 @@ SPEC REPOS:
     - DKPhotoGallery
     - FMDB
     - OLMKit
+    - Reachability
     - SDWebImage
     - SQLCipher
     - SwiftyGif
 
 EXTERNAL SOURCES:
+  connectivity_plus:
+    :path: ".symlinks/plugins/connectivity_plus/ios"
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
   emoji_picker_flutter:
@@ -151,6 +159,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
+  connectivity_plus: 5f0eb61093bec56935f21a1699dd2758bc895587
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   DKImagePickerController: b5eb7f7a388e4643264105d648d01f727110fc3d
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
@@ -166,6 +175,7 @@ SPEC CHECKSUMS:
   OLMKit: 4ee0159d63feeb86d836fdcfefe418e163511639
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SDWebImage: 9169792e9eec3e45bba2a0c02f74bf8bd922d1ee
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904

@@ -477,6 +477,9 @@ class MessageWidget extends StatelessWidget {
                                     child: MarkdownBody(
                                       data: body.trim(),
                                       styleSheet: MarkdownStyleSheet(
+                                        blockquote: TextStyle(
+                                          backgroundColor: bubbleColor,
+                                        ),
                                         p: TextStyle(
                                           color: textColor,
                                           fontStyle: fontStyle,

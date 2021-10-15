@@ -69,9 +69,9 @@ ThunkAction<AppState> fetchKnownServers() {
   };
 }
 
+// fetch homeserver well-known
 ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
   return (Store<AppState> store) async {
-    // fetch homeserver well-known
     try {
       final response = await MatrixApi.checkHomeserver(
             protocol: store.state.authStore.protocol,
