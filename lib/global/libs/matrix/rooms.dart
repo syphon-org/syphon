@@ -25,13 +25,15 @@ abstract class Rooms {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
+    final fullSync = since == null && filter == null;
+
     // Params
     url += '?full_state=$fullState';
     url += since != null ? '&since=$since' : '';
     url += setPresence != null ? '&set_presence=$setPresence' : '';
     url += timeout != null ? '&timeout=$timeout' : '';
     url += filter != null ? '&filter=$filter' : '';
-    url += since == null && filter == null
+    url += fullSync
         ? '&filter={"room":{"state": {"lazy_load_members":true}, "timeline": {"lazy_load_members":true}}}'
         : '';
 
@@ -45,7 +47,7 @@ abstract class Rooms {
           headers: headers,
         )
         .timeout(
-          const Duration(seconds: 60),
+          Duration(seconds: fullSync ? 180 : 60),
         );
 
     return await json.decode(utf8.decode(response.bodyBytes));
