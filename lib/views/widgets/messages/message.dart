@@ -312,7 +312,8 @@ class MessageWidget extends StatelessWidget {
 
     // efficent way to check if Matrix message is a reply
     if (body.length > 1 && body[0] == '>') {
-      replyColor = HSLColor.fromColor(bubbleColor).withLightness(0.85).toColor();
+      final isLight = bubbleColor.computeLuminance() > 0.5;
+      replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
     }
 
     if (message.type == EventTypes.encrypted) {
@@ -489,9 +490,10 @@ class MessageWidget extends StatelessWidget {
                                         ),
                                         blockquoteDecoration: BoxDecoration(
                                           color: replyColor,
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: bubbleBorder.topLeft,
-                                            topRight: bubbleBorder.topRight,
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft:
+                                                Radius.circular(12), //TODO: shape similar to bubbleBorder
+                                            topRight: Radius.circular(12),
                                             bottomLeft: Radius.circular(4),
                                             bottomRight: Radius.circular(4),
                                           ),

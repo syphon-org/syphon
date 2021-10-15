@@ -57,7 +57,7 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
         final _action = action as UpdateMediaCache;
 
         // dont save decrypted images
-        final decrypting = store.state.mediaStore.mediaStatus[_action.mxcUri] != MediaStatus.DECRYPTING.value;
+        final decrypting = store.state.mediaStore.mediaStatus[_action.mxcUri] == MediaStatus.DECRYPTING.value;
         if (decrypting) return;
 
         saveMedia(_action.mxcUri, _action.data, info: _action.info, type: _action.type, storage: storage!);

@@ -9,6 +9,7 @@ scripts:
   start: flutter run # -d <device_id>
   start-fresh: flutter run --no-fast-start # -d <device_id>
   devices: flutter devices
+  install: flutter pub get
   build: flutter pub run build_runner build --delete-conflicting-outputs
   watch: flutter pub run build_runner build --delete-conflicting-outputs
   uninstall: adb shell && pm uninstall org.tether.tether # (sometimes doesn't uninstall when debugging?)
