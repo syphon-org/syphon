@@ -1,27 +1,25 @@
 import 'dart:io';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
-import 'package:syphon/views/widgets/avatars/avatar.dart';
-import 'package:syphon/views/widgets/input/text-field-secure.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
-
-import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/behaviors.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -111,11 +109,9 @@ class ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        final backgroundColor = selectBackgroundBrightness(props.themeType);
+        final backgroundColor = selectAvatarBackground(props.themeType);
 
-        final hasNewInfo = avatarFileNew != null ||
-            displayNameNew != null ||
-            userIdNew != null;
+        final hasNewInfo = avatarFileNew != null || displayNameNew != null || userIdNew != null;
 
         return Scaffold(
           appBar: AppBar(
@@ -247,8 +243,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     loading: props.loading,
                                     disabled: props.loading || !hasNewInfo,
                                     onPressed: () async {
-                                      final bool successful =
-                                          await props.onSaveProfile(
+                                      final bool successful = await props.onSaveProfile(
                                         userIdNew: null,
                                         avatarFileNew: avatarFileNew,
                                         displayNameNew: displayNameNew,
@@ -329,8 +324,7 @@ class _Props extends Equatable {
         }) async {
           final currentUser = store.state.authStore.user;
 
-          if (displayNameNew != null &&
-              currentUser.displayName != displayNameNew) {
+          if (displayNameNew != null && currentUser.displayName != displayNameNew) {
             final bool successful = await store.dispatch(
               updateDisplayName(displayNameNew),
             );

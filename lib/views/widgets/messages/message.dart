@@ -491,8 +491,8 @@ class MessageWidget extends StatelessWidget {
                                         blockquoteDecoration: BoxDecoration(
                                           color: replyColor,
                                           borderRadius: const BorderRadius.only(
-                                            topLeft:
-                                                Radius.circular(12), //TODO: shape similar to bubbleBorder
+                                            //TODO: shape similar to bubbleBorder
+                                            topLeft: Radius.circular(12),
                                             topRight: Radius.circular(12),
                                             bottomLeft: Radius.circular(4),
                                             bottomRight: Radius.circular(4),

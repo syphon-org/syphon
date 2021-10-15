@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
@@ -14,11 +13,10 @@ import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
-
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -331,7 +329,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     var alertOverride;
 
-    if (ConnectionService.currentStatus == null && !alert.offline) {
+    if (!ConnectionService.isConnected() && !alert.offline) {
       alertOverride = 'Looks like you may be offline. Check your connection and try again.';
     }
 
