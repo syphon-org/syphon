@@ -207,6 +207,7 @@ class MessageWidget extends StatelessWidget {
 
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
+    var replyColor = color;
     var bubbleColor = color ?? Colours.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var alignmentMessage = MainAxisAlignment.start;
@@ -308,6 +309,12 @@ class MessageWidget extends StatelessWidget {
     }
 
     String body = message.body ?? '';
+
+    // efficent way to check if Matrix message is a reply
+    if (body.length > 1 && body[0] == '>') {
+      replyColor = HSLColor.fromColor(bubbleColor).withLightness(0.85).toColor();
+    }
+
     if (message.type == EventTypes.encrypted) {
       if (message.body!.isEmpty) {
         body = Strings.labelEncryptedMessage;
@@ -479,6 +486,15 @@ class MessageWidget extends StatelessWidget {
                                       styleSheet: MarkdownStyleSheet(
                                         blockquote: TextStyle(
                                           backgroundColor: bubbleColor,
+                                        ),
+                                        blockquoteDecoration: BoxDecoration(
+                                          color: replyColor,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: bubbleBorder.topLeft,
+                                            topRight: bubbleBorder.topRight,
+                                            bottomLeft: Radius.circular(4),
+                                            bottomRight: Radius.circular(4),
+                                          ),
                                         ),
                                         p: TextStyle(
                                           color: textColor,
