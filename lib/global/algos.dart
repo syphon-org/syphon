@@ -21,7 +21,8 @@ List<int> fibonacci(int n) {
 String getRandomString(int length) {
   const ch = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
   final r = Random();
-  return String.fromCharCodes(Iterable.generate(length, (_) => ch.codeUnitAt(r.nextInt(ch.length))));
+  return String.fromCharCodes(
+      Iterable.generate(length, (_) => ch.codeUnitAt(r.nextInt(ch.length))));
 }
 
 // time functions by wrapping them here - needs testing
@@ -44,7 +45,8 @@ String enumToString(dynamic enumItem) {
   return enumItem.toString().split('.')[1];
 }
 
-Future onFocusSafe({FocusNode? focusNode, required Future<void> Function() onFunction}) async {
+Future onFocusSafe(
+    {FocusNode? focusNode, required Future<void> Function() onFunction}) async {
   if (focusNode == null) return Future.value();
 
   if (!focusNode.hasFocus) {

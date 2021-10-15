@@ -159,9 +159,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
     final ChatDetailsArguments? arguments =
         ModalRoute.of(context)!.settings.arguments as ChatDetailsArguments?;
 
-    final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
-        ? Color(Colours.greyLightest)
-        : Theme.of(context).scaffoldBackgroundColor;
+    final scaffordBackgroundColor =
+        Theme.of(context).brightness == Brightness.light
+            ? Color(Colours.greyLightest)
+            : Theme.of(context).scaffoldBackgroundColor;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
@@ -170,7 +171,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
         arguments?.roomId,
       ),
       builder: (context, props) {
-        var notificationsEnabled = props.notificationSettings.toggleType == ToggleType.Enabled;
+        var notificationsEnabled =
+            props.notificationSettings.toggleType == ToggleType.Enabled;
 
         if (props.notificationOptions != null) {
           notificationsEnabled = props.notificationOptions?.enabled ?? false;
@@ -184,7 +186,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
               SliverAppBar(
                 pinned: true,
                 expandedHeight: height * 0.3,
-                systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
+                systemOverlayStyle:
+                    Theme.of(context).appBarTheme.systemOverlayStyle,
                 automaticallyImplyLeading: false,
                 titleSpacing: 0.0,
                 title: Row(
@@ -200,7 +203,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                       child: Text(
                         arguments!.title!,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.white),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ],
@@ -247,14 +253,17 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                               width: width,
                               padding: titlePadding,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
                                       Text(
                                         Strings.labelUsers,
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context).textTheme.subtitle2,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .subtitle2,
                                       ),
                                     ],
                                   ),
@@ -320,7 +329,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                   Text(
                                     props.room.name!,
                                     textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.headline6,
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
                                   ),
                                   Text(
                                     props.room.id,
@@ -333,7 +343,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                     style: Theme.of(context).textTheme.caption,
                                   ),
                                   Visibility(
-                                    visible: props.room.topic != null && props.room.topic!.isNotEmpty,
+                                    visible: props.room.topic != null &&
+                                        props.room.topic!.isNotEmpty,
                                     child: Container(
                                       padding: EdgeInsets.only(top: 12),
                                       child: Text(
@@ -421,7 +432,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                               ),
                               trailing: Switch(
                                 value: notificationsEnabled,
-                                onChanged: (_) => props.onToggleRoomNotifications(),
+                                onChanged: (_) =>
+                                    props.onToggleRoomNotifications(),
                               ),
                             ),
                             ListTile(
@@ -434,7 +446,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   'Default',
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(color: Colors.grey),
                                 ),
                               ),
                             ),
@@ -448,7 +463,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   'Default (Argon)',
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(color: Colors.grey),
                                 ),
                               ),
                             ),
@@ -491,7 +509,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                   contentPadding: contentPadding,
                                   title: Text(
                                     'Block User',
-                                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .subtitle1!
+                                        .copyWith(
                                           color: Colors.redAccent,
                                         ),
                                   ),
@@ -502,7 +523,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                 contentPadding: contentPadding,
                                 title: Text(
                                   'Leave Chat',
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(
                                         color: Colors.redAccent,
                                       ),
                                 ),
@@ -565,36 +589,38 @@ class _Props extends Equatable {
         loading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
-      loading: store.state.roomStore.loading,
-      notificationSettings: store.state.settingsStore.notificationSettings,
-      notificationOptions: store.state.settingsStore.notificationSettings.notificationOptions[roomId],
-      room: selectRoom(id: roomId, state: store.state),
-      users: roomUsers(store.state, roomId),
-      currentUser: store.state.authStore.user,
-      messages: roomMessages(store.state, roomId),
-      onToggleRoomNotifications: () async {
-        if (roomId != null) {
-          await store.dispatch(toggleChatNotifications(roomId: roomId));
-        }
-      },
-      onBlockUser: (User user) async {
-        await store.dispatch(toggleBlockUser(user: user));
-      },
-      onLeaveChat: () async {
-        await store.dispatch(leaveRoom(
-          room: selectRoom(state: store.state, id: roomId),
-        ));
-      },
-      chatColorPrimary: selectChatColor(store, roomId),
-      onSelectPrimaryColor: (color) {
-        store.dispatch(updateRoomPrimaryColor(
-          roomId: roomId,
-          color: color,
-        ));
-      },
-      onToggleDirectRoom: () {
-        final room = selectRoom(id: roomId, state: store.state);
-        store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct));
-      });
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
+          loading: store.state.roomStore.loading,
+          notificationSettings: store.state.settingsStore.notificationSettings,
+          notificationOptions: store.state.settingsStore.notificationSettings
+              .notificationOptions[roomId],
+          room: selectRoom(id: roomId, state: store.state),
+          users: roomUsers(store.state, roomId),
+          currentUser: store.state.authStore.user,
+          messages: roomMessages(store.state, roomId),
+          onToggleRoomNotifications: () async {
+            if (roomId != null) {
+              await store.dispatch(toggleChatNotifications(roomId: roomId));
+            }
+          },
+          onBlockUser: (User user) async {
+            await store.dispatch(toggleBlockUser(user: user));
+          },
+          onLeaveChat: () async {
+            await store.dispatch(leaveRoom(
+              room: selectRoom(state: store.state, id: roomId),
+            ));
+          },
+          chatColorPrimary: selectChatColor(store, roomId),
+          onSelectPrimaryColor: (color) {
+            store.dispatch(updateRoomPrimaryColor(
+              roomId: roomId,
+              color: color,
+            ));
+          },
+          onToggleDirectRoom: () {
+            final room = selectRoom(id: roomId, state: store.state);
+            store.dispatch(toggleDirectRoom(room: room, enabled: !room.direct));
+          });
 }

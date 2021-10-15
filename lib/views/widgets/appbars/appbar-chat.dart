@@ -216,7 +216,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.room!.id),
+        converter: (Store<AppState> store) =>
+            _Props.mapStateToProps(store, widget.room!.id),
         builder: (context, props) => AppBar(
           titleSpacing: 0.0,
           automaticallyImplyLeading: false,
@@ -278,7 +279,9 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                         ),
                       ),
                       Visibility(
-                        visible: widget.badgesEnabled && widget.room!.type == 'group' && !widget.room!.invite,
+                        visible: widget.badgesEnabled &&
+                            widget.room!.type == 'group' &&
+                            !widget.room!.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -298,8 +301,9 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                         ),
                       ),
                       Visibility(
-                        visible:
-                            widget.badgesEnabled && widget.room!.type == 'public' && !widget.room!.invite,
+                        visible: widget.badgesEnabled &&
+                            widget.room!.type == 'public' &&
+                            !widget.room!.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -326,7 +330,10 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                 child: Text(
                   widget.room!.name!,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.white),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(color: Colors.white),
                 ),
               ),
             ],
@@ -436,7 +443,8 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         currentUser: store.state.authStore.user,
         roomUsers: (store.state.roomStore.rooms[roomId!]!.userIds)
             .map((id) => store.state.userStore.users[id])
@@ -452,7 +460,8 @@ class _Props extends Equatable {
           ));
         },
         onToggleNotifications: () {
-          store.dispatch(toggleChatNotifications(roomId: roomId, enabled: false));
+          store.dispatch(
+              toggleChatNotifications(roomId: roomId, enabled: false));
         },
       );
 }

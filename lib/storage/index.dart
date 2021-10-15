@@ -12,7 +12,7 @@ import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/constants.dart';
-import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/sembast/codec.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';

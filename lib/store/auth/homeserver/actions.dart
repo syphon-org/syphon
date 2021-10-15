@@ -80,14 +80,16 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
           {};
 
       var identityUrl = response['m.identity_server'];
-      var baseUrl = (response['m.homeserver']['base_url'] as String).replaceAll('https://', '');
+      var baseUrl = (response['m.homeserver']['base_url'] as String)
+          .replaceAll('https://', '');
 
       if (baseUrl.endsWith('/')) {
         baseUrl = baseUrl.replaceRange(baseUrl.length - 1, null, '');
       }
 
       if (identityUrl != null) {
-        identityUrl = (response['m.identity_server']['base_url'] as String).replaceAll('https://', '');
+        identityUrl = (response['m.identity_server']['base_url'] as String)
+            .replaceAll('https://', '');
       }
 
       return homeserver.copyWith(
@@ -113,7 +115,8 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
           identityUrl: baseUrl,
         );
       } catch (error) {
-        printError('[fetchBaseUrl] failed alternative .well-known server query');
+        printError(
+            '[fetchBaseUrl] failed alternative .well-known server query');
       }
     }
 

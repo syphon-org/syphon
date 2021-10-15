@@ -139,6 +139,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        primaryColor: selectPrimaryColor(store.state.settingsStore.themeSettings),
+        primaryColor:
+            selectPrimaryColor(store.state.settingsStore.themeSettings),
       );
 }

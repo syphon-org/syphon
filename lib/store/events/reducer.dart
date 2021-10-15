@@ -7,7 +7,8 @@ import 'package:syphon/store/events/redaction/model.dart';
 import './actions.dart';
 import './state.dart';
 
-EventStore eventReducer([EventStore state = const EventStore(), dynamic action]) {
+EventStore eventReducer(
+    [EventStore state = const EventStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetEvents:
       final roomId = action.roomId;
@@ -66,7 +67,8 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       messages[roomId] = messagesAll.values.toList();
 
       // remove locally saved outbox messages if they've now been received from a server
-      if (state.outbox.containsKey(roomId) && state.outbox[roomId]!.isNotEmpty) {
+      if (state.outbox.containsKey(roomId) &&
+          state.outbox[roomId]!.isNotEmpty) {
         final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
 
         // removed based on eventId, not tempId

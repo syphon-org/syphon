@@ -94,7 +94,8 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                   scrollDirection: Axis.vertical,
                   itemCount: props.homeservers.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final homeserver = props.homeservers[index] ?? {} as Homeserver;
+                    final homeserver =
+                        props.homeservers[index] ?? {} as Homeserver;
 
                     return Container(
                       padding: EdgeInsets.only(top: 8, bottom: 8),
@@ -108,7 +109,8 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                             size: Dimensions.avatarSizeMin,
                             url: homeserver.photoUrl,
                             alt: homeserver.hostname,
-                            background: Colours.hashedColor(homeserver.hostname),
+                            background:
+                                Colours.hashedColor(homeserver.hostname),
                           ),
                           title: Text(
                             homeserver.hostname!,
@@ -119,7 +121,8 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                             style: Theme.of(context).textTheme.caption,
                           ),
                           trailing: Visibility(
-                            visible: homeserver.hostname == props.homeserver.hostname,
+                            visible: homeserver.hostname ==
+                                props.homeserver.hostname,
                             child: Container(
                               width: 32,
                               height: 32,
@@ -210,8 +213,9 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                   ),
                 ),
                 Visibility(
-                  visible:
-                      props.searchText.isNotEmpty && props.searchText.isNotEmpty && props.homeservers.isEmpty,
+                  visible: props.searchText.isNotEmpty &&
+                      props.searchText.isNotEmpty &&
+                      props.homeservers.isEmpty,
                   child: Container(
                     padding: EdgeInsets.only(top: 8, bottom: 8),
                     child: GestureDetector(
@@ -278,7 +282,8 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading: store.state.searchStore.loading || store.state.authStore.loading,
+        loading:
+            store.state.searchStore.loading || store.state.authStore.loading,
         searchText: store.state.searchStore.searchText ?? '',
         homeservers: store.state.searchStore.searchText != null
             ? store.state.searchStore.searchResults

@@ -26,7 +26,8 @@ class HomeserverStep extends StatefulWidget {
   HomeserverStepState createState() => HomeserverStepState();
 }
 
-class HomeserverStepState extends State<HomeserverStep> with Lifecycle<HomeserverStep> {
+class HomeserverStepState extends State<HomeserverStep>
+    with Lifecycle<HomeserverStep> {
   HomeserverStepState();
 
   final homeserverController = TextEditingController();
@@ -40,7 +41,8 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
   }
 
   onDidChange(_Props? oldProps, _Props props) {
-    final baseUrlChanged = props.homeserver.hostname != oldProps?.homeserver.hostname;
+    final baseUrlChanged =
+        props.homeserver.hostname != oldProps?.homeserver.hostname;
 
     if (baseUrlChanged) {
       final hostname = props.hostname;
@@ -140,7 +142,8 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupHomeserver,
-                    semanticsLabel: 'User resting their leg on an at symbol stool box',
+                    semanticsLabel:
+                        'User resting their leg on an at symbol stool box',
                   ),
                 ),
               ),

@@ -113,7 +113,9 @@ class ProfileScreenState extends State<ProfileScreen> {
 
         final backgroundColor = selectBackgroundBrightness(props.themeType);
 
-        final hasNewInfo = avatarFileNew != null || displayNameNew != null || userIdNew != null;
+        final hasNewInfo = avatarFileNew != null ||
+            displayNameNew != null ||
+            userIdNew != null;
 
         return Scaffold(
           appBar: AppBar(
@@ -245,7 +247,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     loading: props.loading,
                                     disabled: props.loading || !hasNewInfo,
                                     onPressed: () async {
-                                      final bool successful = await props.onSaveProfile(
+                                      final bool successful =
+                                          await props.onSaveProfile(
                                         userIdNew: null,
                                         avatarFileNew: avatarFileNew,
                                         displayNameNew: displayNameNew,
@@ -326,7 +329,8 @@ class _Props extends Equatable {
         }) async {
           final currentUser = store.state.authStore.user;
 
-          if (displayNameNew != null && currentUser.displayName != displayNameNew) {
+          if (displayNameNew != null &&
+              currentUser.displayName != displayNameNew) {
             final bool successful = await store.dispatch(
               updateDisplayName(displayNameNew),
             );

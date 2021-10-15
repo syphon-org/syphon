@@ -63,7 +63,8 @@ Future<Message> formatMessageContent({
 
         if (room.encryptionEnabled) {
           if (info!.key == null || info.iv == null) {
-            throw Exception('Cannot send encrypted media message without providing decryption info');
+            throw Exception(
+                'Cannot send encrypted media message without providing decryption info');
           }
 
           // must be unpadded url safe per spec, so replacing the pad with nothing

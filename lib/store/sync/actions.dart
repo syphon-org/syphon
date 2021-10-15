@@ -191,7 +191,8 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       store.dispatch(SetSyncing(syncing: true));
 
       final lastSince = store.state.syncStore.lastSince;
-      final isFullSync = forceFull || since == null || store.state.roomStore.rooms.isEmpty;
+      final isFullSync =
+          forceFull || since == null || store.state.roomStore.rooms.isEmpty;
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync running *** ');
@@ -222,7 +223,8 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       final String nextBatch = data['next_batch'];
       final Map<String, dynamic> roomJson = data['rooms'] ?? {};
       final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};
-      final Map<String, dynamic> oneTimeKeyCount = data['device_one_time_keys_count'] ?? {};
+      final Map<String, dynamic> oneTimeKeyCount =
+          data['device_one_time_keys_count'] ?? {};
 
       if (roomJson.isNotEmpty) {
         final Map<String, dynamic> joinedJson = roomJson['join'] ?? {};

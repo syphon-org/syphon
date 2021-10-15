@@ -111,8 +111,10 @@ ThunkAction<AppState> addAlert({
     if (message.isEmpty && error == null) return;
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
-    final alert =
-        Alert(type: type, message: message.isNotEmpty ? message : error.toString(), error: error.toString());
+    final alert = Alert(
+        type: type,
+        message: message.isNotEmpty ? message : error.toString(),
+        error: error.toString());
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);
   };

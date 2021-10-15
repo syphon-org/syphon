@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:moor/moor.dart' as moor;
-import 'package:syphon/storage/moor/database.dart';
+import 'package:drift/drift.dart' as drift;
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/media/encryption.dart';
 
 enum MediaType {
@@ -51,7 +51,7 @@ extension MediaStatusValue on MediaStatus {
 ///
 /// Currently used for cold storage of media data only
 ///
-class Media implements moor.Insertable<Media> {
+class Media implements drift.Insertable<Media> {
   final String? mxcUri;
   final String? type;
   final Uint8List? data;
@@ -78,12 +78,12 @@ class Media implements moor.Insertable<Media> {
       );
 
   @override
-  Map<String, moor.Expression> toColumns(bool nullToAbsent) {
+  Map<String, drift.Expression> toColumns(bool nullToAbsent) {
     return MediasCompanion(
-      mxcUri: moor.Value(mxcUri!),
-      type: moor.Value(type),
-      data: moor.Value(data),
-      info: moor.Value(info),
+      mxcUri: drift.Value(mxcUri!),
+      type: drift.Value(type),
+      data: drift.Value(data),
+      info: drift.Value(info),
     ).toColumns(nullToAbsent);
   }
 }

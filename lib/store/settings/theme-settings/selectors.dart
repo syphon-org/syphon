@@ -26,10 +26,13 @@ Color selectAccentColor(ThemeSettings themeSettings) {
 }
 
 Color computeContrastColorText(Color? color, {double ratio = 0.5}) {
-  return (color ?? Colors.white).computeLuminance() < ratio ? Colors.white : Colors.black;
+  return (color ?? Colors.white).computeLuminance() < ratio
+      ? Colors.white
+      : Colors.black;
 }
 
-SystemUiOverlayStyle computeSystemUIColor(BuildContext context, {double ratio = 0.5}) {
+SystemUiOverlayStyle computeSystemUIColor(BuildContext context,
+    {double ratio = 0.5}) {
   return Theme.of(context).scaffoldBackgroundColor.computeLuminance() < ratio
       ? SystemUiOverlayStyle.light
       : SystemUiOverlayStyle.dark;

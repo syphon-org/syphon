@@ -15,9 +15,12 @@ class Algorithms {
 }
 
 class Keys {
-  static String fingerprintId({String? deviceId}) => '${Algorithms.ed25519}:$deviceId';
-  static String identityKeyId({String? deviceId}) => '${Algorithms.curve25591}:$deviceId';
-  static String oneTimeKeyId({String? keyId}) => '${Algorithms.signedcurve25519}:$keyId';
+  static String fingerprintId({String? deviceId}) =>
+      '${Algorithms.ed25519}:$deviceId';
+  static String identityKeyId({String? deviceId}) =>
+      '${Algorithms.curve25591}:$deviceId';
+  static String oneTimeKeyId({String? keyId}) =>
+      '${Algorithms.signedcurve25519}:$keyId';
 }
 
 abstract class Encryption {
@@ -69,7 +72,8 @@ abstract class Encryption {
     String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/unstable/room_keys/version';
+    final String url =
+        '$protocol$homeserver/_matrix/client/unstable/room_keys/version';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

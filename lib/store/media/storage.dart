@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:moor/moor.dart';
+import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/media/model.dart';

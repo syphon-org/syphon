@@ -207,7 +207,8 @@ class HomeState extends State<HomeScreen> {
       });
     } else {
       setState(() {
-        selectedChats.addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
+        selectedChats
+            .addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
       });
     }
   }
@@ -217,7 +218,9 @@ class HomeState extends State<HomeScreen> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
+  Widget buildAppBarRoomOptions(
+          {required BuildContext context, required _Props props}) =>
+      AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -381,8 +384,10 @@ class HomeState extends State<HomeScreen> {
   @protected
   Widget buildChatList(BuildContext context, _Props props) {
     final rooms = props.rooms;
-    final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
-    final noSearchResults = searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
+    final label =
+        props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
+    final noSearchResults =
+        searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
 
     if (rooms.isEmpty) {
       return Center(
@@ -423,7 +428,8 @@ class HomeState extends State<HomeScreen> {
         final decrypted = props.decrypted[room.id] ?? const [];
         final chatSettings = props.chatSettings[room.id];
 
-        final messageLatest = latestMessage(messages, room: room, decrypted: decrypted);
+        final messageLatest =
+            latestMessage(messages, room: room, decrypted: decrypted);
         final preview = formatPreview(room: room, message: messageLatest);
         final chatName = room.name ?? '';
         final newMessage = messageLatest != null &&
@@ -464,7 +470,8 @@ class HomeState extends State<HomeScreen> {
 
         if (messages.isNotEmpty && messageLatest != null) {
           // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
+          if (messageLatest.type == EventTypes.encrypted &&
+              messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
@@ -565,7 +572,9 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.type == 'group' &&
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -585,7 +594,9 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
+                        visible: props.roomTypeBadgesEnabled &&
+                            room.type == 'public' &&
+                            !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -628,7 +639,8 @@ class HomeState extends State<HomeScreen> {
                           ),
                           Text(
                             formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w100),
                           ),
                         ],
                       ),

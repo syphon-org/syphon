@@ -238,7 +238,8 @@ class ChatInputState extends State<ChatInput> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
+        converter: (Store<AppState> store) =>
+            _Props.mapStateToProps(store, widget.roomId),
         onInitialBuild: onMounted,
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -247,9 +248,11 @@ class ChatInputState extends State<ChatInput> {
 
           // dynamic dimensions
           final double messageInputWidth = width - 72;
-          final bool replying = widget.quotable != null && widget.quotable!.sender != null;
+          final bool replying =
+              widget.quotable != null && widget.quotable!.sender != null;
           final double maxInputHeight = replying ? height * 0.45 : height * 0.5;
-          final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight - 24 : height * 0.38;
+          final double maxMediaHeight =
+              keyboardHeight > 0 ? keyboardHeight - 24 : height * 0.38;
 
           final isSendable = sendable && !widget.sending;
 
@@ -345,31 +348,41 @@ class ChatInputState extends State<ChatInput> {
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              labelText: replying ? widget.quotable!.sender : '',
-                              labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                              contentPadding: Dimensions.inputContentPadding.copyWith(right: 36),
+                              labelText:
+                                  replying ? widget.quotable!.sender : '',
+                              labelStyle: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
+                              contentPadding: Dimensions.inputContentPadding
+                                  .copyWith(right: 36),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.secondary,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
-                                  bottomRight: Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft:
+                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomRight:
+                                      Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.secondary,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
-                                  bottomRight: Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft:
+                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomRight:
+                                      Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                             ),
@@ -409,7 +422,9 @@ class ChatInputState extends State<ChatInput> {
                       enableSuggestions: props.suggestionsEnabled,
                       textCapitalization: props.textCapitalization,
                       keyboardType: TextInputType.multiline,
-                      textInputAction: widget.enterSend ? TextInputAction.send : TextInputAction.newline,
+                      textInputAction: widget.enterSend
+                          ? TextInputAction.send
+                          : TextInputAction.newline,
                       cursorColor: props.inputCursorColor,
                       focusNode: widget.focusNode,
                       controller: widget.controller,
@@ -438,10 +453,14 @@ class ChatInputState extends State<ChatInput> {
                               width: 1,
                             ),
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                              topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                              bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                              bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                              topLeft: Radius.circular(
+                                  !replying ? DEFAULT_BORDER_RADIUS : 0),
+                              topRight: Radius.circular(
+                                  !replying ? DEFAULT_BORDER_RADIUS : 0),
+                              bottomLeft:
+                                  Radius.circular(DEFAULT_BORDER_RADIUS),
+                              bottomRight:
+                                  Radius.circular(DEFAULT_BORDER_RADIUS),
                             )),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -449,10 +468,14 @@ class ChatInputState extends State<ChatInput> {
                               width: 1,
                             ),
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                              topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                              bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                              bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                              topLeft: Radius.circular(
+                                  !replying ? DEFAULT_BORDER_RADIUS : 0),
+                              topRight: Radius.circular(
+                                  !replying ? DEFAULT_BORDER_RADIUS : 0),
+                              bottomLeft:
+                                  Radius.circular(DEFAULT_BORDER_RADIUS),
+                              bottomRight:
+                                  Radius.circular(DEFAULT_BORDER_RADIUS),
                             )),
                       ),
                     ),
@@ -486,7 +509,8 @@ class ChatInputState extends State<ChatInput> {
                         ),
                         child: ListLocalImages(
                           imageSize: imageWidth,
-                          onSelectImage: (file) => widget.onAddMedia(file: file, type: MessageType.image),
+                          onSelectImage: (file) => widget.onAddMedia(
+                              file: file, type: MessageType.image),
                         ),
                       ),
                       Row(children: [
@@ -565,13 +589,18 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
-        inputTextColor: selectInputTextColor(store.state.settingsStore.themeSettings.themeType),
-        inputCursorColor: selectCursorColor(store.state.settingsStore.themeSettings.themeType),
-        inputColorBackground: selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
+        inputTextColor: selectInputTextColor(
+            store.state.settingsStore.themeSettings.themeType),
+        inputCursorColor: selectCursorColor(
+            store.state.settingsStore.themeSettings.themeType),
+        inputColorBackground: selectInputBackgroundColor(
+            store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
         suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
-        textCapitalization: Platform.isIOS ? TextCapitalization.sentences : TextCapitalization.none,
+        textCapitalization: Platform.isIOS
+            ? TextCapitalization.sentences
+            : TextCapitalization.none,
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),
         ),

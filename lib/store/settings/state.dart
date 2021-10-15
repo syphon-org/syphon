@@ -111,11 +111,15 @@ class SettingsStore extends Equatable {
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
         readReceiptsEnabled: readReceiptsEnabled ?? this.readReceiptsEnabled,
-        typingIndicatorsEnabled: typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
+        typingIndicatorsEnabled:
+            typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
-        dismissKeyboardEnabled: dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
-        membershipEventsEnabled: membershipEventsEnabled ?? this.membershipEventsEnabled,
-        roomTypeBadgesEnabled: roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
+        dismissKeyboardEnabled:
+            dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
+        membershipEventsEnabled:
+            membershipEventsEnabled ?? this.membershipEventsEnabled,
+        roomTypeBadgesEnabled:
+            roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
         syncInterval: syncInterval ?? this.syncInterval,
         syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
         chatSettings: chatSettings ?? this.chatSettings,
@@ -130,5 +134,6 @@ class SettingsStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
 
-  factory SettingsStore.fromJson(Map<String, dynamic> json) => _$SettingsStoreFromJson(json);
+  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
+      _$SettingsStoreFromJson(json);
 }

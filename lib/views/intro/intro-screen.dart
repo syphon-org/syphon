@@ -70,7 +70,9 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
 
     // TODO: decide on always showing alpha aggrement on intro
     if (alphaAgreement == null || true) {
-      final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
+      final termsTitle = Platform.isIOS
+          ? Strings.titleDialogTerms
+          : Strings.titleDialogTermsAlpha;
 
       showDialog(
         context: context,
@@ -147,7 +149,8 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
                         },
                         child: Text(
                           Strings.buttonTextAgreement,
-                          style: TextStyle(color: Theme.of(context).primaryColor),
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
                         ),
                       ),
                     ),
@@ -275,14 +278,16 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
                                     dotWidth: 12,
                                     paintStyle: PaintingStyle.fill,
                                     strokeWidth: 12,
-                                    activeDotColor: Theme.of(context).primaryColor,
+                                    activeDotColor:
+                                        Theme.of(context).primaryColor,
                                   ), // your preferred effect
                                 ),
                               ],
                             )
                           : TouchableOpacity(
                               activeOpacity: 0.4,
-                              onTap: () => Navigator.pushNamed(context, Routes.login),
+                              onTap: () =>
+                                  Navigator.pushNamed(context, Routes.login),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
@@ -299,9 +304,14 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
                                     child: Text(
                                       Strings.buttonTextLogin,
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                                            color: Theme.of(context).primaryColor,
-                                            decoration: TextDecoration.underline,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2!
+                                          .copyWith(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                     ),
                                   ),

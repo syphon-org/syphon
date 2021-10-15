@@ -1,7 +1,8 @@
 import './actions.dart';
 import './state.dart';
 
-SearchStore searchReducer([SearchStore state = const SearchStore(), dynamic action]) {
+SearchStore searchReducer(
+    [SearchStore state = const SearchStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(

@@ -21,7 +21,7 @@ packages:
       name: analyzer_plugin
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.0"
+    version: "0.8.0"
   android_alarm_manager:
     dependency: "direct main"
     description:
@@ -281,6 +281,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  drift:
+    dependency: "direct main"
+    description:
+      name: drift
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
+  drift_dev:
+    dependency: "direct dev"
+    description:
+      name: drift_dev
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2"
   easy_localization:
     dependency: "direct main"
     description:
@@ -563,7 +577,7 @@ packages:
       name: io
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.3"
   js:
     dependency: transitive
     description:
@@ -641,22 +655,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  moor:
-    dependency: "direct main"
-    description:
-      name: moor
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.5.0"
-  moor_generator:
-    dependency: "direct dev"
-    description:
-      path: moor_generator
-      ref: cc7d98d110204acb72d415312a78ed7821382d69
-      resolved-ref: cc7d98d110204acb72d415312a78ed7821382d69
-      url: "https://github.com/simolus3/moor.git"
-    source: git
-    version: "4.5.1"
   nm:
     dependency: transitive
     description:

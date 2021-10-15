@@ -38,7 +38,8 @@ class ChatSearchScreen extends StatefulWidget {
   ChatSearchState createState() => ChatSearchState();
 }
 
-class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchScreen> {
+class ChatSearchState extends State<ChatSearchScreen>
+    with Lifecycle<ChatSearchScreen> {
   final searchInputFocusNode = FocusNode();
 
   ChatSearchState();
@@ -71,7 +72,8 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
   Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
-    final ChatSearchArguments arguments = ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
+    final ChatSearchArguments arguments =
+        ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
     final user = arguments.user!;
     final username = formatUsername(user);
 
@@ -80,7 +82,8 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Invite $username',
-        content: '${Strings.confirmInvite}\n\nUser: $username\nRoom: ${room.name}',
+        content:
+            '${Strings.confirmInvite}\n\nUser: $username\nRoom: ${room.name}',
         action: 'send invite',
         onStartChat: () async {
           props.onSendInvite(room: room, user: user);

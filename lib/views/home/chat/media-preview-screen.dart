@@ -38,14 +38,16 @@ class MediaPreviewScreen extends StatefulWidget {
   MediaPreviewState createState() => MediaPreviewState();
 }
 
-class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPreviewScreen> {
+class MediaPreviewState extends State<MediaPreviewScreen>
+    with Lifecycle<MediaPreviewScreen> {
   MediaPreviewState() : super();
 
   File? currentImage;
 
   @override
   onMounted() async {
-    final params = ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments;
+    final params =
+        ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments;
 
     try {
       final firstImage = params.mediaList.first;
@@ -60,7 +62,8 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
 
   @protected
   onConfirm(_Props props) async {
-    final params = ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments;
+    final params =
+        ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments;
 
     await params.onConfirmSend();
     Navigator.pop(context);
@@ -71,7 +74,8 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments).roomId,
+          (ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments)
+              .roomId,
         ),
         builder: (context, props) {
           final encryptionEnabled = props.room.encryptionEnabled;
@@ -107,11 +111,14 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                       Padding(
                         padding: EdgeInsets.only(right: 8),
                         child: Text(
-                          encryptionEnabled ? 'Send Media Message' : 'Send Media Message (Unencrypted)',
+                          encryptionEnabled
+                              ? 'Send Media Message'
+                              : 'Send Media Message (Unencrypted)',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.subtitle2?.copyWith(
-                                fontWeight: FontWeight.w400,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.subtitle2?.copyWith(
+                                    fontWeight: FontWeight.w400,
+                                  ),
                         ),
                       ),
                       Container(
@@ -124,7 +131,9 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                           label: Strings.labelSendEncrypted,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(48),
-                            onTap: props.room.sending ? null : () => onConfirm(props),
+                            onTap: props.room.sending
+                                ? null
+                                : () => onConfirm(props),
                             child: CircleAvatar(
                               backgroundColor: props.room.sending
                                   ? Color(Colours.greyDisabled)
@@ -133,9 +142,15 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                                   ? Padding(
                                       padding: EdgeInsets.all(4),
                                       child: CircularProgressIndicator(
-                                        strokeWidth: Dimensions.strokeWidthThin * 1.5,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          Theme.of(context).colorScheme.secondary.computeLuminance() > 0.6
+                                        strokeWidth:
+                                            Dimensions.strokeWidthThin * 1.5,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                          Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary
+                                                      .computeLuminance() >
+                                                  0.6
                                               ? Colors.black
                                               : Colors.white,
                                         ),
@@ -149,7 +164,8 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                                             ? Assets.iconSendLockSolidBeing
                                             : Assets.iconSendUnlockBeing,
                                         color: Colors.white,
-                                        semanticsLabel: Strings.labelSendEncrypted,
+                                        semanticsLabel:
+                                            Strings.labelSendEncrypted,
                                       ),
                                     ),
                             ),
@@ -178,7 +194,8 @@ class _Props extends Equatable {
         room,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         room: selectRoom(id: roomId, state: store.state),
       );
 }

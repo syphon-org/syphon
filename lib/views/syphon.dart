@@ -18,7 +18,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';

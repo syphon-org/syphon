@@ -66,7 +66,8 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
     final mediaCache = store.state.mediaStore.mediaCache;
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
-      store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
+      store.dispatch(
+          fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
     }
 
     // Created in attempts to reduce framerate drop in chat details
@@ -87,9 +88,11 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
+        converter: (Store<AppState> store) =>
+            _Props.mapStateToProps(store, widget.mxcUri),
         builder: (context, props) {
-          final failed = props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
+          final failed = props.mediaStatus != null &&
+              props.mediaStatus == MediaStatus.FAILURE.value;
           final loading = widget.forceLoading || !props.exists;
 
           if (failed) {
@@ -150,7 +153,8 @@ class _Props extends Equatable {
         mediaCache,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? mxcUri) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? mxcUri) =>
+      _Props(
         exists: store.state.mediaStore.mediaCache[mxcUri] != null,
         mediaCache: store.state.mediaStore.mediaCache[mxcUri],
         mediaStatus: store.state.mediaStore.mediaStatus[mxcUri],

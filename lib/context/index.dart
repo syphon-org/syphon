@@ -17,7 +17,11 @@ import 'package:syphon/global/print.dart';
 
 String generateContextId() {
   final shaHash = sha256.convert(utf8.encode(getRandomString(10)));
-  return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
+  return base64
+      .encode(shaHash.bytes)
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^\w]'), '')
+      .substring(0, 10);
 }
 
 // TODO: convert to setCurrentContext after 0.1.14 release
@@ -29,20 +33,28 @@ Future setCurrentContext(String? current) async {
 
 Future<AppContext> loadCurrentContext() async {
   try {
-    final contextJson = await SecureStorage().read(key: AppContext.ALL_CONTEXT_KEY) ?? '[]';
+    final contextJson =
+        await SecureStorage().read(key: AppContext.ALL_CONTEXT_KEY) ?? '[]';
     final allContexts = List<String>.from(await json.decode(contextJson));
 
-    setCurrentContext(allContexts.isNotEmpty ? allContexts[0] : AppContext.DEFAULT);
+    setCurrentContext(
+        allContexts.isNotEmpty ? allContexts[0] : AppContext.DEFAULT);
 
-    return AppContext(current: allContexts.isNotEmpty ? allContexts[0] : AppContext.DEFAULT);
+    return AppContext(
+        current: allContexts.isNotEmpty ? allContexts[0] : AppContext.DEFAULT);
   } catch (error) {
-    printError('[loadCurrentContext] ERROR LOADING CURRENT CONTEXT ${error.toString()}');
+    printError(
+        '[loadCurrentContext] ERROR LOADING CURRENT CONTEXT ${error.toString()}');
 
     try {
-      SecureStorage().write(key: AppContext.ALL_CONTEXT_KEY, value: json.encode([]));
-      SecureStorage().write(key: AppContext.CURRENT_CONTEXT_KEY, value: json.encode(AppContext.DEFAULT));
+      SecureStorage()
+          .write(key: AppContext.ALL_CONTEXT_KEY, value: json.encode([]));
+      SecureStorage().write(
+          key: AppContext.CURRENT_CONTEXT_KEY,
+          value: json.encode(AppContext.DEFAULT));
     } catch (error) {
-      printError('[loadCurrentContext] ERROR SAVING DEFAULTS ${error.toString()}');
+      printError(
+          '[loadCurrentContext] ERROR SAVING DEFAULTS ${error.toString()}');
     }
 
     setCurrentContext(AppContext.DEFAULT);
@@ -53,7 +65,8 @@ Future<AppContext> loadCurrentContext() async {
 Future saveContext(String? current) async {
   if (current == null) return;
 
-  final contextJson = await SecureStorage().read(key: AppContext.ALL_CONTEXT_KEY) ?? '[]';
+  final contextJson =
+      await SecureStorage().read(key: AppContext.ALL_CONTEXT_KEY) ?? '[]';
   final allContexts = List<String>.from(await json.decode(contextJson));
   final position = allContexts.indexOf(current);
 
@@ -67,12 +80,14 @@ Future saveContext(String? current) async {
     allContexts.insert(0, current);
   }
 
-  return SecureStorage().write(key: AppContext.ALL_CONTEXT_KEY, value: json.encode(allContexts));
+  return SecureStorage()
+      .write(key: AppContext.ALL_CONTEXT_KEY, value: json.encode(allContexts));
 }
 
 Future<List<AppContext>> loadContexts() async {
   try {
-    final contextJson = await SecureStorage().read(key: AppContext.ALL_CONTEXT_KEY) ?? '[]';
+    final contextJson =
+        await SecureStorage().read(key: AppContext.ALL_CONTEXT_KEY) ?? '[]';
     final allContexts = List<String>.from(await json.decode(contextJson));
     return allContexts.map((context) => AppContext(current: context)).toList();
   } catch (error) {
@@ -85,10 +100,12 @@ Future<List<AppContext>> loadContexts() async {
 Future deleteContext(String? current) async {
   if (current == null || current.isEmpty) return;
 
-  final contextJson = await SecureStorage().read(key: AppContext.ALL_CONTEXT_KEY) ?? '[]';
+  final contextJson =
+      await SecureStorage().read(key: AppContext.ALL_CONTEXT_KEY) ?? '[]';
   final allContexts = List<String>.from(await json.decode(contextJson));
 
   allContexts.remove(current);
 
-  return SecureStorage().write(key: AppContext.ALL_CONTEXT_KEY, value: json.encode(allContexts));
+  return SecureStorage()
+      .write(key: AppContext.ALL_CONTEXT_KEY, value: json.encode(allContexts));
 }

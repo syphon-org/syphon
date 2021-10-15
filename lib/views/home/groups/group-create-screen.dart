@@ -192,17 +192,21 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                     Flexible(
                                       flex: 0,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: <Widget>[
                                           Stack(
                                             children: [
                                               Container(
-                                                margin: EdgeInsets.only(top: 42, bottom: 8),
+                                                margin: EdgeInsets.only(
+                                                    top: 42, bottom: 8),
                                                 width: imageSize,
                                                 height: imageSize,
                                                 child: GestureDetector(
-                                                  onTap: () => onShowImageOptions(),
+                                                  onTap: () =>
+                                                      onShowImageOptions(),
                                                   child: avatarWidget,
                                                 ),
                                               ),
@@ -210,11 +214,14 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                 right: 6,
                                                 bottom: 2,
                                                 child: Container(
-                                                  width: Dimensions.iconSizeLarge,
-                                                  height: Dimensions.iconSizeLarge,
+                                                  width:
+                                                      Dimensions.iconSizeLarge,
+                                                  height:
+                                                      Dimensions.iconSizeLarge,
                                                   decoration: BoxDecoration(
                                                     color: backgroundColor,
-                                                    borderRadius: BorderRadius.circular(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
                                                       Dimensions.iconSizeLarge,
                                                     ),
                                                     boxShadow: [
@@ -227,8 +234,11 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                   ),
                                                   child: Icon(
                                                     Icons.camera_alt,
-                                                    color: Theme.of(context).iconTheme.color,
-                                                    size: Dimensions.iconSizeLite,
+                                                    color: Theme.of(context)
+                                                        .iconTheme
+                                                        .color,
+                                                    size:
+                                                        Dimensions.iconSizeLite,
                                                   ),
                                                 ),
                                               ),
@@ -237,30 +247,41 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                           Container(
                                             padding: EdgeInsets.only(top: 12),
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
                                               children: [
                                                 Container(
-                                                  padding: EdgeInsets.only(bottom: 4),
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 4),
                                                   child: Text(
                                                     name ?? '',
-                                                    overflow: TextOverflow.ellipsis,
-                                                    style: Theme.of(context).textTheme.bodyText1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText1,
                                                   ),
                                                 ),
                                                 Flexible(
                                                     flex: 0,
                                                     fit: FlexFit.tight,
                                                     child: Container(
-                                                      padding: EdgeInsets.only(top: 4),
-                                                      constraints: BoxConstraints(
+                                                      padding: EdgeInsets.only(
+                                                          top: 4),
+                                                      constraints:
+                                                          BoxConstraints(
                                                         maxWidth: width / 1.5,
                                                       ),
                                                       child: Text(
                                                         topic ?? '',
                                                         maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
-                                                        textAlign: TextAlign.center,
-                                                        style: Theme.of(context).textTheme.caption,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .caption,
                                                       ),
                                                     )),
                                               ],
@@ -273,51 +294,67 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                       flex: 0,
                                       fit: FlexFit.loose,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
                                           Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: <Widget>[
                                               Container(
                                                 padding: Dimensions.listPadding,
                                                 child: Text(
                                                   'About',
                                                   textAlign: TextAlign.start,
-                                                  style: Theme.of(context).textTheme.subtitle2,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .subtitle2,
                                                 ),
                                               ),
                                               Container(
                                                 margin: Dimensions.inputMargin,
                                                 constraints: BoxConstraints(
-                                                  maxHeight: Dimensions.inputHeight,
-                                                  maxWidth: Dimensions.inputWidthMax,
+                                                  maxHeight:
+                                                      Dimensions.inputHeight,
+                                                  maxWidth:
+                                                      Dimensions.inputWidthMax,
                                                 ),
                                                 child: TextFieldSecure(
                                                   label: 'Name*',
-                                                  textInputAction: TextInputAction.next,
+                                                  textInputAction:
+                                                      TextInputAction.next,
                                                   controller: nameController,
                                                   onSubmitted: (text) =>
-                                                      FocusScope.of(context).requestFocus(topicFocus),
-                                                  onChanged: (text) => setState(() {
+                                                      FocusScope.of(context)
+                                                          .requestFocus(
+                                                              topicFocus),
+                                                  onChanged: (text) =>
+                                                      setState(() {
                                                     name = text;
                                                   }),
                                                 ),
                                               ),
                                               Container(
                                                 margin: Dimensions.inputMargin,
-                                                height: Dimensions.inputEditorHeight,
+                                                height: Dimensions
+                                                    .inputEditorHeight,
                                                 constraints: BoxConstraints(
-                                                  maxHeight: Dimensions.inputEditorHeight,
-                                                  maxWidth: Dimensions.inputWidthMax,
+                                                  maxHeight: Dimensions
+                                                      .inputEditorHeight,
+                                                  maxWidth:
+                                                      Dimensions.inputWidthMax,
                                                 ),
                                                 child: TextFieldSecure(
                                                   label: 'Topic',
                                                   maxLines: 25,
                                                   focusNode: topicFocus,
                                                   controller: topicController,
-                                                  textInputAction: TextInputAction.newline,
-                                                  onChanged: (text) => setState(() {
+                                                  textInputAction:
+                                                      TextInputAction.newline,
+                                                  onChanged: (text) =>
+                                                      setState(() {
                                                     topic = text;
                                                   }),
                                                 ),
@@ -331,8 +368,10 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                       flex: 0,
                                       fit: FlexFit.loose,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: <Widget>[
                                           Container(
                                             padding: EdgeInsets.only(
@@ -345,7 +384,9 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                 Text(
                                                   Strings.labelUsers,
                                                   textAlign: TextAlign.start,
-                                                  style: Theme.of(context).textTheme.subtitle2,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .subtitle2,
                                                 ),
                                               ],
                                             ),
@@ -367,8 +408,10 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                       flex: 0,
                                       fit: FlexFit.loose,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: <Widget>[
                                           Container(
                                             padding: EdgeInsets.only(
@@ -381,7 +424,9 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                 Text(
                                                   'Options',
                                                   textAlign: TextAlign.start,
-                                                  style: Theme.of(context).textTheme.subtitle2,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .subtitle2,
                                                 ),
                                               ],
                                             ),
@@ -389,16 +434,21 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                           Container(
                                             width: width / 1.3,
                                             child: ListTile(
-                                              contentPadding: Dimensions.listPadding,
+                                              contentPadding:
+                                                  Dimensions.listPadding,
                                               title: Text(
                                                 'Message Encryption',
-                                                style: Theme.of(context).textTheme.subtitle1,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .subtitle1,
                                               ),
                                               trailing: Switch(
                                                 value: encryption,
-                                                onChanged: (value) => onToggleEncryption(props),
+                                                onChanged: (value) =>
+                                                    onToggleEncryption(props),
                                               ),
-                                              onTap: () => onToggleEncryption(props),
+                                              onTap: () =>
+                                                  onToggleEncryption(props),
                                             ),
                                           ),
                                         ],
@@ -409,8 +459,10 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                       child: Container(
                                         padding: EdgeInsets.only(top: 16),
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
                                           children: <Widget>[
                                             Container(
                                               margin: const EdgeInsets.all(8.0),
@@ -418,15 +470,19 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                 text: Strings.buttonCreate,
                                                 loading: props.loading,
                                                 disabled: props.loading,
-                                                onPressed: () => onCreateRoom(props),
+                                                onPressed: () =>
+                                                    onCreateRoom(props),
                                               ),
                                             ),
                                             Container(
                                               height: Dimensions.inputHeight,
-                                              margin: const EdgeInsets.all(10.0),
+                                              margin:
+                                                  const EdgeInsets.all(10.0),
                                               constraints: BoxConstraints(
-                                                minWidth: Dimensions.buttonWidthMin,
-                                                minHeight: Dimensions.buttonHeightMin,
+                                                minWidth:
+                                                    Dimensions.buttonWidthMin,
+                                                minHeight:
+                                                    Dimensions.buttonHeightMin,
                                               ),
                                               child: ButtonTextOpacity(
                                                 text: Strings.buttonQuit,

@@ -38,7 +38,8 @@ class SignupScreen extends StatefulWidget {
   SignupScreenState createState() => SignupScreenState();
 }
 
-class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen> {
+class SignupScreenState extends State<SignupScreen>
+    with Lifecycle<SignupScreen> {
   final sectionsPassword = [
     HomeserverStep(),
     UsernameStep(),
@@ -140,10 +141,13 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
   }
 
   onDidChange(_Props? oldProps, _Props props) {
-    final ssoLoginChanged = props.isSSOLoginAvailable != oldProps?.isSSOLoginAvailable;
-    final passwordLoginChanged = props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
+    final ssoLoginChanged =
+        props.isSSOLoginAvailable != oldProps?.isSSOLoginAvailable;
+    final passwordLoginChanged =
+        props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
 
-    final signupTypesChanged = props.homeserver.signupTypes != oldProps?.homeserver.signupTypes;
+    final signupTypesChanged =
+        props.homeserver.signupTypes != oldProps?.homeserver.signupTypes;
 
     if (passwordLoginChanged || ssoLoginChanged || signupTypesChanged) {
       onUpdateFlows(props);
@@ -173,7 +177,9 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
       case HomeserverStep:
         return props.isHomeserverValid;
       case UsernameStep:
-        return props.isUsernameValid && props.isUsernameAvailable && !props.loading;
+        return props.isUsernameValid &&
+            props.isUsernameAvailable &&
+            !props.loading;
       case PasswordStep:
         return props.isPasswordValid;
       case EmailStep:
@@ -194,7 +200,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
     );
   }
 
-  onCompleteStep(_Props props, PageController? controller, {bool usingSSO = false}) {
+  onCompleteStep(_Props props, PageController? controller,
+      {bool usingSSO = false}) {
     final currentSection = sections[currentStep];
     final lastStep = (sections.length - 1) == currentStep;
 
@@ -207,7 +214,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
             valid = await props.onSelectHomeserver(props.hostname);
           }
 
-          if (props.homeserver.loginTypes.contains(MatrixAuthTypes.SSO) && usingSSO) {
+          if (props.homeserver.loginTypes.contains(MatrixAuthTypes.SSO) &&
+              usingSSO) {
             valid = false; // don't do anything else
             await props.onLoginSSO();
           }
@@ -301,7 +309,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        onWillChange: onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
+        onWillChange:
+            onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -355,7 +364,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 && index != sections.length - 1;
+                                    onboarding = index != 0 &&
+                                        index != sections.length - 1;
                                   });
                                 },
                                 children: sections,
@@ -371,9 +381,11 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
                           direction: Axis.vertical,
                           children: <Widget>[
                             Visibility(
-                              visible: !(!props.isPasswordLoginAvailable && props.isSSOLoginAvailable),
+                              visible: !(!props.isPasswordLoginAvailable &&
+                                  props.isSSOLoginAvailable),
                               child: Container(
-                                padding: const EdgeInsets.only(top: 12, bottom: 12),
+                                padding:
+                                    const EdgeInsets.only(top: 12, bottom: 12),
                                 child: ButtonSolid(
                                   text: buildButtonString(props),
                                   loading: props.creating || props.loading,
@@ -390,9 +402,11 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
                               ),
                             ),
                             Visibility(
-                              visible: props.isSSOLoginAvailable && currentStep == 0,
+                              visible:
+                                  props.isSSOLoginAvailable && currentStep == 0,
                               child: Container(
-                                padding: const EdgeInsets.only(top: 12, bottom: 12),
+                                padding:
+                                    const EdgeInsets.only(top: 12, bottom: 12),
                                 child: props.isPasswordLoginAvailable
                                     ? ButtonOutline(
                                         text: Strings.buttonLoginSSO,
@@ -439,7 +453,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
                                       spacing: 16,
                                       dotHeight: 12,
                                       dotWidth: 12,
-                                      activeDotColor: Theme.of(context).primaryColor,
+                                      activeDotColor:
+                                          Theme.of(context).primaryColor,
                                     ),
                                   ),
                                 ],
@@ -550,7 +565,8 @@ class _Props extends Equatable {
       completed: store.state.authStore.completed,
       hostname: store.state.authStore.hostname,
       homeserver: store.state.authStore.homeserver,
-      isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
+      isHomeserverValid: store.state.authStore.homeserver.valid &&
+          !store.state.authStore.loading,
       isSSOLoginAvailable: selectSSOEnabled(store.state),
       isPasswordLoginAvailable: selectPasswordEnabled(store.state),
       isSignupAvailable: selectSignupClosed(store.state),

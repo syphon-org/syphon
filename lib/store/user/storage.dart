@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
-import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/user/model.dart';
 
 ///

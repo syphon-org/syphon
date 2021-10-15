@@ -116,7 +116,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         await store.dispatch(setUsers(room.usersNew));
         await store.dispatch(setReactions(reactions: room.reactions));
         await store.dispatch(setRedactions(redactions: room.redactions));
-        await store.dispatch(setReceipts(room: room, receipts: room.readReceipts));
+        await store
+            .dispatch(setReceipts(room: room, receipts: room.readReceipts));
 
         // mutation filters - handles backfilling mutations for old messages
         await store.dispatch(mutateMessagesRoom(room: room));
@@ -179,7 +180,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         // determined by the fromSync function of room
         final roomUpdated = store.state.roomStore.rooms[room.id];
         if (roomUpdated != null && room.limited) {
-          printWarning('[fetchMessageEvents] ${room.name} LIMITED TRUE - Fetching more messages');
+          printWarning(
+              '[fetchMessageEvents] ${room.name} LIMITED TRUE - Fetching more messages');
           store.dispatch(fetchMessageEvents(
             room: room,
             from: room.prevHash,
@@ -745,7 +747,8 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -813,7 +816,8 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));

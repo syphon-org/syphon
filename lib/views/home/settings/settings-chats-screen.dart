@@ -55,7 +55,8 @@ class ChatsSettingsScreen extends StatelessWidget {
                             GestureDetector(
                               onTap: () => props.onDisabled(),
                               child: ListTile(
-                                onTap: () => Navigator.pushNamed(context, Routes.settingsLanguages),
+                                onTap: () => Navigator.pushNamed(
+                                    context, Routes.settingsLanguages),
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
                                   'Language',
@@ -77,7 +78,8 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 ),
                                 trailing: Switch(
                                   value: false,
-                                  inactiveThumbColor: Color(Colours.greyDisabled),
+                                  inactiveThumbColor:
+                                      Color(Colours.greyDisabled),
                                   onChanged: (showMembershipEvents) {},
                                 ),
                               ),
@@ -94,7 +96,8 @@ class ChatsSettingsScreen extends StatelessWidget {
                               ),
                               trailing: Switch(
                                 value: props.enterSend!,
-                                onChanged: (enterSend) => props.onToggleEnterSend(),
+                                onChanged: (enterSend) =>
+                                    props.onToggleEnterSend(),
                               ),
                             ),
                             ListTile(
@@ -109,7 +112,8 @@ class ChatsSettingsScreen extends StatelessWidget {
                               ),
                               trailing: Switch(
                                 value: props.timeFormat24!,
-                                onChanged: (value) => props.onToggleTimeFormat(),
+                                onChanged: (value) =>
+                                    props.onToggleTimeFormat(),
                               ),
                             ),
                             ListTile(
@@ -124,7 +128,8 @@ class ChatsSettingsScreen extends StatelessWidget {
                               ),
                               trailing: Switch(
                                 value: props.dismissKeyboard!,
-                                onChanged: (value) => props.onToggleDismissKeyboard(),
+                                onChanged: (value) =>
+                                    props.onToggleDismissKeyboard(),
                               ),
                             ),
                           ],
@@ -298,7 +303,8 @@ class Props extends Equatable {
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        language: DisplayName(Locale(store.state.settingsStore.language)).toDisplayName(),
+        language: DisplayName(Locale(store.state.settingsStore.language))
+            .toDisplayName(),
         enterSend: store.state.settingsStore.enterSendEnabled,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
         dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,

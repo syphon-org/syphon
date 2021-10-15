@@ -5,7 +5,8 @@ import 'package:syphon/store/media/model.dart';
 import './actions.dart';
 import './state.dart';
 
-MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action]) {
+MediaStore mediaReducer(
+    [MediaStore state = const MediaStore(), dynamic action]) {
   switch (action.runtimeType) {
     case UpdateMediaCache:
       final _action = action as UpdateMediaCache;

@@ -1,4 +1,4 @@
-import 'package:moor/moor.dart';
+import 'package:drift/drift.dart';
 import 'package:syphon/store/user/model.dart';
 
 ///

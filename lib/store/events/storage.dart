@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/constants.dart'; 
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
- 
+
 ///
 /// Save Redactions
 ///
@@ -119,12 +119,15 @@ Future<Map<String, List<Reaction>>> loadReactions(
   try {
     final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
     final reactionsMap = <String, List<Reaction>>{};
-    final reactionsRecords = await store.records(messageIds).getSnapshots(storage);
+    final reactionsRecords =
+        await store.records(messageIds).getSnapshots(storage);
 
-    for (final RecordSnapshot<String?, String>? reactionList in reactionsRecords) {
+    for (final RecordSnapshot<String?, String>? reactionList
+        in reactionsRecords) {
       if (reactionList != null) {
-        final reactions =
-            List.from(await json.decode(reactionList.value)).map((json) => Reaction.fromJson(json)).toList();
+        final reactions = List.from(await json.decode(reactionList.value))
+            .map((json) => Reaction.fromJson(json))
+            .toList();
         reactionsMap.putIfAbsent(reactionList.key!, () => reactions);
       }
     }

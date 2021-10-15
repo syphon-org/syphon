@@ -27,7 +27,10 @@ List<Message> roomMessages(AppState state, String? roomId) {
 
     messages = messagesNormal.keys
         .map((id) =>
-            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? Message())
+            (messagesDecrypted.containsKey(id)
+                ? messagesDecrypted[id]
+                : messagesNormal[id]) ??
+            Message())
         .toList();
   }
 
@@ -101,7 +104,8 @@ Map<String, Message?> appendReactions(
   required Map<String, List<Reaction>> reactions,
 }) {
   // get a list message ids (also reaction keys) that have values in 'reactions'
-  final List<String> reactionedMessageIds = reactions.keys.where((k) => messages.containsKey(k)).toList();
+  final List<String> reactionedMessageIds =
+      reactions.keys.where((k) => messages.containsKey(k)).toList();
 
   // add the parsed list to the message to be handled in the UI
   for (String messageId in reactionedMessageIds) {
@@ -164,7 +168,8 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   return messagesMap;
 }
 
-Message? latestMessage(List<Message> messages, {Room? room, List<Message>? decrypted}) {
+Message? latestMessage(List<Message> messages,
+    {Room? room, List<Message>? decrypted}) {
   if (messages.isEmpty) {
     return null;
   }
@@ -174,8 +179,12 @@ Message? latestMessage(List<Message> messages, {Room? room, List<Message>? decry
     (latest, msg) => msg.timestamp > latest.timestamp ? msg : latest,
   );
 
-  if (room != null && decrypted != null && room.encryptionEnabled && decrypted.isNotEmpty) {
-    return decrypted.firstWhere((msg) => msg.id == latestMessage.id, orElse: () => latestMessage);
+  if (room != null &&
+      decrypted != null &&
+      room.encryptionEnabled &&
+      decrypted.isNotEmpty) {
+    return decrypted.firstWhere((msg) => msg.id == latestMessage.id,
+        orElse: () => latestMessage);
   }
 
   return latestMessage;

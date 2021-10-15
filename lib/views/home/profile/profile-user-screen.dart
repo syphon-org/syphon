@@ -109,13 +109,15 @@ class UserProfileState extends State<UserProfileScreen> {
     final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
     final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
-    final UserProfileArguments arguments = ModalRoute.of(context)!.settings.arguments as UserProfileArguments;
+    final UserProfileArguments arguments =
+        ModalRoute.of(context)!.settings.arguments as UserProfileArguments;
 
     final user = arguments.user!;
     final userColor = Colours.hashedColor(user.userId);
-    final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
-        ? Color(Colours.greyLightest)
-        : Theme.of(context).scaffoldBackgroundColor;
+    final scaffordBackgroundColor =
+        Theme.of(context).brightness == Brightness.light
+            ? Color(Colours.greyLightest)
+            : Theme.of(context).scaffoldBackgroundColor;
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
@@ -129,7 +131,8 @@ class UserProfileState extends State<UserProfileScreen> {
             SliverAppBar(
               pinned: true,
               expandedHeight: height * 0.3,
-              systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
+              systemOverlayStyle:
+                  Theme.of(context).appBarTheme.systemOverlayStyle,
               automaticallyImplyLeading: false,
               titleSpacing: 0.0,
               title: Row(

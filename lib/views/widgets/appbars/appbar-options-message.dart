@@ -12,7 +12,8 @@ import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
-class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget {
+class AppBarMessageOptions extends StatefulWidget
+    implements PreferredSizeWidget {
   const AppBarMessageOptions({
     Key? key,
     this.title = 'title:',

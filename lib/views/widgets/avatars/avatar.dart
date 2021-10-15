@@ -44,7 +44,8 @@ class Avatar extends StatelessWidget {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final bool emptyAvi = uri == null && url == null;
-          final Color backgroundColor = !emptyAvi ? Colors.transparent : Colors.grey;
+          final Color backgroundColor =
+              !emptyAvi ? Colors.transparent : Colors.grey;
 
           var borderRadius = BorderRadius.circular(size);
 
@@ -114,7 +115,9 @@ class Avatar extends StatelessWidget {
                   height: size,
                   decoration: BoxDecoration(
                     borderRadius: borderRadius,
-                    color: emptyAvi && !force ? background ?? backgroundColor : Colors.transparent,
+                    color: emptyAvi && !force
+                        ? background ?? backgroundColor
+                        : Colors.transparent,
                   ),
                   child: Center(child: avatarWidget),
                 ),
@@ -130,7 +133,8 @@ class Avatar extends StatelessWidget {
                           border: Border.all(
                             color: Colors.white,
                           ),
-                          borderRadius: BorderRadius.circular(Dimensions.badgeAvatarSize),
+                          borderRadius:
+                              BorderRadius.circular(Dimensions.badgeAvatarSize),
                         ),
                         width: Dimensions.badgeAvatarSize,
                         height: Dimensions.badgeAvatarSize,

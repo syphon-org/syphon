@@ -120,7 +120,8 @@ class UsernameStepState extends State<UsernameStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label: props.isUsernameValid ? props.fullUserId : 'Username',
+                    label:
+                        props.isUsernameValid ? props.fullUserId : 'Username',
                     disableSpacing: true,
                     valid: props.isUsernameValid,
                     controller: usernameController,

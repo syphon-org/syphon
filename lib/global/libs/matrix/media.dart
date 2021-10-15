@@ -41,9 +41,11 @@ class MatrixMedia {
 
     // Parce the mxc uri for the server location and id
     final String mediaId = mediaUriParts[mediaUriParts.length - 1];
-    final String mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
+    final String mediaServer =
+        serverName ?? mediaUriParts[mediaUriParts.length - 2];
 
-    String url = '$protocol$homeserver/_matrix/media/r0/thumbnail/$mediaServer/$mediaId';
+    String url =
+        '$protocol$homeserver/_matrix/media/r0/thumbnail/$mediaServer/$mediaId';
 
     // Params
     url += '?height=$size&width=$size&method=$method';
@@ -97,7 +99,8 @@ class MatrixMedia {
     // Parce the mxc uri for the server location and id
     final mediaId = mediaUriParts[mediaUriParts.length - 1];
     final mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
-    final url = '$protocol$homeserver/_matrix/media/r0/download/$mediaServer/$mediaId';
+    final url =
+        '$protocol$homeserver/_matrix/media/r0/download/$mediaServer/$mediaId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -188,7 +191,8 @@ dynamic buildMediaDownloadRequest({
   final List<String> mediaUriParts = mediaUri.split('/');
   final String mediaId = mediaUriParts[mediaUriParts.length - 1];
   final String mediaOrigin = serverName ?? homeserver;
-  final String url = '$protocol$homeserver/_matrix/media/r0/download/$mediaOrigin/$mediaId';
+  final String url =
+      '$protocol$homeserver/_matrix/media/r0/download/$mediaOrigin/$mediaId';
 
   final Map<String, String> headers = {
     'Authorization': 'Bearer $accessToken',

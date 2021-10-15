@@ -121,7 +121,8 @@ ThunkAction<AppState> addMessagesDecrypted({
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        AddMessagesDecrypted(roomId: room.id, messages: messages, outbox: outbox),
+        AddMessagesDecrypted(
+            roomId: room.id, messages: messages, outbox: outbox),
       );
     };
 

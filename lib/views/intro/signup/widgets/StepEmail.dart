@@ -135,7 +135,8 @@ class EmailStepState extends State<EmailStep> {
                             onTap: () {
                               showDialog(
                                 context: context,
-                                builder: (BuildContext context) => DialogExplaination(
+                                builder: (BuildContext context) =>
+                                    DialogExplaination(
                                   title: Strings.titleEmailRequirement,
                                   content: Strings.contentEmailRequirement,
                                   onConfirm: () {

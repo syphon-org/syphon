@@ -1,13 +1,13 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart' as moor;
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
@@ -25,7 +25,7 @@ class RoomPresets {
 }
 
 @JsonSerializable()
-class Room implements moor.Insertable<Room> {
+class Room implements drift.Insertable<Room> {
   final String id;
   final String? name;
   final String? alias;
@@ -679,38 +679,38 @@ class Room implements moor.Insertable<Room> {
     );
   }
 
-  // allows converting to message companion type for saving through moor
+  // allows converting to message companion type for saving through drift
   @override
-  Map<String, moor.Expression> toColumns(bool nullToAbsent) {
+  Map<String, drift.Expression> toColumns(bool nullToAbsent) {
     return RoomsCompanion(
-      id: moor.Value(id),
-      name: moor.Value(name),
-      alias: moor.Value(alias),
-      homeserver: moor.Value(homeserver),
-      avatarUri: moor.Value(avatarUri),
-      topic: moor.Value(topic),
-      joinRule: moor.Value(joinRule),
-      drafting: moor.Value(drafting),
-      direct: moor.Value(direct),
-      sending: moor.Value(sending),
-      invite: moor.Value(invite),
-      guestEnabled: moor.Value(guestEnabled),
-      encryptionEnabled: moor.Value(encryptionEnabled),
-      worldReadable: moor.Value(worldReadable),
-      hidden: moor.Value(hidden),
-      archived: moor.Value(archived),
-      lastHash: moor.Value(lastHash),
-      prevHash: moor.Value(prevHash),
-      nextHash: moor.Value(nextHash),
-      lastRead: moor.Value(lastRead),
-      lastUpdate: moor.Value(lastUpdate),
-      totalJoinedUsers: moor.Value(totalJoinedUsers),
-      namePriority: moor.Value(namePriority),
-      draft: moor.Value(draft),
-      reply: moor.Value(reply),
-      userIds: moor.Value(userIds),
-      messageIds: moor.Value(messageIds),
-      reactionIds: moor.Value(reactionIds),
+      id: drift.Value(id),
+      name: drift.Value(name),
+      alias: drift.Value(alias),
+      homeserver: drift.Value(homeserver),
+      avatarUri: drift.Value(avatarUri),
+      topic: drift.Value(topic),
+      joinRule: drift.Value(joinRule),
+      drafting: drift.Value(drafting),
+      direct: drift.Value(direct),
+      sending: drift.Value(sending),
+      invite: drift.Value(invite),
+      guestEnabled: drift.Value(guestEnabled),
+      encryptionEnabled: drift.Value(encryptionEnabled),
+      worldReadable: drift.Value(worldReadable),
+      hidden: drift.Value(hidden),
+      archived: drift.Value(archived),
+      lastHash: drift.Value(lastHash),
+      prevHash: drift.Value(prevHash),
+      nextHash: drift.Value(nextHash),
+      lastRead: drift.Value(lastRead),
+      lastUpdate: drift.Value(lastUpdate),
+      totalJoinedUsers: drift.Value(totalJoinedUsers),
+      namePriority: drift.Value(namePriority),
+      draft: drift.Value(draft),
+      reply: drift.Value(reply),
+      userIds: drift.Value(userIds),
+      messageIds: drift.Value(messageIds),
+      reactionIds: drift.Value(reactionIds),
     ).toColumns(nullToAbsent);
   }
 }

@@ -139,12 +139,14 @@ ThunkAction<AppState> fetchMedia({
               UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.DECRYPTING),
             );
             media = media.copyWith(
-              data: await decryptMediaData(localData: media.data!, info: currentMedia?.info),
+              data: await decryptMediaData(
+                  localData: media.data!, info: currentMedia?.info),
             );
           }
 
           store.dispatch(
-            UpdateMediaCache(mxcUri: mxcUri, data: media.data, info: media.info),
+            UpdateMediaCache(
+                mxcUri: mxcUri, data: media.data, info: media.info),
           );
 
           return store.dispatch(
@@ -181,7 +183,8 @@ ThunkAction<AppState> fetchMedia({
           UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.DECRYPTING),
         );
 
-        bodyBytes = await decryptMediaData(localData: bodyBytes, info: info ?? currentMedia?.info);
+        bodyBytes = await decryptMediaData(
+            localData: bodyBytes, info: info ?? currentMedia?.info);
       }
 
       store.dispatch(

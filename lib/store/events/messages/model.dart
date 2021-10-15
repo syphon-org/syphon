@@ -1,7 +1,7 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart' as moor;
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 
@@ -14,7 +14,7 @@ part 'model.g.dart';
 /// JsonSerializable and Moor conversions respectively
 ///
 @JsonSerializable()
-class Message extends Event implements moor.Insertable<Message> {
+class Message extends Event implements drift.Insertable<Message> {
   // message drafting
   @JsonKey(defaultValue: false)
   final bool pending;
@@ -166,36 +166,36 @@ class Message extends Event implements moor.Insertable<Message> {
         reactions: reactions ?? this.reactions,
       );
 
-  // allows converting to message companion type for saving through moor
+  // allows converting to message companion type for saving through drift
   @override
-  Map<String, moor.Expression> toColumns(bool nullToAbsent) {
+  Map<String, drift.Expression> toColumns(bool nullToAbsent) {
     return MessagesCompanion(
-      id: moor.Value(id!),
-      userId: moor.Value(userId),
-      roomId: moor.Value(roomId),
-      type: moor.Value(type),
-      sender: moor.Value(sender),
-      stateKey: moor.Value(stateKey),
-      syncing: moor.Value(syncing),
-      pending: moor.Value(pending),
-      failed: moor.Value(failed),
-      replacement: moor.Value(replacement),
-      edited: moor.Value(edited),
-      timestamp: moor.Value(timestamp),
-      received: moor.Value(received),
-      body: moor.Value(body),
-      msgtype: moor.Value(msgtype),
-      format: moor.Value(format),
-      url: moor.Value(url),
-      file: moor.Value(file),
-      formattedBody: moor.Value(formattedBody),
-      typeDecrypted: moor.Value(typeDecrypted),
-      ciphertext: moor.Value(ciphertext),
-      senderKey: moor.Value(senderKey),
-      deviceId: moor.Value(deviceId),
-      algorithm: moor.Value(algorithm),
-      sessionId: moor.Value(sessionId),
-      relatedEventId: moor.Value(relatedEventId),
+      id: drift.Value(id!),
+      userId: drift.Value(userId),
+      roomId: drift.Value(roomId),
+      type: drift.Value(type),
+      sender: drift.Value(sender),
+      stateKey: drift.Value(stateKey),
+      syncing: drift.Value(syncing),
+      pending: drift.Value(pending),
+      failed: drift.Value(failed),
+      replacement: drift.Value(replacement),
+      edited: drift.Value(edited),
+      timestamp: drift.Value(timestamp),
+      received: drift.Value(received),
+      body: drift.Value(body),
+      msgtype: drift.Value(msgtype),
+      format: drift.Value(format),
+      url: drift.Value(url),
+      file: drift.Value(file),
+      formattedBody: drift.Value(formattedBody),
+      typeDecrypted: drift.Value(typeDecrypted),
+      ciphertext: drift.Value(ciphertext),
+      senderKey: drift.Value(senderKey),
+      deviceId: drift.Value(deviceId),
+      algorithm: drift.Value(algorithm),
+      sessionId: drift.Value(sessionId),
+      relatedEventId: drift.Value(relatedEventId),
     ).toColumns(nullToAbsent);
   }
 

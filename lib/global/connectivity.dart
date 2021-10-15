@@ -10,7 +10,9 @@ class ConnectionService {
   static Future startListener() async {
     if (connectivity != null) return;
 
-    return connectivity = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    return connectivity = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
       currentStatus = result;
     });
   }

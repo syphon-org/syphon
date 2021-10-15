@@ -146,9 +146,11 @@ class EmailStepState extends State<EmailVerifyStep> {
                               onTap: () {
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) => DialogExplaination(
+                                  builder: (BuildContext context) =>
+                                      DialogExplaination(
                                     title: Strings.titleEmailRequirement,
-                                    content: Strings.contentForgotEmailVerification,
+                                    content:
+                                        Strings.contentForgotEmailVerification,
                                     onConfirm: () {
                                       Navigator.pop(context);
                                     },
@@ -160,7 +162,8 @@ class EmailStepState extends State<EmailVerifyStep> {
                                 width: 20,
                                 child: Icon(
                                   Icons.info_outline,
-                                  color: Theme.of(context).colorScheme.secondary,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   size: 20,
                                 ),
                               ),
@@ -328,7 +331,8 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
-        session: store.state.authStore.authSession != null && store.state.authStore.authSession!.isNotEmpty,
+        session: store.state.authStore.authSession != null &&
+            store.state.authStore.authSession!.isNotEmpty,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },

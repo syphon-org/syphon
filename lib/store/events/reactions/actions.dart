@@ -20,8 +20,8 @@ ThunkAction<AppState> toggleReaction({
   return (Store<AppState> store) async {
     final user = store.state.authStore.user;
 
-    final reaction = message!.reactions
-        .firstWhereOrNull((reaction) => reaction.sender == user.userId && reaction.body == emoji);
+    final reaction = message!.reactions.firstWhereOrNull(
+        (reaction) => reaction.sender == user.userId && reaction.body == emoji);
 
     if (reaction == null) {
       store.dispatch(sendReaction(message: message, room: room, emoji: emoji));

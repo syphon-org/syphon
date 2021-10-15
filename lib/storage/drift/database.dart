@@ -1,8 +1,8 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:moor/ffi.dart';
-import 'package:moor/moor.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlcipher_library_windows/sqlcipher_library_windows.dart';
@@ -10,8 +10,8 @@ import 'package:sqlite3/open.dart';
 import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/storage/drift/converters.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/storage/moor/converters.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
 import 'package:syphon/store/media/encryption.dart';
@@ -64,7 +64,7 @@ void _openOnLinux() {
 LazyDatabase openDatabase(String context) {
   return LazyDatabase(() async {
     var storageKeyId = Storage.keyLocation;
-    var storageLocation = Storage.sqliteLocation; // TODO: convert after total moor conversion
+    var storageLocation = Storage.sqliteLocation; // TODO: convert after total drift conversion
 
     // prepend with context
     storageKeyId = '$context-$storageKeyId';
@@ -102,7 +102,7 @@ LazyDatabase openDatabase(String context) {
     // Configure cache encryption/decryption instance
     final storageKey = await loadKey(storageKeyId);
 
-    return VmDatabase(
+    return NativeDatabase(
       filePath,
       logStatements: false, // DEBUG_MODE,
       setup: (rawDb) {
@@ -112,7 +112,7 @@ LazyDatabase openDatabase(String context) {
   });
 }
 
-@UseMoor(tables: [Messages, Decrypted, Rooms, Users, Medias])
+@DriftDatabase(tables: [Messages, Decrypted, Rooms, Users, Medias])
 class StorageDatabase extends _$StorageDatabase {
   // we tell the database where to store the data with this constructor
   StorageDatabase(String context) : super(openDatabase(context));

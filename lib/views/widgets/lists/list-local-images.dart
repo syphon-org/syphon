@@ -34,7 +34,8 @@ class ListLocalImages extends StatefulWidget {
   _ListLocalImagesState createState() => _ListLocalImagesState();
 }
 
-class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLocalImages> {
+class _ListLocalImagesState extends State<ListLocalImages>
+    with Lifecycle<ListLocalImages> {
   List<LocalImage> images = [];
   LocalImageProvider imageProvider = LocalImageProvider();
 
@@ -51,7 +52,8 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
   }
 
   onSelected(LocalImage image) async {
-    final imageBytes = await imageProvider.imageBytes(image.id!, image.pixelHeight!, image.pixelWidth!);
+    final imageBytes = await imageProvider.imageBytes(
+        image.id!, image.pixelHeight!, image.pixelWidth!);
 
     final directory = await getTemporaryDirectory();
     final filepath = image.fileName;

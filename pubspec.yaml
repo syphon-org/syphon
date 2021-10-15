@@ -6,8 +6,8 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 scripts:
-  start: flutter run -d 01ACE394-C1FE-49C0-8FB7-436F382F9E12
-  start-fresh: flutter run --no-fast-start
+  start: flutter run # -d <device_id>
+  start-fresh: flutter run --no-fast-start # -d <device_id>
   devices: flutter devices
   build: flutter pub run build_runner build --delete-conflicting-outputs
   watch: flutter pub run build_runner build --delete-conflicting-outputs
@@ -70,7 +70,7 @@ dependencies:
   sqlcipher_flutter_libs: ^0.5.0
   sqlcipher_library_windows: ^1.0.1
   flutter_secure_storage: ^4.1.0
-  moor: ^4.5.0
+  drift: ^1.0.0
 
   ### services
   http: ^0.13.1
@@ -111,20 +111,20 @@ dependencies:
   collection: ^1.15.0-nullsafety.4
 
 dev_dependencies:
-  lint: ^1.5.3
   build_runner: ^2.0.2
-  moor_generator: ^4.5.1
+  drift_dev: ^1.0.0
+  lint: ^1.5.3
   json_serializable: ^5.0.2
   flutter_launcher_icons: ^0.9.0
   test: any
 
-# TODO: remov when similar functionality is merged
+# TODO: remove when similar functionality is merged
 dependency_overrides:
-  moor_generator: # TODO: for moor_generator Uint8List error output
-    git:
-      url: https://github.com/simolus3/moor.git
-      ref: cc7d98d110204acb72d415312a78ed7821382d69
-      path: moor_generator
+  # moor_generator: # TODO: for moor_generator Uint8List error output
+  #   git:
+  #     url: https://github.com/simolus3/moor.git
+  #     ref: cc7d98d110204acb72d415312a78ed7821382d69
+  #     path: moor_generator
   sqlparser: # TODO: for moor_generator Uint8List error output
     git:
       url: https://github.com/simolus3/moor.git

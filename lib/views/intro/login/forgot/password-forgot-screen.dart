@@ -89,8 +89,10 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width: width, // set actual height and width for flex constraints
-                  height: height, // set actual height and width for flex constraints
+                  width:
+                      width, // set actual height and width for flex constraints
+                  height:
+                      height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -138,13 +140,15 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                     child: ButtonSolid(
                                       text: Strings.buttonSendVerification,
                                       loading: loading,
-                                      disabled: !props.isEmailValid || !props.isHomeserverValid,
+                                      disabled: !props.isEmailValid ||
+                                          !props.isHomeserverValid,
                                       onPressed: () async {
                                         setState(() {
                                           loading = true;
                                         });
 
-                                        final result = await props.onSendVerification(sendAttempt);
+                                        final result = await props
+                                            .onSendVerification(sendAttempt);
 
                                         if (result) {
                                           onShowConfirmDialog();
@@ -171,7 +175,8 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                           loading = true;
                                         });
 
-                                        final result = await props.onConfirmVerification();
+                                        final result =
+                                            await props.onConfirmVerification();
 
                                         if (result) {
                                           onVerificationConfirmed();

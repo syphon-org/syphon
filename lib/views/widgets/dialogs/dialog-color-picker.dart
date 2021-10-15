@@ -115,7 +115,8 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
       dialogHeight = height / 1.80;
     }
 
-    const optionsPadding = EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0);
+    const optionsPadding =
+        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0);
 
     final options = [
       SimpleDialogOption(
@@ -193,7 +194,9 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
           constraints: !widget.advanced ? null : BoxConstraints(minHeight: 460),
           child: SingleChildScrollView(
             child: Column(children: [
-              widget.advanced ? buildAdvancedPicker(context) : buildDefaultPicker(context),
+              widget.advanced
+                  ? buildAdvancedPicker(context)
+                  : buildDefaultPicker(context),
               Visibility(
                 visible: widget.advanced,
                 child: TextField(
