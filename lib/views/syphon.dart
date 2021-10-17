@@ -221,13 +221,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     setState(() {
       cache = cacheNew;
-      storage = storageNew;
       store = storeNew;
+      storage = storageNew;
+      storageCold = storageColdNew;
     });
 
     // reinitialize and start new store listeners
-    onDispatchListeners();
-    onStartListeners();
+    await onDispatchListeners();
+    await onStartListeners();
 
     final userNew = storeNew.state.authStore.user;
     final authObserverNew = storeNew.state.authStore.authObserver;
