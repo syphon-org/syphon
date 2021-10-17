@@ -1,11 +1,9 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -13,6 +11,7 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
@@ -26,8 +25,7 @@ class HomeserverStep extends StatefulWidget {
   HomeserverStepState createState() => HomeserverStepState();
 }
 
-class HomeserverStepState extends State<HomeserverStep>
-    with Lifecycle<HomeserverStep> {
+class HomeserverStepState extends State<HomeserverStep> with Lifecycle<HomeserverStep> {
   HomeserverStepState();
 
   final homeserverController = TextEditingController();
@@ -41,8 +39,7 @@ class HomeserverStepState extends State<HomeserverStep>
   }
 
   onDidChange(_Props? oldProps, _Props props) {
-    final baseUrlChanged =
-        props.homeserver.hostname != oldProps?.homeserver.hostname;
+    final baseUrlChanged = props.homeserver.hostname != oldProps?.homeserver.hostname;
 
     if (baseUrlChanged) {
       final hostname = props.hostname;
@@ -70,7 +67,11 @@ class HomeserverStepState extends State<HomeserverStep>
           ),
           trailing: TouchableOpacity(
             onTap: () {
-              Navigator.pushNamed(context, Routes.searchHomeservers);
+              Navigator.pushNamed(
+                context,
+                Routes.searchHomeservers,
+                arguments: SearchHomeserverArguments(signup: true),
+              );
             },
             child: Icon(
               Icons.search_rounded,
@@ -102,7 +103,11 @@ class HomeserverStepState extends State<HomeserverStep>
               icon: Icon(Icons.search),
               tooltip: 'Find your homeserver',
               onPressed: () {
-                Navigator.pushNamed(context, Routes.searchHomeservers);
+                Navigator.pushNamed(
+                  context,
+                  Routes.searchHomeservers,
+                  arguments: SearchHomeserverArguments(signup: true),
+                );
               }),
         ),
       );
@@ -142,8 +147,7 @@ class HomeserverStepState extends State<HomeserverStep>
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupHomeserver,
-                    semanticsLabel:
-                        'User resting their leg on an at symbol stool box',
+                    semanticsLabel: 'User resting their leg on an at symbol stool box',
                   ),
                 ),
               ),

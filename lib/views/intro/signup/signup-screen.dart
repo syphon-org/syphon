@@ -8,6 +8,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/auth/selectors.dart';
@@ -38,8 +39,7 @@ class SignupScreen extends StatefulWidget {
   SignupScreenState createState() => SignupScreenState();
 }
 
-class SignupScreenState extends State<SignupScreen>
-    with Lifecycle<SignupScreen> {
+class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen> {
   final sectionsPassword = [
     HomeserverStep(),
     UsernameStep(),
@@ -141,13 +141,10 @@ class SignupScreenState extends State<SignupScreen>
   }
 
   onDidChange(_Props? oldProps, _Props props) {
-    final ssoLoginChanged =
-        props.isSSOLoginAvailable != oldProps?.isSSOLoginAvailable;
-    final passwordLoginChanged =
-        props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
+    final ssoLoginChanged = props.isSSOLoginAvailable != oldProps?.isSSOLoginAvailable;
+    final passwordLoginChanged = props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
 
-    final signupTypesChanged =
-        props.homeserver.signupTypes != oldProps?.homeserver.signupTypes;
+    final signupTypesChanged = props.homeserver.signupTypes != oldProps?.homeserver.signupTypes;
 
     if (passwordLoginChanged || ssoLoginChanged || signupTypesChanged) {
       onUpdateFlows(props);
@@ -177,9 +174,7 @@ class SignupScreenState extends State<SignupScreen>
       case HomeserverStep:
         return props.isHomeserverValid;
       case UsernameStep:
-        return props.isUsernameValid &&
-            props.isUsernameAvailable &&
-            !props.loading;
+        return props.isUsernameValid && props.isUsernameAvailable && !props.loading;
       case PasswordStep:
         return props.isPasswordValid;
       case EmailStep:
@@ -200,8 +195,8 @@ class SignupScreenState extends State<SignupScreen>
     );
   }
 
-  onCompleteStep(_Props props, PageController? controller,
-      {bool usingSSO = false}) {
+  onCompleteStep(_Props props, PageController? controller, {bool usingSSO = false}) {
+    final store = StoreProvider.of<AppState>(context);
     final currentSection = sections[currentStep];
     final lastStep = (sections.length - 1) == currentStep;
 
@@ -214,8 +209,15 @@ class SignupScreenState extends State<SignupScreen>
             valid = await props.onSelectHomeserver(props.hostname);
           }
 
-          if (props.homeserver.loginTypes.contains(MatrixAuthTypes.SSO) &&
-              usingSSO) {
+          final _homeserver = store.state.authStore.homeserver;
+          if (_homeserver.signupTypes.isEmpty && !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+            store.dispatch(addInfo(
+              origin: 'selectHomeserver',
+              message: 'No new signups allowed on this server, try another if creating an account',
+            ));
+          }
+
+          if (props.homeserver.loginTypes.contains(MatrixAuthTypes.SSO) && usingSSO) {
             valid = false; // don't do anything else
             await props.onLoginSSO();
           }
@@ -309,8 +311,7 @@ class SignupScreenState extends State<SignupScreen>
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        onWillChange:
-            onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
+        onWillChange: onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -364,8 +365,7 @@ class SignupScreenState extends State<SignupScreen>
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
+                                    onboarding = index != 0 && index != sections.length - 1;
                                   });
                                 },
                                 children: sections,
@@ -381,11 +381,9 @@ class SignupScreenState extends State<SignupScreen>
                           direction: Axis.vertical,
                           children: <Widget>[
                             Visibility(
-                              visible: !(!props.isPasswordLoginAvailable &&
-                                  props.isSSOLoginAvailable),
+                              visible: !(!props.isPasswordLoginAvailable && props.isSSOLoginAvailable),
                               child: Container(
-                                padding:
-                                    const EdgeInsets.only(top: 12, bottom: 12),
+                                padding: const EdgeInsets.only(top: 12, bottom: 12),
                                 child: ButtonSolid(
                                   text: buildButtonString(props),
                                   loading: props.creating || props.loading,
@@ -402,11 +400,9 @@ class SignupScreenState extends State<SignupScreen>
                               ),
                             ),
                             Visibility(
-                              visible:
-                                  props.isSSOLoginAvailable && currentStep == 0,
+                              visible: props.isSSOLoginAvailable && currentStep == 0,
                               child: Container(
-                                padding:
-                                    const EdgeInsets.only(top: 12, bottom: 12),
+                                padding: const EdgeInsets.only(top: 12, bottom: 12),
                                 child: props.isPasswordLoginAvailable
                                     ? ButtonOutline(
                                         text: Strings.buttonLoginSSO,
@@ -453,8 +449,7 @@ class SignupScreenState extends State<SignupScreen>
                                       spacing: 16,
                                       dotHeight: 12,
                                       dotWidth: 12,
-                                      activeDotColor:
-                                          Theme.of(context).primaryColor,
+                                      activeDotColor: Theme.of(context).primaryColor,
                                     ),
                                   ),
                                 ],
@@ -565,8 +560,7 @@ class _Props extends Equatable {
       completed: store.state.authStore.completed,
       hostname: store.state.authStore.hostname,
       homeserver: store.state.authStore.homeserver,
-      isHomeserverValid: store.state.authStore.homeserver.valid &&
-          !store.state.authStore.loading,
+      isHomeserverValid: store.state.authStore.homeserver.valid && !store.state.authStore.loading,
       isSSOLoginAvailable: selectSSOEnabled(store.state),
       isPasswordLoginAvailable: selectPasswordEnabled(store.state),
       isSignupAvailable: selectSignupClosed(store.state),

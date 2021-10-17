@@ -312,11 +312,19 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   onAlertsChanged(Alert alert) {
     Color? color;
 
+    var alertOverride;
+
     switch (alert.type) {
       case 'error':
+        if (!ConnectionService.isConnected() && !alert.offline) {
+          alertOverride = 'Looks like you may be offline. Check your connection and try again.';
+        }
         color = Colors.red;
         break;
       case 'warning':
+        if (!ConnectionService.isConnected() && !alert.offline) {
+          alertOverride = 'Looks like you may be offline. Check your connection and try again.';
+        }
         color = Colors.red;
         break;
       case 'success':
@@ -325,12 +333,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       case 'info':
       default:
         color = Colors.grey;
-    }
-
-    var alertOverride;
-
-    if (!ConnectionService.isConnected() && !alert.offline) {
-      alertOverride = 'Looks like you may be offline. Check your connection and try again.';
     }
 
     final alertMessage = alertOverride ?? alert.message ?? alert.error ?? 'Unknown Error Occurred';

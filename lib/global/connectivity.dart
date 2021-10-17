@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectionService {
-  static StreamSubscription<ConnectivityResult>? connectivity;
-
   static bool checked = false;
   static ConnectivityResult? currentStatus;
+  static StreamSubscription<ConnectivityResult>? connectivity;
 
   static bool isConnected() {
     return currentStatus != null && currentStatus != ConnectivityResult.none;

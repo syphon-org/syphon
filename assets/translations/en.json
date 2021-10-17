@@ -99,7 +99,7 @@
     "alert-invite-user-unknown": "This user doesn't appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.",
     "alert-feature-in-progress": "🛠 This feature is coming soon",
     "alert-message-failed": "Message Failed To Send",
-    "alert-homeserver-invalid": "This server failed the 'well-known' check. Make sure the server is configured correctly",
+    "alert-homeserver-invalid": "This server failed the 'well-known' check. Make sure the server is configured correctly.",
     "prompt-homeserver-select": "Select your username and homeserver",
     "prompt-confirm-deactivate": "Enter your password below to confirm deactivation",
     "placeholder-topic": "No Topic Description",

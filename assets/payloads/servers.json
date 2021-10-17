@@ -20,9 +20,9 @@
         "total_room_count_estimate": 619
     },
     {
-        "hostname": "chat.privacytools.io",
+        "hostname": "dendrite-client.privacyguides.org",
         "description": "Privacy-centric Matrix Homeserver",
-        "url": "https://www.privacytools.io/",
+        "url": "https://privacyguides.org/",
         "category": "Free (Organization)",
         "location": "DE",
         "online_since": 2019,
@@ -58,6 +58,16 @@
         "online_since": 2021,
         "users_active": null,
         "total_room_count_estimate": 83
+    },
+    {
+        "hostname": "matrix.envs.net",
+        "description": "minimalist, non-commercial, linux enthusiast Matrix server",
+        "url": "https://envs.net/",
+        "category": "Free (Organization)",
+        "location": "DE",
+        "online_since": 2019,
+        "users_active": 5193,
+        "total_room_count_estimate": 96
     },
     {
         "hostname": "chat.weho.st",

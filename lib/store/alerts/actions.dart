@@ -103,18 +103,20 @@ ThunkAction<AppState> addAlert({
   required String origin,
   type = 'warning',
   String message = '',
-  error,
+  dynamic error,
 }) {
   return (Store<AppState> store) async {
-    printError('[ERROR] [$origin] ${error.toString()}');
+    final errorMessage = error?.toString() ?? '';
+
+    printError('[ERROR] [$origin] $errorMessage');
 
     if (message.isEmpty && error == null) return;
 
     final alertsObserver = store.state.alertsStore.alertsObserver!;
     final alert = Alert(
       type: type,
-      message: message.isNotEmpty ? message : error.toString(),
-      error: error.toString(),
+      message: message.isNotEmpty ? message : errorMessage,
+      error: errorMessage,
     );
     store.dispatch(AddAlert(alert: alert));
     alertsObserver.add(alert);

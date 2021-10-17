@@ -7,6 +7,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
@@ -80,16 +81,14 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
           {};
 
       var identityUrl = response['m.identity_server'];
-      var baseUrl = (response['m.homeserver']['base_url'] as String)
-          .replaceAll('https://', '');
+      var baseUrl = (response['m.homeserver']['base_url'] as String).replaceAll('https://', '');
 
       if (baseUrl.endsWith('/')) {
         baseUrl = baseUrl.replaceRange(baseUrl.length - 1, null, '');
       }
 
       if (identityUrl != null) {
-        identityUrl = (response['m.identity_server']['base_url'] as String)
-            .replaceAll('https://', '');
+        identityUrl = (response['m.identity_server']['base_url'] as String).replaceAll('https://', '');
       }
 
       return homeserver.copyWith(
@@ -116,7 +115,8 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
         );
       } catch (error) {
         printError(
-            '[fetchBaseUrl] failed alternative .well-known server query');
+          '[fetchBaseUrl] failed alternative .well-known server query',
+        );
       }
     }
 

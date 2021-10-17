@@ -191,8 +191,7 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
       } on PlatformException {
         store.dispatch(addAlert(
           origin: 'initDeepLinks',
-          message:
-              'Failed to SSO Login, please try again later or contact support',
+          message: 'Failed to SSO Login, please try again later or contact support',
         ));
         // Handle exception by warning the user their action did not succeed
         // return?
@@ -310,11 +309,8 @@ ThunkAction<AppState> generateDeviceId({String? salt}) {
       // hash it
       final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
 
-      final deviceIdHash = base64
-          .encode(deviceIdDigest.bytes)
-          .toUpperCase()
-          .replaceAll(RegExp(r'[^\w]'), '')
-          .substring(0, 10);
+      final deviceIdHash =
+          base64.encode(deviceIdDigest.bytes).toUpperCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 
       return Device(
         deviceId: deviceIdHash,
@@ -369,8 +365,7 @@ ThunkAction<AppState> loginUser() {
 
       final errorCode = data['errcode'];
 
-      if (errorCode == MatrixErrors.not_authorized ||
-          errorCode == MatrixErrors.forbidden) {
+      if (errorCode == MatrixErrors.not_authorized || errorCode == MatrixErrors.forbidden) {
         throw 'Invalid credentials, confirm and try again';
       }
 
@@ -500,17 +495,13 @@ ThunkAction<AppState> logoutUser() {
 
         if (data['errcode'] != null) {
           if (data['errcode'] != MatrixErrors.unknown_token) {
-            throw Exception(data['error']);
+            throw data['error'];
           }
         }
       }
 
       // Remove this user from available multiaccounts
       await store.dispatch(removeAvailableUser(user));
-
-      // Attempt to switch to another user if session is present
-      // final nextAvailableUser = store.state.authStore.availableUsers;
-      // final nextUser = nextAvailableUser.isNotEmpty ? nextAvailableUser.first : null;
 
       store.state.authStore.contextObserver?.add(null);
     } catch (error) {
@@ -585,8 +576,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
 ThunkAction<AppState> setInteractiveAuths({Map? auths}) {
   return (Store<AppState> store) async {
     try {
-      final List<String> completed =
-          List<String>.from(auths!['completed'] ?? []);
+      final List<String> completed = List<String>.from(auths!['completed'] ?? []);
 
       await store.dispatch(SetSession(session: auths['session']));
       await store.dispatch(SetCompleted(completed: completed));
@@ -643,8 +633,7 @@ ThunkAction<AppState> checkPasswordResetVerification({
         session: session,
       );
 
-      if (data['errcode'] != null &&
-          data['errcode'] == MatrixErrors.not_authorized) {
+      if (data['errcode'] != null && data['errcode'] == MatrixErrors.not_authorized) {
         throw data['error'];
       }
 
@@ -750,8 +739,7 @@ ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
       final currentCredential = store.state.authStore.credential!;
       final protocol = store.state.authStore.protocol;
 
-      if (currentCredential.params!.containsValue(emailSubmitted) &&
-          sendAttempt! < 2) {
+      if (currentCredential.params!.containsValue(emailSubmitted) && sendAttempt! < 2) {
         return true;
       }
 
@@ -806,16 +794,18 @@ ThunkAction<AppState> fetchSignupStages() {
 
       // TODO: servers can have multiple perferred flows, need to determine how to chose, largely UX issue
       // "flows": [ { "stages": [ "m.login.recaptcha", "m.login.terms", "m.login.email.identity" ] } ]
-      final stages = List<String>.from(
-          data['flows'][0]['stages']?.map((stage) => stage as String));
+      final stages = List<String>.from(data['flows'][0]['stages']?.map((stage) => stage as String));
       final homeserverUpdated = homeserver.copyWith(signupTypes: stages);
 
       store.dispatch(SetHomeserver(homeserver: homeserverUpdated));
     } catch (error) {
-      printError(error.toString());
+      addAlert(
+        origin: 'fetchSignupStages',
+        error: 'No new signups allowed on this server, try another if creating an account',
+      );
+
       final homeserver = store.state.authStore.homeserver;
-      store.dispatch(
-          SetHomeserver(homeserver: homeserver.copyWith(signupTypes: [])));
+      store.dispatch(SetHomeserver(homeserver: homeserver.copyWith(signupTypes: [])));
     }
 
     store.dispatch(SetLoading(loading: false));
@@ -835,8 +825,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       final baseUrl = store.state.authStore.homeserver.baseUrl;
       final credential = store.state.authStore.credential;
       final session = store.state.authStore.authSession;
-      final authType =
-          session != null ? credential!.type : MatrixAuthTypes.DUMMY;
+      final authType = session != null ? credential!.type : MatrixAuthTypes.DUMMY;
       final authValue = session != null ? credential!.value : null;
       final authParams = session != null ? credential!.params : null;
 
@@ -857,8 +846,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       );
 
       if (data['errcode'] != null) {
-        if (data['errcode'] == MatrixErrors.not_authorized &&
-            credential!.type == MatrixAuthTypes.EMAIL) {
+        if (data['errcode'] == MatrixErrors.not_authorized && credential!.type == MatrixAuthTypes.EMAIL) {
           store.dispatch(SetVerificationNeeded(needed: true));
           return false;
         }
@@ -868,8 +856,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       if (data['flows'] != null) {
         await store.dispatch(setInteractiveAuths(auths: data));
 
-        final List<dynamic> stages =
-            store.state.authStore.interactiveAuths['flows'][0]['stages'];
+        final List<dynamic> stages = store.state.authStore.interactiveAuths['flows'][0]['stages'];
         final completed = store.state.authStore.completed;
 
         // Compare the completed stages to the flow stages provided
@@ -1088,17 +1075,9 @@ ThunkAction<AppState> selectHomeserver({String? hostname}) {
 
     await store.dispatch(setHomeserver(homeserver: homeserver));
     await store.dispatch(setHostname(hostname: hostname));
-    await store.dispatch(fetchSignupStages());
 
-    final _homeserver = store.state.authStore.homeserver;
-
-    if (_homeserver.signupTypes.isEmpty &&
-        !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
-      store.dispatch(addInfo(
-        origin: 'selectHomeserver',
-        message:
-            'No new signups allowed on this server, try another if creating an account',
-      ));
+    if (homeserver.valid) {
+      await store.dispatch(fetchSignupStages());
     }
 
     return homeserver.valid;
@@ -1109,8 +1088,7 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
       try {
         store.dispatch(SetLoading(loading: true));
 
-        final currentCredential =
-            store.state.authStore.credential ?? Credential();
+        final currentCredential = store.state.authStore.credential ?? Credential();
 
         final user = store.state.authStore.user;
         final idServer = user.idserver;
@@ -1169,11 +1147,13 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
         homeserver: homeserver,
       ));
       if (!homeserver.valid) {
-        throw Exception(Strings.alertCheckHomeserver);
+        throw Strings.alertCheckHomeserver;
       }
     } catch (error) {
-      printError('[selectHomserver] $error');
-      addInfo(message: error.toString());
+      store.dispatch(addAlert(
+        origin: 'fetchHomeserver',
+        message: error.toString(),
+      ));
 
       store.dispatch(SetLoading(loading: false));
 
@@ -1196,16 +1176,13 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
           {};
 
       // { "flows": [ { "type": "m.login.sso" }, { "type": "m.login.token" } ]}
-      final loginTypes = (response['flows'] as List)
-          .map((flow) => flow['type'] as String)
-          .toList();
+      final loginTypes = (response['flows'] as List).map((flow) => flow['type'] as String).toList();
 
       homeserver = homeserver.copyWith(loginTypes: loginTypes);
     } catch (error) {
       store.dispatch(addAlert(
         origin: 'fetchHomeserver',
-        message:
-            'Having trouble connecting to this Matrix server, try again later or pick another server.',
+        message: 'Having trouble connecting to this Matrix server, try again later or pick another server.',
         error: error,
       ));
     }
@@ -1215,20 +1192,17 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
   };
 }
 
-ThunkAction<AppState> initClientSecret({String? hostname}) =>
-    (Store<AppState> store) {
+ThunkAction<AppState> initClientSecret({String? hostname}) => (Store<AppState> store) {
       store.dispatch(SetClientSecret(
         clientSecret: generateClientSecret(length: 24),
       ));
     };
 
-ThunkAction<AppState> setHostname({String? hostname}) =>
-    (Store<AppState> store) {
+ThunkAction<AppState> setHostname({String? hostname}) => (Store<AppState> store) {
       store.dispatch(SetHostname(hostname: hostname!.trim()));
     };
 
-ThunkAction<AppState> setHomeserver({Homeserver? homeserver}) =>
-    (Store<AppState> store) {
+ThunkAction<AppState> setHomeserver({Homeserver? homeserver}) => (Store<AppState> store) {
       store.dispatch(SetHomeserver(homeserver: homeserver));
     };
 
@@ -1246,8 +1220,7 @@ ThunkAction<AppState> setEmail({String? email}) {
 
 ThunkAction<AppState> setUsername({String? username}) {
   return (Store<AppState> store) {
-    store.dispatch(
-        SetUsernameValid(valid: username != null && username.isNotEmpty));
+    store.dispatch(SetUsernameValid(valid: username != null && username.isNotEmpty));
     store.dispatch(SetUsername(username: username!.trim()));
   };
 }
@@ -1278,8 +1251,7 @@ ThunkAction<AppState> resolveUsername({String? username}) {
   };
 }
 
-ThunkAction<AppState> setLoginPassword({String? password}) =>
-    (Store<AppState> store) {
+ThunkAction<AppState> setLoginPassword({String? password}) => (Store<AppState> store) {
       store.dispatch(SetPassword(password: password));
       store.dispatch(SetPasswordValid(
         valid: password != null && password.isNotEmpty,
@@ -1297,8 +1269,7 @@ ThunkAction<AppState> setPassword({
     final currentConfirm = store.state.authStore.passwordConfirm;
 
     store.dispatch(SetPasswordValid(
-      valid: (currentPassword == currentConfirm || ignoreConfirm) &&
-          password.length > 8,
+      valid: (currentPassword == currentConfirm || ignoreConfirm) && password.length > 8,
     ));
   };
 }
@@ -1317,9 +1288,7 @@ ThunkAction<AppState> setPasswordConfirm({String? password}) {
     final currentConfirm = store.state.authStore.passwordConfirm;
 
     store.dispatch(SetPasswordValid(
-      valid: password != null &&
-          password.length > 6 &&
-          currentPassword == currentConfirm,
+      valid: password != null && password.length > 6 && currentPassword == currentConfirm,
     ));
   };
 }
