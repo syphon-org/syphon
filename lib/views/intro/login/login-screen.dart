@@ -254,6 +254,12 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
+      onInitialBuild: (props) {
+        if (multiaccount) {
+          final store = StoreProvider.of<AppState>(context);
+          store.dispatch(initDeepLinks());
+        }
+      },
       converter: (store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
         extendBodyBehindAppBar: true,

@@ -181,10 +181,9 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
         }
 
         _sub = uriLinkStream.listen((Uri? uri) {
+          printInfo('SSO URI CAUGHT $uri');
           final token = uri!.queryParameters['loginToken'];
-          if (store.state.authStore.user.accessToken == null) {
-            store.dispatch(loginUserSSO(token: token));
-          }
+          store.dispatch(loginUserSSO(token: token));
         }, onError: (err) {
           printError('[streamUniLinks] error $err');
         });
@@ -193,15 +192,20 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
           origin: 'initDeepLinks',
           message: 'Failed to SSO Login, please try again later or contact support',
         ));
-        // Handle exception by warning the user their action did not succeed
-        // return?
+      } catch (error) {
+        store.dispatch(addAlert(
+          origin: 'initDeepLinks',
+          message: error.toString(),
+        ));
       }
     };
 
 ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
       try {
         _sub.cancel();
-      } catch (error) {}
+      } catch (error) {
+        printError(error.toString());
+      }
     };
 
 ThunkAction<AppState> startAuthObserver() {
