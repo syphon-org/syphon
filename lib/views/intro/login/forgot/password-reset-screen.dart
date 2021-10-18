@@ -1,16 +1,14 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
-import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PagePasswordReset.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
@@ -55,7 +53,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
 
           return Scaffold(
             appBar: AppBar(
-              brightness: Brightness.light,
+              systemOverlayStyle: computeSystemUIColor(context),
               elevation: 0,
               backgroundColor: Colors.transparent,
               leading: IconButton(
@@ -73,8 +71,10 @@ class PasswordResetState extends State<ResetPasswordScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width: width, // set actual height and width for flex constraints
-                  height: height, // set actual height and width for flex constraints
+                  width:
+                      width, // set actual height and width for flex constraints
+                  height:
+                      height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -101,7 +101,8 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 && index != sections.length - 1;
+                                    onboarding = index != 0 &&
+                                        index != sections.length - 1;
                                   });
                                 },
                                 children: sections,
@@ -126,14 +127,15 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                               child: ButtonSolid(
                                 text: Strings.buttonResetPassword,
                                 loading: props.loading,
-                                disabled: !props.isPasswordValid || props.loading,
+                                disabled:
+                                    !props.isPasswordValid || props.loading,
                                 onPressed: () async {
                                   final result = await props.onResetPassword();
 
                                   if (result) {
                                     Navigator.popUntil(
                                       context,
-                                      ModalRoute.withName(NavigationPaths.login),
+                                      ModalRoute.withName(Routes.login),
                                     );
                                   }
                                 },

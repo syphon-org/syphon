@@ -1,18 +1,17 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/middleware.dart';
+import 'package:syphon/cache/serializer.dart';
 import 'package:syphon/cache/storage.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/middleware.dart';
-import 'package:syphon/storage/moor/database.dart';
 import 'package:syphon/store/alerts/middleware.dart';
-
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/middleware.dart';
 import 'package:syphon/store/auth/reducer.dart';
@@ -21,12 +20,12 @@ import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/events/reducer.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/media/reducer.dart';
-import 'package:syphon/cache/serializer.dart';
 import 'package:syphon/store/search/middleware.dart';
 import 'package:syphon/store/sync/reducer.dart';
 import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/reducer.dart';
 import 'package:syphon/store/user/state.dart';
+
 import './alerts/model.dart';
 import './alerts/reducer.dart';
 import './auth/state.dart';
@@ -154,7 +153,7 @@ Future<Store<AppState>> initStore(
 
   if (storage != null) {
     // partially load storage to memory to rehydrate cache
-    preloaded = await loadStorage(storage);
+    preloaded = await loadStorage(storage, coldStorage!);
   }
 
   // Configure redux persist instance

@@ -15,17 +15,21 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/lists/list-item-account.dart';
 
 class ModalContextSwitcher extends StatelessWidget {
-  onNavigateToMultiLogin({required BuildContext context, required _Props props}) async {
+  onNavigateToMultiLogin(
+      {required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      NavigationPaths.login,
+      Routes.login,
       arguments: LoginScreenArguments(
         multiaccount: true,
       ),
     );
   }
 
-  onSwitchUser({required User user, required BuildContext context, required _Props props}) async {
+  onSwitchUser(
+      {required User user,
+      required BuildContext context,
+      required _Props props}) async {
     props.onSwitchUser(user);
     Navigator.pop(context);
   }
@@ -44,7 +48,8 @@ class ModalContextSwitcher extends StatelessWidget {
           user: user,
           selected: selected,
           enabled: !props.loading && !selected,
-          onPress: () => onSwitchUser(user: user, context: context, props: props),
+          onPress: () =>
+              onSwitchUser(user: user, context: context, props: props),
         );
       });
 
@@ -69,9 +74,10 @@ class ModalContextSwitcher extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline5?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).brightness == Brightness.light
-                              ? Color(Colours.greyDark)
-                              : Color(Colours.whiteDefault),
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? Color(Colours.greyDark)
+                                  : Color(Colours.whiteDefault),
                         ),
                   ),
                 ),
@@ -145,7 +151,8 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        loading: !store.state.syncStore.synced || store.state.syncStore.lastSince == null,
+        loading: !store.state.syncStore.synced ||
+            store.state.syncStore.lastSince == null,
         currentUser: store.state.authStore.currentUser,
         themeSettings: store.state.settingsStore.themeSettings,
         availableUsers: store.state.authStore.availableUsers,

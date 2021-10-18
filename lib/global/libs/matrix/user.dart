@@ -23,7 +23,8 @@ abstract class Users {
     String? userId,
     String type = AccountDataTypes.direct,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -54,7 +55,8 @@ abstract class Users {
     String type = AccountDataTypes.direct,
     Map? accountData,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -121,7 +123,8 @@ abstract class Users {
     String? roomId,
     String? userId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -183,7 +186,8 @@ abstract class Users {
     String? displayName,
     Map? accountData,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -216,7 +220,8 @@ abstract class Users {
     String? userId,
     String? avatarUri,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -254,7 +259,8 @@ abstract class Users {
     String? authType,
     String? authValue,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/deactivate';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/account/deactivate';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -295,7 +301,8 @@ dynamic buildRoomMembersRequest({
   String? accessToken,
   String? roomId,
 }) {
-  final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/members';
+  final String url =
+      '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/members';
 
   final Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 

@@ -1,5 +1,5 @@
 /// Event Models and Types
-///  
+///
 /// https://matrix.org/docs/spec/client_server/latest#m-room-message-msgtypes
 class AccountDataTypes {
   static const direct = 'm.direct';
@@ -33,15 +33,42 @@ class EventTypes {
   static const roomKeyRequest = 'm.room_key_request';
 }
 
-class MessageTypes {
-  static const TEXT = 'm.text';
-  static const EMOTE = 'm.emote';
-  static const NOTICE = 'm.notice';
-  static const IMAGE = 'm.text';
-  static const FILE = 'm.file';
-  static const AUDIO = 'm.text';
-  static const LOCATION = 'm.location';
-  static const VIDEO = 'm.video';
+enum MessageType {
+  text,
+  emote,
+  notice,
+  image,
+  file,
+  audio,
+  location,
+  video,
+}
+
+class MatrixMessageTypes {
+  static const text = 'm.text';
+  static const emote = 'm.emote';
+  static const notice = 'm.notice';
+  static const image = 'm.image';
+  static const file = 'm.file';
+  static const audio = 'm.audio';
+  static const location = 'm.location';
+  static const video = 'm.video';
+}
+
+extension MatrixMessageType on MessageType {
+  static String _value(MessageType val) {
+    switch (val) {
+      case MessageType.text:
+        return MatrixMessageTypes.text;
+      case MessageType.image:
+        return MatrixMessageTypes.image;
+      case MessageType.file:
+        return MatrixMessageTypes.file;
+    }
+    return '';
+  }
+
+  String get value => _value(this);
 }
 
 class MediumType {

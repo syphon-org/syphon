@@ -2,11 +2,10 @@ import 'dart:convert';
 
 import 'package:canonical_json/canonical_json.dart';
 import 'package:flutter/material.dart';
-
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -17,13 +16,16 @@ import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
+///
 /// Encrypt event content with loaded outbound session for room
 ///
 /// https://matrix.org/docs/guides/end-to-end-encryption-implementation-guide#sending-an-encrypted-message-event
+///
 ThunkAction<AppState> encryptMessageContent({
   required String roomId,
   Map? content,
@@ -31,7 +33,8 @@ ThunkAction<AppState> encryptMessageContent({
 }) {
   return (Store<AppState> store) async {
     // Load and deserialize session
-    final olm.OutboundGroupSession outboundMessageSession = await store.dispatch(
+    final olm.OutboundGroupSession outboundMessageSession =
+        await store.dispatch(
       loadMessageSessionOutbound(roomId: roomId),
     );
 
@@ -82,6 +85,7 @@ ThunkAction<AppState> backfillDecryptMessages(
       if (!rooms.containsKey(roomId)) {
         throw 'No room found for room ID $roomId';
       }
+
       // redecrypt events in the room with new key
       final messages = store.state.eventStore.messages;
 
@@ -95,7 +99,8 @@ ThunkAction<AppState> backfillDecryptMessages(
       final roomMessages = messages[roomId] ?? [];
       final roomDecrypted = messagesDecrypted[roomId] ?? [];
 
-      final undecrypted = roomMessages.where((msg) => roomDecrypted.contains(msg)).toList();
+      final undecrypted =
+          roomMessages.where((msg) => roomDecrypted.contains(msg)).toList();
 
       final decrypted = await store.dispatch(decryptMessages(
         room,
@@ -147,7 +152,6 @@ ThunkAction<AppState> decryptMessages(
 
             if (!sentKeyRequest && verified) {
               sentKeyRequest = true;
-              debugPrint('[decryptMessage] SENDING KEY REQUEST');
               store.dispatch(sendKeyRequest(
                 event: message,
                 roomId: room.id,
@@ -175,13 +179,15 @@ ThunkAction<AppState> decryptMessages(
 ThunkAction<AppState> decryptMessage({
   required String roomId,
   required Message message,
+  bool forceDecryption = true,
   String eventType = EventTypes.encrypted,
 }) {
   return (Store<AppState> store) async {
     // Pull out event data
     final ciphertext = message.ciphertext;
     final identityKey = message.senderKey;
-    final roomMessageIndexs = store.state.cryptoStore.messageSessionIndex[roomId];
+    final roomMessageIndexs =
+        store.state.cryptoStore.messageSessionIndex[roomId];
 
     // return already decrypted events
     if (ciphertext == null || identityKey == null) {
@@ -207,20 +213,48 @@ ThunkAction<AppState> decryptMessage({
     final messageIndexNew = payloadDecrypted.message_index;
 
     // protection against replay attacks
-    if (messageIndexNew <= identityMessageIndex && identityMessageIndex != 0) {
+    if ((messageIndexNew <= identityMessageIndex &&
+            identityMessageIndex != 0) &&
+        !forceDecryption) {
       throw '[decryptMessage] messageIndex invalid $messageIndexNew <= $identityMessageIndex';
     }
 
     final decryptedJson = json.decode(payloadScrubbed);
 
-    final decryptedMessage = Message.fromEvent(Event.fromMatrix(decryptedJson));
+    printJson(decryptedJson);
+    final decryptedMessage = Message.fromEvent(
+      Event.fromMatrix(decryptedJson),
+    );
 
     // combine all possible decrypted fields with encrypted version of message
-    final combinedMessage = message.copyWith(
+    var combinedMessage = message.copyWith(
+      url: decryptedMessage.url,
       body: decryptedMessage.body,
+      format: decryptedMessage.format,
+      formattedBody: decryptedMessage.formattedBody,
       msgtype: decryptedMessage.msgtype,
       typeDecrypted: decryptedMessage.type,
+      file: decryptedMessage.file,
+      info: decryptedMessage.info,
     );
+
+    // update media store with iv, keys for decrypting said media
+    if (MessageType.image.value == decryptedMessage.msgtype) {
+      final mxcUri = combinedMessage.file?['url']; // encrypted image only
+      final iv = combinedMessage.file?['iv'];
+      final key = combinedMessage.file?['key']['k'];
+      final shasum = combinedMessage.file?['hashes']['sha256'];
+
+      store.dispatch(UpdateMediaCache(
+        mxcUri: mxcUri,
+        info: EncryptInfo(iv: iv, key: key, shasum: shasum),
+      ));
+
+      // unfortunately, decrypted images have urls under the file property
+      combinedMessage = combinedMessage.copyWith(
+        url: mxcUri,
+      );
+    }
 
     await store.dispatch(saveMessageSessionInbound(
       roomId: roomId,
@@ -250,7 +284,8 @@ ThunkAction<AppState> encryptKeyContent({
     final userCurrent = store.state.authStore.user;
     final deviceId = userCurrent.deviceId!;
     final userOlmAccount = store.state.cryptoStore.olmAccount!;
-    final currentIdentityKeys = await json.decode(userOlmAccount.identity_keys());
+    final currentIdentityKeys =
+        await json.decode(userOlmAccount.identity_keys());
     final currentFingerprint = currentIdentityKeys[Algorithms.ed25519];
 
     // pull recipient key data and id
@@ -274,8 +309,6 @@ ThunkAction<AppState> encryptKeyContent({
       'type': eventType,
       'content': content,
     };
-
-    printJson(payload);
 
     // all olm sessions should already be created or received
     // before sending a room key event to devices

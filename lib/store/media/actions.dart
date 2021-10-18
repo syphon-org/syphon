@@ -9,20 +9,18 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/converters.dart';
+import 'package:syphon/store/media/encryption.dart';
+import 'package:syphon/store/media/model.dart';
 import 'package:syphon/store/media/storage.dart';
-
-class MediaStatus {
-  static const FAILURE = 'failure';
-  static const CHECKING = 'checking';
-  static const SUCCESS = 'success';
-}
 
 class UpdateMediaChecks {
   final String? mxcUri;
-  final String? status;
+  final MediaStatus? status;
 
   UpdateMediaChecks({
     this.mxcUri,
@@ -32,22 +30,29 @@ class UpdateMediaChecks {
 
 class UpdateMediaCache {
   final String? mxcUri;
+  final String? type;
   final Uint8List? data;
+  final EncryptInfo? info;
 
   UpdateMediaCache({
     this.mxcUri,
+    this.type,
     this.data,
+    this.info,
   });
 }
 
 ThunkAction<AppState> uploadMedia({
-  File? localFile,
-  String? mediaName = 'photo',
+  required File localFile,
+  String? mediaName = 'profile-photo',
 }) {
   return (Store<AppState> store) async {
     try {
       // Extension handling
-      final String fileType = lookupMimeType(localFile!.path)!;
+      final mimeTypeOption = lookupMimeType(localFile.path);
+      final mimeType = convertMimeTypes(localFile, mimeTypeOption);
+
+      final String fileType = mimeType;
       final String fileExtension = fileType.split('/')[1];
 
       // Setting up params for upload
@@ -65,6 +70,7 @@ ThunkAction<AppState> uploadMedia({
         fileLength: fileLength,
         fileStream: fileStream,
       );
+
       // If upload fails, throw an error for the whole update
       if (data['errcode'] != null) {
         throw data['error'];
@@ -72,9 +78,12 @@ ThunkAction<AppState> uploadMedia({
 
       return data;
     } catch (error) {
-      store.dispatch(
-        addAlert(origin: 'uploadMedia', message: error.toString()),
-      );
+      printError(error.toString());
+
+      store.dispatch(addAlert(
+        origin: 'uploadMedia',
+        message: error.toString(),
+      ));
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -82,71 +91,114 @@ ThunkAction<AppState> uploadMedia({
   };
 }
 
-ThunkAction<AppState> fetchThumbnail({String? mxcUri, double? size, bool force = false}) {
+ThunkAction<AppState> fetchMedia({
+  String? mxcUri,
+  double? size,
+  EncryptInfo? info, // allows quicker local provided media decryption
+  bool force = false,
+  bool thumbnail = false,
+}) {
   return (Store<AppState> store) async {
     try {
       final mediaCache = store.state.mediaStore.mediaCache;
-      final mediaChecks = store.state.mediaStore.mediaChecks;
+      final mediaStatus = store.state.mediaStore.mediaStatus;
+      final medias = store.state.mediaStore.media;
 
       // Noop if already cached data
       if (mediaCache.containsKey(mxcUri) && !force) {
         return;
       }
 
-      // Noop if currently checking or failed
-      if (mediaChecks.containsKey(mxcUri) &&
-          (mediaChecks[mxcUri!] == MediaStatus.CHECKING || mediaChecks[mxcUri] == MediaStatus.FAILURE) &&
+      final currentStatus = mediaStatus[mxcUri!];
+      // Noop if currently checking, failed, or decrypting
+      if (mediaStatus.containsKey(mxcUri) &&
+          (currentStatus == MediaStatus.CHECKING.value ||
+              currentStatus == MediaStatus.FAILURE.value ||
+              currentStatus == MediaStatus.DECRYPTING.value) &&
           !force) {
         return;
       }
+
+      final currentMedia = medias[mxcUri];
 
       store.dispatch(
         UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.CHECKING),
       );
 
       // check if the media is only located in cold storage
-      if (await checkMedia(mxcUri, storage: Storage.instance!)) {
-        final storedData = await loadMedia(
+      if (await checkMedia(mxcUri, storage: Storage.database!)) {
+        var media = await loadMedia(
           mxcUri: mxcUri,
-          storage: Storage.instance!,
+          storage: Storage.database!,
         );
 
-        if (storedData != null) {
-          store.dispatch(UpdateMediaCache(mxcUri: mxcUri, data: storedData));
-          return;
+        // Dont assume decrypted from cold storage
+        if (media != null && media.data != null) {
+          if (media.info?.key != null) {
+            store.dispatch(
+              UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.DECRYPTING),
+            );
+            media = media.copyWith(
+              data: await decryptMediaData(
+                  localData: media.data!, info: currentMedia?.info),
+            );
+          }
+
+          store.dispatch(
+            UpdateMediaCache(
+                mxcUri: mxcUri, data: media.data, info: media.info),
+          );
+
+          return store.dispatch(
+            UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.SUCCESS),
+          );
         }
       }
 
-      final params = {
-        'protocol': store.state.authStore.protocol,
-        'accessToken': store.state.authStore.user.accessToken,
-        'homeserver': store.state.authStore.currentUser.homeserver,
-        'mediaUri': mxcUri,
-      };
+      var data;
 
-      if (size != null) {
-        params['size'] = size.toString();
+      if (thumbnail) {
+        data = await compute(MatrixApi.fetchThumbnail, {
+          'protocol': store.state.authStore.protocol,
+          'accessToken': store.state.authStore.user.accessToken,
+          'homeserver': store.state.authStore.currentUser.homeserver,
+          'mediaUri': mxcUri,
+          'size': size,
+        });
+      } else {
+        data = await compute(MatrixApi.fetchMediaMapped, {
+          'protocol': store.state.authStore.protocol,
+          'accessToken': store.state.authStore.user.accessToken,
+          'homeserver': store.state.authStore.currentUser.homeserver,
+          'mediaUri': mxcUri,
+        });
       }
 
-      final data = await compute(
-        MatrixApi.fetchThumbnail,
-        params,
-      );
+      var bodyBytes = data['bodyBytes'] as Uint8List?;
 
-      final bodyBytes = data['bodyBytes'];
+      // Resolve encrypted info for media message based on available sources
+      final currentInfo = info ?? currentMedia?.info ?? const EncryptInfo();
+      if (currentInfo.key != null && bodyBytes != null) {
+        store.dispatch(
+          UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.DECRYPTING),
+        );
+
+        bodyBytes = await decryptMediaData(
+            localData: bodyBytes, info: info ?? currentMedia?.info);
+      }
 
       store.dispatch(
-        UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes),
+        UpdateMediaCache(mxcUri: mxcUri, data: bodyBytes, info: info),
       );
+
       store.dispatch(
         UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.SUCCESS),
       );
     } catch (error) {
-      debugPrint('[fetchThumbnail] $mxcUri $error');
-      store.dispatch(UpdateMediaChecks(
-        mxcUri: mxcUri,
-        status: MediaStatus.FAILURE,
-      ));
+      debugPrint('[fetchMedia] $mxcUri $error');
+      store.dispatch(
+        UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.FAILURE),
+      );
     }
   };
 }

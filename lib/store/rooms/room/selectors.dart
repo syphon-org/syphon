@@ -57,12 +57,14 @@ String formatPreview({required Room room, Message? message}) {
   }
 
   // message was deleted
-  if (message.type != EventTypes.encrypted && (message.body == null || message.body!.isEmpty)) {
+  if (message.type != EventTypes.encrypted &&
+      (message.body == null || message.body!.isEmpty)) {
     return 'This message was deleted';
   }
 
   // message hasn't been decrypted
-  if (message.type == EventTypes.encrypted && (message.body == null || message.body!.isEmpty)) {
+  if (message.type == EventTypes.encrypted &&
+      (message.body == null || message.body!.isEmpty)) {
     return Strings.labelEncryptedMessage;
   }
 

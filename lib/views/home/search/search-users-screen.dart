@@ -76,7 +76,8 @@ class SearchUserState extends State<SearchUserScreen> {
   }
 
   @protected
-  onCreateChat({required BuildContext context, _Props? props, User? user}) async {
+  onCreateChat(
+      {required BuildContext context, _Props? props, User? user}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -112,7 +113,10 @@ class SearchUserState extends State<SearchUserScreen> {
   /// attempt chating with a user by the name searched
   ///
   @protected
-  onAttemptChat({required User user, required BuildContext context, _Props? props}) async {
+  onAttemptChat(
+      {required User user,
+      required BuildContext context,
+      _Props? props}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -154,7 +158,9 @@ class SearchUserState extends State<SearchUserScreen> {
 
     final attemptableUser = User(
       displayName: searchable,
-      userId: searchable.isNotEmpty && searchable.contains(':') ? searchable : formatUserId(searchable),
+      userId: searchable.isNotEmpty && searchable.contains(':')
+          ? searchable
+          : formatUserId(searchable),
     );
 
     return ListView(
@@ -174,7 +180,8 @@ class SearchUserState extends State<SearchUserScreen> {
         Visibility(
           visible: showManualUser,
           child: GestureDetector(
-            onTap: () => onAttemptChat(props: props, context: context, user: attemptableUser),
+            onTap: () => onAttemptChat(
+                props: props, context: context, user: attemptableUser),
             child: ListItemUser(
               user: attemptableUser,
               enabled: creatingRoomDisplayName != searchable,

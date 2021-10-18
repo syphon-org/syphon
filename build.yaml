@@ -1,0 +1,8 @@
+# build.yaml. This file is quite powerful, see https://pub.dev/packages/build_config
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          generate_connect_constructor: true
+          compact_query_methods: true

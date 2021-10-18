@@ -1,31 +1,37 @@
 import 'dart:typed_data';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/model.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 
 ///
-/// MatrixImage
+/// Matrix Image
 ///
-/// uses the matrix mxc uris and either pulls from cached data or
-/// downloads the image and saves it to cache
+/// uses the matrix mxc uris and either pulls from cached data
+/// or downloads the image and saves it to cache
+///
+/// TODO: optimize widget rebuilds, the ViewModel equatable updates
+/// too frequently as is but none of the data is changing
+///
 class MatrixImage extends StatefulWidget {
   final String? mxcUri;
   final double width;
   final double height;
   final double? size;
   final double strokeWidth;
+  final double loadingPadding;
   final String? imageType;
   final BoxFit fit;
   final bool thumbnail;
-  final bool disableRebuild;
+  final bool rebuild;
   final bool forceLoading;
   final Widget? fallback;
   final Color fallbackColor;
@@ -33,14 +39,15 @@ class MatrixImage extends StatefulWidget {
   const MatrixImage({
     Key? key,
     required this.mxcUri,
-    this.width = 48,
-    this.height = 48,
+    this.width = Dimensions.avatarSizeMin,
+    this.height = Dimensions.avatarSizeMin,
     this.size,
-    this.strokeWidth = Dimensions.defaultStrokeWidthLite,
+    this.strokeWidth = Dimensions.strokeWidthThin,
     this.imageType,
+    this.loadingPadding = 0,
     this.fit = BoxFit.fill,
     this.thumbnail = true,
-    this.disableRebuild = false,
+    this.rebuild = true,
     this.forceLoading = false,
     this.fallbackColor = Colors.grey,
     this.fallback,
@@ -50,52 +57,40 @@ class MatrixImage extends StatefulWidget {
   MatrixImageState createState() => MatrixImageState();
 }
 
-class MatrixImageState extends State<MatrixImage> {
-  final bool disableRebuild;
-  final bool forceLoading;
-
+class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
   Uint8List? finalUriData;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
-  void onMounted() {
+  void onMounted({bool rebuild = true}) {
     final store = StoreProvider.of<AppState>(context);
     final mediaCache = store.state.mediaStore.mediaCache;
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
-      store.dispatch(fetchThumbnail(mxcUri: widget.mxcUri));
+      store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
     }
 
-    // Created in attempts to reduce framerate drop in chat details
+    // Attempts to reduce framerate drop in chat details
     // not sure this actually works as it still drops on scroll
-    if (disableRebuild && mediaCache.containsKey(widget.mxcUri)) {
+    if (rebuild && mediaCache.containsKey(widget.mxcUri)) {
+      printInfo('[onMounted] disabled rebuild');
       finalUriData = mediaCache[widget.mxcUri!];
     }
   }
 
-  MatrixImageState({
-    this.forceLoading = false,
-    this.disableRebuild = false,
-  });
+  // TODO: potentially revert to didChangeDependencies
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted(rebuild: true);
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
         builder: (context, props) {
-          final failed = props.mediaChecks[widget.mxcUri!] != null &&
-              props.mediaChecks[widget.mxcUri!] == MediaStatus.FAILURE;
-          final loading = forceLoading || !props.mediaCache.containsKey(widget.mxcUri);
+          final failed = props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
+          final loading = widget.forceLoading || !props.exists;
 
           if (failed) {
             return CircleAvatar(
@@ -111,16 +106,18 @@ class MatrixImageState extends State<MatrixImage> {
 
           if (loading) {
             return Container(
-              width: widget.size ?? widget.width,
-              height: widget.size ?? widget.height,
-              child: CircularProgressIndicator(
-                strokeWidth: widget.strokeWidth * 1.5,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).accentColor,
-                ),
-                value: null,
-              ),
-            );
+                width: widget.size ?? widget.width,
+                height: widget.size ?? widget.height,
+                child: Padding(
+                  padding: EdgeInsets.all(widget.loadingPadding),
+                  child: CircularProgressIndicator(
+                    strokeWidth: widget.strokeWidth * 1.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).colorScheme.secondary,
+                    ),
+                    value: null,
+                  ),
+                ));
           }
 
           return Image(
@@ -128,7 +125,7 @@ class MatrixImageState extends State<MatrixImage> {
             height: widget.height,
             fit: widget.fit,
             image: MemoryImage(
-              props.mediaCache[widget.mxcUri!] ?? finalUriData!,
+              props.mediaCache ?? finalUriData!,
             ),
           );
         },
@@ -136,22 +133,26 @@ class MatrixImageState extends State<MatrixImage> {
 }
 
 class _Props extends Equatable {
-  final Map<String, Uint8List> mediaCache;
-  final Map<String, String> mediaChecks;
+  final bool exists;
+  final String? mediaStatus;
+  final Uint8List? mediaCache;
 
-  _Props({
+  const _Props({
+    required this.exists,
+    required this.mediaStatus,
     required this.mediaCache,
-    required this.mediaChecks,
   });
 
-  static _Props mapStateToProps(Store<AppState> store) => _Props(
-        mediaCache: store.state.mediaStore.mediaCache,
-        mediaChecks: store.state.mediaStore.mediaChecks,
-      );
-
   @override
-  List<Object> get props => [
-        mediaChecks,
+  List<Object?> get props => [
+        exists,
+        mediaStatus,
         mediaCache,
       ];
+
+  static _Props mapStateToProps(Store<AppState> store, String? mxcUri) => _Props(
+        exists: store.state.mediaStore.mediaCache[mxcUri] != null,
+        mediaCache: store.state.mediaStore.mediaCache[mxcUri],
+        mediaStatus: store.state.mediaStore.mediaStatus[mxcUri],
+      );
 }

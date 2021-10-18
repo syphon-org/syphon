@@ -89,19 +89,20 @@ class ListUserBubbles extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 14),
               child: ClipOval(
                 child: Material(
-                  color: Theme.of(context).scaffoldBackgroundColor, // button color
+                  color:
+                      Theme.of(context).scaffoldBackgroundColor, // button color
                   child: InkWell(
                     onTap: () {
                       if (invite) {
                         Navigator.pushNamed(
                           context,
-                          NavigationPaths.userInvite,
+                          Routes.userInvite,
                           arguments: InviteUsersArguments(roomId: null),
                         );
                       } else {
                         Navigator.pushNamed(
                           context,
-                          NavigationPaths.chatUsers,
+                          Routes.chatUsers,
                           arguments: ChatUsersDetailArguments(roomId: roomId),
                         );
                       }
@@ -124,7 +125,9 @@ class ListUserBubbles extends StatelessWidget {
                         ),
                         child: Icon(
                           invite ? Icons.edit : Icons.arrow_forward_ios,
-                          size: invite ? Dimensions.iconSize : Dimensions.iconSizeLarge,
+                          size: invite
+                              ? Dimensions.iconSize
+                              : Dimensions.iconSizeLarge,
                           color: Theme.of(context).textTheme.caption!.color,
                         ),
                       ),

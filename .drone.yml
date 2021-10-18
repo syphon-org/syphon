@@ -6,7 +6,7 @@ trigger:
     - push
 steps:
   - name: build linux
-    image: cirrusci/flutter:2.2.2
+    image: cirrusci/flutter:2.5.2
     commands:
       # Install dependencies
       - apt-get update -y
@@ -18,7 +18,7 @@ steps:
       - flutter pub run build_runner build --delete-conflicting-outputs
       - flutter config --enable-linux-desktop
       # Build the linux app exec
-      - flutter build linux -v --release
+      - flutter build linux --release
       - tar -cvzf syphon.linux.x64.tar.gz -C build/linux/x64/release/bundle .
 
   - name: release linux
@@ -42,7 +42,7 @@ trigger:
     - push
 steps:
   - name: build android
-    image: cirrusci/flutter:2.2.2
+    image: cirrusci/flutter:2.5.2
     commands:
       # Keep track of the time when build was started
       - echo $(date -Iseconds) > BUILD_START_TIME

@@ -61,7 +61,8 @@ class DialogCaptcha extends StatelessWidget {
                   child: Captcha(
                     baseUrl: props.hostname,
                     publicKey: props.publicKey,
-                    onVerified: (token) => props.onCompleteCaptcha(token, context: context),
+                    onVerified: (token) =>
+                        props.onCompleteCaptcha(token, context: context),
                   ),
                 ),
               ),
@@ -110,10 +111,12 @@ class Props extends Equatable {
         hostname: store.state.authStore.hostname,
         completed: store.state.authStore.captcha,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'] ??
+          return store.state.authStore.interactiveAuths['params']
+                  [MatrixAuthTypes.RECAPTCHA]['public_key'] ??
               '';
         }(),
-        onCompleteCaptcha: (String token, {required BuildContext context}) async {
+        onCompleteCaptcha: (String token,
+            {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),

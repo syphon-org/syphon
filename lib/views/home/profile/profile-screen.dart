@@ -1,27 +1,25 @@
 import 'dart:io';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
-import 'package:syphon/views/widgets/avatars/avatar.dart';
-import 'package:syphon/views/widgets/input/text-field-secure.dart';
-import 'package:touchable_opacity/touchable_opacity.dart';
-
-import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/behaviors.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -33,14 +31,13 @@ class ProfileScreen extends StatefulWidget {
 class ProfileScreenState extends State<ProfileScreen> {
   ProfileScreenState() : super();
 
-  final String title = Strings.titleProfile;
-
+  final title = Strings.titleProfile;
   final userIdController = TextEditingController();
   final displayNameController = TextEditingController();
 
+  File? avatarFileNew;
   String? userIdNew;
   String? displayNameNew;
-  File? avatarFileNew;
 
   onMounted(_Props props) {
     displayNameController.value = TextEditingValue(
@@ -112,7 +109,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        final backgroundColor = selectBackgroundBrightness(props.themeType);
+        final backgroundColor = selectAvatarBackground(props.themeType);
 
         final hasNewInfo = avatarFileNew != null || displayNameNew != null || userIdNew != null;
 
@@ -172,7 +169,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     borderRadius: BorderRadius.circular(
                                       Dimensions.iconSizeLarge,
                                     ),
-                                    boxShadow: [
+                                    boxShadow: const [
                                       BoxShadow(
                                         blurRadius: 6,
                                         offset: Offset(0, 0),
@@ -304,15 +301,22 @@ class _Props extends Equatable {
 
   const _Props({
     required this.user,
-    required this.themeType,
     required this.loading,
+    required this.themeType,
     required this.onSaveProfile,
   });
 
+  @override
+  List<Object> get props => [
+        user,
+        loading,
+        themeType,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         user: store.state.authStore.user,
-        themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.authStore.loading,
+        themeType: store.state.settingsStore.themeSettings.themeType,
         onSaveProfile: ({
           File? avatarFileNew,
           String? userIdNew,
@@ -338,10 +342,4 @@ class _Props extends Equatable {
           return true;
         },
       );
-
-  @override
-  List<Object> get props => [
-        user,
-        loading,
-      ];
 }

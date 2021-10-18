@@ -3,30 +3,27 @@ import 'dart:io';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/parsers.dart';
-
-import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/store/events/selectors.dart';
-import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
+
 import 'room/model.dart';
 
 class SetLoading {
@@ -119,7 +116,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         await store.dispatch(setUsers(room.usersNew));
         await store.dispatch(setReactions(reactions: room.reactions));
         await store.dispatch(setRedactions(redactions: room.redactions));
-        await store.dispatch(setReceipts(room: room, receipts: room.readReceipts));
+        await store
+            .dispatch(setReceipts(room: room, receipts: room.readReceipts));
 
         // mutation filters - handles backfilling mutations for old messages
         await store.dispatch(mutateMessagesRoom(room: room));
@@ -170,8 +168,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         // fetch avatar if a uri was found
         if (room.avatarUri != null) {
-          store.dispatch(fetchThumbnail(
+          store.dispatch(fetchMedia(
             mxcUri: room.avatarUri,
+            thumbnail: true,
           ));
         }
 
@@ -181,7 +180,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         // determined by the fromSync function of room
         final roomUpdated = store.state.roomStore.rooms[room.id];
         if (roomUpdated != null && room.limited) {
-          printWarning('[fetchMessageEvents] ${room.name} LIMITED TRUE - Fetching more messages');
+          printWarning(
+              '[fetchMessageEvents] ${room.name} LIMITED TRUE - Fetching more messages');
           store.dispatch(fetchMessageEvents(
             room: room,
             from: room.prevHash,
@@ -543,9 +543,9 @@ ThunkAction<AppState> markRoomsReadAll() {
 
       final rooms = store.state.roomStore.roomList;
 
-      rooms.forEach((room) {
+      for (final room in rooms) {
         store.dispatch(markRoomRead(roomId: room.id));
-      });
+      }
     } catch (error) {
       store.dispatch(addAlert(
         message: 'Failed to mark all room as read',
@@ -663,7 +663,7 @@ ThunkAction<AppState> updateRoomAvatar({
   return (Store<AppState> store) async {
     try {
       final data = await store.dispatch(uploadMedia(
-        localFile: localFile,
+        localFile: localFile!,
         mediaName: roomId,
       ));
 
@@ -747,7 +747,8 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -815,7 +816,8 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));

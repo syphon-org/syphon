@@ -55,7 +55,8 @@ class Redaction extends Event {
 
   @override
   Map<String, dynamic> toJson() => _$RedactionToJson(this);
-  factory Redaction.fromJson(Map<String, dynamic> json) => _$RedactionFromJson(json);
+  factory Redaction.fromJson(Map<String, dynamic> json) =>
+      _$RedactionFromJson(json);
 
   factory Redaction.fromEvent(Event event) {
     return Redaction(

@@ -32,6 +32,14 @@ class DialogColorPicker extends StatefulWidget {
 class _DialogColorPickerState extends State<DialogColorPicker> {
   Color? currentColor;
 
+  TextEditingController controller = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
+
   buildDefaultPicker(context) => BlockPicker(
         availableColors: const <Color>[
           MaterialColor(
@@ -81,6 +89,8 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
 
   buildAdvancedPicker(context) => ColorPicker(
         pickerColor: currentColor ?? Color(widget.currentColor),
+        hexInputController: controller,
+        showLabel: false,
         onColorChanged: (Color color) {
           widget.onSelectColor!(color.value);
           setState(() {
@@ -105,7 +115,8 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
       dialogHeight = height / 1.80;
     }
 
-    const optionsPadding = EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0);
+    const optionsPadding =
+        EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0);
 
     final options = [
       SimpleDialogOption(
@@ -181,7 +192,25 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
           width: width,
           height: dialogHeight,
           constraints: !widget.advanced ? null : BoxConstraints(minHeight: 460),
-          child: widget.advanced ? buildAdvancedPicker(context) : buildDefaultPicker(context),
+          child: SingleChildScrollView(
+            child: Column(children: [
+              widget.advanced
+                  ? buildAdvancedPicker(context)
+                  : buildDefaultPicker(context),
+              Visibility(
+                visible: widget.advanced,
+                child: TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    labelText: 'HEX',
+                  ),
+                  controller: controller,
+                ),
+              ),
+            ]),
+          ),
         ),
         Container(
           padding: EdgeInsets.symmetric(vertical: 4),

@@ -8,10 +8,12 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
-class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget {
+class AppBarMessageOptions extends StatefulWidget
+    implements PreferredSizeWidget {
   const AppBarMessageOptions({
     Key? key,
     this.title = 'title:',
@@ -61,7 +63,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
 
   @override
   Widget build(BuildContext context) => AppBar(
-        brightness: Brightness.dark, // TOOD: this should inherit from theme
+        systemOverlayStyle: computeSystemUIColor(context),
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -92,7 +94,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             onPressed: () {
               Navigator.pushNamed(
                 context,
-                NavigationPaths.messageDetails,
+                Routes.messageDetails,
                 arguments: MessageDetailArguments(
                   roomId: widget.room!.id,
                   message: widget.message,

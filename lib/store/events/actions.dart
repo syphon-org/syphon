@@ -121,7 +121,8 @@ ThunkAction<AppState> addMessagesDecrypted({
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        AddMessagesDecrypted(roomId: room.id, messages: messages, outbox: outbox),
+        AddMessagesDecrypted(
+            roomId: room.id, messages: messages, outbox: outbox),
       );
     };
 
@@ -169,7 +170,7 @@ ThunkAction<AppState> loadMessagesCached({
 
       final messagesStored = await loadMessages(
         room.messageIds,
-        storage: Storage.instance!,
+        storage: Storage.database!,
         offset: offset, // offset from the most recent eventId found
         limit: !room.encryptionEnabled ? limit : room.messageIds.length,
       );
@@ -312,48 +313,6 @@ ThunkAction<AppState> selectReply({
   return (Store<AppState> store) async {
     final room = store.state.roomStore.rooms[roomId!]!;
     store.dispatch(SetRoom(room: room.copyWith(reply: message ?? Null)));
-  };
-}
-
-///
-/// Format Message Reply
-///
-/// Format a message as a reply to another
-/// https://matrix.org/docs/spec/client_server/latest#rich-replies
-/// https://github.com/matrix-org/matrix-doc/pull/1767
-///
-///
-ThunkAction<AppState> formatMessageReply(
-  Room? room,
-  Message? message,
-  Message reply,
-) {
-  return (Store<AppState> store) async {
-    try {
-      final body = '''> <${reply.sender}> ${reply.body}\n\n${message!.body}''';
-      final formattedBody =
-          '''<mx-reply><blockquote><a href="https://matrix.to/#/${room!.id}/${reply.id}">In reply to</a><a href="https://matrix.to/#/${reply.sender}">${reply.sender}</a><br />${reply.formattedBody ?? reply.body}</blockquote></mx-reply>${message.formattedBody ?? message.body}''';
-
-      return message.copyWith(
-        body: body,
-        format: 'org.matrix.custom.html',
-        formattedBody: formattedBody,
-        content: {
-          'body': body,
-          'format': 'org.matrix.custom.html',
-          'formatted_body': formattedBody,
-          // m.relates_to below is not necessary in the unencrypted part of the
-          // message according to the spec but Element web and android seem to
-          // do it so I'm leaving it here
-          'm.relates_to': {
-            'm.in_reply_to': {'event_id': reply.id}
-          },
-          'msgtype': message.type
-        },
-      );
-    } catch (error) {
-      return null;
-    }
   };
 }
 

@@ -26,28 +26,28 @@ class FabCircleExpanding extends StatelessWidget {
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
-    Navigator.pushNamed(context, NavigationPaths.searchGroups);
+    Navigator.pushNamed(context, Routes.searchGroups);
   }
 
   @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
-    Navigator.pushNamed(context, NavigationPaths.searchUsers);
+    Navigator.pushNamed(context, Routes.searchUsers);
   }
 
   @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
-    Navigator.pushNamed(context, NavigationPaths.groupCreate);
+    Navigator.pushNamed(context, Routes.groupCreate);
   }
 
   @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
-    Navigator.pushNamed(context, NavigationPaths.groupCreatePublic);
+    Navigator.pushNamed(context, Routes.groupCreatePublic);
   }
 
   @override
@@ -119,7 +119,8 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        primaryColor: selectPrimaryColor(store.state.settingsStore.themeSettings),
+        primaryColor:
+            selectPrimaryColor(store.state.settingsStore.themeSettings),
       );
 }
 
@@ -141,7 +142,8 @@ class FabBarContainer extends StatefulWidget {
   FabBarContainerState createState() => FabBarContainerState();
 }
 
-class FabBarContainerState extends State<FabBarContainer> with SingleTickerProviderStateMixin {
+class FabBarContainerState extends State<FabBarContainer>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _expandAnimation;
   bool _open = false;
@@ -233,7 +235,9 @@ class FabBarContainerState extends State<FabBarContainer> with SingleTickerProvi
     final children = <Widget>[];
     final count = widget.children.length;
     final step = 90.0 / (count - 1);
-    for (var i = 0, angleInDegrees = 0.0; i < count; i++, angleInDegrees += step) {
+    for (var i = 0, angleInDegrees = 0.0;
+        i < count;
+        i++, angleInDegrees += step) {
       children.add(
         _ExpandingActionButton(
           directionInDegrees: angleInDegrees,

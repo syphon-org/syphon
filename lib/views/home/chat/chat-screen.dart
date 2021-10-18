@@ -1,42 +1,45 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
 import 'package:syphon/views/home/chat/widgets/message-list.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
 import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
@@ -69,11 +72,6 @@ class ChatScreenState extends State<ChatScreen> {
   final editorController = TextEditingController();
   final messagesController = ScrollController();
   final listViewController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -117,7 +115,7 @@ class ChatScreenState extends State<ChatScreen> {
       props.onFetchNewest();
     }
 
-    if (draft != null && draft.type == MessageTypes.TEXT) {
+    if (draft != null && draft.type == MatrixMessageTypes.text) {
       editorController.value = TextEditingValue(
         text: draft.body!,
         selection: TextSelection.fromPosition(
@@ -214,10 +212,12 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       sending = true;
     });
+
     props.onSendMessage(
       body: editorController.text,
-      type: MessageTypes.TEXT,
+      type: MatrixMessageTypes.text,
     );
+
     editorController.clear();
     if (props.dismissKeyboardEnabled) {
       FocusScope.of(context).unfocus();
@@ -225,6 +225,105 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       sending = false;
     });
+  }
+
+  onSendMedia(File file, MessageType type, _Props props) async {
+    final store = StoreProvider.of<AppState>(context);
+    final encryptionEnabled = props.room.encryptionEnabled;
+
+    setState(() {
+      sending = true;
+    });
+
+    // Globally notify other widgets you're sending a message in this room
+    store.dispatch(
+      UpdateRoom(id: props.room.id, sending: true),
+    );
+
+    File? encryptedFile;
+    EncryptInfo? info;
+
+    try {
+      if (encryptionEnabled) {
+        info = EncryptInfo.generate();
+        encryptedFile = await encryptMedia(localFile: file, info: info);
+        info = info.copyWith(
+          shasum: base64.encode(
+            sha256.convert(encryptedFile!.readAsBytesSync().toList()).bytes,
+          ),
+        );
+      }
+    } catch (error) {
+      // Globally notify other widgets you're sending a message in this room
+      store.dispatch(
+        UpdateRoom(id: props.room.id, sending: false),
+      );
+      rethrow;
+    }
+
+    final mxcData = await store.dispatch(
+      uploadMedia(localFile: encryptedFile ?? file),
+    );
+
+    final mxcUri = mxcData['content_uri'] as String?;
+
+    ///
+    /// TODO: solve mounted issue with back navigation
+    ///
+    /// should not have to do this but unfortunately
+    /// when navigating back from the preview screen and
+    /// submitting a new draft message, a MatrixImage widget
+    /// doesn't fire onMounted or initState. Could potentially
+    /// have something to do with the Visibility widget
+    if (mxcUri != null) {
+      store.dispatch(fetchMedia(
+        mxcUri: mxcUri,
+        info: info,
+      ));
+    }
+
+    final message = Message(
+      url: mxcUri,
+      type: type.value, // get matrix type string (m.image)
+      body: path.basename(file.path),
+    );
+
+    if (props.room.encryptionEnabled) {
+      store.dispatch(sendMessageEncrypted(
+        roomId: props.room.id,
+        message: message,
+        file: file,
+        info: info,
+      ));
+    } else {
+      store.dispatch(sendMessage(
+        roomId: props.room.id,
+        message: message,
+        file: file,
+      ));
+    }
+
+    editorController.clear();
+
+    if (props.dismissKeyboardEnabled) {
+      FocusScope.of(context).unfocus();
+    }
+
+    setState(() {
+      sending = false;
+    });
+  }
+
+  onAddMedia(File file, MessageType type, _Props props) async {
+    Navigator.pushNamed(
+      context,
+      Routes.chatMediaPreview,
+      arguments: MediaPreviewArguments(
+        roomId: props.room.id,
+        mediaList: [file],
+        onConfirmSend: () => onSendMedia(file, type, props),
+      ),
+    );
   }
 
   onToggleSelectedMessage(Message? message) {
@@ -295,7 +394,7 @@ class ChatScreenState extends State<ChatScreen> {
         child: EmojiPicker(
             config: Config(
               columns: 9,
-              indicatorColor: Theme.of(context).accentColor,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
               bgColor: Theme.of(context).scaffoldBackgroundColor,
               categoryIcons: CategoryIcons(
                 smileyIcon: Icons.tag_faces_rounded,
@@ -357,7 +456,8 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
                         color: Colors.white,
-                        semanticsLabel: 'Switch to ${Strings.labelSendUnencrypted}',
+                        semanticsLabel:
+                            'Switch to ${Strings.labelSendUnencrypted}',
                       ),
                     ),
                   ),
@@ -390,7 +490,8 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendLockSolidBeing,
                         color: Colors.white,
-                        semanticsLabel: 'Switch to ${Strings.labelSendEncrypted}',
+                        semanticsLabel:
+                            'Switch to ${Strings.labelSendEncrypted}',
                       ),
                     ),
                   ),
@@ -411,13 +512,17 @@ class ChatScreenState extends State<ChatScreen> {
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments).roomId,
+          (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments)
+              .roomId,
         ),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
-          final closedInputPadding =
-              !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
-          final isScrolling = messagesController.hasClients && messagesController.offset != 0;
+          final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+          final closedInputPadding = !inputFieldNode.hasFocus &&
+              Platform.isIOS &&
+              Dimensions.buttonlessHeightiOS < height;
+          final isScrolling =
+              messagesController.hasClients && messagesController.offset != 0;
 
           var inputContainerColor = Colors.white;
 
@@ -436,7 +541,7 @@ class ChatScreenState extends State<ChatScreen> {
               if (editorController.text.isNotEmpty) {
                 props.onSaveDraftMessage(
                   body: editorController.text,
-                  type: MessageTypes.TEXT,
+                  type: MatrixMessageTypes.text,
                 );
               } else if (props.room.draft != null) {
                 props.onClearDraftMessage();
@@ -460,7 +565,7 @@ class ChatScreenState extends State<ChatScreen> {
           return Scaffold(
             appBar: appBar as PreferredSizeWidget?,
             backgroundColor: selectedMessage != null
-                ? Theme.of(context).scaffoldBackgroundColor.withAlpha(64)
+                ? Theme.of(context).scaffoldBackgroundColor.withAlpha(200)
                 : Theme.of(context).scaffoldBackgroundColor,
             body: Align(
               alignment: Alignment.topRight,
@@ -503,7 +608,9 @@ class ChatScreenState extends State<ChatScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Load more messages',
-                                        style: Theme.of(context).textTheme.bodyText2,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2,
                                       )
                                     ],
                                   ),
@@ -516,15 +623,22 @@ class ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
+                    padding:
+                        EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
                     decoration: BoxDecoration(
                       color: inputContainerColor,
                       boxShadow: isScrolling
-                          ? [BoxShadow(blurRadius: 6, offset: Offset(0, -4), color: Colors.black12)]
+                          ? [
+                              BoxShadow(
+                                  blurRadius: 6,
+                                  offset: Offset(0, -4),
+                                  color: Colors.black12)
+                            ]
                           : [],
                     ),
                     child: AnimatedPadding(
-                      duration: Duration(milliseconds: inputFieldNode.hasFocus ? 225 : 0),
+                      duration: Duration(
+                          milliseconds: inputFieldNode.hasFocus ? 225 : 0),
                       padding: EdgeInsets.only(
                         bottom: closedInputPadding ? 16 : 0,
                       ),
@@ -536,9 +650,14 @@ class ChatScreenState extends State<ChatScreen> {
                         controller: editorController,
                         quotable: props.room.reply,
                         sending: sending,
+                        inset: keyboardInset,
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onSubmitMessage: () => onSendMessage(props),
+                        onAddMedia: (
+                                {required File file,
+                                required MessageType type}) =>
+                            onAddMedia(file, type, props),
                       ),
                     ),
                   ),
@@ -611,13 +730,15 @@ class _Props extends Equatable {
         chatColorPrimary,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         room: selectRoom(id: roomId, state: store.state),
         showAvatars: roomUsers(store.state, roomId).length > 2,
         themeType: store.state.settingsStore.themeSettings.themeType,
         userId: store.state.authStore.user.userId,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
-        dismissKeyboardEnabled: store.state.settingsStore.dismissKeyboardEnabled,
+        dismissKeyboardEnabled:
+            store.state.settingsStore.dismissKeyboardEnabled,
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         loading: selectRoom(state: store.state, id: roomId).syncing,
         messagesLength: store.state.eventStore.messages.containsKey(roomId)
@@ -660,13 +781,13 @@ class _Props extends Equatable {
 
           if (room.encryptionEnabled) {
             return store.dispatch(sendMessageEncrypted(
-              roomId: roomId,
+              roomId: room.id,
               message: message,
             ));
           }
 
           return store.dispatch(sendMessage(
-            room: room,
+            roomId: room.id,
             message: message,
           ));
         },

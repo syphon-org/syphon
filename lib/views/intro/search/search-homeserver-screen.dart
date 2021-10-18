@@ -1,25 +1,31 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
-import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-import 'package:syphon/views/widgets/avatars/avatar.dart';
-
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
+
+class SearchHomeserverArguments {
+  final bool signup;
+
+  SearchHomeserverArguments({this.signup = false});
+}
 
 class SearchHomeserverScreen extends StatefulWidget {
   const SearchHomeserverScreen({Key? key}) : super(key: key);
@@ -67,7 +73,11 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(
+          store,
+          // ignore: cast_nullable_to_non_nullable
+          signup: (ModalRoute.of(context)!.settings.arguments as SearchHomeserverArguments?)?.signup ?? false,
+        ),
         builder: (context, props) => Scaffold(
           appBar: AppBarSearch(
             title: Strings.titleHomeserverSearch,
@@ -277,15 +287,25 @@ class _Props extends Equatable {
         homeserver,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, {bool signup = false}) => _Props(
         loading: store.state.searchStore.loading || store.state.authStore.loading,
         searchText: store.state.searchStore.searchText ?? '',
         homeservers: store.state.searchStore.searchText != null
             ? store.state.searchStore.searchResults
             : store.state.searchStore.homeservers,
         homeserver: store.state.authStore.homeserver,
-        onSelect: (String hostname) {
-          store.dispatch(selectHomeserver(hostname: hostname));
+        onSelect: (String hostname) async {
+          await store.dispatch(selectHomeserver(hostname: hostname));
+          final _homeserver = store.state.authStore.homeserver;
+
+          if (signup &&
+              _homeserver.signupTypes.isEmpty &&
+              (!_homeserver.loginTypes.contains(MatrixAuthTypes.SSO))) {
+            store.dispatch(addInfo(
+              origin: 'selectHomeserver',
+              message: 'No new signups allowed on this server, try another if creating an account.',
+            ));
+          }
         },
         onSearch: (text) {
           store.dispatch(searchHomeservers(searchText: text));

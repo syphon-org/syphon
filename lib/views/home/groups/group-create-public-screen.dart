@@ -1,32 +1,28 @@
 import 'dart:io';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/actions.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/behaviors.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text-opacity.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
-
-import 'package:syphon/views/behaviors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
 class CreatePublicGroupScreen extends StatefulWidget {
   const CreatePublicGroupScreen({Key? key}) : super(key: key);
@@ -95,7 +91,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
           final double width = MediaQuery.of(context).size.width;
           final double imageSize = Dimensions.avatarSizeDetails;
 
-          final backgroundColor = selectBackgroundBrightness(props.themeType);
+          final backgroundColor = selectAvatarBackground(props.themeType);
 
           // // Space for confirming rebuilding
           Widget avatarWidget = CircleAvatar(
@@ -206,7 +202,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                     borderRadius: BorderRadius.circular(
                                                       Dimensions.iconSizeLarge,
                                                     ),
-                                                    boxShadow: [
+                                                    boxShadow: const [
                                                       BoxShadow(
                                                           blurRadius: 6,
                                                           offset: Offset(0, 0),

@@ -33,7 +33,8 @@ class ChatUsersDetailScreen extends StatefulWidget {
   ChatUsersDetailState createState() => ChatUsersDetailState();
 }
 
-class ChatUsersDetailState extends State<ChatUsersDetailScreen> with Lifecycle<ChatUsersDetailScreen> {
+class ChatUsersDetailState extends State<ChatUsersDetailScreen>
+    with Lifecycle<ChatUsersDetailScreen> {
   final searchInputFocusNode = FocusNode();
 
   bool loading = false;
@@ -58,7 +59,8 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> with Lifecycle<C
     super.dispose();
   }
 
-  onShowUserDetails({required BuildContext context, String? roomId, String? userId}) async {
+  onShowUserDetails(
+      {required BuildContext context, String? roomId, String? userId}) async {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -103,7 +105,9 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> with Lifecycle<C
                   user.userId!,
                   style: Theme.of(context).textTheme.caption!.merge(
                         TextStyle(
-                          color: props.loading ? Color(Colours.greyDisabled) : null,
+                          color: props.loading
+                              ? Color(Colours.greyDisabled)
+                              : null,
                         ),
                       ),
                 ),
@@ -120,7 +124,8 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> with Lifecycle<C
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStateToProps(store, arguments!.roomId),
+      converter: (Store<AppState> store) =>
+          _Props.mapStateToProps(store, arguments!.roomId),
       builder: (context, props) => Scaffold(
         appBar: AppBarSearch(
           title: Strings.titleChatUsers,
@@ -172,7 +177,8 @@ class _Props extends Equatable {
         loading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         loading: store.state.roomStore.loading,
         searchText: store.state.searchStore.searchText,
         room: store.state.roomStore.rooms[roomId!] ?? Room(id: roomId),

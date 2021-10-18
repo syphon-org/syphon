@@ -25,10 +25,12 @@ class Avatar extends StatelessWidget {
     this.padding,
     this.background,
     this.selected = false,
+    this.rebuild = true,
   }) : super(key: key);
 
   final bool force;
   final bool selected;
+  final bool rebuild;
   final String? uri;
   final String? url;
   final String? alt;
@@ -85,6 +87,7 @@ class Avatar extends StatelessWidget {
                 width: size,
                 height: size,
                 fallbackColor: Colors.transparent,
+                rebuild: false,
               ),
             );
           }
@@ -126,7 +129,7 @@ class Avatar extends StatelessWidget {
                     child: ClipRRect(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Theme.of(context).accentColor,
+                          color: Theme.of(context).colorScheme.secondary,
                           border: Border.all(
                             color: Colors.white,
                           ),

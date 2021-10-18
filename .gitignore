@@ -67,3 +67,5 @@ Flutter.podspec
 # example payloads
 *.example.json
 
+# generated shared lib artifacts for iOS
+**/dgph

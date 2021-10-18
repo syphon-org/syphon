@@ -34,7 +34,8 @@ class NotificationSettingsScreen extends StatelessWidget {
     }
   }
 
-  onConfirmNotifications({required BuildContext context, required _Props props}) async {
+  onConfirmNotifications(
+      {required BuildContext context, required _Props props}) async {
     // If the platform is iOS, we'll want to confirm they
     // understand the native notification prompt first
     if (Platform.isIOS && !props.notificationsEnabled) {
@@ -67,14 +68,17 @@ class NotificationSettingsScreen extends StatelessWidget {
 
           switch (props.styleType) {
             case StyleType.Inbox:
-              styleTypeDescription = 'Notification content is formatted together within one notification';
+              styleTypeDescription =
+                  'Notification content is formatted together within one notification';
               break;
             case StyleType.Latest:
-              styleTypeDescription = 'Notifications will only show one for the most recent notification';
+              styleTypeDescription =
+                  'Notifications will only show one for the most recent notification';
               break;
             case StyleType.Itemized:
             default:
-              styleTypeDescription = 'A new notification will appear for every notification';
+              styleTypeDescription =
+                  'A new notification will appear for every notification';
               break;
           }
 
@@ -83,7 +87,9 @@ class NotificationSettingsScreen extends StatelessWidget {
             body: Column(
               children: <Widget>[
                 Visibility(
-                  visible: Platform.isAndroid || Platform.isMacOS || Platform.isLinux,
+                  visible: Platform.isAndroid ||
+                      Platform.isMacOS ||
+                      Platform.isLinux,
                   child: CardSection(
                     child: Column(children: [
                       Container(
@@ -101,12 +107,16 @@ class NotificationSettingsScreen extends StatelessWidget {
                         child: RichText(
                           textAlign: TextAlign.left,
                           text: TextSpan(
-                            text: 'Show notifications using a background service',
+                            text:
+                                'Show notifications using a background service',
                             style: Theme.of(context).textTheme.caption,
                             children: <TextSpan>[
                               TextSpan(
                                 text: ' without ',
-                                style: Theme.of(context).textTheme.caption!.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .caption!
+                                    .copyWith(
                                       fontWeight: FontWeight.w500,
                                     ),
                               ),
@@ -159,7 +169,8 @@ class NotificationSettingsScreen extends StatelessWidget {
                       ListTile(
                         enabled: Platform.isIOS,
                         dense: true,
-                        onTap: () => onConfirmNotifications(context: context, props: props),
+                        onTap: () => onConfirmNotifications(
+                            context: context, props: props),
                         contentPadding: Dimensions.listPadding,
                         title: Text(
                           'Notifications',
@@ -169,7 +180,8 @@ class NotificationSettingsScreen extends StatelessWidget {
                           value: props.remoteNotificationsEnabled,
                           onChanged: !Platform.isIOS
                               ? null
-                              : (value) => onConfirmNotifications(context: context, props: props),
+                              : (value) => onConfirmNotifications(
+                                  context: context, props: props),
                         ),
                       ),
                       ListTile(
@@ -183,8 +195,9 @@ class NotificationSettingsScreen extends StatelessWidget {
                         ),
                         trailing: Switch(
                           value: props.httpPusherEnabled,
-                          onChanged:
-                              !props.remoteNotificationsEnabled ? null : (value) => props.onTogglePusher(),
+                          onChanged: !props.remoteNotificationsEnabled
+                              ? null
+                              : (value) => props.onTogglePusher(),
                         ),
                       ),
                     ]),
@@ -203,7 +216,9 @@ class NotificationSettingsScreen extends StatelessWidget {
                         ),
                       ),
                       ListTile(
-                        onTap: !props.localNotificationsEnabled ? null : () => props.onIncrementStyleType(),
+                        onTap: !props.localNotificationsEnabled
+                            ? null
+                            : () => props.onIncrementStyleType(),
                         contentPadding: Dimensions.listPadding,
                         title: Text('Notification Type'),
                         subtitle: Text(
@@ -213,7 +228,9 @@ class NotificationSettingsScreen extends StatelessWidget {
                         trailing: Text(enumToString(props.styleType)),
                       ),
                       ListTile(
-                        onTap: !props.localNotificationsEnabled ? null : () => props.onIncrementToggleType(),
+                        onTap: !props.localNotificationsEnabled
+                            ? null
+                            : () => props.onIncrementToggleType(),
                         contentPadding: Dimensions.listPadding,
                         title: Text('Notification Default'),
                         subtitle: Text(
@@ -278,13 +295,16 @@ class _Props extends Equatable {
   ) =>
       _Props(
         // will not always be platform dependent
-        localNotificationsEnabled:
-            Platform.isAndroid && store.state.settingsStore.notificationSettings.enabled,
-        remoteNotificationsEnabled: Platform.isIOS && store.state.settingsStore.notificationSettings.enabled,
-        notificationsEnabled: store.state.settingsStore.notificationSettings.enabled,
+        localNotificationsEnabled: Platform.isAndroid &&
+            store.state.settingsStore.notificationSettings.enabled,
+        remoteNotificationsEnabled: Platform.isIOS &&
+            store.state.settingsStore.notificationSettings.enabled,
+        notificationsEnabled:
+            store.state.settingsStore.notificationSettings.enabled,
         styleType: store.state.settingsStore.notificationSettings.styleType,
         toggleType: store.state.settingsStore.notificationSettings.toggleType,
-        httpPusherEnabled: store.state.settingsStore.notificationSettings.pushers.isNotEmpty,
+        httpPusherEnabled:
+            store.state.settingsStore.notificationSettings.pushers.isNotEmpty,
         onTogglePusher: () async {
           // await store.dispatch(fetchNotificationPushers());
           store.dispatch(fetchNotifications());

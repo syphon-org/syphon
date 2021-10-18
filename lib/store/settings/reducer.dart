@@ -3,7 +3,8 @@ import 'package:syphon/store/settings/notification-settings/actions.dart';
 import './actions.dart';
 import './state.dart';
 
-SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dynamic action]) {
+SettingsStore settingsReducer(
+    [SettingsStore state = const SettingsStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(
@@ -31,21 +32,25 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       );
     case SetMessageSize:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(messageSize: action.messageSize),
+        themeSettings:
+            state.themeSettings.copyWith(messageSize: action.messageSize),
       );
     case SetAvatarShape:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(avatarShape: action.avatarShape),
+        themeSettings:
+            state.themeSettings.copyWith(avatarShape: action.avatarShape),
       );
     case SetMainFabType:
       final _action = action as SetMainFabType;
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(mainFabType: _action.fabType),
+        themeSettings:
+            state.themeSettings.copyWith(mainFabType: _action.fabType),
       );
     case SetMainFabLocation:
       final _action = action as SetMainFabLocation;
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(mainFabLocation: _action.fabLocation),
+        themeSettings:
+            state.themeSettings.copyWith(mainFabLocation: _action.fabLocation),
       );
     case SetDevices:
       return state.copyWith(
@@ -82,7 +87,8 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       );
     case SetThemeType:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(themeType: action.themeType),
+        themeSettings:
+            state.themeSettings.copyWith(themeType: action.themeType),
       );
     case ToggleEnterSend:
       return state.copyWith(
@@ -122,8 +128,8 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       );
     case ToggleNotifications:
       return state.copyWith(
-        notificationSettings:
-            state.notificationSettings.copyWith(enabled: !state.notificationSettings.enabled),
+        notificationSettings: state.notificationSettings
+            .copyWith(enabled: !state.notificationSettings.enabled),
       );
     case SetNotificationSettings:
       return state.copyWith(notificationSettings: action.settings);

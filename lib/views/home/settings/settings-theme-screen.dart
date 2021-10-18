@@ -31,7 +31,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
       builder: (dialogContext) => DialogConfirm(
         title: 'Confirm Advanced Colors',
         content: Strings.confirmAdvancedColors,
-        confirmText: Strings.buttonEnable,
+        confirmText: Strings.buttonEnable.capitalize(),
         onConfirm: () async {
           Navigator.pop(dialogContext);
           onAdvanced();
@@ -189,7 +189,8 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           ),
                           trailing: Switch(
                             value: props.roomTypeBadgesEnabled,
-                            onChanged: (value) => props.onToggleRoomTypeBadges(),
+                            onChanged: (value) =>
+                                props.onToggleRoomTypeBadges(),
                             activeColor: Color(props.primaryColor),
                           ),
                           onTap: () => props.onToggleRoomTypeBadges(),
@@ -352,15 +353,21 @@ class _Props extends Equatable {
         primaryColor: store.state.settingsStore.themeSettings.primaryColor,
         accentColor: store.state.settingsStore.themeSettings.accentColor,
         appBarColor: store.state.settingsStore.themeSettings.appBarColor,
-        themeType: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
+        themeType: selectThemeTypeString(
+            store.state.settingsStore.themeSettings.themeType),
         language: store.state.settingsStore.language,
-        fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
-        fontSize: selectFontSizeString(store.state.settingsStore.themeSettings.fontSize),
-        messageSize: selectMessageSizeString(store.state.settingsStore.themeSettings.messageSize),
-        avatarShape: selectAvatarShapeString(store.state.settingsStore.themeSettings.avatarShape),
+        fontName: selectFontNameString(
+            store.state.settingsStore.themeSettings.fontName),
+        fontSize: selectFontSizeString(
+            store.state.settingsStore.themeSettings.fontSize),
+        messageSize: selectMessageSizeString(
+            store.state.settingsStore.themeSettings.messageSize),
+        avatarShape: selectAvatarShapeString(
+            store.state.settingsStore.themeSettings.avatarShape),
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         mainFabType: selectMainFabType(store.state.settingsStore.themeSettings),
-        mainFabLocation: selectMainFabLocation(store.state.settingsStore.themeSettings),
+        mainFabLocation:
+            selectMainFabLocation(store.state.settingsStore.themeSettings),
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),
         ),

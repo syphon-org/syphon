@@ -41,7 +41,8 @@ class ListItemAccount extends StatelessWidget {
   final Function? onPress;
   final Function? onPressAvatar;
 
-  Widget buildTouchType({required BuildContext context, required Widget child}) {
+  Widget buildTouchType(
+      {required BuildContext context, required Widget child}) {
     switch (type) {
       case ListItemUserType.Pressable:
         return GestureDetector(
@@ -50,7 +51,9 @@ class ListItemAccount extends StatelessWidget {
         );
       case ListItemUserType.Selectable:
         return InkWell(
-          splashColor: selected ? Theme.of(context).selectedRowColor : Colors.transparent,
+          splashColor: selected
+              ? Theme.of(context).selectedRowColor
+              : Colors.transparent,
           child: child,
         );
       default:
@@ -62,7 +65,9 @@ class ListItemAccount extends StatelessWidget {
   Widget build(BuildContext context) => Opacity(
       opacity: enabled || selected ? 1 : 0.7,
       child: Container(
-          color: selected ? Theme.of(context).selectedRowColor : Colors.transparent,
+          color: selected
+              ? Theme.of(context).selectedRowColor
+              : Colors.transparent,
           child: ListTile(
             enabled: enabled,
             selected: selected,

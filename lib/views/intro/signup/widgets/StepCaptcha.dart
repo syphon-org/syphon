@@ -123,8 +123,12 @@ class CaptchaStepState extends State<CaptchaStep> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   ButtonText(
-                    text: !props.completed ? Strings.buttonTextLoadCaptcha : Strings.buttonTextConfirmed,
-                    color: !props.completed ? Color(Colours.cyanSyphon) : Color(Colours.cyanSyphonAlpha),
+                    text: !props.completed
+                        ? Strings.buttonTextLoadCaptcha
+                        : Strings.buttonTextConfirmed,
+                    color: !props.completed
+                        ? Color(Colours.cyanSyphon)
+                        : Color(Colours.cyanSyphonAlpha),
                     loading: props.loading,
                     disabled: props.completed,
                     onPressed: () => props.onShowCaptcha(

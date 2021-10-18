@@ -23,6 +23,7 @@ abstract class MatrixApi {
   static const checkUsernameAvailability = Auth.checkUsernameAvailability;
   static const sendPasswordResetEmail = Auth.sendPasswordResetEmail;
   static const checkHomeserver = Auth.checkHomeserver;
+  static const checkHomeserverAlt = Auth.checkHomeserverAlt;
   static const checkVersion = Auth.checkVersion;
 
   // Search
@@ -69,8 +70,10 @@ abstract class MatrixApi {
   static const updateBlockedUsers = Users.updateBlockedUsers;
 
   // Media
-  static const fetchThumbnail = Media.fetchThumbnail;
-  static const uploadMedia = Media.uploadMedia;
+  static const fetchMedia = MatrixMedia.fetchMedia;
+  static const fetchMediaMapped = MatrixMedia.fetchMediaMapped;
+  static const uploadMedia = MatrixMedia.uploadMedia;
+  static const fetchThumbnail = MatrixMedia.fetchThumbnail;
 
   // Device Management
   static const fetchDevices = Devices.fetchDevices;
@@ -87,7 +90,8 @@ abstract class MatrixApi {
 
   // Notifications
   static const fetchNotifications = Notifications.fetchNotifications;
-  static const fetchNotificationPushers = Notifications.fetchNotificationPushers;
+  static const fetchNotificationPushers =
+      Notifications.fetchNotificationPushers;
 
   /// Save Notification Pusher
   ///

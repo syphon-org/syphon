@@ -19,7 +19,8 @@ abstract class Events {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -46,7 +47,8 @@ abstract class Events {
     int? limit = 10, // default limit by matrix
     bool desc = true, // direction of events
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/messages';
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/messages';
 
     url += '?limit=$limit';
     url += from != null ? '&from=$from' : '';
@@ -70,7 +72,8 @@ abstract class Events {
   /// Sync (Background Isolate) (main functionality)
   ///
   /// https://matrix.org/docs/spec/client_server/latest#id251
-  static Future<dynamic> fetchMessageEventsMapped(Map params) async => fetchMessageEvents(
+  static Future<dynamic> fetchMessageEventsMapped(Map params) async =>
+      fetchMessageEvents(
         protocol: params['protocol'],
         homeserver: params['homeserver'],
         accessToken: params['accessToken'],
@@ -103,7 +106,8 @@ abstract class Events {
     String? sessionId,
     String? deviceId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.encrypted/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.encrypted/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -149,7 +153,8 @@ abstract class Events {
     String? stateKey,
     Map? content,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state/$eventType';
+    String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state/$eventType';
 
     url += stateKey != null ? '/$stateKey' : '';
 
@@ -184,7 +189,8 @@ abstract class Events {
     String? trxId,
     Map? message,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.message/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.message/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -235,7 +241,8 @@ abstract class Events {
     String? messageId,
     String? trxId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.reaction/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.reaction/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -243,7 +250,11 @@ abstract class Events {
     };
 
     final Map body = {
-      'm.relates_to': {'rel_type': 'm.annotation', 'event_id': messageId, 'key': reaction}
+      'm.relates_to': {
+        'rel_type': 'm.annotation',
+        'event_id': messageId,
+        'key': reaction
+      }
     };
 
     final response = await http.put(
@@ -268,7 +279,8 @@ abstract class Events {
     String? eventId,
     String? trxId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -305,7 +317,8 @@ abstract class Events {
     String? deviceId,
     Map? content,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/sendToDevice/$eventType/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/sendToDevice/$eventType/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -335,7 +348,8 @@ abstract class Events {
     String? userId,
     bool? typing,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/typing/$userId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/typing/$userId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -368,7 +382,8 @@ abstract class Events {
     String? lastRead,
     bool readAll = true,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/read_markers';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/read_markers';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

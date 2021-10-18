@@ -81,5 +81,6 @@ class Homeserver extends Equatable {
 
   Map<String, dynamic> toJson() => _$HomeserverToJson(this);
 
-  factory Homeserver.fromJson(Map<String, dynamic> json) => _$HomeserverFromJson(json);
+  factory Homeserver.fromJson(Map<String, dynamic> json) =>
+      _$HomeserverFromJson(json);
 }

@@ -1,30 +1,36 @@
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
+import 'package:syphon/store/media/model.dart';
 
 // @JsonSerializable(nullable: true, includeIfNull: true)
 class MediaStore extends Equatable {
-  final Map<String, String> mediaChecks; // Map<mxcUri, status>
+  final Map<String, Media> media;
+  final Map<String, String> mediaStatus;
   final Map<String, Uint8List> mediaCache;
 
   const MediaStore({
+    this.media = const {},
     this.mediaCache = const {},
-    this.mediaChecks = const {},
+    this.mediaStatus = const {},
   });
 
   @override
   List<Object?> get props => [
         mediaCache,
-        mediaChecks,
+        mediaStatus,
+        media,
       ];
 
   MediaStore copyWith({
+    Map<String, Media>? media,
+    Map<String, String>? mediaStatus,
     Map<String, Uint8List>? mediaCache,
-    Map<String, String>? mediaChecks,
   }) =>
       MediaStore(
+        media: media ?? this.media,
         mediaCache: mediaCache ?? this.mediaCache,
-        mediaChecks: mediaChecks ?? this.mediaChecks,
+        mediaStatus: mediaStatus ?? this.mediaStatus,
       );
 
   // custom json converter to allow Uint8List when in cache
@@ -32,7 +38,7 @@ class MediaStore extends Equatable {
   // Would repeatedly update even if a locally cached version matched
   factory MediaStore.fromJson(Map<String, dynamic> json) {
     return MediaStore(
-      mediaChecks: (json['mediaChecks'] as Map<String, dynamic>).map(
+      mediaStatus: (json['mediaChecks'] as Map<String, dynamic>).map(
         (k, e) => MapEntry(k, e as String),
       ),
       mediaCache: (json['mediaCache'] as Map<String, dynamic>).map(
@@ -47,6 +53,6 @@ class MediaStore extends Equatable {
       <String, dynamic>{
         'mediaCache':
             instance.mediaCache.map((key, value) => MapEntry(key, value)),
-        'mediaChecks': instance.mediaChecks,
+        'mediaChecks': instance.mediaStatus,
       };
 }

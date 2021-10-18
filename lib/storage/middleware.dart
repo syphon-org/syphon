@@ -1,7 +1,7 @@
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/auth/storage.dart';
@@ -13,6 +13,7 @@ import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/media/model.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/storage.dart';
@@ -29,7 +30,7 @@ import 'package:syphon/store/user/storage.dart';
 /// Saves store data to cold storage based
 /// on which redux actions are fired.
 ///
-storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
+storageMiddleware(Database? storageOld, StorageDatabase? storage) {
   return (
     Store<AppState> store,
     dynamic action,
@@ -37,7 +38,7 @@ storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
   ) {
     next(action);
 
-    if (storage == null) {
+    if (storageOld == null) {
       printWarning('storage is null, skipping saving cold storage data!!!', title: 'storageMiddleware');
       return;
     }
@@ -46,14 +47,20 @@ storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
       case AddAvailableUser:
       case RemoveAvailableUser:
       case SetUser:
-        saveAuth(store.state.authStore, storage: storage);
+        saveAuth(store.state.authStore, storage: storageOld);
         break;
       case SetUsers:
         final _action = action as SetUsers;
-        saveUsers(_action.users ?? {}, storage: storage);
+        saveUsers(_action.users ?? {}, storage: storage!);
         break;
       case UpdateMediaCache:
-        saveMedia(action.mxcUri, action.data, storage: storage);
+        final _action = action as UpdateMediaCache;
+
+        // dont save decrypted images
+        final decrypting = store.state.mediaStore.mediaStatus[_action.mxcUri] == MediaStatus.DECRYPTING.value;
+        if (decrypting) return;
+
+        saveMedia(_action.mxcUri, _action.data, info: _action.info, type: _action.type, storage: storage!);
         break;
       case UpdateRoom:
         final _action = action as UpdateRoom;
@@ -66,48 +73,42 @@ storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
         // TODO: extract room event keys to a helper class / object to remove large map copies
         if ((isSending || isDrafting || isLastRead) && rooms.containsKey(_action.id)) {
           final room = rooms[_action.id];
-          saveRoom(room!, storage: storage);
+          saveRoom(room!, storage: storage!);
         }
         break;
       case RemoveRoom:
         final _action = action as RemoveRoom;
         final room = store.state.roomStore.rooms[_action.roomId];
         if (room != null) {
-          deleteRooms({room.id: room}, storage: storage);
+          deleteRooms({room.id: room}, storage: storage!);
         }
         break;
       case SetReactions:
         final _action = action as SetReactions;
-        saveReactions(_action.reactions ?? [], storage: storage);
+        saveReactions(_action.reactions ?? [], storage: storageOld);
         break;
       case SetRedactions:
         final _action = action as SetRedactions;
-        saveRedactions(_action.redactions ?? [], storage: storage);
+        saveRedactions(_action.redactions ?? [], storage: storageOld);
         break;
       case SetReceipts:
         final _action = action as SetReceipts;
         final isSynced = store.state.syncStore.synced;
         // TODO: the initial sync loads way too many read receipts
-        saveReceipts(_action.receipts ?? {}, storage: storage, ready: isSynced);
+        saveReceipts(_action.receipts ?? {}, storage: storageOld, ready: isSynced);
         break;
       case SetRoom:
         final _action = action as SetRoom;
         final room = _action.room;
-        saveRooms({room.id: room}, storage: storage);
+        saveRooms({room.id: room}, storage: storage!);
         break;
       case AddMessages:
         final _action = action as AddMessages;
-        saveMessages(_action.messages, storage: storage);
-        if (coldStorage == null) {
-          printWarning('MOOR STORAGE is null, skipping saving cold storage data!!!',
-              title: 'storageMiddleware');
-          break;
-        }
-        saveMessagesCold(_action.messages, storage: coldStorage);
+        saveMessages(_action.messages, storage: storage!);
         break;
       case AddMessagesDecrypted:
         final _action = action as AddMessagesDecrypted;
-        saveDecrypted(_action.messages, storage: storage);
+        saveDecrypted(_action.messages, storage: storage!);
         break;
       case SetThemeType:
       case SetPrimaryColor:
@@ -131,7 +132,7 @@ storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
       case SetSyncInterval:
       case SetMainFabLocation:
       case SetMainFabType:
-        saveSettings(store.state.settingsStore, storage: storage);
+        saveSettings(store.state.settingsStore, storage: storageOld);
         break;
       case SetOlmAccountBackup:
       case SetDeviceKeysOwned:
@@ -144,14 +145,14 @@ storageMiddleware(Database? storage, StorageDatabase? coldStorage) {
       case UpdateMessageSessionOutbound:
       case SaveKeySession:
       case ResetCrypto:
-        saveCrypto(store.state.cryptoStore, storage: storage);
+        saveCrypto(store.state.cryptoStore, storage: storageOld);
         break;
       case SetNotificationSettings:
         // handles updating the background sync thread with new chat settings
         saveNotificationSettings(
           settings: store.state.settingsStore.notificationSettings,
         );
-        saveSettings(store.state.settingsStore, storage: storage);
+        saveSettings(store.state.settingsStore, storage: storageOld);
         break;
 
       default:

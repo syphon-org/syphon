@@ -61,8 +61,10 @@ class BackgroundSync {
       secureStorage.write(key: Cache.accessTokenKey, value: accessToken),
       secureStorage.write(key: Cache.lastSinceKey, value: lastSince),
       secureStorage.write(key: Cache.userIdKey, value: currentUser),
-      secureStorage.write(key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
-      secureStorage.write(key: notificationSettings, value: jsonEncode(settings))
+      secureStorage.write(
+          key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
+      secureStorage.write(
+          key: notificationSettings, value: jsonEncode(settings))
     ]);
 
     await AndroidAlarmManager.periodic(
@@ -253,7 +255,8 @@ Future backgroundSyncLoop({
       }
 
       // Make sure the room name exists in the cache
-      if (!roomNames.containsKey(roomId) || roomNames[roomId] == Values.EMPTY_CHAT) {
+      if (!roomNames.containsKey(roomId) ||
+          roomNames[roomId] == Values.EMPTY_CHAT) {
         try {
           final roomNameList = await MatrixApi.fetchRoomName(
             protocol: protocol,
@@ -263,13 +266,15 @@ Future backgroundSyncLoop({
           );
 
           final roomAlias = roomNameList[roomNameList.length - 1];
-          final roomName = roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
+          final roomName =
+              roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
 
           roomNames[room.id] = roomName;
 
           saveRoomNames(roomNames: roomNames);
         } catch (error) {
-          print('[backgroundSyncLoop] failed to fetch & parse room name ${room.id}');
+          print(
+              '[backgroundSyncLoop] failed to fetch & parse room name ${room.id}');
         }
       }
 

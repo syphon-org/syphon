@@ -5,13 +5,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/index.dart';
 
 class CardSection extends StatelessWidget {
-  CardSection({
+  const CardSection({
     Key? key,
     this.child,
     this.margin,
@@ -29,7 +28,6 @@ class CardSection extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
-
           return Card(
             margin: margin ?? EdgeInsets.symmetric(vertical: 4),
             elevation: elevation ?? 0.5,
@@ -47,7 +45,7 @@ class CardSection extends StatelessWidget {
 class Props extends Equatable {
   final ThemeType themeType;
 
-  Props({
+  const Props({
     required this.themeType,
   });
 

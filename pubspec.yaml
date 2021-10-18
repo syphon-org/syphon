@@ -1,63 +1,40 @@
 name: syphon
 description: a privacy focused matrix client
-
-# flutter commands
-# $ flutter create --org org.tether.tether
-# $ flutter run --no-fast-start
-# $ flutter run --no-sound-null-safety
-# $ flutter pub get
-# $ flutter pub upgrade --major-versions
-# $ flutter pub global run devtools
-# $ flutter pub run build_runner build
-# $ flutter pub run build_runner watch --delete-conflicting-outputs
-# $ flutter pub run build_runner build --delete-conflicting-outputs
-# $ adb shell && pm uninstall org.tether.tether (sometimes doesn't uninstall when debugging?)
-
-# troubleshooting
-# $ pub cache repair
-# $ flutter pub cache repair
-
-# release commands
-# flutter build android --release
-# flutter build ipa  --release # ios
-# flutter build macos --release
-
-# mobile development commands
-# $ xcrun simctl delete unavailable
-# $ xcrun simctl list devices
-# $ xcrun simctl boot <device-id>
-# $ xcrun simctl boot 9EC4AC8E-5BD0-4D38-A8FC-52504C130844
-# $ emulator -list-avds
-# $ emulator -avd Pixel_3a_API_29
-# $ adb shell && run-as org.tether.tether # cache inspection
-# $ adb logcat ActivityManager:I flutter:I *:S
-
-# desktop support options
-# $ flutter config --enable-macos-desktop
-# $ flutter config --enable-linux-desktop
-# $ flutter config --no-enable-<type>-desktop
-
-# asset generation
-# iOS icons - https://github.com/smallmuou/ios-icon-generator
-#           - run generation script for ios and macos (desktop and mobile)
-# android icons - use Android Studio with generic png
-
-# env setup
-# - git submodule update --init --recursive
-# - defaults delete com.apple.dt.Xcode # Reset XCode settings
-# - synctl start on 192.168.1.2 or respective local server
-# - curl -XGET "http://192.168.1.2:8008/_matrix/client/r0/login" to test
-
-# notes
-# https://github.com/flutter/plugins/pull/1570
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-version: 0.1.14+240
+version: 0.2.0+2000
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
+
+scripts:
+  start: flutter run # -d <device_id>
+  start-fresh: flutter run --no-fast-start # -d <device_id>
+  devices: flutter devices
+  install: flutter pub get
+  build: flutter pub run build_runner build --delete-conflicting-outputs
+  watch: flutter pub run build_runner build --delete-conflicting-outputs
+  uninstall: adb shell && pm uninstall org.tether.tether # (sometimes doesn't uninstall when debugging?)
+
+  build-release-android: flutter build apk --release
+  build-release-ios: flutter build ipa  --release
+  build-release-macos: flutter build macos --release
+
+  # mobile development commands
+  clean-ios: xcrun simctl delete unavailable
+  list-ios: xcrun simctl list devices
+  boot-ios: xcrun simctl boot #<device_id>
+  list-android: emulator -list-avds
+  boot-android: emulator -avd #<device_id>
+  inspect-android: adb shell && run-as org.tether.tether # cache inspection
+  log-all: adb logcat ActivityManager:I flutter:I *:S
+
+  # configuration and troubleshooting
+  init-repo: git submodule update --init --recursive
+  reset-xcode: defaults delete com.apple.dt.Xcode
+  dev-tools: flutter pub global run devtools
+  cache-clean: pub cache repair && flutter pub cache repair
+  upgrade-deps: flutter pub upgrade --major-versions
+  init-platform-dirs: flutter create --org org.tether.tether
+  enable-desktop: flutter config --enable-macos-desktop --enable-linux-desktop # --no-enable-<type>-desktop
 
 dependencies:
   flutter:
@@ -65,7 +42,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # state
+  ### state
   equatable: ^2.0.0
   expandable: ^5.0.1
   convert: ^3.0.0
@@ -80,27 +57,27 @@ dependencies:
   path_provider: ^2.0.1
   package_info: ^2.0.0
 
-  # encryption
+  ### encryption
   olm: ^2.0.0
   crypto: ^3.0.1
   encrypt: ^5.0.0
   canonical_json: 1.1.0
 
-  # cache/storage
+  ### cache/storage
   sembast: ^3.0.1
   sqflite: ^2.0.0+3
-  sqlite3: ^1.0.0
   sembast_sqflite: ^2.0.0+1
   sqflite_common_ffi: ^2.0.0
-  # sqflite_sqlcipher: 1.1.2 TODO: figure out if these are needed still
   sqlcipher_flutter_libs: ^0.5.0
+  sqlcipher_library_windows: ^1.0.1
   flutter_secure_storage: ^4.1.0
-  moor: ^4.5.0
+  drift: ^1.0.0
 
-  # services
+  ### services
   http: ^0.13.1
   html: ^0.15.0
   intl: ^0.17.0
+  connectivity_plus: ^2.0.2
   http_parser: ^4.0.0
   easy_localization: ^3.0.0
   flutter_dotenv: ^4.0.0-nullsafety.0
@@ -108,55 +85,71 @@ dependencies:
   uni_links: ^0.5.0
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
-  # Desktop UI Only - UNCOMMENT FOR BUILDS
-  # window_utils: 1.0.2
-
-  # UI Only
+  ### ui
+  swipeable: ^1.1.0
   cupertino_icons: ^1.0.2
   url_launcher: ^6.0.3
   flutter_svg: ^0.22.0
-  file_picker: ^3.0.1
+  file_picker: ^4.1.1
   image_picker: ^0.7.4
-  # TODO: convert back when similar functionality is merged
-  # webview_flutter: ^2.0.13
-  webview_flutter:
-    git:
-      url: https://github.com/ereio/plugins.git
-      path: packages/webview_flutter/webview_flutter
-      ref: 41e4ce6d17078942f6ceb3e614bb2849aab55760
+  local_image_provider: ^4.0.1
+  flutter_keyboard_visibility: ^5.0.3
+  flutter_markdown: ^0.6.6
+  webview_flutter: ^2.0.13
   touchable_opacity: ^1.2.0
   smooth_page_indicator: ^0.3.0-nullsafety.0
   flutter_local_notifications: ^5.0.0+1
-  flutter_colorpicker: ^0.4.0
+  flutter_colorpicker: ^0.6.0
   palette_generator: ^0.3.0
   emoji_picker_flutter: ^1.0.3
   flutter_speed_dial: ^4.2.0
-  fab_circular_menu:
-    git:
-      url: https://github.com/ereio/fab-circular-menu.git
-      ref: 623b65c0d8f392065f41a4628c0278563a809644
-  swipeable:
-    git:
-      url: https://github.com/ereio/swipeable.git
-      ref: 867b117f15f51404e31597d8ab9d5325f6b52938
+  fab_circular_menu: ^1.0.2
+  # window_utils: 1.0.2 # TODO: desktop only window sizing
 
-  # data
+  ### data
   uuid: ^3.0.4
   json_annotation: ^4.0.0
   collection: ^1.15.0-nullsafety.4
 
-  # UNSOUND NULL-SAFTEY
-  # flutter_material_color_picker: ^1.0.5
-  # swipeable: 1.1.0
-
 dev_dependencies:
-  lint: ^1.5.3
+  build_config: ^1.0.0
   build_runner: ^2.0.2
-  moor_generator: ^4.4.0
-  json_serializable: ^4.0.0
+  drift_dev: ^1.0.0
+  lint: ^1.5.3
+  json_serializable: ^5.0.2
   flutter_launcher_icons: ^0.9.0
   test: any
 
+# TODO: remove when similar functionality is merged
+dependency_overrides:
+  # moor_generator: # TODO: for moor_generator Uint8List error output
+  #   git:
+  #     url: https://github.com/simolus3/moor.git
+  #     ref: cc7d98d110204acb72d415312a78ed7821382d69
+  #     path: moor_generator
+  sqlparser: # TODO: for moor_generator Uint8List error output
+    git:
+      url: https://github.com/simolus3/moor.git
+      ref: cc7d98d110204acb72d415312a78ed7821382d69
+      path: sqlparser
+  swipeable: # TODO: null saftey version
+    git:
+      url: https://github.com/ereio/swipeable.git
+      ref: 867b117f15f51404e31597d8ab9d5325f6b52938
+  fab_circular_menu: # TODO: accesibility and color theme issues
+    git:
+      url: https://github.com/ereio/fab-circular-menu.git
+      ref: 623b65c0d8f392065f41a4628c0278563a809644
+  webview_flutter: # TODO: open html as link from as different origins
+    git:
+      url: https://github.com/ereio/plugins.git
+      path: packages/webview_flutter/webview_flutter
+      ref: 41e4ce6d17078942f6ceb3e614bb2849aab55760
+
+# asset generation
+# iOS icons - https://github.com/smallmuou/ios-icon-generator
+#           - run generation script for ios and macos (desktop and mobile)
+# android icons - use Android Studio with generic png
 flutter_icons:
   android: true
   ios: true
