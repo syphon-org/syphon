@@ -25,10 +25,12 @@ class Avatar extends StatelessWidget {
     this.padding,
     this.background,
     this.selected = false,
+    this.rebuild = true,
   }) : super(key: key);
 
   final bool force;
   final bool selected;
+  final bool rebuild;
   final String? uri;
   final String? url;
   final String? alt;
@@ -44,8 +46,7 @@ class Avatar extends StatelessWidget {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final bool emptyAvi = uri == null && url == null;
-          final Color backgroundColor =
-              !emptyAvi ? Colors.transparent : Colors.grey;
+          final Color backgroundColor = !emptyAvi ? Colors.transparent : Colors.grey;
 
           var borderRadius = BorderRadius.circular(size);
 
@@ -86,6 +87,7 @@ class Avatar extends StatelessWidget {
                 width: size,
                 height: size,
                 fallbackColor: Colors.transparent,
+                rebuild: false,
               ),
             );
           }
@@ -115,9 +117,7 @@ class Avatar extends StatelessWidget {
                   height: size,
                   decoration: BoxDecoration(
                     borderRadius: borderRadius,
-                    color: emptyAvi && !force
-                        ? background ?? backgroundColor
-                        : Colors.transparent,
+                    color: emptyAvi && !force ? background ?? backgroundColor : Colors.transparent,
                   ),
                   child: Center(child: avatarWidget),
                 ),
@@ -133,8 +133,7 @@ class Avatar extends StatelessWidget {
                           border: Border.all(
                             color: Colors.white,
                           ),
-                          borderRadius:
-                              BorderRadius.circular(Dimensions.badgeAvatarSize),
+                          borderRadius: BorderRadius.circular(Dimensions.badgeAvatarSize),
                         ),
                         width: Dimensions.badgeAvatarSize,
                         height: Dimensions.badgeAvatarSize,

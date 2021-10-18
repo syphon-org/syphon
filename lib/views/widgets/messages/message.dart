@@ -468,6 +468,7 @@ class MessageWidget extends StatelessWidget {
                                         mxcUri: message.url,
                                         thumbnail: false,
                                         fit: BoxFit.cover,
+                                        rebuild: true,
                                         width: Dimensions.mediaSizeMaxMessage,
                                         height: Dimensions.mediaSizeMaxMessage,
                                         fallbackColor: Colors.transparent,

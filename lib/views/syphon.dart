@@ -90,7 +90,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   }
 
   onInitListeners() async {
-    // ** domain listeners ** TODO: potential race condition with
+    // ** domain listeners **
     await onDispatchListeners();
     await onStartListeners();
 
@@ -179,7 +179,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // save new user context
     if (user != null) {
-      contextNew = generateContextId();
+      contextNew = generateContextId_DEPRECATED(id: user.userId!);
       await saveContext(contextNew);
     } else {
       // revert to another user context or default

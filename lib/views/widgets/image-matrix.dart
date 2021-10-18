@@ -31,7 +31,7 @@ class MatrixImage extends StatefulWidget {
   final String? imageType;
   final BoxFit fit;
   final bool thumbnail;
-  final bool disableRebuild;
+  final bool rebuild;
   final bool forceLoading;
   final Widget? fallback;
   final Color fallbackColor;
@@ -47,7 +47,7 @@ class MatrixImage extends StatefulWidget {
     this.loadingPadding = 0,
     this.fit = BoxFit.fill,
     this.thumbnail = true,
-    this.disableRebuild = false,
+    this.rebuild = true,
     this.forceLoading = false,
     this.fallbackColor = Colors.grey,
     this.fallback,
@@ -61,38 +61,35 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
   Uint8List? finalUriData;
 
   @override
-  void onMounted() {
+  void onMounted({bool rebuild = true}) {
     final store = StoreProvider.of<AppState>(context);
     final mediaCache = store.state.mediaStore.mediaCache;
 
     if (!mediaCache.containsKey(widget.mxcUri)) {
-      store.dispatch(
-          fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
+      store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
     }
 
-    // Created in attempts to reduce framerate drop in chat details
+    // Attempts to reduce framerate drop in chat details
     // not sure this actually works as it still drops on scroll
-    if (widget.disableRebuild && mediaCache.containsKey(widget.mxcUri)) {
+    if (rebuild && mediaCache.containsKey(widget.mxcUri)) {
       printInfo('[onMounted] disabled rebuild');
       finalUriData = mediaCache[widget.mxcUri!];
     }
   }
 
   // TODO: potentially revert to didChangeDependencies
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   onMounted();
-  // }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onMounted(rebuild: true);
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) =>
-            _Props.mapStateToProps(store, widget.mxcUri),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
         builder: (context, props) {
-          final failed = props.mediaStatus != null &&
-              props.mediaStatus == MediaStatus.FAILURE.value;
+          final failed = props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
           final loading = widget.forceLoading || !props.exists;
 
           if (failed) {
@@ -153,8 +150,7 @@ class _Props extends Equatable {
         mediaCache,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? mxcUri) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? mxcUri) => _Props(
         exists: store.state.mediaStore.mediaCache[mxcUri] != null,
         mediaCache: store.state.mediaStore.mediaCache[mxcUri],
         mediaStatus: store.state.mediaStore.mediaStatus[mxcUri],
