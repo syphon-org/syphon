@@ -8,6 +8,7 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -124,7 +125,10 @@ class ToggleTypingIndicators {}
 
 class ToggleTimeFormat {}
 
-class ToggleReadReceipts {}
+class SetReadReceipts {
+  final ReadReceiptTypes? readReceipts;
+  SetReadReceipts({this.readReceipts});
+}
 
 class LogAppAgreement {}
 
@@ -413,9 +417,15 @@ ThunkAction<AppState> incrementLanguage() {
   };
 }
 
-ThunkAction<AppState> toggleReadReceipts() {
+ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
-    store.dispatch(ToggleReadReceipts());
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(currentTheme.readReceipts);
+
+    store.dispatch(SetReadReceipts(
+      readReceipts:
+      ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length],
+    ));
   };
 }
 

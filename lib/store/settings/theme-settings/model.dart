@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 
 part 'model.g.dart';
 
@@ -58,6 +59,7 @@ class ThemeSettings extends Equatable {
   final AvatarShape avatarShape;
   final MainFabType mainFabType;
   final MainFabLocation mainFabLocation;
+  final ReadReceiptTypes readReceipts;
 
   const ThemeSettings({
     this.primaryColor = Colours.cyanSyphon,
@@ -71,6 +73,7 @@ class ThemeSettings extends Equatable {
     this.avatarShape = AvatarShape.Circle,
     this.mainFabType = MainFabType.Ring,
     this.mainFabLocation = MainFabLocation.Right,
+    this.readReceipts = ReadReceiptTypes.Off,
   });
 
   @override
@@ -85,7 +88,8 @@ class ThemeSettings extends Equatable {
         messageSize,
         avatarShape,
         mainFabType,
-        mainFabLocation
+        mainFabLocation,
+        readReceipts,
       ];
 
   ThemeSettings copyWith({
@@ -100,6 +104,7 @@ class ThemeSettings extends Equatable {
     AvatarShape? avatarShape,
     MainFabType? mainFabType,
     MainFabLocation? mainFabLocation,
+    ReadReceiptTypes? readReceipts,
   }) =>
       ThemeSettings(
         primaryColor: primaryColor ?? this.primaryColor,
@@ -113,6 +118,7 @@ class ThemeSettings extends Equatable {
         avatarShape: avatarShape ?? this.avatarShape,
         mainFabType: mainFabType ?? this.mainFabType,
         mainFabLocation: mainFabLocation ?? this.mainFabLocation,
+        readReceipts: readReceipts ?? this.readReceipts,
       );
 
   Map<String, dynamic> toJson() => _$ThemeSettingsToJson(this);

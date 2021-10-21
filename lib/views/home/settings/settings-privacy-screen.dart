@@ -16,6 +16,7 @@ import 'package:syphon/store/crypto/keys/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
@@ -225,20 +226,16 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => props.onToggleReadReceipts(),
+                            onTap: () => props.onIncrementReadReceipts(),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Read Receipts',
                             ),
                             subtitle: Text(
-                              'If read receipts are disabled, users will not see solid read indicators for your messages.',
+                              'If read receipts are disabled or hidden, users will not see solid read indicators for your messages.',
                               style: Theme.of(context).textTheme.caption,
                             ),
-                            trailing: Switch(
-                              value: props.readReceipts!,
-                              onChanged: (enterSend) =>
-                                  props.onToggleReadReceipts(),
-                            ),
+                            trailing: Text(props.readReceipts),
                           ),
                           ListTile(
                             onTap: () => props.onToggleTypingIndicators(),
@@ -389,15 +386,15 @@ class PrivacySettingsScreen extends StatelessWidget {
 
 class _Props extends Equatable {
   final bool loading;
-  final bool? readReceipts;
   final bool? typingIndicators;
 
   final String sessionId;
   final String sessionName;
   final String sessionKey;
+  final String readReceipts;
 
   final Function onToggleTypingIndicators;
-  final Function onToggleReadReceipts;
+  final Function onIncrementReadReceipts;
   final Function onImportDeviceKey;
   final Function onDisabled;
   final Function onDeactivateAccount;
@@ -412,7 +409,7 @@ class _Props extends Equatable {
     required this.sessionKey,
     required this.onDisabled,
     required this.onToggleTypingIndicators,
-    required this.onToggleReadReceipts,
+    required this.onIncrementReadReceipts,
     required this.onImportDeviceKey,
     required this.onDeactivateAccount,
     required this.onResetConfirmAuth,
@@ -431,7 +428,8 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
-        readReceipts: store.state.settingsStore.readReceiptsEnabled,
+        readReceipts: selectReadReceiptsString(
+          store.state.settingsStore.themeSettings.readReceipts),
         sessionId: store.state.authStore.user.deviceId ?? Values.EMPTY,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),
@@ -440,9 +438,10 @@ class _Props extends Equatable {
         onToggleTypingIndicators: () => store.dispatch(
           toggleTypingIndicators(),
         ),
-        onToggleReadReceipts: () => store.dispatch(
-          toggleReadReceipts(),
-        ),
+        onIncrementReadReceipts: () {
+
+          store.dispatch(incrementReadReceipts());
+        } ,
         onImportDeviceKey: () => store.dispatch(
           importDeviceKeysOwned(),
         ),

@@ -16,7 +16,6 @@ class SettingsStore extends Equatable {
 
   final bool smsEnabled;
   final bool enterSendEnabled;
-  final bool readReceiptsEnabled;
   final bool typingIndicatorsEnabled;
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
@@ -50,7 +49,6 @@ class SettingsStore extends Equatable {
     this.globalSortOrder = SortOrder.Latest,
     this.enterSendEnabled = false,
     this.smsEnabled = false,
-    this.readReceiptsEnabled = false,
     this.typingIndicatorsEnabled = false,
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
@@ -70,7 +68,6 @@ class SettingsStore extends Equatable {
         language,
         smsEnabled,
         enterSendEnabled,
-        readReceiptsEnabled,
         typingIndicatorsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
@@ -89,7 +86,6 @@ class SettingsStore extends Equatable {
     String? language,
     bool? smsEnabled,
     bool? enterSendEnabled,
-    bool? readReceiptsEnabled,
     bool? typingIndicatorsEnabled,
     bool? membershipEventsEnabled,
     bool? roomTypeBadgesEnabled,
@@ -110,7 +106,6 @@ class SettingsStore extends Equatable {
         language: language ?? this.language,
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
-        readReceiptsEnabled: readReceiptsEnabled ?? this.readReceiptsEnabled,
         typingIndicatorsEnabled:
             typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,

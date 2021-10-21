@@ -16,6 +16,7 @@ import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 
 class ResetEvents {}
 
@@ -329,8 +330,12 @@ ThunkAction<AppState> sendReadReceipts({
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.readReceiptsEnabled) {
+      if (store.state.settingsStore.themeSettings.readReceipts == ReadReceiptTypes.Off) {
         return debugPrint('[sendReadReceipts] read receipts disabled');
+      }
+
+      if (store.state.settingsStore.themeSettings.readReceipts == ReadReceiptTypes.Hidden) {
+        debugPrint('[sendReadReceipts] read receipts hidden');
       }
 
       final data = await MatrixApi.sendReadReceipts(
@@ -340,6 +345,7 @@ ThunkAction<AppState> sendReadReceipts({
         roomId: room!.id,
         messageId: message!.id,
         readAll: readAll,
+        hidden: (store.state.settingsStore.themeSettings.readReceipts == ReadReceiptTypes.Hidden),
       );
 
       if (data['errcode'] != null) {
