@@ -1,6 +1,6 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.0+2000
+version: 0.2.1+2001
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
