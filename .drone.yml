@@ -6,7 +6,7 @@ trigger:
     - push
 steps:
   - name: build linux
-    image: cirrusci/flutter:2.5.2
+    image: cirrusci/flutter:2.5.3
     commands:
       # Install dependencies
       - apt-get update -y
