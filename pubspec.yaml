@@ -98,7 +98,7 @@ dependencies:
   webview_flutter: ^2.0.13
   touchable_opacity: ^1.2.0
   smooth_page_indicator: ^0.3.0-nullsafety.0
-  flutter_local_notifications: ^5.0.0+1
+  flutter_local_notifications: ^9.0.0
   flutter_colorpicker: ^0.6.0
   palette_generator: ^0.3.0
   emoji_picker_flutter: ^1.0.3

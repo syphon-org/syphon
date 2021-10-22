@@ -29,8 +29,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
   Function? onMessage,
   Function? onSaveToken,
   Future<dynamic> Function(String?)? onSelectNotification,
-  Future<dynamic> Function(int, String?, String?, String?)?
-      onDidReceiveLocalNotification,
+  Future<dynamic> Function(int, String?, String?, String?)? onDidReceiveLocalNotification,
 }) async {
   // Currently mobile only
   if (!(Platform.isIOS || Platform.isAndroid)) {
@@ -54,8 +53,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
     iOS: initializationSettingsIOS,
   );
 
-  final FlutterLocalNotificationsPlugin pluginInstance =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin pluginInstance = FlutterLocalNotificationsPlugin();
 
   await pluginInstance.initialize(
     initializationSettings,
@@ -101,8 +99,7 @@ Future<bool> promptNativeNotificationsRequest({
     //
 
     result = await pluginInstance
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
           alert: true,
           badge: true,
@@ -131,12 +128,15 @@ Future showBackgroundServiceNotification({
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id_background_service,
     Values.channel_name_background_service,
-    Values.channel_description,
+    channelDescription: Values.channel_description,
     ongoing: true,
     autoCancel: false,
     showWhen: false,
-    priority: Priority.defaultPriority,
-    importance: Importance.defaultImportance,
+    playSound: false,
+    enableVibration: false,
+    onlyAlertOnce: true,
+    priority: Priority.low,
+    importance: Importance.low,
     visibility: NotificationVisibility.private,
     channelShowBadge: false,
     // Timeout if not repeatedly set by the background service
@@ -168,7 +168,7 @@ Future showMessageNotification({
   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id,
     Values.channel_name_messages,
-    Values.channel_description,
+    channelDescription: Values.channel_description,
     groupKey: Values.channel_group_key,
     priority: Priority.defaultPriority,
     importance: Importance.defaultImportance,
@@ -186,7 +186,7 @@ Future showMessageNotification({
       androidPlatformChannelSpecifics = AndroidNotificationDetails(
         Values.channel_id,
         Values.channel_name_messages,
-        Values.channel_description,
+        channelDescription: Values.channel_description,
         groupKey: Values.channel_group_key,
         priority: Priority.defaultPriority,
         importance: Importance.defaultImportance,
@@ -203,9 +203,9 @@ Future showMessageNotification({
       messageHash = 0;
       final List<String> lines = <String>[];
 
-      uncheckedMessages.values.forEach((notificationBody) {
+      for (final notificationBody in uncheckedMessages.values) {
         lines.add(notificationBody);
-      });
+      }
 
       final inboxStyleInformation = InboxStyleInformation(
         lines,
@@ -216,7 +216,7 @@ Future showMessageNotification({
       androidPlatformChannelSpecifics = AndroidNotificationDetails(
         Values.channel_id,
         Values.channel_name_messages,
-        Values.channel_description,
+        channelDescription: Values.channel_description,
         groupKey: Values.channel_group_key,
         priority: Priority.defaultPriority,
         importance: Importance.defaultImportance,
@@ -263,7 +263,7 @@ Future showMessageNotificationTest({
   final firstNotificationAndroidSpecifics = AndroidNotificationDetails(
     groupChannelId,
     groupChannelName,
-    groupChannelDescription,
+    channelDescription: groupChannelDescription,
     setAsGroupSummary: true,
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
@@ -284,7 +284,7 @@ Future showMessageNotificationTest({
   final secondNotificationAndroidSpecifics = AndroidNotificationDetails(
     groupChannelId,
     groupChannelName,
-    groupChannelDescription,
+    channelDescription: groupChannelDescription,
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     groupKey: groupKey,
@@ -304,24 +304,18 @@ Future showMessageNotificationTest({
   // /
   // / Recommended to create this regardless as the behaviour may vary as
   // / mentioned in https://developer.android.com/training/notify-user/group
-  const List<String> lines = <String>[
-    'ABC 123 Check this out',
-    'XYZ URI    Launch Party'
-  ];
-  const InboxStyleInformation inboxStyleInformation = InboxStyleInformation(
-      lines,
-      contentTitle: '2 messages',
-      summaryText: 'janedoe@example.com');
-  const AndroidNotificationDetails androidPlatformChannelSpecifics =
-      AndroidNotificationDetails(
-          groupChannelId, groupChannelName, groupChannelDescription,
-          styleInformation: inboxStyleInformation,
-          groupKey: groupKey,
-          setAsGroupSummary: true);
+  const List<String> lines = <String>['ABC 123 Check this out', 'XYZ URI    Launch Party'];
+  const InboxStyleInformation inboxStyleInformation =
+      InboxStyleInformation(lines, contentTitle: '2 messages', summaryText: 'janedoe@example.com');
+  const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      groupChannelId, groupChannelName,
+      channelDescription: groupChannelDescription,
+      styleInformation: inboxStyleInformation,
+      groupKey: groupKey,
+      setAsGroupSummary: true);
   const NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
-  await pluginInstance.show(
-      3, 'Attention', 'Two messages', platformChannelSpecifics);
+  await pluginInstance.show(3, 'Attention', 'Two messages', platformChannelSpecifics);
 }
 
 Future showDebugNotification({
@@ -334,7 +328,7 @@ Future showDebugNotification({
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id,
     Values.channel_name_messages,
-    Values.channel_description,
+    channelDescription: Values.channel_description,
     importance: Importance.defaultImportance,
     priority: Priority.high,
   );
