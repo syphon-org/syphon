@@ -82,15 +82,15 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-/**
-   * https://matrix.org/docs/spec/client_server/latest#id198
-   * 
-   * Login User
-   * 
-   *  Gets the homeserver's supported login types to authenticate
-   *  users. Clients should pick one of these and supply it as 
-   *  the type when logging in.
-   */
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#id198
+  ///
+  /// Login User
+  ///
+  /// Gets the homeserver's supported login types to authenticate
+  /// users. Clients should pick one of these and supply it as
+  /// the type when logging in.
+  ///
   static Future<dynamic> loginUserToken({
     String? protocol,
     String? homeserver,
@@ -136,8 +136,7 @@ abstract class Auth {
     String? email,
     int? sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
+    final String url = '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
 
     final Map body = {
       'email': email,
@@ -363,8 +362,7 @@ abstract class Auth {
     String? password,
     String? currentPassword,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -408,8 +406,7 @@ abstract class Auth {
     String? session,
     int sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map body = {
       'auth': {
@@ -447,8 +444,7 @@ abstract class Auth {
     String? email,
     int sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
 
     final Map body = {
       'email': email,
