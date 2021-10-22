@@ -330,11 +330,11 @@ ThunkAction<AppState> sendReadReceipts({
   return (Store<AppState> store) async {
     try {
       // Skip if typing indicators are disabled
-      if (store.state.settingsStore.themeSettings.readReceipts == ReadReceiptTypes.Off) {
+      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
         return debugPrint('[sendReadReceipts] read receipts disabled');
       }
 
-      if (store.state.settingsStore.themeSettings.readReceipts == ReadReceiptTypes.Hidden) {
+      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
         debugPrint('[sendReadReceipts] read receipts hidden');
       }
 
@@ -345,7 +345,7 @@ ThunkAction<AppState> sendReadReceipts({
         roomId: room!.id,
         messageId: message!.id,
         readAll: readAll,
-        hidden: (store.state.settingsStore.themeSettings.readReceipts == ReadReceiptTypes.Hidden),
+        hidden: store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden,
       );
 
       if (data['errcode'] != null) {

@@ -115,10 +115,8 @@ SettingsStore settingsReducer(
         dismissKeyboardEnabled: !state.dismissKeyboardEnabled,
       );
     case SetReadReceipts:
-      final _action = action as SetReadReceipts;
       return state.copyWith(
-        themeSettings:
-        state.themeSettings.copyWith(readReceipts: _action.readReceipts),
+        readReceipts: action.readReceipts,
       );
     case ToggleMembershipEvents:
       return state.copyWith(

@@ -502,7 +502,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // mark read locally only
-      if (store.state.settingsStore.themeSettings.readReceipts == ReadReceiptTypes.Off) {
+      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
         await store.dispatch(UpdateRoom(
           id: roomId,
           lastRead: DateTime.now().millisecondsSinceEpoch,
@@ -510,7 +510,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // send read receipt remotely to mark locally on /sync
-      if (store.state.settingsStore.themeSettings.readReceipts != ReadReceiptTypes.Off) {
+      if (store.state.settingsStore.readReceipts != ReadReceiptTypes.Off) {
         final messageLatest = latestMessage(
           roomMessages(store.state, roomId),
         );

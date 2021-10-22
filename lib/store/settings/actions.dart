@@ -419,8 +419,7 @@ ThunkAction<AppState> incrementLanguage() {
 
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.themeSettings;
-    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(currentTheme.readReceipts);
+    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
 
     store.dispatch(SetReadReceipts(
       readReceipts:

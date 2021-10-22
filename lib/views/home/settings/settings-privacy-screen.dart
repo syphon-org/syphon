@@ -429,7 +429,7 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
         readReceipts: selectReadReceiptsString(
-          store.state.settingsStore.themeSettings.readReceipts),
+          store.state.settingsStore.readReceipts),
         sessionId: store.state.authStore.user.deviceId ?? Values.EMPTY,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),
@@ -438,10 +438,7 @@ class _Props extends Equatable {
         onToggleTypingIndicators: () => store.dispatch(
           toggleTypingIndicators(),
         ),
-        onIncrementReadReceipts: () {
-
-          store.dispatch(incrementReadReceipts());
-        } ,
+        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
         onImportDeviceKey: () => store.dispatch(
           importDeviceKeysOwned(),
         ),
