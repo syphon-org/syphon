@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/https.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 
 /// https://matrix.org/docs/spec/client_server/latest#id183
@@ -316,9 +318,14 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/.well-known/matrix/client';
 
-    final response = await http.get(Uri.parse(url));
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    return await json.decode(response.body);
+      return await json.decode(response.body);
+    } catch (error) {
+      printError(error.toString());
+      rethrow;
+    }
   }
 
   ///  https://matrix.org/docs/spec/client_server/latest#id211
