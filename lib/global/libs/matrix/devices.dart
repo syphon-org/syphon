@@ -100,4 +100,38 @@ abstract class Devices {
 
     return await json.decode(response.body);
   }
+
+  /**
+   * https://spec.matrix.org/unstable/client-server-api/#put_matrixclientv3devicesdeviceid
+   *
+   * HTTP:PUT
+   * Change a given Device's public display name.
+   */
+  static Future<dynamic> renameDevice({
+    String? protocol = 'https://',
+    String? homeserver = Values.homeserverDefault,
+    String? accessToken,
+    String? deviceId,
+    String? displayName,
+  }) async {
+    final String url = '$protocol$homeserver/_matrix/client/v3/devices/$deviceId';
+
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
+    };
+
+    final Map body = {
+      'display_name': displayName,
+    };
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
 }

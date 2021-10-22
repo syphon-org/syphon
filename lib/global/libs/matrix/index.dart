@@ -81,6 +81,7 @@ abstract class MatrixApi {
   static const fetchDevices = Devices.fetchDevices;
   static const updateDevice = Devices.updateDevice;
   static const deleteDevices = Devices.deleteDevices;
+  static const renameDevice = Devices.renameDevice;
 
   // Keys
   static const fetchKeys = Encryption.fetchKeys;
