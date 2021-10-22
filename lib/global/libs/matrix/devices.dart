@@ -56,61 +56,6 @@ abstract class Devices {
   }
 
   /**
- * https://matrix.org/docs/spec/client_server/latest#id413
- *  
- * HTTP:DELETE
- * Gets all currently active pushers for the authenticated user.
- */
-  static Future<dynamic> deleteDevice({
-    String protocol = 'https://',
-    String homeserver = Values.homeserverDefault,
-    String? accessToken,
-    String? deviceId,
-    String? session,
-    String? userId,
-    String? authType,
-    String? authValue,
-  }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
-
-    final Map<String, String> headers = {
-      'Authorization': 'Bearer $accessToken',
-    };
-
-    Map? body;
-
-    if (session != null) {
-      body = {
-        'auth': {
-          'session': session,
-          'type': authType,
-          'user': userId,
-          'password': authValue, // WARNING: this may not always be password?
-        }
-      };
-    }
-
-    final request = http.Request(
-      'DELETE',
-      Uri.parse(url),
-    );
-
-    request.headers.addAll(headers);
-
-    if (body != null) {
-      request.body = json.encode(body);
-    }
-
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(
-      streamedResponse,
-    );
-
-    return await json.decode(response.body);
-  }
-
-  /**
  * https://matrix.org/docs/spec/client_server/latest#id414
  *  
  * HTTP:DELETE

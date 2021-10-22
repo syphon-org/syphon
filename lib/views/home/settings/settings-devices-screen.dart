@@ -308,11 +308,7 @@ class _Props extends Equatable {
           final List<String?> deviceIds =
               devices.map((device) => device.deviceId).toList();
 
-          if (devices.length == 1) {
-            await store.dispatch(deleteDevice(deviceId: deviceIds[0]));
-          } else {
-            await store.dispatch(deleteDevices(deviceIds: deviceIds));
-          }
+          await store.dispatch(deleteDevices(deviceIds: deviceIds));
 
           final authSession = store.state.authStore.authSession;
           if (authSession != null) {
@@ -326,11 +322,8 @@ class _Props extends Equatable {
                   final List<String?> deviceIds =
                       devices.map((device) => device.deviceId).toList();
 
-                  if (devices.length == 1) {
-                    await store.dispatch(deleteDevice(deviceId: deviceIds[0]));
-                  } else {
-                    await store.dispatch(deleteDevices(deviceIds: deviceIds));
-                  }
+                  await store.dispatch(deleteDevices(deviceIds: deviceIds));
+
                   store.dispatch(resetInteractiveAuth());
                   Navigator.of(dialogContext).pop();
                 },

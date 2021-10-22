@@ -78,7 +78,6 @@ abstract class MatrixApi {
   // Device Management
   static const fetchDevices = Devices.fetchDevices;
   static const updateDevice = Devices.updateDevice;
-  static const deleteDevice = Devices.deleteDevice;
   static const deleteDevices = Devices.deleteDevices;
 
   // Keys
