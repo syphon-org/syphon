@@ -36,7 +36,7 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/login';
 
-    final response = await http.get(Uri.parse(url));
+    final response = await httpClient.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -75,7 +75,7 @@ abstract class Auth {
       body['initial_device_display_name'] = deviceName;
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -119,7 +119,7 @@ abstract class Auth {
       body['initial_device_display_name'] = deviceName;
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -146,7 +146,7 @@ abstract class Auth {
       'send_attempt': sendAttempt,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -231,7 +231,7 @@ abstract class Auth {
       body['initial_device_display_name'] = deviceName;
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -252,7 +252,7 @@ abstract class Auth {
       ...Values.defaultHeaders,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
     );
@@ -273,7 +273,7 @@ abstract class Auth {
       ...Values.defaultHeaders,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
     );
@@ -296,7 +296,7 @@ abstract class Auth {
     url += username != null ? '?username=$username' : '';
 
     // Specified timeout because servers can hang
-    final response = await http.get(Uri.parse(url)).timeout(
+    final response = await httpClient.get(Uri.parse(url)).timeout(
       Duration(seconds: 5),
       onTimeout: () {
         // Time has run out, do what you wanted to do.
@@ -319,7 +319,7 @@ abstract class Auth {
     final String url = '$protocol$homeserver/.well-known/matrix/client';
 
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await httpClient.get(Uri.parse(url));
 
       return await json.decode(response.body);
     } catch (error) {
@@ -339,7 +339,7 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/.well-known/matrix/server';
 
-    final response = await http.get(Uri.parse(url));
+    final response = await httpClient.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -350,7 +350,7 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/versions';
 
-    final response = await http.get(Uri.parse(url));
+    final response = await httpClient.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -391,7 +391,7 @@ abstract class Auth {
       };
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -430,7 +430,7 @@ abstract class Auth {
       'new_password': passwordNew
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -459,7 +459,7 @@ abstract class Auth {
       'send_attempt': sendAttempt,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),

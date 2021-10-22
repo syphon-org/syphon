@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/https.dart';
 
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/values.dart';
@@ -23,14 +24,13 @@ abstract class Users {
     String? userId,
     String type = AccountDataTypes.direct,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
+    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final saveResponse = await http.get(
+    final saveResponse = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -55,8 +55,7 @@ abstract class Users {
     String type = AccountDataTypes.direct,
     Map? accountData,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
+    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/$type';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -123,8 +122,7 @@ abstract class Users {
     String? roomId,
     String? userId,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/invite';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -135,7 +133,7 @@ abstract class Users {
       'user_id': userId,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -163,7 +161,7 @@ abstract class Users {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -186,8 +184,7 @@ abstract class Users {
     String? displayName,
     Map? accountData,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
+    final String url = '$protocol$homeserver/_matrix/client/r0/profile/$userId/displayname';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -220,8 +217,7 @@ abstract class Users {
     String? userId,
     String? avatarUri,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
+    final String url = '$protocol$homeserver/_matrix/client/r0/profile/$userId/avatar_url';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -259,8 +255,7 @@ abstract class Users {
     String? authType,
     String? authValue,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/deactivate';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/deactivate';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -278,7 +273,7 @@ abstract class Users {
       };
     }
 
-    final saveResponse = await http.post(
+    final saveResponse = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -301,8 +296,7 @@ dynamic buildRoomMembersRequest({
   String? accessToken,
   String? roomId,
 }) {
-  final String url =
-      '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/members';
+  final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/members';
 
   final Map<String, String> headers = {'Authorization': 'Bearer $accessToken'};
 

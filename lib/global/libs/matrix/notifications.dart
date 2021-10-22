@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 
 abstract class Notifications {
@@ -29,7 +30,7 @@ abstract class Notifications {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -53,7 +54,7 @@ abstract class Notifications {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -125,7 +126,7 @@ abstract class Notifications {
       body['profile_tag'] = profileTag;
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),

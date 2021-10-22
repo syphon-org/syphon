@@ -85,5 +85,5 @@ Future<void> initPlatformDependencies() async {
     printInfo('[main] background service initialized $backgroundSyncStatus');
   }
 
-  activeHttpClient = createClient();
+  httpClient = createClient();
 }

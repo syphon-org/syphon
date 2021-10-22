@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 
 /// https://matrix.org/docs/spec/client_server/latest#id295
@@ -24,8 +25,7 @@ class Search {
     String? searchText,
     String? since,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/user_directory/search';
+    final String url = '$protocol$homeserver/_matrix/client/r0/user_directory/search';
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
@@ -36,7 +36,7 @@ class Search {
       'search_term': searchText,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -75,7 +75,7 @@ class Search {
 
     url += '?server=${server ?? homeserver}';
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),

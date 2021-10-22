@@ -77,4 +77,4 @@ http.Client createClient() {
 }
 
 // WARN: global var for httpClient requests
-http.Client activeHttpClient = createClient();
+http.Client httpClient = createClient();

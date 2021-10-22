@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 
 abstract class Devices {
@@ -20,7 +21,7 @@ abstract class Devices {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(Uri.parse(url), headers: headers);
+    final response = await httpClient.get(Uri.parse(url), headers: headers);
 
     return await json.decode(response.body);
   }
@@ -91,7 +92,7 @@ abstract class Devices {
       };
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),

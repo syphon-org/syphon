@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
@@ -50,7 +51,7 @@ ThunkAction<AppState> fetchKnownServers() {
           final url = await fetchFavicon(url: homeserver.hostname);
           try {
             final uri = Uri.parse(url!);
-            final response = await http.get(uri);
+            final response = await httpClient.get(uri);
 
             if (response.statusCode == 200) {
               return homeserver.copyWith(photoUrl: url);
