@@ -42,6 +42,7 @@ class Strings {
   static final titleDialogCaptcha = tr('title-dialog-captcha');
   static final titleDialogSignupEmailVerification = tr('title-dialog-email-requirement-verified');
   static final titleConfirmPassword = tr('title-confirm-password');
+  static final titleRenameDevice = tr('title-device-rename');
   static final titleConfirmDeleteKeys = tr('title-dialog-delete-keys');
   static final titleConfirmEmail = tr('title-confirm-email');
 
@@ -149,7 +150,9 @@ class Strings {
   static final contentCaptchaWarning = tr('content-captcha-warning');
   static final contentPasswordRecommendation = tr('content-password-recommendation');
   static final contentDeleteDevices = tr('content-dialog-devices-delete');
-  static final contentKeyExportWarning = tr('content-dialog-devices-key-export');
+  static final contentRenameDevice = tr('content-dialog-device-rename');
+  static final contentKeyExportWarning =
+      tr('content-dialog-devices-key-export');
   static final contentEmailRequirement = tr('content-signup-email-requirement');
   static final contentEmailVerification = tr('content-signup-email-verification');
   static final contentForgotEmailVerification = tr('content-forgot-email-verification');
