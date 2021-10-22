@@ -6,6 +6,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/chat-settings/actions.dart';
@@ -425,6 +426,10 @@ ThunkAction<AppState> incrementReadReceipts() {
       readReceipts:
       ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length],
     ));
+
+    if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
+      store.dispatch(addInfo(message: Strings.alertHiddenReadReceipts));
+    }
   };
 }
 
