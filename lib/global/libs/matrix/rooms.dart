@@ -57,7 +57,7 @@ abstract class Rooms {
   /// Sync (Background Isolate) (main functionality)
   ///
   /// https://matrix.org/docs/spec/client_server/latest#id251
-  static Future<dynamic> syncBackground(Map params) async {
+  static Future<dynamic> syncThreaded(Map params) async {
     final String? protocol = params['protocol'];
     final String? homeserver = params['homeserver'];
     final String? accessToken = params['accessToken'];
@@ -65,6 +65,8 @@ abstract class Rooms {
     final bool? fullState = params['fullState'];
     final int? timeout = params['timeout'];
     final String? filter = params['filter'];
+
+    httpClient = createClient();
 
     return sync(
       protocol: protocol,

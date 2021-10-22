@@ -11,14 +11,16 @@ import 'package:syphon/global/values.dart';
 /// as the default to allow calling from
 /// a non-ui thread
 class MatrixMedia {
-  static Future<dynamic> fetchThumbnail(Map params) async {
+  static Future<dynamic> fetchThumbnailThreaded(Map params) async {
     final String? protocol = params['protocol'];
     final String? homeserver = params['homeserver'];
     final String? accessToken = params['accessToken'];
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
 
-    return fetchThumbnailUnmapped(
+    httpClient = createClient();
+
+    return fetchThumbnail(
       protocol: protocol,
       homeserver: homeserver,
       accessToken: accessToken,
@@ -29,7 +31,7 @@ class MatrixMedia {
     );
   }
 
-  static Future<dynamic> fetchThumbnailUnmapped({
+  static Future<dynamic> fetchThumbnail({
     String? protocol = Values.DEFAULT_PROTOCOL,
     String? homeserver = Values.homeserverDefault,
     String? accessToken,
@@ -66,12 +68,14 @@ class MatrixMedia {
     return {'bodyBytes': response.bodyBytes};
   }
 
-  static Future<dynamic> fetchMediaMapped(Map params) async {
+  static Future<dynamic> fetchMediaThreaded(Map params) async {
     final String? protocol = params['protocol'];
     final String? homeserver = params['homeserver'];
     final String? accessToken = params['accessToken'];
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
+
+    httpClient = createClient();
 
     return fetchMedia(
       protocol: protocol,

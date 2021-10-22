@@ -139,14 +139,12 @@ ThunkAction<AppState> fetchMedia({
               UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.DECRYPTING),
             );
             media = media.copyWith(
-              data: await decryptMediaData(
-                  localData: media.data!, info: currentMedia?.info),
+              data: await decryptMediaData(localData: media.data!, info: currentMedia?.info),
             );
           }
 
           store.dispatch(
-            UpdateMediaCache(
-                mxcUri: mxcUri, data: media.data, info: media.info),
+            UpdateMediaCache(mxcUri: mxcUri, data: media.data, info: media.info),
           );
 
           return store.dispatch(
@@ -158,7 +156,7 @@ ThunkAction<AppState> fetchMedia({
       var data;
 
       if (thumbnail) {
-        data = await compute(MatrixApi.fetchThumbnail, {
+        data = await compute(MatrixApi.fetchThumbnailThreaded, {
           'protocol': store.state.authStore.protocol,
           'accessToken': store.state.authStore.user.accessToken,
           'homeserver': store.state.authStore.currentUser.homeserver,
@@ -166,7 +164,7 @@ ThunkAction<AppState> fetchMedia({
           'size': size,
         });
       } else {
-        data = await compute(MatrixApi.fetchMediaMapped, {
+        data = await compute(MatrixApi.fetchMediaThreaded, {
           'protocol': store.state.authStore.protocol,
           'accessToken': store.state.authStore.user.accessToken,
           'homeserver': store.state.authStore.currentUser.homeserver,
@@ -183,8 +181,7 @@ ThunkAction<AppState> fetchMedia({
           UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.DECRYPTING),
         );
 
-        bodyBytes = await decryptMediaData(
-            localData: bodyBytes, info: info ?? currentMedia?.info);
+        bodyBytes = await decryptMediaData(localData: bodyBytes, info: info ?? currentMedia?.info);
       }
 
       store.dispatch(

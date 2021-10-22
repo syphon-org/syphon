@@ -1,3 +1,4 @@
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -27,10 +28,7 @@ List<Message> roomMessages(AppState state, String? roomId) {
 
     messages = messagesNormal.keys
         .map((id) =>
-            (messagesDecrypted.containsKey(id)
-                ? messagesDecrypted[id]
-                : messagesNormal[id]) ??
-            Message())
+            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? Message())
         .toList();
   }
 
@@ -59,11 +57,12 @@ List<Message> filterMessages(
     );
 }
 
-List<Message> reviseMessagesBackground(Map params) {
+List<Message> reviseMessagesThreaded(Map params) {
   final List<Message> messages = params['messages'] ?? [];
   final Map<String, Redaction> redactions = params['redactions'];
   final Map<String, List<Reaction>> reactions = params['reactions'];
 
+  httpClient = createClient();
   return reviseMessagesFilter(messages, redactions, reactions);
 }
 
@@ -104,11 +103,10 @@ Map<String, Message?> appendReactions(
   required Map<String, List<Reaction>> reactions,
 }) {
   // get a list message ids (also reaction keys) that have values in 'reactions'
-  final List<String> reactionedMessageIds =
-      reactions.keys.where((k) => messages.containsKey(k)).toList();
+  final List<String> reactionedMessageIds = reactions.keys.where((k) => messages.containsKey(k)).toList();
 
   // add the parsed list to the message to be handled in the UI
-  for (String messageId in reactionedMessageIds) {
+  for (final String messageId in reactionedMessageIds) {
     final reactionList = reactions[messageId];
     if (reactionList != null) {
       messages[messageId] = messages[messageId]!.copyWith(
@@ -144,7 +142,7 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   // iterate through replacements and modify messages as needed O(M + M)
   replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
 
-  for (Message messageEdited in replacements) {
+  for (final Message messageEdited in replacements) {
     final messageIdOriginal = messageEdited.relatedEventId!;
     final messageOriginal = messagesMap[messageIdOriginal];
 
@@ -156,7 +154,7 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
           edited: true,
           body: messageEdited.body,
           msgtype: messageEdited.msgtype,
-          edits: [messageOriginal, ...(messageOriginal.edits)],
+          edits: [messageOriginal, ...messageOriginal.edits],
         );
       }
     }
@@ -168,8 +166,7 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   return messagesMap;
 }
 
-Message? latestMessage(List<Message> messages,
-    {Room? room, List<Message>? decrypted}) {
+Message? latestMessage(List<Message> messages, {Room? room, List<Message>? decrypted}) {
   if (messages.isEmpty) {
     return null;
   }
@@ -179,12 +176,8 @@ Message? latestMessage(List<Message> messages,
     (latest, msg) => msg.timestamp > latest.timestamp ? msg : latest,
   );
 
-  if (room != null &&
-      decrypted != null &&
-      room.encryptionEnabled &&
-      decrypted.isNotEmpty) {
-    return decrypted.firstWhere((msg) => msg.id == latestMessage.id,
-        orElse: () => latestMessage);
+  if (room != null && decrypted != null && room.encryptionEnabled && decrypted.isNotEmpty) {
+    return decrypted.firstWhere((msg) => msg.id == latestMessage.id, orElse: () => latestMessage);
   }
 
   return latestMessage;

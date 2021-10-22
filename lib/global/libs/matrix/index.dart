@@ -33,7 +33,7 @@ abstract class MatrixApi {
   // Rooms
   static const sync = Rooms.sync;
   static const syncRoom = Rooms.syncRoom;
-  static const syncBackground = Rooms.syncBackground;
+  static const syncThreaded = Rooms.syncThreaded;
   static const fetchRoomIds = Rooms.fetchRoomIds;
   static const fetchRoomName = Rooms.fetchRoomName;
   static const fetchDirectRoomIds = Rooms.fetchDirectRoomIds;
@@ -54,7 +54,7 @@ abstract class MatrixApi {
   static const sendMessageEncrypted = Events.sendMessageEncrypted;
   static const fetchStateEvents = Events.fetchStateEvents;
   static const fetchMessageEvents = Events.fetchMessageEvents;
-  static const fetchMessageEventsMapped = Events.fetchMessageEventsMapped;
+  static const fetchMessageEventsThreaded = Events.fetchMessageEventsThreaded;
   static const redactEvent = Events.redactEvent;
 
   // Account Data & User Management
@@ -71,9 +71,9 @@ abstract class MatrixApi {
 
   // Media
   static const fetchMedia = MatrixMedia.fetchMedia;
-  static const fetchMediaMapped = MatrixMedia.fetchMediaMapped;
   static const uploadMedia = MatrixMedia.uploadMedia;
-  static const fetchThumbnail = MatrixMedia.fetchThumbnail;
+  static const fetchMediaThreaded = MatrixMedia.fetchMediaThreaded;
+  static const fetchThumbnailThreaded = MatrixMedia.fetchThumbnailThreaded;
 
   // Device Management
   static const fetchDevices = Devices.fetchDevices;
@@ -89,8 +89,7 @@ abstract class MatrixApi {
 
   // Notifications
   static const fetchNotifications = Notifications.fetchNotifications;
-  static const fetchNotificationPushers =
-      Notifications.fetchNotificationPushers;
+  static const fetchNotificationPushers = Notifications.fetchNotificationPushers;
 
   /// Save Notification Pusher
   ///

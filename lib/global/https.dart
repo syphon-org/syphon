@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
@@ -57,7 +56,6 @@ HttpClient customHttpClient({String? cert}) {
     if (cert != null) {
       context.setTrustedCertificatesBytes(utf8.encode(cert));
     }
-    print('createHttpClient() - cert added!');
   } on TlsException catch (e) {
     if (e.osError?.message != null && e.osError!.message.contains('CERT_ALREADY_IN_HASH_TABLE')) {
       print('createHttpClient() - cert already trusted! Skipping.');

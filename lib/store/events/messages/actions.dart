@@ -31,7 +31,7 @@ ThunkAction<AppState> mutateMessages({List<Message>? messages}) {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
 
-    final revisedMessages = await compute(reviseMessagesBackground, {
+    final revisedMessages = await compute(reviseMessagesThreaded, {
       'reactions': reactions,
       'redactions': redactions,
       'messages': messages,
@@ -79,7 +79,7 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
     final redactions = store.state.eventStore.redactions;
 
     final mutations = [
-      compute(reviseMessagesBackground, {
+      compute(reviseMessagesThreaded, {
         'reactions': reactions,
         'redactions': redactions,
         'messages': messages,
@@ -87,7 +87,7 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
     ];
 
     if (room.encryptionEnabled) {
-      mutations.add(compute(reviseMessagesBackground, {
+      mutations.add(compute(reviseMessagesThreaded, {
         'reactions': reactions,
         'redactions': redactions,
         'messages': decrypted,
