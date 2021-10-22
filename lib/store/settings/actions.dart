@@ -186,52 +186,7 @@ ThunkAction<AppState> updateDevice({String? deviceId}) {
   };
 }
 
-/// Delete a single device
-/// ** Fails after recent matix.org update **
-ThunkAction<AppState> deleteDevice({String? deviceId, bool? disableLoading}) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-
-      final currentCredential =
-          store.state.authStore.credential ?? Credential();
-
-      final data = await MatrixApi.deleteDevices(
-        protocol: store.state.authStore.protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        deviceIds: [deviceId],
-        session: store.state.authStore.authSession,
-        userId: store.state.authStore.user.userId,
-        authType: MatrixAuthTypes.PASSWORD,
-        authValue: currentCredential.value,
-      );
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-
-      // If a flow exists, more authentication is needed before
-      // attempting to delete again
-      if (data['flows'] != null) {
-        return store.dispatch(setInteractiveAuths(auths: data));
-      }
-
-      store.dispatch(fetchDevices());
-      return true;
-    } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        message: error.toString(),
-        origin: 'deleteDevice',
-      ));
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-/// Delete multiple devices
+/// Delete device(s)
 ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
   return (Store<AppState> store) async {
     try {
