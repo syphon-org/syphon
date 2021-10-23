@@ -146,18 +146,19 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
     case DeleteMessage:
       final message = (action as DeleteMessage).message;
+      final roomId = message.roomId;
 
       final messages = Map<String, List<Message>>.from(
         state.messages,
       );
 
-      messages.forEach((key, value) {
-        for(var index = 0; index < value.length; index++){
-          if (value[index].id == message.id){
-            value.remove(value[index]);
-          }
-        }
-       });
+      final messagesRoom = messages[roomId];
+
+      if (messagesRoom == null) {
+        return state;
+      }
+
+      messagesRoom.removeWhere((messageRoom) => messageRoom.id == message.id);
 
       return state.copyWith(messages: messages);
 
