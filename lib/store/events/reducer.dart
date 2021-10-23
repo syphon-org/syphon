@@ -144,6 +144,23 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       return state.copyWith(outbox: outboxNew);
 
+    case DeleteLocalMessage:
+      final message = (action as DeleteLocalMessage).message;
+
+      final messages = Map<String, List<Message>>.from(
+        state.messages,
+      );
+
+      messages.forEach((key, value) {
+        for(var index = 0; index < value.length; index++){
+          if (value[index].id == message.id){
+            value.remove(value[index]);
+          }
+        }
+       });
+
+      return state.copyWith(messages: messages);
+
     case SetRedactions:
       if (action.redactions.isEmpty) {
         return state;

@@ -55,6 +55,8 @@ abstract class MatrixApi {
   static const fetchMessageEvents = Events.fetchMessageEvents;
   static const fetchMessageEventsMapped = Events.fetchMessageEventsMapped;
   static const redactEvent = Events.redactEvent;
+  static const deleteMessage = Events.deleteMessage;
+
 
   // Account Data & User Management
   static const fetchAccountData = Users.fetchAccountData;
