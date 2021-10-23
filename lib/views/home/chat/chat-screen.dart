@@ -451,8 +451,9 @@ class ChatScreenState extends State<ChatScreen> {
               room: props.room,
               message: selectedMessage,
               onDismiss: () => onToggleSelectedMessage(null),
-              onDelete: () => props.onDeleteMessage(
+              onDelete: ()  => props.onDeleteMessage(
                 message: selectedMessage,
+                room: props.room
               ),
             );
           }
@@ -670,9 +671,9 @@ class _Props extends Equatable {
             message: message,
           ));
         },
-        onDeleteMessage: ({Message? message}) {
-          if (message != null) {
-              store.dispatch(deleteMessage(message: message));
+        onDeleteMessage: ({Message? message, Room? room}) {
+          if (message != null && room != null) {
+              store.dispatch(deleteMessage(message: message, room: room));
           }
         },
         onAcceptInvite: () {
