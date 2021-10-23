@@ -1,20 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/events/model.dart';
-import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 class ResetEvents {}
@@ -94,10 +92,10 @@ class DeleteOutboxMessage {
   DeleteOutboxMessage({required this.message});
 }
 
-class DeleteLocalMessage{
+class DeleteMessage{
   final Message message;
 
-  DeleteLocalMessage({required this.message});
+  DeleteMessage({required this.message});
 }
 
 ThunkAction<AppState> addMessages({
@@ -436,11 +434,19 @@ ThunkAction<AppState> sendTyping({
 }
 
 /// Delete Room Event (For Outbox, Local, and Remote)
-ThunkAction<AppState> deleteMessage({required Message message}) {
+ThunkAction<AppState> deleteMessage({required Message message, required Room room}) {
   return (Store<AppState> store) async {
     try {
       if (message.pending || message.failed) {
         return store.dispatch(DeleteOutboxMessage(message: message));
+      }
+      else {
+        await MatrixApi.deleteMessage(
+            roomId: room.id,
+            eventId: message.id,
+            accessToken: store.state.authStore.user.accessToken,
+            homeserver: store.state.authStore.user.homeserver);
+        return store.dispatch(DeleteMessage(message: message));
       }
     } catch (error) {
       debugPrint('[deleteMessage] $error');
