@@ -671,12 +671,8 @@ class _Props extends Equatable {
           ));
         },
         onDeleteMessage: ({Message? message}) {
-
           if (message != null) {
-            // TODO: SHOW DIALOG
-            if (!message.pending){
-              store.dispatch(deleteMessage(message: message, deleteRemote: true));
-            }
+              store.dispatch(deleteMessage(message: message));
           }
         },
         onAcceptInvite: () {
