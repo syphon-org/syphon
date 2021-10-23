@@ -144,8 +144,8 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       return state.copyWith(outbox: outboxNew);
 
-    case DeleteLocalMessage:
-      final message = (action as DeleteLocalMessage).message;
+    case DeleteMessage:
+      final message = (action as DeleteMessage).message;
 
       final messages = Map<String, List<Message>>.from(
         state.messages,
