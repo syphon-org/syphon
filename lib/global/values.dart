@@ -88,6 +88,14 @@ class SupportedLanguages {
     'sk',
   ];
 
+  static const rtl = [
+    'ar',
+    'fa',
+    'he',
+    'ps',
+    'ur',
+  ];
+
   static final list = all.map((locale) => Locale(locale)).toList();
   static final displayNames = all.map((locale) => Locale(locale).toDisplayName().capitalize()).toList();
 }

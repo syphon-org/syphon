@@ -17,6 +17,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
@@ -148,9 +149,8 @@ class ChatScreenState extends State<ChatScreen> {
     final store = StoreProvider.of<AppState>(context);
     final keySessions = store.state.cryptoStore.keySessions;
 
-    try {
-      printJson(jsonDecode(jsonEncode(keySessions)));
-    } catch (error) {
+    printInfo(SupportedLanguages.rtl.contains(store.state.settingsStore.language).toString());
+    try {} catch (error) {
       printDebug(error.toString());
     }
   }
@@ -456,8 +456,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
                         color: Colors.white,
-                        semanticsLabel:
-                            'Switch to ${Strings.labelSendUnencrypted}',
+                        semanticsLabel: 'Switch to ${Strings.labelSendUnencrypted}',
                       ),
                     ),
                   ),
@@ -490,8 +489,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendLockSolidBeing,
                         color: Colors.white,
-                        semanticsLabel:
-                            'Switch to ${Strings.labelSendEncrypted}',
+                        semanticsLabel: 'Switch to ${Strings.labelSendEncrypted}',
                       ),
                     ),
                   ),
@@ -512,17 +510,14 @@ class ChatScreenState extends State<ChatScreen> {
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments)
-              .roomId,
+          (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments).roomId,
         ),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
           final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
-          final closedInputPadding = !inputFieldNode.hasFocus &&
-              Platform.isIOS &&
-              Dimensions.buttonlessHeightiOS < height;
-          final isScrolling =
-              messagesController.hasClients && messagesController.offset != 0;
+          final closedInputPadding =
+              !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
+          final isScrolling = messagesController.hasClients && messagesController.offset != 0;
 
           var inputContainerColor = Colors.white;
 
@@ -608,9 +603,7 @@ class ChatScreenState extends State<ChatScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Load more messages',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2,
+                                        style: Theme.of(context).textTheme.bodyText2,
                                       )
                                     ],
                                   ),
@@ -623,22 +616,15 @@ class ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding:
-                        EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
+                    padding: EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
                     decoration: BoxDecoration(
                       color: inputContainerColor,
                       boxShadow: isScrolling
-                          ? [
-                              BoxShadow(
-                                  blurRadius: 6,
-                                  offset: Offset(0, -4),
-                                  color: Colors.black12)
-                            ]
+                          ? [BoxShadow(blurRadius: 6, offset: Offset(0, -4), color: Colors.black12)]
                           : [],
                     ),
                     child: AnimatedPadding(
-                      duration: Duration(
-                          milliseconds: inputFieldNode.hasFocus ? 225 : 0),
+                      duration: Duration(milliseconds: inputFieldNode.hasFocus ? 225 : 0),
                       padding: EdgeInsets.only(
                         bottom: closedInputPadding ? 16 : 0,
                       ),
@@ -654,9 +640,7 @@ class ChatScreenState extends State<ChatScreen> {
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
                         onSubmitMessage: () => onSendMessage(props),
-                        onAddMedia: (
-                                {required File file,
-                                required MessageType type}) =>
+                        onAddMedia: ({required File file, required MessageType type}) =>
                             onAddMedia(file, type, props),
                       ),
                     ),
@@ -730,15 +714,13 @@ class _Props extends Equatable {
         chatColorPrimary,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
         showAvatars: roomUsers(store.state, roomId).length > 2,
         themeType: store.state.settingsStore.themeSettings.themeType,
         userId: store.state.authStore.user.userId,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
-        dismissKeyboardEnabled:
-            store.state.settingsStore.dismissKeyboardEnabled,
+        dismissKeyboardEnabled: store.state.settingsStore.dismissKeyboardEnabled,
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         loading: selectRoom(state: store.state, id: roomId).syncing,
         messagesLength: store.state.eventStore.messages.containsKey(roomId)

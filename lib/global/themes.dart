@@ -18,8 +18,7 @@ void setSystemTheme(ThemeType themeType) {
 // Set the theme
 // Applies a system theme and returns a ThemeData instance which should be
 // applied immediately to match the system UI
-ThemeData? setupTheme(ThemeSettings appTheme,
-    {bool generateThemeData = false}) {
+ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) {
   // Set system UI theme
   setSystemTheme(appTheme.themeType);
 
@@ -28,12 +27,10 @@ ThemeData? setupTheme(ThemeSettings appTheme,
     final primaryColor = Color(appTheme.primaryColor).withOpacity(1);
     final secondaryColor = Color(appTheme.accentColor);
     final brightness = selectThemeBrightness(appTheme.themeType);
-    final invertedPrimaryColor =
-        brightness == Brightness.light ? primaryColor : secondaryColor;
+    final invertedPrimaryColor = brightness == Brightness.light ? primaryColor : secondaryColor;
 
     final appBarElevation = selectAppBarElevation(appTheme.themeType);
-    final scaffoldBackgroundColor =
-        selectScaffoldBackgroundColor(appTheme.themeType);
+    final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
     final dialogBackgroundColor = selectModalColor(appTheme.themeType);
     final iconColor = selectIconColor(appTheme.themeType);
 
@@ -78,9 +75,7 @@ ThemeData? setupTheme(ThemeSettings appTheme,
       ),
       selectedRowColor: Color(selectedRowColor),
       iconTheme: IconThemeData(color: iconColor),
-      scaffoldBackgroundColor: scaffoldBackgroundColor != null
-          ? Color(scaffoldBackgroundColor)
-          : null,
+      scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
           color: invertedPrimaryColor,
