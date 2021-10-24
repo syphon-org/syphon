@@ -34,7 +34,7 @@ class Message extends Event implements moor.Insertable<Message> {
   final int received;
 
   // Message Only
-  final String? body;
+  String? body;
   final String? msgtype;
   final String? format;
   final String? filename;
@@ -56,7 +56,7 @@ class Message extends Event implements moor.Insertable<Message> {
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
 
-  const Message({
+  Message({
     String? id,
     String? userId,
     String? roomId,
@@ -178,7 +178,7 @@ class Message extends Event implements moor.Insertable<Message> {
       body: moor.Value(body),
       msgtype: moor.Value(msgtype),
       format: moor.Value(format),
-      filename: moor.Value(filename),
+      // filename: moor.Value(filename),
       formattedBody: moor.Value(formattedBody),
       typeDecrypted: moor.Value(typeDecrypted),
       ciphertext: moor.Value(ciphertext),

@@ -159,7 +159,9 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
         return state;
       }
 
-      messagesRoom.removeWhere((messageRoom) => messageRoom.id == message.id);
+      for (final rMessage in messagesRoom) {
+        rMessage.body = Strings.labelDeletedMessage;
+      }
 
       return state.copyWith(messages: messages);
 
