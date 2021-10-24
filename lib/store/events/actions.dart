@@ -93,10 +93,9 @@ class DeleteOutboxMessage {
 }
 
 class DeleteMessage{
-  final Message message;
   final Room room;
 
-  DeleteMessage({required this.message, required this.room });
+  DeleteMessage({required this.room });
 }
 
 ThunkAction<AppState> addMessages({
