@@ -8,6 +8,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
@@ -25,11 +26,13 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
     this.onCopy,
     this.onDelete,
     this.onDismiss,
+    this.user,
   }) : super(key: key);
 
   final String title;
   final String label;
   final String tooltip;
+  final User? user;
 
   final Room? room;
   final Message? message;
@@ -60,7 +63,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
   }
 
   @override
-  Widget build(BuildContext context) => AppBar(
+  Widget build(BuildContext context) =>  AppBar(
         brightness: Brightness.dark, // TOOD: this should inherit from theme
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
@@ -104,7 +107,9 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               }
             },
           ),
-          IconButton(
+          Visibility(
+            visible: isDeletable(message: widget.message, user: widget.user),
+            child: IconButton(
               icon: Icon(Icons.delete),
               iconSize: 28.0,
               tooltip: 'Delete Message',
@@ -116,7 +121,9 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                 if (widget.onDismiss != null) {
                   widget.onDismiss!();
                 }
-              }),
+              }
+            ),
+          ),
           Visibility(
             visible: isTextMessage(message: widget.message!),
             child: IconButton(

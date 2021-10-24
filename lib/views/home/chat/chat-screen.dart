@@ -448,6 +448,7 @@ class ChatScreenState extends State<ChatScreen> {
 
           if (selectedMessage != null) {
             appBar = AppBarMessageOptions(
+              user: props.currentUser,
               room: props.room,
               message: selectedMessage,
               onDismiss: () => onToggleSelectedMessage(null),
@@ -562,6 +563,7 @@ class _Props extends Equatable {
   final Color chatColorPrimary;
   final bool roomTypeBadgesEnabled;
   final bool dismissKeyboardEnabled;
+  final User currentUser;
 
   final Function onSendMessage;
   final Function onDeleteMessage;
@@ -601,6 +603,7 @@ class _Props extends Equatable {
     required this.onToggleReaction,
     required this.onMarkRead,
     required this.onSelectReply,
+    required this.currentUser
   });
 
   @override
@@ -612,7 +615,7 @@ class _Props extends Equatable {
         chatColorPrimary,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+        currentUser: store.state.authStore.currentUser,
         room: selectRoom(id: roomId, state: store.state),
         showAvatars: roomUsers(store.state, roomId).length > 2,
         themeType: store.state.settingsStore.themeSettings.themeType,
