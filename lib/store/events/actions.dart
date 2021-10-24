@@ -446,7 +446,7 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
             eventId: message.id,
             accessToken: store.state.authStore.user.accessToken,
             homeserver: store.state.authStore.user.homeserver);
-        return store.dispatch(DeleteMessage(message: message));
+        return store.dispatch(DeleteMessage(room: room));
       }
     } catch (error) {
       debugPrint('[deleteMessage] $error');
