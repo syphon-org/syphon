@@ -104,12 +104,16 @@ ThunkAction<AppState> fetchMedia({
       final mediaStatus = store.state.mediaStore.mediaStatus;
       final medias = store.state.mediaStore.media;
 
+      if (mxcUri == null || mxcUri.isEmpty) {
+        return;
+      }
+
       // Noop if already cached data
       if (mediaCache.containsKey(mxcUri) && !force) {
         return;
       }
 
-      final currentStatus = mediaStatus[mxcUri!];
+      final currentStatus = mediaStatus[mxcUri];
       // Noop if currently checking, failed, or decrypting
       if (mediaStatus.containsKey(mxcUri) &&
           (currentStatus == MediaStatus.CHECKING.value ||

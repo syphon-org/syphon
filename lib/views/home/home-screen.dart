@@ -23,6 +23,7 @@ import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -31,8 +32,8 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/widgets/appbars/appbar-avatar.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-import 'package:syphon/views/widgets/avatars/avatar-app-bar.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
@@ -63,7 +64,7 @@ class HomeState extends State<HomeScreen> {
   bool searching = false;
   String searchText = '';
   Map<String, Room> selectedChats = {};
-  Map<String, Color> roomColorDefaults = {};
+  Map<String, Color> chatColorCache = {};
 
   @protected
   onToggleRoomOptions({required Room room}) {
@@ -207,8 +208,7 @@ class HomeState extends State<HomeScreen> {
       });
     } else {
       setState(() {
-        selectedChats
-            .addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
+        selectedChats.addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
       });
     }
   }
@@ -218,9 +218,7 @@ class HomeState extends State<HomeScreen> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions(
-          {required BuildContext context, required _Props props}) =>
-      AppBar(
+  Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -303,7 +301,7 @@ class HomeState extends State<HomeScreen> {
       titleSpacing: 16.00,
       title: Row(
         children: <Widget>[
-          AvatarAppBar(
+          AppBarAvatar(
             themeType: props.themeType,
             user: props.currentUser,
             offline: props.offline,
@@ -383,11 +381,10 @@ class HomeState extends State<HomeScreen> {
 
   @protected
   Widget buildChatList(BuildContext context, _Props props) {
+    final store = StoreProvider.of<AppState>(context);
     final rooms = props.rooms;
-    final label =
-        props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
-    final noSearchResults =
-        searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
+    final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
+    final noSearchResults = searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
 
     if (rooms.isEmpty) {
       return Center(
@@ -426,10 +423,8 @@ class HomeState extends State<HomeScreen> {
         final room = rooms[index];
         final messages = props.messages[room.id] ?? const [];
         final decrypted = props.decrypted[room.id] ?? const [];
-        final chatSettings = props.chatSettings[room.id];
 
-        final messageLatest =
-            latestMessage(messages, room: room, decrypted: decrypted);
+        final messageLatest = latestMessage(messages, room: room, decrypted: decrypted);
         final preview = formatPreview(room: room, message: messageLatest);
         final chatName = room.name ?? '';
         final newMessage = messageLatest != null &&
@@ -438,21 +433,7 @@ class HomeState extends State<HomeScreen> {
 
         var backgroundColor;
         var textStyle = TextStyle();
-        Color primaryColor = Colors.grey;
-
-        // Check settings for custom color, then check temp cache,
-        // or generate new temp color
-        if (chatSettings != null) {
-          primaryColor = Color(chatSettings.primaryColor);
-        } else if (roomColorDefaults.containsKey(room.id)) {
-          primaryColor = roomColorDefaults[room.id] ?? primaryColor;
-        } else {
-          primaryColor = Colours.hashedColor(room.id);
-          roomColorDefaults.putIfAbsent(
-            room.id,
-            () => primaryColor,
-          );
-        }
+        final chatColor = selectChatColor(store, room.id);
 
         // highlight selected rooms if necessary
         if (selectedChats.isNotEmpty) {
@@ -470,8 +451,7 @@ class HomeState extends State<HomeScreen> {
 
         if (messages.isNotEmpty && messageLatest != null) {
           // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted &&
-              messageLatest.body!.isEmpty) {
+          if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
             textStyle = TextStyle(fontStyle: FontStyle.italic);
           }
 
@@ -512,7 +492,7 @@ class HomeState extends State<HomeScreen> {
                         uri: room.avatarUri,
                         size: Dimensions.avatarSizeMin,
                         alt: formatRoomInitials(room: room),
-                        background: primaryColor,
+                        background: chatColor,
                       ),
                       Visibility(
                         visible: !room.encryptionEnabled,
@@ -572,9 +552,7 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled &&
-                            room.type == 'group' &&
-                            !room.invite,
+                        visible: props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -594,9 +572,7 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled &&
-                            room.type == 'public' &&
-                            !room.invite,
+                        visible: props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -639,8 +615,7 @@ class HomeState extends State<HomeScreen> {
                           ),
                           Text(
                             formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w100),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
                           ),
                         ],
                       ),

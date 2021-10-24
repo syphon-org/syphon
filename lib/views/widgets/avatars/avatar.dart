@@ -46,7 +46,7 @@ class Avatar extends StatelessWidget {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final bool emptyAvi = uri == null && url == null;
-          final Color backgroundColor = !emptyAvi ? Colors.transparent : Colors.grey;
+          final Color backgroundColor = !emptyAvi || force ? Colors.transparent : background ?? Colors.grey;
 
           var borderRadius = BorderRadius.circular(size);
 
@@ -59,7 +59,7 @@ class Avatar extends StatelessWidget {
             child: Text(
               formatInitialsLong(alt ?? ''),
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).textTheme.bodyText1?.color,
                 fontSize: Dimensions.avatarFontSize(size: size),
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.9,
@@ -67,7 +67,8 @@ class Avatar extends StatelessWidget {
             ),
           );
 
-          if (url != null) {
+          // TODO: empty urls and uris under dendrite?
+          if (url != null && url!.isNotEmpty) {
             avatarWidget = ClipRRect(
               borderRadius: borderRadius,
               child: Image(
@@ -79,7 +80,8 @@ class Avatar extends StatelessWidget {
             );
           }
 
-          if (uri != null) {
+          // TODO: empty urls and uris under dendrite?
+          if (uri != null && uri!.isNotEmpty) {
             avatarWidget = ClipRRect(
               borderRadius: borderRadius,
               child: MatrixImage(
@@ -117,7 +119,7 @@ class Avatar extends StatelessWidget {
                   height: size,
                   decoration: BoxDecoration(
                     borderRadius: borderRadius,
-                    color: emptyAvi && !force ? background ?? backgroundColor : Colors.transparent,
+                    color: backgroundColor,
                   ),
                   child: Center(child: avatarWidget),
                 ),

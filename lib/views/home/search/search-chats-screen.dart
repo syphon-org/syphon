@@ -1,26 +1,23 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
-import 'package:syphon/store/settings/chat-settings/model.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/settings/chat-settings/selectors.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -38,19 +35,10 @@ class ChatSearchScreen extends StatefulWidget {
   ChatSearchState createState() => ChatSearchState();
 }
 
-class ChatSearchState extends State<ChatSearchScreen>
-    with Lifecycle<ChatSearchScreen> {
+class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchScreen> {
   final searchInputFocusNode = FocusNode();
 
   ChatSearchState();
-
-  late Map<String, Color> roomColorDefaults;
-
-  @override
-  void initState() {
-    super.initState();
-    roomColorDefaults = {};
-  }
 
   @override
   onMounted() async {
@@ -58,7 +46,7 @@ class ChatSearchState extends State<ChatSearchScreen>
     final searchResults = store.state.searchStore.searchResults;
 
     // Clear search if previous results are not from User searching
-    if (searchResults.isNotEmpty && !(searchResults[0] is Room)) {
+    if (searchResults.isNotEmpty && searchResults[0] is! Room) {
       store.dispatch(clearSearchResults());
     }
 
@@ -72,8 +60,7 @@ class ChatSearchState extends State<ChatSearchScreen>
   Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
-    final ChatSearchArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
+    final ChatSearchArguments arguments = ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
     final user = arguments.user!;
     final username = formatUsername(user);
 
@@ -82,8 +69,7 @@ class ChatSearchState extends State<ChatSearchScreen>
       builder: (BuildContext context) => DialogStartChat(
         user: user,
         title: 'Invite $username',
-        content:
-            '${Strings.confirmInvite}\n\nUser: $username\nRoom: ${room.name}',
+        content: '${Strings.confirmInvite}\n\nUser: $username\nRoom: ${room.name}',
         action: 'send invite',
         onStartChat: () async {
           props.onSendInvite(room: room, user: user);
@@ -102,6 +88,7 @@ class ChatSearchState extends State<ChatSearchScreen>
 
   @protected
   Widget buildRoomList(BuildContext context, _Props props) {
+    final store = StoreProvider.of<AppState>(context);
     final rooms = props.searchResults as List<Room>;
 
     if (rooms.isEmpty) {
@@ -139,26 +126,14 @@ class ChatSearchState extends State<ChatSearchScreen>
       itemCount: rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
-        final chatSettings = props.chatSettings[room.id];
 
         var previewStyle;
         var preview = room.topic;
-        var backgroundColor = Color(Colours.greyDefault);
+        final backgroundColor = selectChatColor(store, room.id);
 
         if (preview == null || preview.isEmpty) {
           preview = 'No Description';
           previewStyle = TextStyle(fontStyle: FontStyle.italic);
-        }
-
-        // Check settings for custom color,
-        // then check temp cache, or generate new temp color
-        if (chatSettings != null) {
-          backgroundColor = Color(chatSettings.primaryColor);
-        } else if (roomColorDefaults.containsKey(room.id)) {
-          backgroundColor = roomColorDefaults[room.id]!;
-        } else {
-          backgroundColor = Colours.hashedColor(room.id);
-          roomColorDefaults.putIfAbsent(room.id, () => backgroundColor);
         }
 
         // GestureDetector w/ animation
