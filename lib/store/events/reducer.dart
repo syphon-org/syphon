@@ -146,7 +146,8 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
     case DeleteMessage:
       final message = (action as DeleteMessage).message;
-      final roomId = message.roomId;
+      final room = action.room;
+      final roomId = room.id;
 
       final messages = Map<String, List<Message>>.from(
         state.messages,
