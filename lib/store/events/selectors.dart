@@ -4,6 +4,7 @@ import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/user/model.dart';
 
 List<Message> roomMessages(AppState state, String? roomId) {
   final room = state.roomStore.rooms[roomId] ?? Room(id: '');
@@ -212,4 +213,8 @@ bool isTextMessage({required Message message}) {
       message.msgtype == MessageTypes.EMOTE ||
       message.msgtype == MessageTypes.NOTICE ||
       message.type == EventTypes.encrypted;
+}
+
+bool isDeletable({Message? message, User? user}){
+  return false;
 }
