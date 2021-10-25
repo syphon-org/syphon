@@ -12,6 +12,7 @@ class DialogTextInput extends StatefulWidget {
     Key? key,
     this.title = '',
     this.content = '',
+    this.label = '',
     this.loading = false,
     this.valid = false,
     this.keyboardType = TextInputType.text,
@@ -24,6 +25,7 @@ class DialogTextInput extends StatefulWidget {
 
   final String title;
   final String content;
+  final String label;
   final bool loading;
   final bool valid;
   final TextInputType keyboardType;
@@ -104,16 +106,16 @@ class _DialogTextInputState extends State<DialogTextInput> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
-                  labelText: 'seconds',
+                  labelText: widget.label,
                 ),
-                onChanged: (seconds) {
+                onChanged: (value) {
                   if (widget.onChange != null) {
-                    widget.onChange!(seconds);
+                    widget.onChange!(value);
                   }
                 },
-                onSubmitted: (seconds) {
+                onSubmitted: (value) {
                   if (widget.onConfirm != null) {
-                    widget.onConfirm!(seconds);
+                    widget.onConfirm!(value);
                   }
                   Navigator.of(context).pop();
                 },
