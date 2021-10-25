@@ -164,7 +164,7 @@ ThunkAction<AppState> searchRooms({String? searchText}) {
 }
 
 ///  Search Rooms (Remote)
-ThunkAction<AppState> searchPublicRooms({String? searchable}) {
+ThunkAction<AppState> searchRoomsPublic({String? searchable}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));

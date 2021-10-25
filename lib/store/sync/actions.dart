@@ -201,7 +201,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       store.dispatch(SetSyncing(syncing: true));
 
       final lastSince = store.state.syncStore.lastSince;
-      final isFullSync = forceFull || since == null || store.state.roomStore.rooms.isEmpty;
+      final isFullSync = forceFull || since == null;
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync running *** ');

@@ -1,27 +1,23 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
-
-import 'package:syphon/global/values.dart';
-import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
@@ -54,7 +50,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
     }
     // Initial search to show rooms by most popular
     if (store.state.searchStore.searchResults.isEmpty) {
-      store.dispatch(searchPublicRooms(searchable: ''));
+      store.dispatch(searchRoomsPublic(searchable: ''));
     }
   }
 
@@ -66,8 +62,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
 
   @protected
   Widget buildSearchList(BuildContext context, _Props props) {
-    final label =
-        props.loading ? Strings.labelSearching : Strings.labelGroupsEmpty;
+    final label = props.loading ? Strings.labelSearching : Strings.labelGroupsEmpty;
 
     if (props.searchResults.isEmpty) {
       return Center(
@@ -408,7 +403,7 @@ class _Props extends Equatable {
           store.dispatch(joinRoom(room: room));
         },
         onSearch: (text) {
-          store.dispatch(searchPublicRooms(searchable: text));
+          store.dispatch(searchRoomsPublic(searchable: text));
         },
       );
 }
