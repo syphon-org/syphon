@@ -208,5 +208,6 @@ class AuthStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$AuthStoreToJson(this);
 
-  factory AuthStore.fromJson(Map<String, dynamic> json) => _$AuthStoreFromJson(json);
+  factory AuthStore.fromJson(Map<String, dynamic> json) =>
+      _$AuthStoreFromJson(json);
 }

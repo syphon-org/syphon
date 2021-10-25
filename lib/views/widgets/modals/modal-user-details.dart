@@ -1,13 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -33,20 +31,22 @@ class ModalUserDetails extends StatelessWidget {
   final String? userId;
   final bool? nested; // pop context twice when double nested in a view
 
-  onNavigateToProfile({required BuildContext context, required _Props props}) async {
+  onNavigateToProfile(
+      {required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      NavigationPaths.userDetails,
+      Routes.userDetails,
       arguments: UserProfileArguments(
         user: props.user,
       ),
     );
   }
 
-  onNavigateToInvite({required BuildContext context, required _Props props}) async {
+  onNavigateToInvite(
+      {required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
-      NavigationPaths.searchChats,
+      Routes.searchChats,
       arguments: ChatSearchArguments(
         user: props.user,
       ),
@@ -74,7 +74,7 @@ class ModalUserDetails extends StatelessWidget {
           if (newRoomId != null) {
             Navigator.popAndPushNamed(
               context,
-              NavigationPaths.chat,
+              Routes.chat,
               arguments: ChatScreenArguments(
                 roomId: newRoomId,
                 title: user.displayName,
@@ -130,8 +130,9 @@ class ModalUserDetails extends StatelessWidget {
                             uri: props.user.avatarUri,
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
-                            background:
-                                props.user.avatarUri == null ? Colours.hashedColorUser(props.user) : null,
+                            background: props.user.avatarUri == null
+                                ? Colours.hashedColorUser(props.user)
+                                : null,
                           ),
                         ),
                       ],
@@ -144,9 +145,10 @@ class ModalUserDetails extends StatelessWidget {
                             props.user.displayName ?? '',
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.subtitle1!.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
                           ),
                         )
                       ],
@@ -277,11 +279,14 @@ class _Props extends Equatable {
         blocked,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, {User? user, String? userId}) => _Props(
+  static _Props mapStateToProps(Store<AppState> store,
+          {User? user, String? userId}) =>
+      _Props(
         user: () {
           final users = store.state.userStore.users;
           final loading = store.state.userStore.loading;
-          if (user != null) {
+
+          if (user != null && user.userId != null) {
             return user;
           }
 

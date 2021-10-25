@@ -79,7 +79,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       final availableUser = _action.availableUser;
       final availableUsers = List<User>.from(state.availableUsers);
 
-      final existingIndex = availableUsers.indexWhere((user) => user.userId == availableUser.userId);
+      final existingIndex = availableUsers
+          .indexWhere((user) => user.userId == availableUser.userId);
 
       if (existingIndex == -1) {
         availableUsers.add(availableUser);
@@ -91,7 +92,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       final availableUser = _action.availableUser;
       final availableUsers = List<User>.from(state.availableUsers);
 
-      final existingIndex = availableUsers.indexWhere((user) => user.userId == availableUser.userId);
+      final existingIndex = availableUsers
+          .indexWhere((user) => user.userId == availableUser.userId);
 
       if (existingIndex != -1) {
         availableUsers.remove(availableUser);

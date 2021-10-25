@@ -59,7 +59,8 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                     ),
                     child: SvgPicture.asset(
                       Assets.heroSignupPassword,
-                      semanticsLabel: 'User thinking up a password in a swirl of wind',
+                      semanticsLabel:
+                          'User thinking up a password in a swirl of wind',
                     ),
                   ),
                 ),

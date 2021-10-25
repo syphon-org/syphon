@@ -66,7 +66,8 @@ class GroupSearchState extends State<GroupSearchScreen> {
 
   @protected
   Widget buildSearchList(BuildContext context, _Props props) {
-    final label = props.loading ? Strings.labelSearching : Strings.labelGroupsEmpty;
+    final label =
+        props.loading ? Strings.labelSearching : Strings.labelGroupsEmpty;
 
     if (props.searchResults.isEmpty) {
       return Center(

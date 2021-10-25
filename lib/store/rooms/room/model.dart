@@ -1,16 +1,16 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/print.dart';
-
-import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
@@ -25,7 +25,7 @@ class RoomPresets {
 }
 
 @JsonSerializable()
-class Room {
+class Room implements drift.Insertable<Room> {
   final String id;
   final String? name;
   final String? alias;
@@ -159,7 +159,7 @@ class Room {
     String? name,
     String? homeserver,
     avatar,
-    avatarUri,
+    String? avatarUri,
     topic,
     bool? invite,
     bool? direct,
@@ -180,8 +180,8 @@ class Room {
     usersTyping,
     draft,
     reply,
-    Map<String, User>? users,
     List<String>? userIds,
+    Map<String, User>? users,
     events,
     List<Message>? outbox,
     List<Message>? messagesNew,
@@ -246,7 +246,7 @@ class Room {
         homeserver: (json['room_id'] as String).split(':')[1],
         topic: json['topic'],
         avatarUri: json['avatar_url'],
-        totalJoinedUsers: json['num_joined_members'],
+        totalJoinedUsers: json['num_joined_members'] ?? 0,
         guestEnabled: json['guest_can_join'],
         worldReadable: json['world_readable'],
         syncing: false,
@@ -308,7 +308,7 @@ class Room {
 
       if (limited != null) {
         printInfo(
-          '[fromSync] ${id} limited $limited lastHash ${lastHash != null} prevHash ${prevHash != null}',
+          '[fromSync] $id limited $limited lastHash ${lastHash != null} prevHash ${prevHash != null}',
         );
       }
 
@@ -365,7 +365,7 @@ class Room {
   Room fromAccountData(List<Event> accountDataEvents) {
     dynamic isDirect;
     try {
-      accountDataEvents.forEach((event) {
+      for (final event in accountDataEvents) {
         switch (event.type) {
           case 'm.direct':
             isDirect = true;
@@ -373,7 +373,7 @@ class Room {
           default:
             break;
         }
-      });
+      }
     } catch (error) {}
 
     return copyWith(
@@ -406,7 +406,7 @@ class Room {
     Set<String> userIds = Set<String>.from(this.userIds);
     final List<String> userIdsRemove = [];
 
-    events.forEach((event) {
+    for (final event in events) {
       try {
         final timestamp = event.timestamp;
         if (lastUpdateType == LastUpdateType.State) {
@@ -479,7 +479,7 @@ class Room {
       } catch (error) {
         debugPrint('[Room.fromStateEvents] $error ${event.type}');
       }
-    });
+    }
 
     userIds = userIds..addAll(usersAdd.keys);
     userIds = userIds..removeWhere((id) => userIdsRemove.contains(id));
@@ -633,7 +633,7 @@ class Room {
     final readReceipts = Map<String, ReadReceipt>.from(this.readReceipts ?? {});
 
     try {
-      events.forEach((event) {
+      for (final event in events) {
         switch (event.type) {
           case 'm.typing':
             final List<dynamic> usersTypingList = event.content['user_ids'];
@@ -669,7 +669,7 @@ class Room {
           default:
             break;
         }
-      });
+      }
     } catch (error) {}
 
     return copyWith(
@@ -677,5 +677,40 @@ class Room {
       usersTyping: usersTyping,
       readReceipts: readReceipts,
     );
+  }
+
+  // allows converting to message companion type for saving through drift
+  @override
+  Map<String, drift.Expression> toColumns(bool nullToAbsent) {
+    return RoomsCompanion(
+      id: drift.Value(id),
+      name: drift.Value(name),
+      alias: drift.Value(alias),
+      homeserver: drift.Value(homeserver),
+      avatarUri: drift.Value(avatarUri),
+      topic: drift.Value(topic),
+      joinRule: drift.Value(joinRule),
+      drafting: drift.Value(drafting),
+      direct: drift.Value(direct),
+      sending: drift.Value(sending),
+      invite: drift.Value(invite),
+      guestEnabled: drift.Value(guestEnabled),
+      encryptionEnabled: drift.Value(encryptionEnabled),
+      worldReadable: drift.Value(worldReadable),
+      hidden: drift.Value(hidden),
+      archived: drift.Value(archived),
+      lastHash: drift.Value(lastHash),
+      prevHash: drift.Value(prevHash),
+      nextHash: drift.Value(nextHash),
+      lastRead: drift.Value(lastRead),
+      lastUpdate: drift.Value(lastUpdate),
+      totalJoinedUsers: drift.Value(totalJoinedUsers),
+      namePriority: drift.Value(namePriority),
+      draft: drift.Value(draft),
+      reply: drift.Value(reply),
+      userIds: drift.Value(userIds),
+      messageIds: drift.Value(messageIds),
+      reactionIds: drift.Value(reactionIds),
+    ).toColumns(nullToAbsent);
   }
 }

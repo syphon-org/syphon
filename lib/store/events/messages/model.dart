@@ -1,7 +1,7 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart' as moor;
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/moor/database.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 
@@ -14,7 +14,7 @@ part 'model.g.dart';
 /// JsonSerializable and Moor conversions respectively
 ///
 @JsonSerializable()
-class Message extends Event implements moor.Insertable<Message> {
+class Message extends Event implements drift.Insertable<Message> {
   // message drafting
   @JsonKey(defaultValue: false)
   final bool pending;
@@ -37,8 +37,10 @@ class Message extends Event implements moor.Insertable<Message> {
   String? body;
   final String? msgtype;
   final String? format;
-  final String? filename;
   final String? formattedBody;
+  final String? url;
+  final Map<String, dynamic>? file;
+  final Map<String, dynamic>? info;
 
   // Encrypted Messages only
   final String? typeDecrypted; // inner type of decrypted event
@@ -69,7 +71,9 @@ class Message extends Event implements moor.Insertable<Message> {
     this.typeDecrypted,
     this.msgtype,
     this.format,
-    this.filename,
+    this.file,
+    this.url,
+    this.info,
     this.formattedBody,
     this.received = 0,
     this.ciphertext,
@@ -117,7 +121,9 @@ class Message extends Event implements moor.Insertable<Message> {
     String? typeDecrypted, // inner type of decrypted event
     String? msgtype,
     String? format,
-    String? filename,
+    String? url,
+    Map<String, dynamic>? file,
+    Map<String, dynamic>? info,
     String? formattedBody,
     String? ciphertext,
     String? senderKey,
@@ -141,7 +147,9 @@ class Message extends Event implements moor.Insertable<Message> {
         formattedBody: formattedBody ?? this.formattedBody,
         msgtype: msgtype ?? this.msgtype,
         format: format ?? this.format,
-        filename: filename ?? this.filename,
+        file: file ?? this.file,
+        url: url ?? this.url,
+        info: info ?? this.info,
         received: received ?? this.received,
         ciphertext: ciphertext ?? this.ciphertext,
         senderKey: senderKey ?? this.senderKey,
@@ -158,42 +166,44 @@ class Message extends Event implements moor.Insertable<Message> {
         reactions: reactions ?? this.reactions,
       );
 
-  // allows converting to message companion type for saving through moor
+  // allows converting to message companion type for saving through drift
   @override
-  Map<String, moor.Expression> toColumns(bool nullToAbsent) {
+  Map<String, drift.Expression> toColumns(bool nullToAbsent) {
     return MessagesCompanion(
-      id: moor.Value(id!),
-      userId: moor.Value(userId),
-      roomId: moor.Value(roomId),
-      type: moor.Value(type),
-      sender: moor.Value(sender),
-      stateKey: moor.Value(stateKey),
-      syncing: moor.Value(syncing),
-      pending: moor.Value(pending),
-      failed: moor.Value(failed),
-      replacement: moor.Value(replacement),
-      edited: moor.Value(edited),
-      timestamp: moor.Value(timestamp),
-      received: moor.Value(received),
-      body: moor.Value(body),
-      msgtype: moor.Value(msgtype),
-      format: moor.Value(format),
-      // filename: moor.Value(filename),
-      formattedBody: moor.Value(formattedBody),
-      typeDecrypted: moor.Value(typeDecrypted),
-      ciphertext: moor.Value(ciphertext),
-      senderKey: moor.Value(senderKey),
-      deviceId: moor.Value(deviceId),
-      algorithm: moor.Value(algorithm),
-      sessionId: moor.Value(sessionId),
-      relatedEventId: moor.Value(relatedEventId),
+      id: drift.Value(id!),
+      userId: drift.Value(userId),
+      roomId: drift.Value(roomId),
+      type: drift.Value(type),
+      sender: drift.Value(sender),
+      stateKey: drift.Value(stateKey),
+      syncing: drift.Value(syncing),
+      pending: drift.Value(pending),
+      failed: drift.Value(failed),
+      replacement: drift.Value(replacement),
+      edited: drift.Value(edited),
+      timestamp: drift.Value(timestamp),
+      received: drift.Value(received),
+      body: drift.Value(body),
+      msgtype: drift.Value(msgtype),
+      format: drift.Value(format),
+      url: drift.Value(url),
+      file: drift.Value(file),
+      formattedBody: drift.Value(formattedBody),
+      typeDecrypted: drift.Value(typeDecrypted),
+      ciphertext: drift.Value(ciphertext),
+      senderKey: drift.Value(senderKey),
+      deviceId: drift.Value(deviceId),
+      algorithm: drift.Value(algorithm),
+      sessionId: drift.Value(sessionId),
+      relatedEventId: drift.Value(relatedEventId),
     ).toColumns(nullToAbsent);
   }
 
   @override
   Map<String, dynamic> toJson() => _$MessageToJson(this);
 
-  factory Message.fromJson(Map<String, dynamic> json) => _$MessageFromJson(json);
+  factory Message.fromJson(Map<String, dynamic> json) =>
+      _$MessageFromJson(json);
 
   factory Message.fromEvent(Event event) {
     try {
@@ -212,6 +222,15 @@ class Message extends Event implements moor.Insertable<Message> {
         msgtype = content['m.new_content']['msgtype'];
       }
 
+      var info;
+      if (content['info'] != null) {
+        try {
+          info = Map<String, dynamic>.from(content['info']);
+        } catch (error) {
+          printError('[Message.fromEvent] Info Conversion Failed $error');
+        }
+      }
+
       return Message(
         id: event.id,
         userId: event.userId,
@@ -224,9 +243,11 @@ class Message extends Event implements moor.Insertable<Message> {
         content: content,
         body: body,
         msgtype: msgtype,
-        format: content['format'],
-        filename: content['filename'],
+        format: content['format'], // "org.matrix.custom.html"
         formattedBody: content['formatted_body'],
+        url: content['url'],
+        file: content['file'],
+        info: info,
         ciphertext: content['ciphertext'] ?? '',
         algorithm: content['algorithm'],
         senderKey: content['sender_key'],

@@ -1,15 +1,15 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
-import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PageEmailVerify.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
@@ -58,7 +58,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
   }
 
   onVerificationConfirmed() {
-    Navigator.pushNamed(context, NavigationPaths.reset);
+    Navigator.pushNamed(context, Routes.reset);
   }
 
   @override
@@ -71,7 +71,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
 
           return Scaffold(
             appBar: AppBar(
-              brightness: Brightness.light,
+              systemOverlayStyle: computeSystemUIColor(context),
               elevation: 0,
               backgroundColor: Colors.transparent,
               leading: IconButton(
@@ -89,8 +89,10 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width: width, // set actual height and width for flex constraints
-                  height: height, // set actual height and width for flex constraints
+                  width:
+                      width, // set actual height and width for flex constraints
+                  height:
+                      height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -138,13 +140,15 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                     child: ButtonSolid(
                                       text: Strings.buttonSendVerification,
                                       loading: loading,
-                                      disabled: !props.isEmailValid || !props.isHomeserverValid,
+                                      disabled: !props.isEmailValid ||
+                                          !props.isHomeserverValid,
                                       onPressed: () async {
                                         setState(() {
                                           loading = true;
                                         });
 
-                                        final result = await props.onSendVerification(sendAttempt);
+                                        final result = await props
+                                            .onSendVerification(sendAttempt);
 
                                         if (result) {
                                           onShowConfirmDialog();
@@ -171,7 +175,8 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                           loading = true;
                                         });
 
-                                        final result = await props.onConfirmVerification();
+                                        final result =
+                                            await props.onConfirmVerification();
 
                                         if (result) {
                                           onVerificationConfirmed();
@@ -209,7 +214,7 @@ class _Props extends Equatable {
   final Function onSendVerification;
   final Function onConfirmVerification;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.isEmailValid,
     required this.isHomeserverValid,

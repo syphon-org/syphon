@@ -23,7 +23,8 @@ class VerificationScreen extends StatefulWidget {
   VerificationScreenState createState() => VerificationScreenState();
 }
 
-class VerificationScreenState extends State<VerificationScreen> with WidgetsBindingObserver {
+class VerificationScreenState extends State<VerificationScreen>
+    with WidgetsBindingObserver {
   late bool sending;
   bool? success;
 
@@ -99,7 +100,8 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                             ),
                             child: SvgPicture.asset(
                               Assets.heroSignupVerificationView,
-                              semanticsLabel: 'Letter in envelop floating upward with attached balloons',
+                              semanticsLabel:
+                                  'Letter in envelop floating upward with attached balloons',
                             ),
                           ),
                         ),
@@ -126,7 +128,8 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                     child: Text(
                                       'Verify your email address',
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(context).textTheme.headline5,
+                                      style:
+                                          Theme.of(context).textTheme.headline5,
                                     ),
                                   ),
                                   Positioned(
@@ -136,9 +139,12 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                       onTap: () {
                                         showDialog(
                                           context: context,
-                                          builder: (BuildContext context) => DialogExplaination(
-                                            title: Strings.titleDialogSignupEmailVerification,
-                                            content: Strings.contentEmailVerification,
+                                          builder: (BuildContext context) =>
+                                              DialogExplaination(
+                                            title: Strings
+                                                .titleDialogSignupEmailVerification,
+                                            content: Strings
+                                                .contentEmailVerification,
                                             onConfirm: () {
                                               Navigator.pop(context);
                                             },
@@ -150,7 +156,9 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                         width: 20,
                                         child: Icon(
                                           Icons.info_outline,
-                                          color: Theme.of(context).accentColor,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
                                           size: 20,
                                         ),
                                       ),
@@ -179,7 +187,8 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                   loading: sending || props.loading,
                                   disabled: sending || props.loading,
                                   onPressed: () async {
-                                    final result = await props.onCreateUser(enableErrors: true);
+                                    final result = await props.onCreateUser(
+                                        enableErrors: true);
                                     setState(() {
                                       success = result;
                                     });

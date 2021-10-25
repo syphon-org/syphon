@@ -136,7 +136,8 @@ abstract class Auth {
     String? email,
     int? sendAttempt = 1,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
 
     final Map body = {
       'email': email,
@@ -162,7 +163,7 @@ abstract class Auth {
     String? username,
     String? password,
     String? session,
-    String? authType = MatrixAuthTypes.DUMMY,
+    String? authType,
     String? authValue,
     Map? authParams,
     String? deviceId,
@@ -171,9 +172,7 @@ abstract class Auth {
     final String url = '$protocol$homeserver/_matrix/client/r0/register';
 
     Map body = {
-      'auth': {
-        'type': MatrixAuthTypes.DUMMY,
-      }
+      'type': MatrixAuthTypes.DUMMY,
     };
 
     // Set and configure params for auth types
@@ -208,7 +207,7 @@ abstract class Auth {
           }
         };
         break;
-      case MatrixAuthTypes.DUMMY: // default
+      case MatrixAuthTypes.DUMMY: // actually password auth, poor spec design
         body = {
           'username': username,
           'password': password,
@@ -323,6 +322,22 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
+  ///  https://matrix.org/docs/spec/client_server/latest#id211
+  ///
+  ///  Check Username Availability
+  ///
+  ///  Used to check what types of logins are available on the server
+  static Future<dynamic> checkHomeserverAlt({
+    String protocol = 'https://',
+    String homeserver = Values.homeserverDefault,
+  }) async {
+    final String url = '$protocol$homeserver/.well-known/matrix/server';
+
+    final response = await http.get(Uri.parse(url));
+
+    return await json.decode(response.body);
+  }
+
   static Future<dynamic> checkVersion({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
@@ -348,7 +363,8 @@ abstract class Auth {
     String? password,
     String? currentPassword,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -392,7 +408,8 @@ abstract class Auth {
     String? session,
     int sendAttempt = 1,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map body = {
       'auth': {
@@ -430,7 +447,8 @@ abstract class Auth {
     String? email,
     int sendAttempt = 1,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
 
     final Map body = {
       'email': email,

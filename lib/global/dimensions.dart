@@ -25,6 +25,7 @@ class Dimensions {
   static const double mediaSize = 264;
   static const double mediaSizeMin = 208;
   static const double mediaSizeMax = 320;
+  static const double mediaSizeMaxMessage = 275;
 
   static const double thumbnailSizeMin = 48;
   static const double thumbnailSizeMax = 48;
@@ -70,13 +71,15 @@ class Dimensions {
   static const double inputWidthMax = inputSizeMax; // 43 * 8
 
   // Padding values
+  static const double padding = 8;
   static const double paddingMin = 4;
   static const double paddingSmall = 12;
   static const double paddingLarge = 24;
   static const double paddingContainer = 16;
 
   // Padding EdgeInsets
-  static const modalEdgeInsets = EdgeInsets.symmetric(vertical: 12, horizontal: 24);
+  static const modalEdgeInsets =
+      EdgeInsets.symmetric(vertical: 12, horizontal: 24);
 
   static const inputContentPadding = EdgeInsets.symmetric(
     vertical: 4.0,
@@ -160,8 +163,8 @@ class Dimensions {
   static const double pageViewerHeightMax = heightMax / 2;
 
   // Progress Indicator
-  static const double defaultStrokeWidth = 2;
-  static const double defaultStrokeWidthLite = 1.5;
+  static const double strokeWidthDefault = 2;
+  static const double strokeWidthThin = 1.5;
 
   // Modals
   static const double defaultModalHeight = 256;

@@ -1,39 +1,36 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/auth/selectors.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
-
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/views/behaviors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/views/widgets/buttons/button-solid.dart';
-import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 class LoginScreenArguments {
   final bool multiaccount;
@@ -51,7 +48,6 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
   final passwordFocus = FocusNode();
   final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
   final avatarHash = Random().nextInt(2);
 
   bool visibility = false;
@@ -61,9 +57,6 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
 
   @override
   void dispose() {
-    usernameController.dispose();
-    passwordController.dispose();
-    passwordFocus.dispose();
     super.dispose();
   }
 
@@ -144,7 +137,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
         ),
         trailing: TouchableOpacity(
           onTap: () {
-            Navigator.pushNamed(context, NavigationPaths.searchHomeservers);
+            Navigator.pushNamed(context, Routes.searchHomeservers);
           },
           child: Icon(
             Icons.search_rounded,
@@ -172,7 +165,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
               disabled: props.loading,
               controller: usernameController,
               autofillHints: const [AutofillHints.username],
-              formatters: [FilteringTextInputFormatter.deny(RegExp(r'@@'))],
+              formatters: [FilteringTextInputFormatter.deny(RegExp('@@'))],
               onSubmitted: (text) {
                 FocusScope.of(context).requestFocus(passwordFocus);
               },
@@ -181,7 +174,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
               },
               suffix: TouchableOpacity(
                 onTap: () {
-                  Navigator.pushNamed(context, NavigationPaths.searchHomeservers);
+                  Navigator.pushNamed(context, Routes.searchHomeservers);
                 },
                 child: Icon(
                   Icons.search_rounded,
@@ -229,7 +222,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                 activeOpacity: 0.4,
                 onTap: () async {
                   await props.onResetSession();
-                  Navigator.pushNamed(context, NavigationPaths.forgot);
+                  Navigator.pushNamed(context, Routes.forgot);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -261,12 +254,18 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
 
     return StoreConnector<AppState, _Props>(
       distinct: true,
+      onInitialBuild: (props) {
+        if (multiaccount) {
+          final store = StoreProvider.of<AppState>(context);
+          store.dispatch(initDeepLinks());
+        }
+      },
       converter: (store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           elevation: 0,
-          brightness: Theme.of(context).brightness,
+          systemOverlayStyle: computeSystemUIColor(context),
           backgroundColor: Colors.transparent,
           actions: <Widget>[
             Visibility(
@@ -277,7 +276,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                 tooltip: 'General Settings',
                 color: Theme.of(context).scaffoldBackgroundColor,
                 onPressed: () {
-                  Navigator.pushNamed(context, NavigationPaths.settingsTheme);
+                  Navigator.pushNamed(context, Routes.settingsTheme);
                   props.onDebug();
                 },
               ),
@@ -471,7 +470,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                         ),
                         child: TouchableOpacity(
                           activeOpacity: 0.4,
-                          onTap: () => Navigator.pushNamed(context, NavigationPaths.signup),
+                          onTap: () => Navigator.pushNamed(context, Routes.signup),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
@@ -595,6 +594,14 @@ class _Props extends Equatable {
 
           if (hostname != homeserver.hostname) {
             await store.dispatch(selectHomeserver(hostname: hostname));
+            final _homeserver = store.state.authStore.homeserver;
+
+            if (_homeserver.signupTypes.isEmpty && !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+              store.dispatch(addInfo(
+                origin: 'selectHomeserver',
+                message: 'No new signups allowed on this server, try another if creating an account',
+              ));
+            }
           }
         },
         onChangePassword: (String text) {

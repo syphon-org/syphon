@@ -2,16 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
 import 'package:crypto/crypto.dart';
-import 'package:flutter/services.dart';
-
-import 'package:flutter/material.dart';
-
 import 'package:device_info/device_info.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -39,6 +36,7 @@ import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../user/model.dart';
 
 class SetLoading {
@@ -183,10 +181,9 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
         }
 
         _sub = uriLinkStream.listen((Uri? uri) {
+          printInfo('SSO URI CAUGHT $uri');
           final token = uri!.queryParameters['loginToken'];
-          if (store.state.authStore.user.accessToken == null) {
-            store.dispatch(loginUserSSO(token: token));
-          }
+          store.dispatch(loginUserSSO(token: token));
         }, onError: (err) {
           printError('[streamUniLinks] error $err');
         });
@@ -195,15 +192,20 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
           origin: 'initDeepLinks',
           message: 'Failed to SSO Login, please try again later or contact support',
         ));
-        // Handle exception by warning the user their action did not succeed
-        // return?
+      } catch (error) {
+        store.dispatch(addAlert(
+          origin: 'initDeepLinks',
+          message: error.toString(),
+        ));
       }
     };
 
 ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
       try {
         _sub.cancel();
-      } catch (error) {}
+      } catch (error) {
+        printError(error.toString());
+      }
     };
 
 ThunkAction<AppState> startAuthObserver() {
@@ -319,7 +321,7 @@ ThunkAction<AppState> generateDeviceId({String? salt}) {
         displayName: Values.appDisplayName,
       );
     } catch (error) {
-      debugPrint('[generateDeviceId] $error');
+      printError('[generateDeviceId] $error');
       return Device(
         deviceId: defaultId,
         displayName: Values.appDisplayName,
@@ -497,17 +499,13 @@ ThunkAction<AppState> logoutUser() {
 
         if (data['errcode'] != null) {
           if (data['errcode'] != MatrixErrors.unknown_token) {
-            throw Exception(data['error']);
+            throw data['error'];
           }
         }
       }
 
       // Remove this user from available multiaccounts
       await store.dispatch(removeAvailableUser(user));
-
-      // Attempt to switch to another user if session is present
-      // final nextAvailableUser = store.state.authStore.availableUsers;
-      // final nextUser = nextAvailableUser.isNotEmpty ? nextAvailableUser.first : null;
 
       store.state.authStore.contextObserver?.add(null);
     } catch (error) {
@@ -571,7 +569,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
         availability: data['available'],
       ));
     } catch (error) {
-      debugPrint('[checkUsernameAvailability] $error');
+      printError('[checkUsernameAvailability] $error');
       store.dispatch(SetUsernameAvailability(availability: false));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -792,19 +790,24 @@ ThunkAction<AppState> fetchSignupStages() {
       final data = await MatrixApi.registerUser(
         homeserver: homeserver.baseUrl,
         session: store.state.authStore.authSession,
-        authType: 'dummy',
       );
 
       if (data['flows'] == null) {
         throw data['error'];
       }
 
+      // TODO: servers can have multiple perferred flows, need to determine how to chose, largely UX issue
       // "flows": [ { "stages": [ "m.login.recaptcha", "m.login.terms", "m.login.email.identity" ] } ]
       final stages = List<String>.from(data['flows'][0]['stages']?.map((stage) => stage as String));
       final homeserverUpdated = homeserver.copyWith(signupTypes: stages);
 
       store.dispatch(SetHomeserver(homeserver: homeserverUpdated));
     } catch (error) {
+      addAlert(
+        origin: 'fetchSignupStages',
+        error: 'No new signups allowed on this server, try another if creating an account',
+      );
+
       final homeserver = store.state.authStore.homeserver;
       store.dispatch(SetHomeserver(homeserver: homeserver.copyWith(signupTypes: [])));
     }
@@ -990,9 +993,13 @@ ThunkAction<AppState> updateAvatar({File? localFile}) {
       final String? displayName = store.state.authStore.user.displayName;
 
       final data = await store.dispatch(uploadMedia(
-        localFile: localFile,
+        localFile: localFile!,
         mediaName: '${displayName}_profile_photo',
       ));
+
+      if (data == null) {
+        throw 'Failed to upload media';
+      }
 
       await store.dispatch(updateAvatarUri(
         mxcUri: data['content_uri'],
@@ -1072,15 +1079,9 @@ ThunkAction<AppState> selectHomeserver({String? hostname}) {
 
     await store.dispatch(setHomeserver(homeserver: homeserver));
     await store.dispatch(setHostname(hostname: hostname));
-    await store.dispatch(fetchSignupStages());
 
-    final _homeserver = store.state.authStore.homeserver;
-
-    if (_homeserver.signupTypes.isEmpty && !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
-      store.dispatch(addInfo(
-        origin: 'selectHomeserver',
-        message: 'No new signups allowed on this server, try another if creating an account',
-      ));
+    if (homeserver.valid) {
+      await store.dispatch(fetchSignupStages());
     }
 
     return homeserver.valid;
@@ -1150,11 +1151,13 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
         homeserver: homeserver,
       ));
       if (!homeserver.valid) {
-        throw Exception(Strings.alertCheckHomeserver);
+        throw Strings.alertCheckHomeserver;
       }
     } catch (error) {
-      printError('[selectHomserver] $error');
-      addInfo(message: error.toString());
+      store.dispatch(addAlert(
+        origin: 'fetchHomeserver',
+        message: error.toString(),
+      ));
 
       store.dispatch(SetLoading(loading: false));
 

@@ -8,11 +8,12 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
-class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget {
+class AppBarMessageOptions extends StatefulWidget
+    implements PreferredSizeWidget {
   const AppBarMessageOptions({
     Key? key,
     this.title = 'title:',
@@ -64,7 +65,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
   }
 
   @override
-  Widget build(BuildContext context) =>  AppBar(
+  Widget build(BuildContext context) => AppBar(
         brightness: Brightness.dark, // TOOD: this should inherit from theme
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
@@ -96,7 +97,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             onPressed: () {
               Navigator.pushNamed(
                 context,
-                NavigationPaths.messageDetails,
+                Routes.messageDetails,
                 arguments: MessageDetailArguments(
                   roomId: widget.room!.id,
                   message: widget.message,
@@ -109,33 +110,35 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             },
           ),
           FutureBuilder<bool>(
-              future: isMessageDeletable(room: widget.room,
-                  message: widget.message, user: widget.user), // async work
-              builder: ( context, snapshot)  {
+              future: isMessageDeletable(
+                  room: widget.room,
+                  message: widget.message,
+                  user: widget.user), // async work
+              builder: (context, snapshot) {
                 final deleteButton = IconButton(
                     icon: Icon(Icons.delete),
                     iconSize: 28.0,
                     tooltip: 'Delete Message',
                     color: Colors.white,
-                    onPressed: (){
+                    onPressed: () {
                       if (widget.onDelete != null) {
                         widget.onDelete!();
                       }
                       if (widget.onDismiss != null) {
                         widget.onDismiss!();
                       }
-                    }
-                );
+                    });
 
                 if (snapshot.hasData) {
-                  return Visibility(visible: snapshot.data!,
-                      child: deleteButton);
+                  return Visibility(
+                      visible: snapshot.data!, child: deleteButton);
                 }
 
-                return Visibility(visible: false,
-                  child: deleteButton,);
-              }
-          ),
+                return Visibility(
+                  visible: false,
+                  child: deleteButton,
+                );
+              }),
           Visibility(
             visible: isTextMessage(message: widget.message!),
             child: IconButton(

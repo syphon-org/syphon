@@ -55,7 +55,9 @@ class CaptchaState extends State<Captcha> with Lifecycle<Captcha> {
     return Stack(
       children: [
         WebView(
-          baseUrl: widget.baseUrl != null ? 'https://${widget.baseUrl}' : 'https://matrix.org',
+          baseUrl: widget.baseUrl != null
+              ? 'https://${widget.baseUrl}'
+              : 'https://matrix.org',
           javascriptMode: JavascriptMode.unrestricted,
           javascriptChannels: {
             JavascriptChannel(

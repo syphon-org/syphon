@@ -83,7 +83,9 @@ class BlockedScreenState extends State<BlockedScreen> {
                   user.userId!,
                   style: Theme.of(context).textTheme.caption!.merge(
                         TextStyle(
-                          color: props.loading ? Color(Colours.greyDisabled) : null,
+                          color: props.loading
+                              ? Color(Colours.greyDisabled)
+                              : null,
                         ),
                       ),
                 ),
@@ -134,6 +136,8 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.roomStore.loading,
-        usersBlocked: store.state.userStore.blocked.map((id) => store.state.userStore.users[id]).toList(),
+        usersBlocked: store.state.userStore.blocked
+            .map((id) => store.state.userStore.users[id])
+            .toList(),
       );
 }

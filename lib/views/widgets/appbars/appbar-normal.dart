@@ -7,9 +7,11 @@ class AppBarNormal extends StatelessWidget implements PreferredSizeWidget {
   const AppBarNormal({
     Key? key,
     required this.title,
+    this.actions,
   }) : super(key: key);
 
   final String title;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) => AppBar(
@@ -25,6 +27,7 @@ class AppBarNormal extends StatelessWidget implements PreferredSizeWidget {
             fontWeight: FontWeight.w100,
           ),
         ),
+        actions: actions ?? const [],
       );
 
   @override

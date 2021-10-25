@@ -8,6 +8,7 @@ class Alert {
   final Duration duration;
   final String? error;
   final String? action;
+  final bool offline;
 
   final Function? onAction;
 
@@ -18,6 +19,7 @@ class Alert {
     this.error,
     this.action,
     this.onAction,
+    this.offline = false,
   });
 }
 

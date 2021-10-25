@@ -1,14 +1,17 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -78,6 +81,8 @@ ThunkAction<AppState> startSyncObserver() {
       final lastSince = store.state.syncStore.lastSince;
       final syncing = store.state.syncStore.syncing;
 
+      final currentStatus = ConnectionService.currentStatus;
+
       if (accessToken == null) {
         debugPrint('[syncObserver] skipping sync, context not authenticated');
         return;
@@ -93,11 +98,16 @@ ThunkAction<AppState> startSyncObserver() {
         return;
       }
 
-      final backoff = store.state.syncStore.backoff;
+      var backoff = store.state.syncStore.backoff;
       final lastAttemptMillis = store.state.syncStore.lastAttempt;
       final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
         lastAttemptMillis!,
       );
+
+      if (ConnectionService.isConnected() && backoff > 5) {
+        ConnectionService.checked = true;
+        backoff = 0;
+      }
 
       if (backoff != 0) {
         final backoffs = fibonacci(backoff);

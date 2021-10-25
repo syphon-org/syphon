@@ -183,7 +183,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, NavigationPaths.settingsPassword);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsPassword);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -196,7 +197,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, NavigationPaths.settingsBlocked);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsBlocked);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -234,7 +236,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.readReceipts!,
-                              onChanged: (enterSend) => props.onToggleReadReceipts(),
+                              onChanged: (enterSend) =>
+                                  props.onToggleReadReceipts(),
                             ),
                           ),
                           ListTile(
@@ -249,7 +252,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.typingIndicators!,
-                              onChanged: (enterSend) => props.onToggleTypingIndicators(),
+                              onChanged: (enterSend) =>
+                                  props.onToggleTypingIndicators(),
                             ),
                           ),
                         ],
@@ -312,7 +316,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap: props.onImportDeviceKey as void Function()?,
+                              onTap:
+                                  props.onImportDeviceKey as void Function()?,
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Import Keys',
@@ -323,7 +328,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap: () => onExportDeviceKey(context: context, props: props),
+                              onTap: () => onExportDeviceKey(
+                                  context: context, props: props),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Export Keys',
@@ -331,7 +337,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onDeleteDeviceKey(context: context, props: props),
+                            onTap: () => onDeleteDeviceKey(
+                                context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Delete Keys',

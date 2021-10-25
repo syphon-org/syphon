@@ -1,23 +1,21 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart' show IterableExtension;
-/**
- * 
- * Event Parsers
- * 
- * It's going to be difficult to parse external to room context
- * because so much of the rooms context is gather through the DAG of
- * events. You'd need to pass back both an updated room AND a list of messages
- * to save seperately, or sacrific iterating through the message list again
- * 
- */
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
+///
+/// Event Parsers
+///
+/// It's going to be difficult to parse external to room context
+/// because so much of the rooms context is gather through the DAG of
+/// events. You'd need to pass back both an updated room AND a list of messages
+/// to save seperately, or sacrific iterating through the message list again
+///
 Room parseRoom(Map params) {
   final Map json = params['json'];
   final Room room = params['room'];
@@ -67,7 +65,9 @@ Map<String, dynamic> parseMessages({
     // - the oldest hash (lastHash) is non-existant
     // - the previous hash (most recent) is non-existant
     // - the oldest hash equals the previously fetched hash
-    if (room.lastHash == null || room.prevHash == null || room.lastHash == room.prevHash) {
+    if (room.lastHash == null ||
+        room.prevHash == null ||
+        room.lastHash == room.prevHash) {
       limited = false;
     }
   }
@@ -88,7 +88,8 @@ Map<String, dynamic> parseMessages({
   );
 
   // save messages and unique message id updates
-  final messageIdsAll = Set<String>.from(room.messageIds)..addAll(messagesAllMap.keys);
+  final messageIdsAll = Set<String>.from(room.messageIds)
+    ..addAll(messagesAllMap.keys);
 
   return {
     'messages': messages,
@@ -135,25 +136,29 @@ Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
   if (json['state'] != null) {
     final List<dynamic> stateEventsRaw = json['state']['events'];
 
-    stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    stateEvents =
+        stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
   if (json['invite_state'] != null) {
     final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
-    stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    stateEvents =
+        stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
   if (json['ephemeral'] != null) {
     final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
-    ephemeralEvents = ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    ephemeralEvents =
+        ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
   if (json['account_data'] != null) {
     final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
-    accountEvents = accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
+    accountEvents =
+        accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
   }
 
   if (json['timeline'] != null) {
@@ -163,7 +168,7 @@ Map<String, dynamic> parseEvents(Map<String, dynamic> json) {
       timelineEventsRaw.map((event) => Event.fromMatrix(event)),
     );
 
-    for (Event event in timelineEvents) {
+    for (final event in timelineEvents) {
       switch (event.type) {
         case EventTypes.message:
         case EventTypes.encrypted:

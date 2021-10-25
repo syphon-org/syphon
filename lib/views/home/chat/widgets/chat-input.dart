@@ -2,29 +2,41 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/widgets/containers/media-card.dart';
+import 'package:syphon/views/widgets/lists/list-local-images.dart';
+
+const DEFAULT_BORDER_RADIUS = 24.0;
+
+_empty({
+  required File file,
+  required MessageType type,
+}) {}
 
 class ChatInput extends StatefulWidget {
   final String roomId;
   final bool sending;
   final bool enterSend;
+  final double inset;
   final Message? quotable;
   final String? mediumType;
   final FocusNode focusNode;
@@ -34,6 +46,10 @@ class ChatInput extends StatefulWidget {
   final Function? onChangeMethod;
   final Function? onUpdateMessage;
   final Function? onCancelReply;
+  final Function({
+    required File file,
+    required MessageType type,
+  }) onAddMedia;
 
   const ChatInput({
     Key? key,
@@ -42,12 +58,14 @@ class ChatInput extends StatefulWidget {
     required this.controller,
     this.mediumType,
     this.quotable,
+    this.inset = 0,
     this.sending = false,
     this.enterSend = false,
     this.onUpdateMessage,
     this.onChangeMethod,
     this.onSubmitMessage,
     this.onCancelReply,
+    this.onAddMedia = _empty,
   }) : super(key: key);
 
   @override
@@ -58,6 +76,9 @@ class ChatInputState extends State<ChatInput> {
   ChatInputState() : super();
 
   bool sendable = false;
+  bool showAttachments = false;
+
+  double keyboardHeight = 0;
 
   Timer? typingNotifier;
   Timer? typingNotifierTimeout;
@@ -68,13 +89,18 @@ class ChatInputState extends State<ChatInput> {
   onMounted(_Props props) {
     final draft = props.room.draft;
 
-    if (draft != null && draft.type == MessageTypes.TEXT) {
+    if (draft != null && draft.type == MatrixMessageTypes.text) {
       setState(() {
         sendable = draft.body != null && draft.body!.isNotEmpty;
       });
     }
 
     widget.focusNode.addListener(() {
+      if (widget.focusNode.hasFocus) {
+        setState(() {
+          showAttachments = false;
+        });
+      }
       if (!widget.focusNode.hasFocus && typingNotifier != null) {
         typingNotifier!.cancel();
         setState(() {
@@ -85,8 +111,15 @@ class ChatInputState extends State<ChatInput> {
   }
 
   @override
+  void didUpdateWidget(covariant ChatInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    keyboardHeight = widget.inset > 0 ? widget.inset : keyboardHeight;
+  }
+
+  @override
   void dispose() {
     super.dispose();
+
     if (typingNotifier != null) {
       typingNotifier!.cancel();
     }
@@ -137,6 +170,25 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
+  onToggleMediaOptions() {
+    // HACK: if nothing is focused yet, just open the media options
+    if (!widget.focusNode.hasFocus && !showAttachments) {
+      return onFocusSafe(
+          focusNode: widget.focusNode,
+          onFunction: () async {
+            setState(() {
+              showAttachments = !showAttachments;
+            });
+          });
+    }
+
+    widget.focusNode.unfocus();
+
+    setState(() {
+      showAttachments = !showAttachments;
+    });
+  }
+
   onSubmit() {
     setState(() {
       sendable = false;
@@ -153,19 +205,54 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
+  onAddInProgress() {
+    final store = StoreProvider.of<AppState>(context);
+    store.dispatch(addInProgress());
+  }
+
+  onAddPhoto() async {
+    final pickerResult = await ImagePicker().getImage(
+      source: ImageSource.gallery,
+      maxWidth: Dimensions.avatarSizeMax,
+      maxHeight: Dimensions.avatarSizeMax,
+    );
+
+    if (pickerResult == null) return;
+
+    final file = File(pickerResult.path);
+    widget.onAddMedia(file: file, type: MessageType.image);
+  }
+
+  onAddFile() async {
+    final pickerResult = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+      allowMultiple: false,
+    );
+
+    if (pickerResult == null) return;
+
+    final file = File(pickerResult.paths[0]!);
+    widget.onAddMedia(file: file, type: MessageType.file);
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
+        converter: (Store<AppState> store) =>
+            _Props.mapStateToProps(store, widget.roomId),
         onInitialBuild: onMounted,
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
           final double height = MediaQuery.of(context).size.height;
+          final imageWidth = width * 0.48; // 2 images in view
 
           // dynamic dimensions
           final double messageInputWidth = width - 72;
-          final bool replying = widget.quotable != null && widget.quotable!.sender != null;
-          final double maxHeight = replying ? height * 0.45 : height * 0.5;
+          final bool replying =
+              widget.quotable != null && widget.quotable!.sender != null;
+          final double maxInputHeight = replying ? height * 0.45 : height * 0.5;
+          final double maxMediaHeight =
+              keyboardHeight > 0 ? keyboardHeight - 24 : height * 0.38;
 
           final isSendable = sendable && !widget.sending;
 
@@ -239,8 +326,8 @@ class ChatInputState extends State<ChatInput> {
                 maintainSize: false,
                 maintainState: false,
                 maintainAnimation: false,
+                //////// REPLY FIELD ////////
                 child: Row(
-                  //////// REPLY FIELD ////////
                   children: <Widget>[
                     Stack(
                       children: [
@@ -261,31 +348,41 @@ class ChatInputState extends State<ChatInput> {
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              labelText: replying ? widget.quotable!.sender : '',
-                              labelStyle: TextStyle(color: Theme.of(context).accentColor),
-                              contentPadding: Dimensions.inputContentPadding.copyWith(right: 36),
+                              labelText:
+                                  replying ? widget.quotable!.sender : '',
+                              labelStyle: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
+                              contentPadding: Dimensions.inputContentPadding
+                                  .copyWith(right: 36),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Theme.of(context).accentColor,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
-                                  bottomRight: Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft:
+                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomRight:
+                                      Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: Theme.of(context).accentColor,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
-                                  bottomRight: Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft:
+                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomRight:
+                                      Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                             ),
@@ -309,14 +406,14 @@ class ChatInputState extends State<ChatInput> {
                   ],
                 ),
               ),
+              //////// TEXT FIELD ////////
               Row(
-                //////// ACTUAL INPUT FIELD ////////
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Container(
                     constraints: BoxConstraints(
-                      maxHeight: maxHeight,
+                      maxHeight: maxInputHeight,
                       maxWidth: messageInputWidth,
                     ),
                     child: TextField(
@@ -325,7 +422,9 @@ class ChatInputState extends State<ChatInput> {
                       enableSuggestions: props.suggestionsEnabled,
                       textCapitalization: props.textCapitalization,
                       keyboardType: TextInputType.multiline,
-                      textInputAction: widget.enterSend ? TextInputAction.send : TextInputAction.newline,
+                      textInputAction: widget.enterSend
+                          ? TextInputAction.send
+                          : TextInputAction.newline,
                       cursorColor: props.inputCursorColor,
                       focusNode: widget.focusNode,
                       controller: widget.controller,
@@ -338,29 +437,45 @@ class ChatInputState extends State<ChatInput> {
                       decoration: InputDecoration(
                         filled: true,
                         hintText: hintText,
+                        suffixIcon: IconButton(
+                          color: Theme.of(context).iconTheme.color,
+                          onPressed: () => onToggleMediaOptions(),
+                          icon: Icon(
+                            Icons.add,
+                            size: Dimensions.iconSizeLarge,
+                          ),
+                        ),
                         fillColor: props.inputColorBackground,
                         contentPadding: Dimensions.inputContentPadding,
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? 24 : 0),
-                              topRight: Radius.circular(!replying ? 24 : 0),
-                              bottomLeft: Radius.circular(24),
-                              bottomRight: Radius.circular(24),
+                              topLeft: Radius.circular(
+                                  !replying ? DEFAULT_BORDER_RADIUS : 0),
+                              topRight: Radius.circular(
+                                  !replying ? DEFAULT_BORDER_RADIUS : 0),
+                              bottomLeft:
+                                  Radius.circular(DEFAULT_BORDER_RADIUS),
+                              bottomRight:
+                                  Radius.circular(DEFAULT_BORDER_RADIUS),
                             )),
                         border: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                               width: 1,
                             ),
                             borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? 24 : 0),
-                              topRight: Radius.circular(!replying ? 24 : 0),
-                              bottomLeft: Radius.circular(24),
-                              bottomRight: Radius.circular(24),
+                              topLeft: Radius.circular(
+                                  !replying ? DEFAULT_BORDER_RADIUS : 0),
+                              topRight: Radius.circular(
+                                  !replying ? DEFAULT_BORDER_RADIUS : 0),
+                              bottomLeft:
+                                  Radius.circular(DEFAULT_BORDER_RADIUS),
+                              bottomRight:
+                                  Radius.circular(DEFAULT_BORDER_RADIUS),
                             )),
                       ),
                     ),
@@ -371,6 +486,70 @@ class ChatInputState extends State<ChatInput> {
                     child: sendButton,
                   ),
                 ],
+              ),
+              //////// MEDIA FIELD ////////
+              Visibility(
+                visible: showAttachments,
+                maintainSize: false,
+                maintainState: false,
+                maintainAnimation: false,
+                child: Container(
+                  padding: EdgeInsets.only(top: 8),
+                  constraints: BoxConstraints(
+                    maxHeight: maxMediaHeight, // whole media field max height
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        constraints: BoxConstraints(
+                          maxWidth: width,
+                          maxHeight: imageWidth,
+                        ),
+                        child: ListLocalImages(
+                          imageSize: imageWidth,
+                          onSelectImage: (file) => widget.onAddMedia(
+                              file: file, type: MessageType.image),
+                        ),
+                      ),
+                      Row(children: [
+                        Padding(
+                          padding: EdgeInsets.only(right: 2),
+                          child: MediaCard(
+                            text: 'Gallery',
+                            icon: Icons.photo,
+                            onPress: () => onAddPhoto(),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          child: MediaCard(
+                            text: 'File',
+                            icon: Icons.note_add,
+                            onPress: () => onAddInProgress(),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          child: MediaCard(
+                            text: 'Contact',
+                            icon: Icons.person,
+                            onPress: () => onAddInProgress(),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          child: MediaCard(
+                            text: 'Location',
+                            icon: Icons.near_me_rounded,
+                            onPress: () => onAddInProgress(),
+                          ),
+                        ),
+                      ])
+                    ],
+                  ),
+                ),
               )
             ],
           );
@@ -410,13 +589,18 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
-        inputTextColor: selectInputTextColor(store.state.settingsStore.themeSettings.themeType),
-        inputCursorColor: selectCursorColor(store.state.settingsStore.themeSettings.themeType),
-        inputColorBackground: selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
+        inputTextColor: selectInputTextColor(
+            store.state.settingsStore.themeSettings.themeType),
+        inputCursorColor: selectCursorColor(
+            store.state.settingsStore.themeSettings.themeType),
+        inputColorBackground: selectInputBackgroundColor(
+            store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
         suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
-        textCapitalization: Platform.isIOS ? TextCapitalization.sentences : TextCapitalization.none,
+        textCapitalization: Platform.isIOS
+            ? TextCapitalization.sentences
+            : TextCapitalization.none,
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),
         ),

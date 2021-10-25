@@ -50,7 +50,8 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => AppBar().preferredSize;
 }
 
-class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch> {
+class AppBarSearchState extends State<AppBarSearch>
+    with Lifecycle<AppBarSearch> {
   final focusNode = FocusNode();
 
   bool searching = false;

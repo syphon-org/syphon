@@ -1,93 +1,103 @@
 import 'dart:convert';
 
-import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/constants.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/rooms/room/schema.dart';
 
-Future saveRooms(
-  Map<String, Room> rooms, {
-  Database? cache,
-  Database? storage,
-}) async {
-  final store = StoreRef<String?, String>(StorageKeys.ROOMS);
+///
+/// Room Queries
+///
+extension RoomQueries on StorageDatabase {
+  Future<void> insertRooms(List<Room> rooms) {
+    return batch(
+      (batch) => batch.insertAllOnConflictUpdate(this.rooms, rooms),
+    );
+  }
 
-  return storage!.transaction((txn) async {
-    for (final Room? room in rooms.values) {
-      final record = store.record(room?.id);
-      await record.put(txn, jsonEncode(room));
-    }
-  });
+  Future<void> deleteRooms(List<Room> rooms) {
+    final ids = rooms.map((r) => r.id).toList();
+
+    return batch((batch) {
+      for (final id in ids) {
+        batch.deleteWhere(this.rooms, (Rooms room) => room.id.equals(id));
+      }
+    });
+  }
+
+  Future<Room> selectRoom(String roomId) {
+    return (select(rooms)
+          ..where((tbl) => tbl.id.equals(roomId))
+          ..limit(1))
+        .getSingle();
+  }
+
+  Future<List<Room>> selectRooms(List<String> ids, {int offset = 0, int limit = 0}) {
+    return (select(rooms)
+          ..where((tbl) => tbl.id.isIn(ids))
+          ..limit(limit, offset: offset))
+        .get();
+  }
+
+  // Select all non-archived rooms
+  Future<List<Room>> selectRoomsAll({int offset = 0, int limit = 0}) {
+    return (select(rooms)..where((tbl) => tbl.archived.equals(false))).get();
+  }
+
+  Future<List<Room>> selectRoomsArchived({int offset = 0, int limit = 0}) {
+    return (select(rooms)..where((tbl) => tbl.archived.equals(true))).get();
+  }
+
+  // Future<List<Room>> searchRooms(String text, {int offset = 0, int limit = 25}) {
+  //   return (select(rooms)
+  //         ..where((tbl) => tbl.topic.like('%$text%'))
+  //         ..limit(25, offset: offset))
+  //       .get();
+  // }
 }
 
 Future saveRoom(
   Room room, {
-  Database? cache,
-  Database? storage,
+  required StorageDatabase storage,
 }) async {
-  final store = StoreRef<String?, String>(StorageKeys.ROOMS);
+  return storage.insertRooms([room]);
+}
 
-  return storage!.transaction((txn) async {
-    final record = store.record(room.id);
-    await record.put(txn, jsonEncode(room));
-  });
+Future saveRooms(
+  Map<String, Room> rooms, {
+  required StorageDatabase storage,
+}) async {
+  return storage.insertRooms(rooms.values.toList());
 }
 
 Future deleteRooms(
-  Map<String, Room?> rooms, {
-  Database? cache,
-  Database? storage,
+  Map<String, Room> rooms, {
+  required StorageDatabase storage,
 }) async {
-  final store = StoreRef<String?, String>(StorageKeys.ROOMS);
-
-  return storage!.transaction((txn) async {
-    for (final Room? room in rooms.values) {
-      final record = store.record(room?.id);
-      await record.delete(txn);
-    }
-  });
+  return storage.deleteRooms(rooms.values.toList());
 }
 
 Future<Map<String, Room>> loadRooms({
-  Database? cache,
-  required Database storage,
   int offset = 0,
   int limit = 10,
+  required StorageDatabase storage,
 }) async {
-  final Map<String, Room> rooms = {};
+  Map<String, Room> rooms = {};
 
   try {
-    final store = StoreRef<String, String>(StorageKeys.ROOMS);
-    final count = await store.count(storage);
+    final loaded = await storage.selectRoomsAll();
+    printInfo('[rooms] loaded ${loaded.length.toString()}');
 
-    final finder = Finder(
-      limit: limit,
-      offset: offset,
+    rooms = Map<String, Room>.fromIterable(
+      loaded,
+      key: (room) => room.id,
+      value: (room) {
+        return room as Room;
+      },
     );
-
-    final roomsPaginated = await store.find(
-      storage,
-      finder: finder,
-    );
-
-    if (roomsPaginated.isEmpty) {
-      return rooms;
-    }
-
-    for (RecordSnapshot<String, String> record in roomsPaginated) {
-      rooms[record.key] = Room.fromJson(json.decode(record.value));
-    }
-
-    if (offset < count) {
-      rooms.addAll(await (loadRooms(
-        offset: offset + limit,
-        storage: storage,
-      ) as Future<Map<String, Room>>));
-    }
-
-    printInfo('[rooms] loaded ${rooms.length.toString()}');
   } catch (error) {
     printError(error.toString(), title: 'loadRooms');
   }
+
   return rooms;
 }

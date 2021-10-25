@@ -9,7 +9,7 @@ import 'package:syphon/global/values.dart';
 /// Testing out using a "params map"
 /// as the default to allow calling from
 /// a non-ui thread
-class Media {
+class MatrixMedia {
   static Future<dynamic> fetchThumbnail(Map params) async {
     final String? protocol = params['protocol'];
     final String? homeserver = params['homeserver'];
@@ -17,25 +17,25 @@ class Media {
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
 
-    return await fetchThumbnailUnmapped(
+    return fetchThumbnailUnmapped(
       protocol: protocol,
       homeserver: homeserver,
       accessToken: accessToken,
       serverName: serverName,
       mediaUri: mediaUri,
       method: params['method'] ?? 'crop',
-      size: params['size'] ?? 52,
+      size: params['size'] ?? 96,
     );
   }
 
   static Future<dynamic> fetchThumbnailUnmapped({
-    String? protocol = 'https://',
+    String? protocol = Values.DEFAULT_PROTOCOL,
     String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? serverName,
     required String mediaUri,
     String method = 'crop',
-    int size = 52,
+    int size = 96,
   }) async {
     final List<String> mediaUriParts = mediaUri.split('/');
 
@@ -67,8 +67,83 @@ class Media {
     return {'bodyBytes': response.bodyBytes};
   }
 
+  static Future<dynamic> fetchMediaMapped(Map params) async {
+    final String? protocol = params['protocol'];
+    final String? homeserver = params['homeserver'];
+    final String? accessToken = params['accessToken'];
+    final String? serverName = params['serverName'];
+    final String mediaUri = params['mediaUri'];
+
+    return fetchMedia(
+      protocol: protocol,
+      homeserver: homeserver,
+      accessToken: accessToken,
+      serverName: serverName,
+      mediaUri: mediaUri,
+      method: params['method'] ?? 'crop',
+      size: params['size'] ?? 96,
+    );
+  }
+
+  static Future<dynamic> fetchMedia({
+    String? protocol = Values.DEFAULT_PROTOCOL,
+    String? homeserver = Values.homeserverDefault,
+    String? accessToken,
+    String? serverName,
+    required String mediaUri,
+    String method = 'crop',
+    int size = 52,
+  }) async {
+    final List<String> mediaUriParts = mediaUri.split('/');
+
+    // Parce the mxc uri for the server location and id
+    final mediaId = mediaUriParts[mediaUriParts.length - 1];
+    final mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
+    final url =
+        '$protocol$homeserver/_matrix/media/r0/download/$mediaServer/$mediaId';
+
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    if (response.headers['content-type'] == 'application/json') {
+      final errorData = await json.decode(response.body);
+      throw errorData['error'];
+    }
+
+    return {'bodyBytes': response.bodyBytes};
+  }
+
+  static Future<dynamic> checkMaxUploadSize({
+    String? protocol = Values.DEFAULT_PROTOCOL,
+    String? homeserver = Values.homeserverDefault,
+    String? accessToken,
+    String? fileName,
+    String fileType = 'application/jpeg', // Content-Type: application/pdf
+    required Stream<List<int>> fileStream,
+    int? fileLength,
+  }) async {
+    final url = '$protocol$homeserver/_matrix/media/r0/config';
+
+    final Map<String, String> headers = {
+      ...Values.defaultHeaders,
+    };
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    return json.decode(response.body);
+  }
+
   static Future<dynamic> uploadMedia({
-    String? protocol = 'https://',
+    String? protocol = Values.DEFAULT_PROTOCOL,
     String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? fileName,
@@ -107,7 +182,7 @@ class Media {
 }
 
 dynamic buildMediaDownloadRequest({
-  String protocol = 'https://',
+  String protocol = Values.DEFAULT_PROTOCOL,
   String homeserver = Values.homeserverDefault,
   String? accessToken,
   String? serverName,
@@ -133,7 +208,7 @@ dynamic buildMediaDownloadRequest({
 ///
 /// Upload some content to the content repository.
 dynamic buildMediaUploadRequest({
-  String protocol = 'https://',
+  String protocol = Values.DEFAULT_PROTOCOL,
   String homeserver = Values.homeserverDefault,
   String? accessToken,
   String? fileName,

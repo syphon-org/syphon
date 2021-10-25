@@ -69,8 +69,10 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width: width, // set actual height and width for flex constraints
-                  height: height, // set actual height and width for flex constraints
+                  width:
+                      width, // set actual height and width for flex constraints
+                  height:
+                      height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -98,7 +100,8 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 && index != sections.length - 1;
+                                    onboarding = index != 0 &&
+                                        index != sections.length - 1;
                                   });
                                 },
                               ),
@@ -122,7 +125,8 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
                               child: ButtonSolid(
                                 text: Strings.buttonSave,
                                 loading: props.loading,
-                                disabled: !props.isPasswordValid || props.loading,
+                                disabled:
+                                    !props.isPasswordValid || props.loading,
                                 onPressed: () async {
                                   final result = await props.onSavePassword();
                                   if (result) {
@@ -166,8 +170,8 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
-        isPasswordValid:
-            store.state.authStore.isPasswordValid && store.state.authStore.passwordCurrent.isNotEmpty,
+        isPasswordValid: store.state.authStore.isPasswordValid &&
+            store.state.authStore.passwordCurrent.isNotEmpty,
         interactiveAuths: store.state.authStore.interactiveAuths,
         onSavePassword: () async {
           final valid = store.state.authStore.isPasswordValid;

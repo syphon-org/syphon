@@ -98,7 +98,9 @@ class ListItemUser extends StatelessWidget {
                     alt: user.displayName ?? user.userId,
                     selected: selected,
                     size: Dimensions.avatarSizeMin,
-                    background: !real ? null : Colours.hashedColor(formatUsername(user)),
+                    background: !real
+                        ? null
+                        : Colours.hashedColor(formatUsername(user)),
                   ),
                 ],
               ),
@@ -118,7 +120,9 @@ class ListItemUser extends StatelessWidget {
             ),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: type == ListItemUserType.Pressable ? [buildArrowIcon(context)] : [],
+              children: type == ListItemUserType.Pressable
+                  ? [buildArrowIcon(context)]
+                  : [],
             ),
           ),
         ),

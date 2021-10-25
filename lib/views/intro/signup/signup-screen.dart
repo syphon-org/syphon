@@ -1,22 +1,21 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/selectors.dart';
-
-import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
-
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
+import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/signup/widgets/StepCaptcha.dart';
 import 'package:syphon/views/intro/signup/widgets/StepEmail.dart';
 import 'package:syphon/views/intro/signup/widgets/StepTerms.dart';
@@ -24,6 +23,7 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-outline.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
+
 import 'widgets/StepHomeserver.dart';
 import 'widgets/StepPassword.dart';
 import 'widgets/StepUsername.dart';
@@ -95,7 +95,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
 
     final sectionsNew = List<Widget>.from(sections);
 
-    signupTypes.forEach((stage) {
+    for (final stage in signupTypes) {
       var stageNew;
 
       switch (stage) {
@@ -115,7 +115,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
       if (!sectionsNew.contains(stageNew) && stageNew != null) {
         sectionsNew.add(stageNew);
       }
-    });
+    }
 
     if (sectionsNew.length != sections.length) {
       setState(() {
@@ -196,6 +196,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
   }
 
   onCompleteStep(_Props props, PageController? controller, {bool usingSSO = false}) {
+    final store = StoreProvider.of<AppState>(context);
     final currentSection = sections[currentStep];
     final lastStep = (sections.length - 1) == currentStep;
 
@@ -206,6 +207,14 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
 
           if (props.hostname != props.homeserver.hostname) {
             valid = await props.onSelectHomeserver(props.hostname);
+          }
+
+          final _homeserver = store.state.authStore.homeserver;
+          if (_homeserver.signupTypes.isEmpty && !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+            store.dispatch(addInfo(
+              origin: 'selectHomeserver',
+              message: 'No new signups allowed on this server, try another if creating an account',
+            ));
           }
 
           if (props.homeserver.loginTypes.contains(MatrixAuthTypes.SSO) && usingSSO) {
@@ -279,7 +288,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
           // otherwise, send to the verification holding page
           if (!result!) {
             if (lastStep) {
-              return Navigator.pushNamed(context, NavigationPaths.verification);
+              return Navigator.pushNamed(context, Routes.verification);
             }
 
             // or continue if not the last step
@@ -313,7 +322,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
             appBar: AppBar(
               elevation: 0,
               backgroundColor: Colors.transparent,
-              brightness: Brightness.light,
+              systemOverlayStyle: computeSystemUIColor(context),
               leading: IconButton(
                 icon: Icon(
                   Icons.arrow_back_ios,

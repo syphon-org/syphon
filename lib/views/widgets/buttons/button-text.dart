@@ -27,7 +27,9 @@ class ButtonText extends StatelessWidget {
         style: ButtonStyle(
           foregroundColor: MaterialStateProperty.resolveWith<Color?>(
             (Set<MaterialState> states) =>
-                states.contains(MaterialState.disabled) ? Color(Colours.greyDisabled) : null,
+                states.contains(MaterialState.disabled)
+                    ? Color(Colours.greyDisabled)
+                    : null,
           ),
         ),
         onPressed: disabled ? null : onPressed as void Function()?,
@@ -38,7 +40,7 @@ class ButtonText extends StatelessWidget {
                   maxWidth: 24,
                 ),
                 child: CircularProgressIndicator(
-                  strokeWidth: Dimensions.defaultStrokeWidth,
+                  strokeWidth: Dimensions.strokeWidthDefault,
                   backgroundColor: Colors.white,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     Colors.grey,

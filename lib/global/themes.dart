@@ -1,8 +1,6 @@
-// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Project imports:
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
@@ -20,19 +18,22 @@ void setSystemTheme(ThemeType themeType) {
 // Set the theme
 // Applies a system theme and returns a ThemeData instance which should be
 // applied immediately to match the system UI
-ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) {
+ThemeData? setupTheme(ThemeSettings appTheme,
+    {bool generateThemeData = false}) {
   // Set system UI theme
   setSystemTheme(appTheme.themeType);
 
   // Generate the ThemeData to return if requested
   if (generateThemeData) {
     final primaryColor = Color(appTheme.primaryColor).withOpacity(1);
-    final accentColor = Color(appTheme.accentColor);
+    final secondaryColor = Color(appTheme.accentColor);
     final brightness = selectThemeBrightness(appTheme.themeType);
-    final invertedPrimaryColor = brightness == Brightness.light ? primaryColor : accentColor;
+    final invertedPrimaryColor =
+        brightness == Brightness.light ? primaryColor : secondaryColor;
 
     final appBarElevation = selectAppBarElevation(appTheme.themeType);
-    final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
+    final scaffoldBackgroundColor =
+        selectScaffoldBackgroundColor(appTheme.themeType);
     final dialogBackgroundColor = selectModalColor(appTheme.themeType);
     final iconColor = selectIconColor(appTheme.themeType);
 
@@ -53,15 +54,21 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       primaryColorBrightness: brightness,
       primaryColorDark: primaryColor,
       primaryColorLight: primaryColor,
-      accentColor: accentColor,
       brightness: brightness,
       colorScheme: ThemeData().colorScheme.copyWith(
             primary: primaryColor,
-            secondary: accentColor,
+            secondary: secondaryColor,
             brightness: brightness,
           ),
 
       // Core UI
+      appBarTheme: AppBarTheme(
+        elevation: appBarElevation,
+        color: Color(appTheme.appBarColor),
+        systemOverlayStyle: Color(appTheme.appBarColor).computeLuminance() < 0.5
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
+      ),
       dialogBackgroundColor: dialogBackgroundColor,
       focusColor: primaryColor,
       textSelectionTheme: TextSelectionThemeData(
@@ -71,12 +78,9 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       ),
       selectedRowColor: Color(selectedRowColor),
       iconTheme: IconThemeData(color: iconColor),
-      scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
-      appBarTheme: AppBarTheme(
-        elevation: appBarElevation,
-        brightness: Brightness.dark,
-        color: Color(appTheme.appBarColor),
-      ),
+      scaffoldBackgroundColor: scaffoldBackgroundColor != null
+          ? Color(scaffoldBackgroundColor)
+          : null,
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
           color: invertedPrimaryColor,
@@ -120,7 +124,7 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
           fontSize: subtitleSize,
           fontWeight: bodyWeight,
           letterSpacing: letterSpacing,
-          color: accentColor,
+          color: secondaryColor,
         ),
         caption: TextStyle(
           fontSize: subtitleSize,

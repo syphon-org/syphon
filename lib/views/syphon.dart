@@ -1,21 +1,22 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/index.dart';
 import 'package:syphon/context/types.dart';
+import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
-
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/storage/moor/database.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -75,7 +76,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     super.initState();
 
     // init all on state change listeners
-    onInitListenersFirst();
+    onInitListeners();
 
     // mutate messages
     store.dispatch(mutateMessagesAll());
@@ -88,13 +89,60 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
   }
 
+  onInitListeners() async {
+    // ** domain listeners **
+    await onDispatchListeners();
+    await onStartListeners();
+
+    // ** context handling **
+    final currentContext = (await loadCurrentContext()).current;
+    final currentUser = store.state.authStore.user;
+
+    // Reset contexts if the current user has no accessToken (unrecoverable state)
+    if (currentUser.accessToken == null && currentContext != AppContext.DEFAULT) {
+      return onResetContext();
+    }
+
+    // init current auth state with current user
+    store.state.authStore.authObserver?.add(
+      currentUser,
+    );
+
+    // ** system listeners **
+    await ConnectionService.startListener();
+  }
+
+  onDispatchListeners() async {
+    await Future.wait([
+      store.dispatch(initDeepLinks()) as Future,
+      store.dispatch(startAuthObserver()) as Future,
+      store.dispatch(startAlertsObserver()) as Future,
+      store.dispatch(startContextObserver()) as Future,
+    ]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  onStartListeners() async {
+    // init auth listener
+    store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
+
+    // init alerts listener
+    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
+
+    // set auth state listener
+    store.state.authStore.onContextChanged.listen(onContextChanged);
+  }
+
   @override
   // ignore: avoid_void_async
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
         setupTheme(store.state.settingsStore.themeSettings);
-
         dismissAllNotifications(
           pluginInstance: globalNotificationPluginInstance,
         );
@@ -109,54 +157,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         store.dispatch(setBackgrounded(true));
         break;
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onStartListeners();
-  }
-
-  onInitListenersFirst() async {
-    onInitListeners();
-
-    final currentContext = (await loadCurrentContext()).current;
-    final currentUser = store.state.authStore.user;
-
-    // Reset contexts if the current user has no accessToken (unrecoverable state)
-    if (currentUser.accessToken == null && currentContext != AppContext.DEFAULT) {
-      return onResetContext();
-    }
-
-    // init current auth state with current user
-    store.state.authStore.authObserver?.add(
-      currentUser,
-    );
-  }
-
-  onInitListeners() {
-    store.dispatch(initDeepLinks());
-    store.dispatch(startAuthObserver());
-    store.dispatch(startAlertsObserver());
-    store.dispatch(startContextObserver());
-  }
-
-  onStartListeners() {
-    // init auth listener
-    store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
-
-    // set auth state listener
-    store.state.authStore.onContextChanged.listen(onContextChanged);
-
-    // init alerts listener
-    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
-  }
-
-  onDestroyListeners() async {
-    await store.dispatch(stopContextObserver());
-    await store.dispatch(stopAlertsObserver());
-    await store.dispatch(stopAuthObserver());
-    await store.dispatch(disposeDeepLinks());
   }
 
   onContextChanged(User? user) async {
@@ -179,7 +179,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // save new user context
     if (user != null) {
-      contextNew = generateContextId(id: user.userId!);
+      contextNew = generateContextId_DEPRECATED(id: user.userId!);
       await saveContext(contextNew);
     } else {
       // revert to another user context or default
@@ -221,13 +221,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     setState(() {
       cache = cacheNew;
-      storage = storageNew;
       store = storeNew;
+      storage = storageNew;
+      storageCold = storageColdNew;
     });
 
     // reinitialize and start new store listeners
-    onInitListeners();
-    onStartListeners();
+    await onDispatchListeners();
+    await onStartListeners();
 
     final userNew = storeNew.state.authStore.user;
     final authObserverNew = storeNew.state.authStore.authObserver;
@@ -285,7 +286,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // No user is present and no contexts are availble to jump to
     if (user == null && allContexts.isEmpty && defaultScreen == HomeScreen) {
       defaultHome = IntroScreen();
-      return NavigationService.clearTo(NavigationPaths.intro, context);
+      return NavigationService.clearTo(Routes.intro, context);
     }
 
     // No user is present during auth state change, but other contexts exist
@@ -296,7 +297,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // New user is found and previously was in an unauthenticated state
     if (user != null && user.accessToken != null && defaultScreen == IntroScreen) {
       defaultHome = HomeScreen();
-      return NavigationService.clearTo(NavigationPaths.home, context);
+      return NavigationService.clearTo(Routes.home, context);
     }
 
     // New user has been authenticated during an existing authenticated session
@@ -305,18 +306,26 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         user.accessToken != null &&
         user.accessToken!.isNotEmpty &&
         defaultScreen == HomeScreen) {
-      return NavigationService.clearTo(NavigationPaths.home, context);
+      return NavigationService.clearTo(Routes.home, context);
     }
   }
 
   onAlertsChanged(Alert alert) {
     Color? color;
 
+    var alertOverride;
+
     switch (alert.type) {
       case 'error':
+        if (!ConnectionService.isConnected() && !alert.offline) {
+          alertOverride = 'Looks like you may be offline. Check your connection and try again.';
+        }
         color = Colors.red;
         break;
       case 'warning':
+        if (!ConnectionService.isConnected() && !alert.offline) {
+          alertOverride = 'Looks like you may be offline. Check your connection and try again.';
+        }
         color = Colors.red;
         break;
       case 'success':
@@ -327,7 +336,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         color = Colors.grey;
     }
 
-    final alertMessage = alert.message ?? alert.error ?? 'Unknown Error Occurred';
+    final alertMessage = alertOverride ?? alert.message ?? alert.error ?? 'Unknown Error Occurred';
 
     globalScaffold.currentState?.showSnackBar(SnackBar(
       backgroundColor: color,
@@ -347,6 +356,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         },
       ),
     ));
+  }
+
+  onDestroyListeners() async {
+    await ConnectionService.stopListener();
+    await store.dispatch(stopContextObserver());
+    await store.dispatch(stopAlertsObserver());
+    await store.dispatch(stopAuthObserver());
+    await store.dispatch(disposeDeepLinks());
   }
 
   @override

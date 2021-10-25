@@ -17,7 +17,7 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/widgets/messages/message-typing.dart';
+import 'package:syphon/views/widgets/messages/typing-indicator.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
 class MessageList extends StatefulWidget {
@@ -27,7 +27,8 @@ class MessageList extends StatefulWidget {
   final ScrollController scrollController;
 
   final Function? onSelectReply;
-  final void Function({Message? message, User? user, String? userId})? onViewUserDetails;
+  final void Function({Message? message, User? user, String? userId})?
+      onViewUserDetails;
   final void Function(Message?)? onToggleSelectedMessage;
 
   const MessageList({
@@ -71,7 +72,7 @@ class MessageListState extends State<MessageList> {
         child: EmojiPicker(
             config: Config(
               columns: 9,
-              indicatorColor: Theme.of(context).accentColor,
+              indicatorColor: Theme.of(context).colorScheme.secondary,
               bgColor: Theme.of(context).scaffoldBackgroundColor,
               categoryIcons: CategoryIcons(
                 smileyIcon: Icons.tag_faces_rounded,
@@ -97,26 +98,31 @@ class MessageListState extends State<MessageList> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
+        converter: (Store<AppState> store) =>
+            _Props.mapStateToProps(store, widget.roomId),
         builder: (context, props) {
           return GestureDetector(
             onTap: () => widget.onToggleSelectedMessage!(null),
             child: ListView(
               reverse: true,
-              padding: EdgeInsets.only(bottom: 12),
-              physics: widget.selectedMessage != null ? const NeverScrollableScrollPhysics() : null,
+              padding: EdgeInsets.only(bottom: 16),
+              physics: widget.selectedMessage != null
+                  ? const NeverScrollableScrollPhysics()
+                  : null,
               controller: widget.scrollController,
               children: [
-                MessageTypingWidget(
+                TypingIndicator(
                   roomUsers: props.users,
                   typing: props.room.userTyping,
                   usersTyping: props.room.usersTyping,
-                  selectedMessageId: widget.selectedMessage != null ? widget.selectedMessage!.id : null,
+                  selectedMessageId: widget.selectedMessage != null
+                      ? widget.selectedMessage!.id
+                      : null,
                 ),
                 ListView.builder(
                   reverse: true,
                   shrinkWrap: true,
-                  padding: EdgeInsets.only(bottom: 4),
+                  padding: EdgeInsets.only(bottom: 0),
                   addRepaintBoundaries: true,
                   addAutomaticKeepAlives: true,
                   itemCount: props.messages.length,
@@ -124,15 +130,22 @@ class MessageListState extends State<MessageList> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
                     final message = props.messages[index];
-                    final lastMessage = index != 0 ? props.messages[index - 1] : null;
-                    final nextMessage = index + 1 < props.messages.length ? props.messages[index + 1] : null;
+                    final lastMessage =
+                        index != 0 ? props.messages[index - 1] : null;
+                    final nextMessage = index + 1 < props.messages.length
+                        ? props.messages[index + 1]
+                        : null;
 
-                    final isLastSender = lastMessage != null && lastMessage.sender == message.sender;
-                    final isNextSender = nextMessage != null && nextMessage.sender == message.sender;
-                    final isUserSent = props.currentUser.userId == message.sender;
+                    final isLastSender = lastMessage != null &&
+                        lastMessage.sender == message.sender;
+                    final isNextSender = nextMessage != null &&
+                        nextMessage.sender == message.sender;
+                    final isUserSent =
+                        props.currentUser.userId == message.sender;
 
-                    final selectedMessageId =
-                        widget.selectedMessage != null ? widget.selectedMessage!.id : null;
+                    final selectedMessageId = widget.selectedMessage != null
+                        ? widget.selectedMessage!.id
+                        : null;
 
                     final user = props.users[message.sender];
                     final avatarUri = user?.avatarUri;
@@ -157,7 +170,8 @@ class MessageListState extends State<MessageList> {
                         user: user,
                         userId: message.sender,
                       ),
-                      onLongPress: (msg) => widget.onToggleSelectedMessage!(msg),
+                      onLongPress: (msg) =>
+                          widget.onToggleSelectedMessage!(msg),
                       onInputReaction: () => onInputReaction(
                         message: message,
                         props: props,
@@ -207,7 +221,8 @@ class _Props extends Equatable {
         messages,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         timeFormat24Enabled: store.state.settingsStore.timeFormat24Enabled,
         themeType: store.state.settingsStore.themeSettings.themeType,
         currentUser: store.state.authStore.user,

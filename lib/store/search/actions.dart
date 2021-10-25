@@ -76,8 +76,9 @@ Future<String?> fetchFavicon({String? url}) async {
   try {
     // get the root store
     final origins = url.toString().split('.');
-    final baseUrl =
-        origins.length > 1 ? origins[origins.length - 2] + '.' + origins[origins.length - 1] : origins[0];
+    final baseUrl = origins.length > 1
+        ? origins[origins.length - 2] + '.' + origins[origins.length - 1]
+        : origins[0];
     final fullUrl = 'https://$baseUrl';
 
     final uri = Uri.parse(fullUrl);
@@ -101,7 +102,8 @@ Future<String?> fetchFavicon({String? url}) async {
       faviconUrl += '/';
     }
 
-    return faviconUrl + favicon.attributes['href']!.replaceAll('...', '').replaceAll('//', '/');
+    return faviconUrl +
+        favicon.attributes['href']!.replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
     printError(error.toString());
   }
@@ -123,10 +125,12 @@ ThunkAction<AppState> searchMessages(String searchText) {
 
 ThunkAction<AppState> searchHomeservers({String? searchText}) {
   return (Store<AppState> store) async {
-    final List<Homeserver> searchResults = (store.state.searchStore.homeservers as List<Homeserver>)
-        .where((homeserver) =>
-            homeserver.hostname!.contains(searchText!) || homeserver.description!.contains(searchText))
-        .toList();
+    final List<Homeserver> searchResults =
+        (store.state.searchStore.homeservers as List<Homeserver>)
+            .where((homeserver) =>
+                homeserver.hostname!.contains(searchText!) ||
+                homeserver.description!.contains(searchText))
+            .toList();
 
     store.dispatch(SetSearchResults(
       searchText: searchText,
@@ -198,7 +202,8 @@ ThunkAction<AppState> searchPublicRooms({String? searchable}) {
       }
 
       final List<dynamic> rawPublicRooms = data['chunk'];
-      final List<Room> convertedRooms = rawPublicRooms.map((room) => Room.fromMatrix(room)).toList();
+      final List<Room> convertedRooms =
+          rawPublicRooms.map((room) => Room.fromMatrix(room)).toList();
 
       store.dispatch(SetSearchResults(
         since: data['next_batch'],
@@ -236,7 +241,8 @@ ThunkAction<AppState> searchUsers({String? searchText}) {
 
       final List<dynamic> rawUsers = data['results'];
 
-      final List<User> searchResults = rawUsers.map((room) => User.fromMatrix(room)).toList();
+      final List<User> searchResults =
+          rawUsers.map((room) => User.fromMatrix(room)).toList();
 
       store.dispatch(SetSearchResults(
         since: data['next_batch'],

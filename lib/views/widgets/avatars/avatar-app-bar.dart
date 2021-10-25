@@ -55,7 +55,7 @@ class AvatarAppBar extends StatelessWidget {
                   child: Container(
                     height: 16,
                     width: 16,
-                    color: selectBackgroundBrightness(themeType),
+                    color: selectIconBackground(themeType),
                     child: Icon(
                       Icons.offline_bolt,
                       color: Colors.white,
@@ -77,7 +77,7 @@ class AvatarAppBar extends StatelessWidget {
                   child: Container(
                     height: 16,
                     width: 16,
-                    color: selectBackgroundBrightness(themeType),
+                    color: selectIconBackground(themeType),
                     child: Icon(
                       Icons.block,
                       color: Colors.white,
@@ -100,9 +100,9 @@ class AvatarAppBar extends StatelessWidget {
                     height: 16,
                     width: 16,
                     padding: EdgeInsets.all(2),
-                    color: selectBackgroundBrightness(themeType),
+                    color: selectIconBackground(themeType),
                     child: CircularProgressIndicator(
-                      strokeWidth: Dimensions.defaultStrokeWidthLite,
+                      strokeWidth: Dimensions.strokeWidthThin,
                     ),
                   ),
                 ),

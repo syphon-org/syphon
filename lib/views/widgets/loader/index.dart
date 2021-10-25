@@ -20,7 +20,7 @@ class Loader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RefreshProgressIndicator(
-                strokeWidth: Dimensions.defaultStrokeWidth,
+                strokeWidth: Dimensions.strokeWidthDefault,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   Theme.of(context).primaryColor,
                 ),

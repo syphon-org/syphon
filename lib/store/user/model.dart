@@ -1,11 +1,13 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/storage/drift/database.dart';
 
 part 'model.g.dart';
 
 @JsonSerializable()
-class User extends Equatable {
+class User extends Equatable implements drift.Insertable<User> {
   final String? userId;
   final String? deviceId; // current device id
   final String? idserver;
@@ -92,4 +94,19 @@ class User extends Equatable {
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   Map<String, dynamic> toJson() => _$UserToJson(this);
+
+  // allows converting to message companion type for saving through drift
+  @override
+  Map<String, drift.Expression> toColumns(bool nullToAbsent) {
+    return UsersCompanion(
+      userId: drift.Value(userId!),
+      deviceId: drift.Value(deviceId), // current device id
+      idserver: drift.Value(idserver),
+      homeserver: drift.Value(homeserver),
+      homeserverName: drift.Value(homeserverName),
+      accessToken: drift.Value(accessToken),
+      displayName: drift.Value(displayName),
+      avatarUri: drift.Value(avatarUri),
+    ).toColumns(nullToAbsent);
+  }
 }

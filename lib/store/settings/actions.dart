@@ -145,7 +145,9 @@ ThunkAction<AppState> fetchDevices() {
       }
 
       final List<dynamic> jsonDevices = data['devices'];
-      final List<Device> devices = jsonDevices.map((jsonDevice) => Device.fromMatrix(jsonDevice)).toList();
+      final List<Device> devices = jsonDevices
+          .map((jsonDevice) => Device.fromMatrix(jsonDevice))
+          .toList();
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
@@ -184,57 +186,14 @@ ThunkAction<AppState> updateDevice({String? deviceId}) {
   };
 }
 
-/// Delete a single device
-/// ** Fails after recent matix.org update **
-ThunkAction<AppState> deleteDevice({String? deviceId, bool? disableLoading}) {
-  return (Store<AppState> store) async {
-    try {
-      store.dispatch(SetLoading(loading: true));
-
-      final currentCredential = store.state.authStore.credential ?? Credential();
-
-      final data = await MatrixApi.deleteDevices(
-        protocol: store.state.authStore.protocol,
-        homeserver: store.state.authStore.user.homeserver,
-        accessToken: store.state.authStore.user.accessToken,
-        deviceIds: [deviceId],
-        session: store.state.authStore.authSession,
-        userId: store.state.authStore.user.userId,
-        authType: MatrixAuthTypes.PASSWORD,
-        authValue: currentCredential.value,
-      );
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-
-      // If a flow exists, more authentication is needed before
-      // attempting to delete again
-      if (data['flows'] != null) {
-        return store.dispatch(setInteractiveAuths(auths: data));
-      }
-
-      store.dispatch(fetchDevices());
-      return true;
-    } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        message: error.toString(),
-        origin: 'deleteDevice',
-      ));
-    } finally {
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-/// Delete multiple devices
+/// Delete device(s)
 ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final currentCredential = store.state.authStore.credential ?? Credential();
+      final currentCredential =
+          store.state.authStore.credential ?? Credential();
 
       final data = await MatrixApi.deleteDevices(
         protocol: store.state.authStore.protocol,
@@ -325,10 +284,12 @@ ThunkAction<AppState> incrementFontSize() {
 ThunkAction<AppState> incrementMessageSize() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.themeSettings;
-    final messageSizeIndex = MessageSize.values.indexOf(currentTheme.messageSize);
+    final messageSizeIndex =
+        MessageSize.values.indexOf(currentTheme.messageSize);
 
     store.dispatch(SetMessageSize(
-      messageSize: MessageSize.values[(messageSizeIndex + 1) % MessageSize.values.length],
+      messageSize: MessageSize
+          .values[(messageSizeIndex + 1) % MessageSize.values.length],
     ));
   };
 }
@@ -338,7 +299,8 @@ ThunkAction<AppState> incrementThemeType() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.themeSettings;
     final themeTypeIndex = ThemeType.values.indexOf(currentTheme.themeType);
-    final nextThemeType = ThemeType.values[(themeTypeIndex + 1) % ThemeType.values.length];
+    final nextThemeType =
+        ThemeType.values[(themeTypeIndex + 1) % ThemeType.values.length];
 
     // update system navbar theme to match
     setSystemTheme(nextThemeType);
@@ -351,10 +313,12 @@ ThunkAction<AppState> incrementThemeType() {
 ThunkAction<AppState> incrementAvatarShape() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.themeSettings;
-    final avatarShapeIndex = AvatarShape.values.indexOf(currentTheme.avatarShape);
+    final avatarShapeIndex =
+        AvatarShape.values.indexOf(currentTheme.avatarShape);
 
     store.dispatch(SetAvatarShape(
-      avatarShape: AvatarShape.values[(avatarShapeIndex + 1) % AvatarShape.values.length],
+      avatarShape: AvatarShape
+          .values[(avatarShapeIndex + 1) % AvatarShape.values.length],
     ));
   };
 }
@@ -366,7 +330,8 @@ ThunkAction<AppState> incrementFabType() {
     final fabTypeIndex = MainFabType.values.indexOf(currentTheme.mainFabType);
 
     store.dispatch(SetMainFabType(
-      fabType: MainFabType.values[(fabTypeIndex + 1) % MainFabType.values.length],
+      fabType:
+          MainFabType.values[(fabTypeIndex + 1) % MainFabType.values.length],
     ));
   };
 }
@@ -375,10 +340,12 @@ ThunkAction<AppState> incrementFabType() {
 ThunkAction<AppState> incrementFabLocation() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.themeSettings;
-    final fabTypeIndex = MainFabLocation.values.indexOf(currentTheme.mainFabLocation);
+    final fabTypeIndex =
+        MainFabLocation.values.indexOf(currentTheme.mainFabLocation);
 
     store.dispatch(SetMainFabLocation(
-      fabLocation: MainFabLocation.values[(fabTypeIndex + 1) % MainFabLocation.values.length],
+      fabLocation: MainFabLocation
+          .values[(fabTypeIndex + 1) % MainFabLocation.values.length],
     ));
   };
 }

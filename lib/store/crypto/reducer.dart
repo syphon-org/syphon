@@ -1,7 +1,8 @@
 import './actions.dart';
 import './state.dart';
 
-CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic action]) {
+CryptoStore cryptoReducer(
+    [CryptoStore state = const CryptoStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetOlmAccount:
       return state.copyWith(
@@ -85,7 +86,8 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
 
       // safety functions to catch newly cached store
       messageSessionIndex.putIfAbsent(_action.roomId, () => <String, int>{});
-      messageSessionsInbound.putIfAbsent(action.roomId, () => <String, String>{});
+      messageSessionsInbound.putIfAbsent(
+          action.roomId, () => <String, String>{});
 
       // add or update inbound message session by roomId + identity
       final messageSessionInboundNew = {_action.identityKey: _action.session};
@@ -93,7 +95,9 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       messageSessionsInbound[_action.roomId]!.addAll(messageSessionInboundNew);
 
       // add or update inbound message index by roomId + identity
-      final messageSessionIndexUpdated = {_action.identityKey: _action.messageIndex};
+      final messageSessionIndexUpdated = {
+        _action.identityKey: _action.messageIndex
+      };
 
       messageSessionIndex[action.roomId]!.addAll(messageSessionIndexUpdated);
 

@@ -26,13 +26,15 @@ abstract class Rooms {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
+    final fullSync = since == null && filter == null;
+
     // Params
     url += '?full_state=$fullState';
     url += since != null ? '&since=$since' : '';
     url += setPresence != null ? '&set_presence=$setPresence' : '';
     url += timeout != null ? '&timeout=$timeout' : '';
     url += filter != null ? '&filter=$filter' : '';
-    url += since == null && filter == null
+    url += fullSync
         ? '&filter={"room":{"state": {"lazy_load_members":true}, "timeline": {"lazy_load_members":true}}}'
         : '';
 
@@ -40,10 +42,14 @@ abstract class Rooms {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
-      Uri.parse(url),
-      headers: headers,
-    );
+    final response = await http
+        .get(
+          Uri.parse(url),
+          headers: headers,
+        )
+        .timeout(
+          Duration(seconds: fullSync ? 180 : 60),
+        );
 
     return await json.decode(utf8.decode(response.bodyBytes));
   }
@@ -122,7 +128,8 @@ abstract class Rooms {
     String? accessToken,
     String? userId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/account_data/m.direct';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -180,7 +187,8 @@ abstract class Rooms {
     final serverName = parts.isNotEmpty ? parts[1] : homeserver;
     final roomIdFormatted = Uri.encodeComponent(roomId);
 
-    final String url = '$protocol$homeserver/_matrix/client/r0/join/$roomIdFormatted?server_name=$serverName';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/join/$roomIdFormatted?server_name=$serverName';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -269,7 +277,8 @@ abstract class Rooms {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/leave';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -305,7 +314,8 @@ abstract class Rooms {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/forget';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -338,7 +348,8 @@ abstract class Rooms {
     String? accessToken,
     String? roomAlias,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/directory/room/$roomAlias';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/directory/room/$roomAlias';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -369,7 +380,8 @@ abstract class Rooms {
     bool lazyLoading = false,
     Map? filters,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/filter';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/filter';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -408,7 +420,8 @@ abstract class Rooms {
     String? filterId,
     String? userId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/user/$userId/filter/$filterId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/user/$userId/filter/$filterId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -437,7 +450,8 @@ abstract class Rooms {
     String? accessToken,
     String? roomId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/aliases';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/aliases';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

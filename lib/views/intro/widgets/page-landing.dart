@@ -46,8 +46,10 @@ class LandingPage extends StatelessWidget {
                   child: Text(
                     Strings.titleIntro,
                     textAlign: TextAlign.center,
-                    style:
-                        Theme.of(context).textTheme.headline4!.copyWith(fontSize: height < 569 ? 28 : null),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline4!
+                        .copyWith(fontSize: height < 569 ? 28 : null),
                   ),
                 ),
               ],
@@ -60,7 +62,10 @@ class LandingPage extends StatelessWidget {
               Text(
                 Strings.headerIntro,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headline6!.copyWith(fontSize: height < 569 ? 18 : null),
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .copyWith(fontSize: height < 569 ? 18 : null),
               ),
             ],
           ),

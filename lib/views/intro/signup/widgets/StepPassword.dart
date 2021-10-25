@@ -88,7 +88,8 @@ class PasswordStepState extends State<PasswordStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupPassword,
-                    semanticsLabel: 'User thinking up a password in a swirl of wind',
+                    semanticsLabel:
+                        'User thinking up a password in a swirl of wind',
                   ),
                 ),
               ),
@@ -130,7 +131,7 @@ class PasswordStepState extends State<PasswordStep> {
                               width: 20,
                               child: Icon(
                                 Icons.info_outline,
-                                color: Theme.of(context).accentColor,
+                                color: Theme.of(context).colorScheme.secondary,
                                 size: 20,
                               ),
                             ),

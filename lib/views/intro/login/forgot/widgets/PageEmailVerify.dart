@@ -1,13 +1,11 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -57,14 +55,14 @@ class EmailStepState extends State<EmailVerifyStep> {
 
         Color suffixBackgroundColor = Colors.grey;
         Widget suffixWidgetHomeserver = CircularProgressIndicator(
-          strokeWidth: Dimensions.defaultStrokeWidth,
+          strokeWidth: Dimensions.strokeWidthDefault,
           valueColor: const AlwaysStoppedAnimation<Color>(
             Colors.white,
           ),
         );
 
         Widget suffixWidgetEmail = CircularProgressIndicator(
-          strokeWidth: Dimensions.defaultStrokeWidth,
+          strokeWidth: Dimensions.strokeWidthDefault,
           valueColor: const AlwaysStoppedAnimation<Color>(
             Colors.white,
           ),
@@ -126,7 +124,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                     Container(
                       margin: EdgeInsets.only(top: 32),
                       child: Stack(
-                        overflow: Overflow.visible,
+                        clipBehavior: Clip.none,
                         children: <Widget>[
                           Container(
                             padding: EdgeInsets.symmetric(
@@ -160,7 +158,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                                 width: 20,
                                 child: Icon(
                                   Icons.info_outline,
-                                  color: Theme.of(context).accentColor,
+                                  color: Theme.of(context).colorScheme.secondary,
                                   size: 20,
                                 ),
                               ),
@@ -232,7 +230,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Container(
-                          padding: EdgeInsets.all((6)),
+                          padding: EdgeInsets.all(6),
                           child: suffixWidgetHomeserver,
                         ),
                       ),
@@ -276,7 +274,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Container(
-                          padding: EdgeInsets.all((6)),
+                          padding: EdgeInsets.all(6),
                           child: suffixWidgetEmail,
                         ),
                       ),
@@ -337,7 +335,7 @@ class _Props extends Equatable {
         },
         onSelectHomeserver: (String? homeserver) async {
           final hostname = homeserver ?? store.state.authStore.hostname;
-          final urlRegex = new RegExp(Values.urlRegex, caseSensitive: false);
+          final urlRegex = RegExp(Values.urlRegex, caseSensitive: false);
 
           if (urlRegex.hasMatch('https://$hostname')) {
             await store.dispatch(selectHomeserver(hostname: hostname));
