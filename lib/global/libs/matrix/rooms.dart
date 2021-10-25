@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 abstract class Rooms {
   /// Sync (main functionality)
@@ -134,6 +135,34 @@ abstract class Rooms {
 
     return await json.decode(response.body);
   }
+
+
+  // https://matrix.org/docs/spec/client_server/r0.2.0#m-room-power-levels
+  static Future<dynamic> fetchPowerLevels({
+    String? protocol = 'https://',
+    String? homeserver = Values.homeserverDefault,
+    String? accessToken,
+    Room? room,}) async{
+
+    final String roomId = room!.id;
+
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state/m.room.power_levels/';
+
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
+    };
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
+
+
 
   /*
   * Create Room - POST

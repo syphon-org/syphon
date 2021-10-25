@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:uuid/uuid.dart';
 
 abstract class Events {
   /// Fetch State Events
@@ -45,7 +46,7 @@ abstract class Events {
     String? txnId,
 
   })async{
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$txnId';
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

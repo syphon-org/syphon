@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
@@ -215,6 +217,26 @@ bool isTextMessage({required Message message}) {
       message.type == EventTypes.encrypted;
 }
 
-bool isDeletable({Message? message, User? user}){
-  return false;
+Future<bool> isMessageDeletable({Message? message, User? user, Room? room})async{
+  try{
+    final powerLevels = await MatrixApi.fetchPowerLevels(room: room, homeserver: user!.homeserver,
+        accessToken: user.accessToken);
+
+    final powerLevelUser = powerLevels['users'];
+    final userLevel = powerLevelUser[user.userId];
+
+    if (userLevel == null && message!.sender != user.userId){
+      return false;
+    }
+
+    if (message!.sender == user.userId || userLevel > 0){
+      return true;
+    }
+
+    return false;
+  }
+  catch(error){
+    debugPrint('[deleteMessage] $error');
+    return false;
+  }
 }

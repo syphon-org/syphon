@@ -94,8 +94,9 @@ class DeleteOutboxMessage {
 
 class DeleteMessage{
   final Room room;
+  final Message message;
 
-  DeleteMessage({required this.room });
+  DeleteMessage({required this.room, required this.message});
 }
 
 ThunkAction<AppState> addMessages({
@@ -446,7 +447,7 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
             eventId: message.id,
             accessToken: store.state.authStore.user.accessToken,
             homeserver: store.state.authStore.user.homeserver);
-        return store.dispatch(DeleteMessage(room: room));
+        return store.dispatch(DeleteMessage(room: room, message: message));
       }
     } catch (error) {
       debugPrint('[deleteMessage] $error');

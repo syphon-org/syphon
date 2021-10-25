@@ -7,6 +7,7 @@ import 'package:syphon/global/libs/matrix/notifications.dart';
 import 'package:syphon/global/libs/matrix/rooms.dart';
 import 'package:syphon/global/libs/matrix/search.dart';
 import 'package:syphon/global/libs/matrix/user.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 abstract class MatrixApi {
   static const NEEDS_INTERACTIVE_AUTH = Auth.NEEDS_INTERACTIVE_AUTH;
@@ -42,6 +43,7 @@ abstract class MatrixApi {
   static const forgetRoom = Rooms.forgetRoom;
   static const fetchFilter = Rooms.fetchFilter;
   static const createFilter = Rooms.createFilter;
+  static const fetchPowerLevels = Rooms.fetchPowerLevels;
 
   // Events
   static const sendEvent = Events.sendEvent;
