@@ -48,18 +48,32 @@ class ListItemUser extends StatelessWidget {
       button: true,
       enabled: true,
       label: 'Start Chat',
-      child: GestureDetector(
-        onTap: onPress != null ? () => onPress!() : null,
-        child: Container(
-          width: Dimensions.iconSizeLite,
-          height: Dimensions.iconSizeLite,
-          child: SvgPicture.asset(
-            Assets.iconSendBeing,
-            fit: BoxFit.contain,
-            height: Dimensions.iconSize,
-            width: Dimensions.iconSize,
-            color: Theme.of(context).iconTheme.color,
-            semanticsLabel: 'Start Chat',
+      child: ClipOval(
+        child: Material(
+          color: Theme.of(context).scaffoldBackgroundColor, // button color
+          child: InkWell(
+            onTap: onPress != null ? () => onPress!() : null,
+            child: SizedBox(
+              width: Dimensions.avatarSizeMin,
+              height: Dimensions.avatarSizeMin,
+              child: Container(
+                width: Dimensions.iconSizeLite,
+                height: Dimensions.iconSizeLite,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(Dimensions.avatarSize),
+                  ),
+                ),
+                child: SvgPicture.asset(
+                  Assets.iconSendBeing,
+                  fit: BoxFit.scaleDown,
+                  height: Dimensions.iconSizeLite,
+                  width: Dimensions.iconSizeLite,
+                  color: Theme.of(context).iconTheme.color,
+                  semanticsLabel: 'Start Chat',
+                ),
+              ),
+            ),
           ),
         ),
       ));
@@ -98,9 +112,7 @@ class ListItemUser extends StatelessWidget {
                     alt: user.displayName ?? user.userId,
                     selected: selected,
                     size: Dimensions.avatarSizeMin,
-                    background: !real
-                        ? null
-                        : Colours.hashedColor(formatUsername(user)),
+                    background: !real ? null : Colours.hashedColor(formatUsername(user)),
                   ),
                 ],
               ),
@@ -120,9 +132,7 @@ class ListItemUser extends StatelessWidget {
             ),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: type == ListItemUserType.Pressable
-                  ? [buildArrowIcon(context)]
-                  : [],
+              children: type == ListItemUserType.Pressable ? [buildArrowIcon(context)] : [],
             ),
           ),
         ),

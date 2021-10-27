@@ -1,29 +1,26 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-invite-users.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
@@ -45,8 +42,7 @@ class InviteUsersScreen extends StatefulWidget {
   InviteUsersState createState() => InviteUsersState();
 }
 
-class InviteUsersState extends State<InviteUsersScreen>
-    with Lifecycle<InviteUsersScreen> {
+class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUsersScreen> {
   InviteUsersState();
 
   final searchInputFocusNode = FocusNode();
@@ -99,8 +95,7 @@ class InviteUsersState extends State<InviteUsersScreen>
   ///
   onToggleInvite({User? user}) async {
     final List<User?> invitesUpdated = List.from(invites);
-    final userIndex =
-        invitesUpdated.indexWhere((u) => u!.userId == user!.userId);
+    final userIndex = invitesUpdated.indexWhere((u) => u!.userId == user!.userId);
 
     if (userIndex == -1) {
       invitesUpdated.add(user);
@@ -128,8 +123,7 @@ class InviteUsersState extends State<InviteUsersScreen>
   ///
   /// attempt chating with a user by the name searched
   ///
-  onAttemptInvite(
-      {required BuildContext context, _Props? props, User? user}) async {
+  onAttemptInvite({required BuildContext context, _Props? props, User? user}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -151,8 +145,7 @@ class InviteUsersState extends State<InviteUsersScreen>
   /// also attempts to invite users directly if a room id already exists
   ///
   onConfirmInvites(_Props props) async {
-    final InviteUsersArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
+    final InviteUsersArguments arguments = ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
     final roomId = arguments.roomId;
 
     if (roomId != null && invites.isNotEmpty) {
@@ -168,8 +161,7 @@ class InviteUsersState extends State<InviteUsersScreen>
   ///
   onSendInvites(_Props props) async {
     FocusScope.of(context).unfocus();
-    final InviteUsersArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
+    final InviteUsersArguments arguments = ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
     final store = StoreProvider.of<AppState>(context);
 
     final roomId = arguments.roomId;
@@ -262,21 +254,16 @@ class InviteUsersState extends State<InviteUsersScreen>
 
         final attemptableUser = User(
           displayName: searchable,
-          userId:
-              searchable.contains(':') ? searchable : formatUserId(searchable),
+          userId: searchable.contains(':') ? searchable : formatUserId(searchable),
         );
 
         final foundResult = props.searchResults.indexWhere(
           (result) => result.userId.contains(searchable),
         );
 
-        final showManualUser =
-            searchable.isNotEmpty && foundResult < 0 && !props.loading;
-        final usersList =
-            searchable.isEmpty ? props.usersRecent : props.searchResults;
-        final usersListLabel = searchable.isEmpty
-            ? Strings.labelUsersRecent
-            : Strings.labelUsersResults;
+        final showManualUser = searchable.isNotEmpty && foundResult < 0 && !props.loading;
+        final usersList = searchable.isEmpty ? props.usersRecent : props.searchResults;
+        final usersListLabel = searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
 
         return Scaffold(
           appBar: AppBarSearch(
@@ -334,8 +321,7 @@ class InviteUsersState extends State<InviteUsersScreen>
                         shrinkWrap: true,
                         children: [
                           Container(
-                            padding:
-                                EdgeInsets.only(left: 20, right: 20, top: 16),
+                            padding: EdgeInsets.only(left: 20, right: 20, top: 16),
                             child: Row(
                               children: [
                                 Text(
@@ -349,10 +335,8 @@ class InviteUsersState extends State<InviteUsersScreen>
                           Visibility(
                             visible: showManualUser,
                             child: ListItemUser(
-                              onPress: () => onAttemptInvite(
-                                  props: props,
-                                  context: context,
-                                  user: attemptableUser),
+                              onPress: () =>
+                                  onAttemptInvite(props: props, context: context, user: attemptableUser),
                               type: ListItemUserType.Selectable,
                               user: attemptableUser,
                               enabled: creatingRoomDisplayName != searchable,
@@ -371,13 +355,11 @@ class InviteUsersState extends State<InviteUsersScreen>
                               return ListItemUser(
                                 type: ListItemUserType.Selectable,
                                 user: user,
-                                enabled:
-                                    creatingRoomDisplayName != user.displayName,
+                                enabled: creatingRoomDisplayName != user.displayName,
                                 selected: invites.contains(user),
                                 loading: props.loading,
                                 onPress: () => onToggleInvite(user: user),
-                                onPressAvatar: () => onShowUserDetails(
-                                    context: context, user: user),
+                                onPressAvatar: () => onShowUserDetails(context: context, user: user),
                               );
                             },
                           )

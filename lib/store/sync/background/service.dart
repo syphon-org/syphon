@@ -3,15 +3,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:flutter/material.dart';
-
 import 'package:android_alarm_manager/android_alarm_manager.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
-
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/values.dart';
@@ -61,10 +57,8 @@ class BackgroundSync {
       secureStorage.write(key: Cache.accessTokenKey, value: accessToken),
       secureStorage.write(key: Cache.lastSinceKey, value: lastSince),
       secureStorage.write(key: Cache.userIdKey, value: currentUser),
-      secureStorage.write(
-          key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
-      secureStorage.write(
-          key: notificationSettings, value: jsonEncode(settings))
+      secureStorage.write(key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
+      secureStorage.write(key: notificationSettings, value: jsonEncode(settings))
     ]);
 
     await AndroidAlarmManager.periodic(
@@ -255,8 +249,7 @@ Future backgroundSyncLoop({
       }
 
       // Make sure the room name exists in the cache
-      if (!roomNames.containsKey(roomId) ||
-          roomNames[roomId] == Values.EMPTY_CHAT) {
+      if (!roomNames.containsKey(roomId) || roomNames[roomId] == Values.EMPTY_CHAT) {
         try {
           final roomNameList = await MatrixApi.fetchRoomName(
             protocol: protocol,
@@ -266,15 +259,14 @@ Future backgroundSyncLoop({
           );
 
           final roomAlias = roomNameList[roomNameList.length - 1];
-          final roomName =
-              roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
+          final roomName = roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
 
           roomNames[room.id] = roomName;
 
           saveRoomNames(roomNames: roomNames);
         } catch (error) {
-          print(
-              '[backgroundSyncLoop] failed to fetch & parse room name ${room.id}');
+          // ignore: avoid_print
+          print('[backgroundSyncLoop] failed to fetch & parse room name ${room.id}');
         }
       }
 
@@ -284,7 +276,7 @@ Future backgroundSyncLoop({
       /// Inbox Style Notifications Only
       ///
       if (settings.styleType == StyleType.Inbox) {
-        room.messagesNew.forEach((message) {
+        for (final message in room.messagesNew) {
           final messageBody = parseMessageNotification(
             room: room,
             message: message,
@@ -297,7 +289,7 @@ Future backgroundSyncLoop({
           uncheckedMessages.addAll(
             {message.id ?? '0': messageBody},
           );
-        });
+        }
 
         await saveNotificationsUnchecked(uncheckedMessages);
 

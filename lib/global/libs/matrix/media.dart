@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 
 /// Media queries for matrix
@@ -10,14 +11,16 @@ import 'package:syphon/global/values.dart';
 /// as the default to allow calling from
 /// a non-ui thread
 class MatrixMedia {
-  static Future<dynamic> fetchThumbnail(Map params) async {
+  static Future<dynamic> fetchThumbnailThreaded(Map params) async {
     final String? protocol = params['protocol'];
     final String? homeserver = params['homeserver'];
     final String? accessToken = params['accessToken'];
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
 
-    return fetchThumbnailUnmapped(
+    httpClient = createClient();
+
+    return fetchThumbnail(
       protocol: protocol,
       homeserver: homeserver,
       accessToken: accessToken,
@@ -28,7 +31,7 @@ class MatrixMedia {
     );
   }
 
-  static Future<dynamic> fetchThumbnailUnmapped({
+  static Future<dynamic> fetchThumbnail({
     String? protocol = Values.DEFAULT_PROTOCOL,
     String? homeserver = Values.homeserverDefault,
     String? accessToken,
@@ -41,11 +44,9 @@ class MatrixMedia {
 
     // Parce the mxc uri for the server location and id
     final String mediaId = mediaUriParts[mediaUriParts.length - 1];
-    final String mediaServer =
-        serverName ?? mediaUriParts[mediaUriParts.length - 2];
+    final String mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
 
-    String url =
-        '$protocol$homeserver/_matrix/media/r0/thumbnail/$mediaServer/$mediaId';
+    String url = '$protocol$homeserver/_matrix/media/r0/thumbnail/$mediaServer/$mediaId';
 
     // Params
     url += '?height=$size&width=$size&method=$method';
@@ -54,7 +55,7 @@ class MatrixMedia {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -67,12 +68,14 @@ class MatrixMedia {
     return {'bodyBytes': response.bodyBytes};
   }
 
-  static Future<dynamic> fetchMediaMapped(Map params) async {
+  static Future<dynamic> fetchMediaThreaded(Map params) async {
     final String? protocol = params['protocol'];
     final String? homeserver = params['homeserver'];
     final String? accessToken = params['accessToken'];
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
+
+    httpClient = createClient();
 
     return fetchMedia(
       protocol: protocol,
@@ -99,14 +102,13 @@ class MatrixMedia {
     // Parce the mxc uri for the server location and id
     final mediaId = mediaUriParts[mediaUriParts.length - 1];
     final mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
-    final url =
-        '$protocol$homeserver/_matrix/media/r0/download/$mediaServer/$mediaId';
+    final url = '$protocol$homeserver/_matrix/media/r0/download/$mediaServer/$mediaId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -134,7 +136,7 @@ class MatrixMedia {
       ...Values.defaultHeaders,
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -191,8 +193,7 @@ dynamic buildMediaDownloadRequest({
   final List<String> mediaUriParts = mediaUri.split('/');
   final String mediaId = mediaUriParts[mediaUriParts.length - 1];
   final String mediaOrigin = serverName ?? homeserver;
-  final String url =
-      '$protocol$homeserver/_matrix/media/r0/download/$mediaOrigin/$mediaId';
+  final String url = '$protocol$homeserver/_matrix/media/r0/download/$mediaOrigin/$mediaId';
 
   final Map<String, String> headers = {
     'Authorization': 'Bearer $accessToken',

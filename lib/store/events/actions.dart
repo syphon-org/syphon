@@ -1,20 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
+import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/events/model.dart';
-import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 class ResetEvents {}
@@ -121,8 +119,7 @@ ThunkAction<AppState> addMessagesDecrypted({
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        AddMessagesDecrypted(
-            roomId: room.id, messages: messages, outbox: outbox),
+        AddMessagesDecrypted(roomId: room.id, messages: messages, outbox: outbox),
       );
     };
 
@@ -202,7 +199,7 @@ ThunkAction<AppState> fetchMessageEvents({
     try {
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
-      final messagesJson = await compute(MatrixApi.fetchMessageEventsMapped, {
+      final messagesJson = await compute(MatrixApi.fetchMessageEventsThreaded, {
         'protocol': store.state.authStore.protocol,
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,

@@ -34,29 +34,10 @@ enum ChatOptions {
 }
 
 class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
-  const AppBarChat({
-    Key? key,
-    this.title = 'title:',
-    this.label = 'label:',
-    this.tooltip = 'tooltip:',
-    this.room,
-    this.color,
-    this.brightness = Brightness.dark,
-    this.elevation,
-    this.focusNode,
-    this.onBack,
-    this.onDebug,
-    this.onSearch,
-    this.onToggleSearch,
-    this.badgesEnabled = true,
-    this.forceFocus = false,
-    this.loading = false,
-  }) : super(key: key);
-
   final bool loading;
   final bool forceFocus;
   final bool badgesEnabled;
-  final Room? room;
+  final Room room;
   final Color? color;
   final String title;
   final String label;
@@ -69,6 +50,25 @@ class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
   final Function? onDebug;
   final Function? onSearch;
   final Function? onToggleSearch;
+
+  const AppBarChat({
+    Key? key,
+    this.title = 'title:',
+    this.label = 'label:',
+    this.tooltip = 'tooltip:',
+    this.room = const Room(id: 'temp'),
+    this.color,
+    this.brightness = Brightness.dark,
+    this.elevation,
+    this.focusNode,
+    this.onBack,
+    this.onDebug,
+    this.onSearch,
+    this.onToggleSearch,
+    this.badgesEnabled = true,
+    this.forceFocus = false,
+    this.loading = false,
+  }) : super(key: key);
 
   @override
   AppBarChatState createState() => AppBarChatState();
@@ -216,8 +216,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) =>
-            _Props.mapStateToProps(store, widget.room!.id),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.room.id),
         builder: (context, props) => AppBar(
           titleSpacing: 0.0,
           automaticallyImplyLeading: false,
@@ -238,8 +237,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     context,
                     Routes.chatDetails,
                     arguments: ChatDetailsArguments(
-                      roomId: widget.room!.id,
-                      title: widget.room!.name,
+                      roomId: widget.room.id,
+                      title: widget.room.name,
                     ),
                   );
                 },
@@ -250,14 +249,14 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                       Hero(
                         tag: 'ChatAvatar',
                         child: Avatar(
-                          uri: widget.room!.avatarUri,
+                          uri: widget.room.avatarUri,
                           size: Dimensions.avatarSizeMin,
-                          alt: formatRoomInitials(room: widget.room!),
+                          alt: formatRoomInitials(room: widget.room),
                           background: widget.color,
                         ),
                       ),
                       Visibility(
-                        visible: !widget.room!.encryptionEnabled,
+                        visible: !widget.room.encryptionEnabled,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -280,8 +279,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                       ),
                       Visibility(
                         visible: widget.badgesEnabled &&
-                            widget.room!.type == 'group' &&
-                            !widget.room!.invite,
+                            widget.room.type == 'group' &&
+                            !widget.room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -302,8 +301,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                       ),
                       Visibility(
                         visible: widget.badgesEnabled &&
-                            widget.room!.type == 'public' &&
-                            !widget.room!.invite,
+                            widget.room.type == 'public' &&
+                            !widget.room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -328,12 +327,9 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               ),
               Flexible(
                 child: Text(
-                  widget.room!.name!,
+                  widget.room.name!,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText1!
-                      .copyWith(color: Colors.white),
+                  style: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.white),
                 ),
               ),
             ],
@@ -359,7 +355,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                         context,
                         Routes.userInvite,
                         arguments: InviteUsersArguments(
-                          roomId: widget.room!.id,
+                          roomId: widget.room.id,
                         ),
                       );
                       break;
@@ -368,8 +364,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                         context,
                         Routes.chatDetails,
                         arguments: ChatDetailsArguments(
-                          roomId: widget.room!.id,
-                          title: widget.room!.name,
+                          roomId: widget.room.id,
+                          title: widget.room.name,
                         ),
                       );
                       break;
@@ -410,7 +406,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     ),
                   ];
 
-                  if (widget.room!.direct) {
+                  if (widget.room.direct) {
                     menu.add(const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.blockUser,
                       child: Text('Block User'),
@@ -443,8 +439,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         currentUser: store.state.authStore.user,
         roomUsers: (store.state.roomStore.rooms[roomId!]!.userIds)
             .map((id) => store.state.userStore.users[id])
@@ -460,8 +455,7 @@ class _Props extends Equatable {
           ));
         },
         onToggleNotifications: () {
-          store.dispatch(
-              toggleChatNotifications(roomId: roomId, enabled: false));
+          store.dispatch(toggleChatNotifications(roomId: roomId, enabled: false));
         },
       );
 }

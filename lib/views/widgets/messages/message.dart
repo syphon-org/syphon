@@ -397,7 +397,8 @@ class MessageWidget extends StatelessWidget {
                             }
                           },
                           child: Container(
-                            margin: const EdgeInsets.only(right: 8).copyWith(bottom: hasReactions ? 16 : 0),
+                            margin: const EdgeInsets.only(right: 8)
+                                .copyWith(bottom: hasReactions ? 16 : 0),
                             child: Avatar(
                               margin: EdgeInsets.zero,
                               padding: EdgeInsets.zero,
@@ -417,7 +418,8 @@ class MessageWidget extends StatelessWidget {
                             Container(
                               constraints: BoxConstraints(
                                 // TODO: issue shrinking the message based on width
-                                maxWidth: !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
+                                maxWidth:
+                                    !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
                               ),
                               padding: EdgeInsets.only(
                                 left: isMedia ? 0 : 12, // make an image span the message width
@@ -460,10 +462,12 @@ class MessageWidget extends StatelessWidget {
                                     visible: isMedia,
                                     maintainState: false,
                                     child: ClipRRect(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: bubbleBorder.topLeft,
-                                        topRight: bubbleBorder.topRight,
-                                      ),
+                                      borderRadius: showSender
+                                          ? BorderRadius.zero
+                                          : BorderRadius.only(
+                                              topLeft: bubbleBorder.topLeft,
+                                              topRight: bubbleBorder.topRight,
+                                            ),
                                       child: MatrixImage(
                                         mxcUri: message.url,
                                         thumbnail: false,
@@ -520,7 +524,8 @@ class MessageWidget extends StatelessWidget {
                                       crossAxisAlignment: alignmentMessageText,
                                       children: [
                                         Visibility(
-                                          visible: !isUserSent && message.type == EventTypes.encrypted,
+                                          visible:
+                                              !isUserSent && message.type == EventTypes.encrypted,
                                           child: Container(
                                             width: Dimensions.indicatorSize,
                                             height: Dimensions.indicatorSize,
@@ -550,7 +555,8 @@ class MessageWidget extends StatelessWidget {
                                           ),
                                         ),
                                         Visibility(
-                                          visible: isUserSent && message.type == EventTypes.encrypted,
+                                          visible:
+                                              isUserSent && message.type == EventTypes.encrypted,
                                           child: Container(
                                             width: Dimensions.indicatorSize,
                                             height: Dimensions.indicatorSize,

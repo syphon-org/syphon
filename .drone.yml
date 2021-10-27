@@ -6,7 +6,7 @@ trigger:
     - push
 steps:
   - name: build linux
-    image: cirrusci/flutter:2.5.2
+    image: cirrusci/flutter:2.5.3
     commands:
       # Install dependencies
       - apt-get update -y
@@ -32,7 +32,7 @@ steps:
       - go get code.gitea.io/tea
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
-      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.linux.x64.tar.gz
+      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.linux.x64.tar.gz
 ---
 kind: pipeline
 type: docker
@@ -80,4 +80,4 @@ steps:
       - go get code.gitea.io/tea
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
-      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)" --asset ./syphon.android.apk
+      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --asset ./syphon.android.apk

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:redux/redux.dart';
@@ -11,7 +10,6 @@ import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -104,7 +102,7 @@ ThunkAction<AppState> startSyncObserver() {
         lastAttemptMillis!,
       );
 
-      if (ConnectionService.isConnected() && backoff > 5) {
+      if (backoff > 5 && ConnectionService.isConnected()) {
         ConnectionService.checked = true;
         backoff = 0;
       }
@@ -201,14 +199,14 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       store.dispatch(SetSyncing(syncing: true));
 
       final lastSince = store.state.syncStore.lastSince;
-      final isFullSync = forceFull || since == null || store.state.roomStore.rooms.isEmpty;
+      final isFullSync = forceFull || since == null;
 
       if (isFullSync) {
         debugPrint('[fetchSync] *** full sync running *** ');
       }
 
       // Normal matrix /sync call to the homeserver (Threaded)
-      final data = await compute(MatrixApi.syncBackground, {
+      final data = await compute(MatrixApi.syncThreaded, {
         'protocol': store.state.authStore.protocol,
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,

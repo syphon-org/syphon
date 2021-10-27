@@ -7,8 +7,8 @@ import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
-class AvatarAppBar extends StatelessWidget {
-  const AvatarAppBar({
+class AppBarAvatar extends StatelessWidget {
+  const AppBarAvatar({
     Key? key,
     this.user,
     this.themeType = ThemeType.Light,

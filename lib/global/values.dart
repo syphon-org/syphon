@@ -18,19 +18,16 @@ class Values {
   static const DEFAULT_PROTOCOL = 'https://';
 
   // Notifications and Background service
-  static const channel_id = '${appLabel}_notifications';
-  static const channel_id_background_service =
-      '${appName}_background_notification';
+  static const channel_id = '${appLabel}_notifications_v2';
+  static const channel_id_background_service = '${appName}_background_notification_v2';
   static const default_channel_title = appName;
 
   static const channel_group_key = 'org.tether.tether.MESSAGES';
   static const channel_name_messages = 'Messages';
   static const channel_name_background_service = 'Background Sync';
-  static const channel_description =
-      '$appName messaging client message and status notifications';
+  static const channel_description = '$appName messaging client message and status notifications';
 
-  static const captchaMatrixSiteKey =
-      '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
+  static const captchaMatrixSiteKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
 
   static const supportEmail = 'hello@syphon.org';
 
@@ -47,8 +44,7 @@ class Values {
   static const homeserverDefault = 'matrix.org';
 
   // hello darkness, my old friend
-  static const emailRegex =
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+  static const emailRegex = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
 
   static const urlRegex =
       r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)';
@@ -63,8 +59,7 @@ class Values {
   static const serviceNotificationTimeoutDuration = 75000; // millis
 
   static const defaultHeaders = {'Content-Type': 'application/json'};
-  static const defaultUserId =
-      '123'; // only for hashing default on colored avatars
+  static const defaultUserId = 'onasind'; // only for hashing default on colored avatars
 
 }
 
@@ -93,9 +88,16 @@ class SupportedLanguages {
     'sk',
   ];
 
+  static const rtl = [
+    'ar',
+    'fa',
+    'he',
+    'ps',
+    'ur',
+  ];
+
   static final list = all.map((locale) => Locale(locale)).toList();
-  static final displayNames =
-      all.map((locale) => Locale(locale).toDisplayName().capitalize()).toList();
+  static final displayNames = all.map((locale) => Locale(locale).toDisplayName().capitalize()).toList();
 }
 
 // https://stackoverflow.com/questions/53999971/how-to-get-languages-full-name-from-languagecode-e-g-from-en-to-english
@@ -129,10 +131,7 @@ extension DisplayName on Locale {
     'ca': {'name': 'Catalan; Valencian', 'nativeName': 'Català'},
     'ch': {'name': 'Chamorro', 'nativeName': 'Chamoru'},
     'ce': {'name': 'Chechen', 'nativeName': 'нохчийн мотт'},
-    'ny': {
-      'name': 'Chichewa; Chewa; Nyanja',
-      'nativeName': 'chiCheŵa, chinyanja'
-    },
+    'ny': {'name': 'Chichewa; Chewa; Nyanja', 'nativeName': 'chiCheŵa, chinyanja'},
     'zh': {'name': 'Chinese', 'nativeName': '中文 (Zhōngwén), 汉语, 漢語'},
     'cv': {'name': 'Chuvash', 'nativeName': 'чӑваш чӗлхи'},
     'kw': {'name': 'Cornish', 'nativeName': 'Kernewek'},
@@ -151,10 +150,7 @@ extension DisplayName on Locale {
     'fj': {'name': 'Fijian', 'nativeName': 'vosa Vakaviti'},
     'fi': {'name': 'Finnish', 'nativeName': 'suomi, suomen kieli'},
     'fr': {'name': 'French', 'nativeName': 'français, langue française'},
-    'ff': {
-      'name': 'Fula; Fulah; Pulaar; Pular',
-      'nativeName': 'Fulfulde, Pulaar, Pular'
-    },
+    'ff': {'name': 'Fula; Fulah; Pulaar; Pular', 'nativeName': 'Fulfulde, Pulaar, Pular'},
     'gl': {'name': 'Galician', 'nativeName': 'Galego'},
     'ka': {'name': 'Georgian', 'nativeName': 'ქართული'},
     'de': {'name': 'German', 'nativeName': 'Deutsch'},
@@ -170,10 +166,7 @@ extension DisplayName on Locale {
     'hu': {'name': 'Hungarian', 'nativeName': 'Magyar'},
     'ia': {'name': 'Interlingua', 'nativeName': 'Interlingua'},
     'id': {'name': 'Indonesian', 'nativeName': 'Bahasa Indonesia'},
-    'ie': {
-      'name': 'Interlingue',
-      'nativeName': 'Originally called Occidental; then Interlingue after WWII'
-    },
+    'ie': {'name': 'Interlingue', 'nativeName': 'Originally called Occidental; then Interlingue after WWII'},
     'ga': {'name': 'Irish', 'nativeName': 'Gaeilge'},
     'ig': {'name': 'Igbo', 'nativeName': 'Asụsụ Igbo'},
     'ik': {'name': 'Inupiaq', 'nativeName': 'Iñupiaq, Iñupiatun'},
@@ -183,10 +176,7 @@ extension DisplayName on Locale {
     'iu': {'name': 'Inuktitut', 'nativeName': 'ᐃᓄᒃᑎᑐᑦ'},
     'ja': {'name': 'Japanese', 'nativeName': '日本語 (にほんご／にっぽんご)'},
     'jv': {'name': 'Javanese', 'nativeName': 'basa Jawa'},
-    'kl': {
-      'name': 'Kalaallisut, Greenlandic',
-      'nativeName': 'kalaallisut, kalaallit oqaasii'
-    },
+    'kl': {'name': 'Kalaallisut, Greenlandic', 'nativeName': 'kalaallisut, kalaallit oqaasii'},
     'kn': {'name': 'Kannada', 'nativeName': 'ಕನ್ನಡ'},
     'kr': {'name': 'Kanuri', 'nativeName': 'Kanuri'},
     'ks': {'name': 'Kashmiri', 'nativeName': 'कश्मीरी, كشميري‎'},
@@ -201,15 +191,9 @@ extension DisplayName on Locale {
     'ku': {'name': 'Kurdish', 'nativeName': 'Kurdî, كوردی‎'},
     'kj': {'name': 'Kwanyama, Kuanyama', 'nativeName': 'Kuanyama'},
     'la': {'name': 'Latin', 'nativeName': 'latine, lingua latina'},
-    'lb': {
-      'name': 'Luxembourgish, Letzeburgesch',
-      'nativeName': 'Lëtzebuergesch'
-    },
+    'lb': {'name': 'Luxembourgish, Letzeburgesch', 'nativeName': 'Lëtzebuergesch'},
     'lg': {'name': 'Luganda', 'nativeName': 'Luganda'},
-    'li': {
-      'name': 'Limburgish, Limburgan, Limburger',
-      'nativeName': 'Limburgs'
-    },
+    'li': {'name': 'Limburgish, Limburgan, Limburger', 'nativeName': 'Limburgs'},
     'ln': {'name': 'Lingala', 'nativeName': 'Lingála'},
     'lo': {'name': 'Lao', 'nativeName': 'ພາສາລາວ'},
     'lt': {'name': 'Lithuanian', 'nativeName': 'lietuvių kalba'},
@@ -238,8 +222,7 @@ extension DisplayName on Locale {
     'oc': {'name': 'Occitan', 'nativeName': 'Occitan'},
     'oj': {'name': 'Ojibwe, Ojibwa', 'nativeName': 'ᐊᓂᔑᓈᐯᒧᐎᓐ'},
     'cu': {
-      'name':
-          'Old Church Slavonic, Church Slavic, Church Slavonic, Old Bulgarian, Old Slavonic',
+      'name': 'Old Church Slavonic, Church Slavic, Church Slavonic, Old Bulgarian, Old Slavonic',
       'nativeName': 'ѩзыкъ словѣньскъ'
     },
     'om': {'name': 'Oromo', 'nativeName': 'Afaan Oromoo'},
@@ -280,10 +263,7 @@ extension DisplayName on Locale {
     'tg': {'name': 'Tajik', 'nativeName': 'тоҷикӣ, toğikī, تاجیکی‎'},
     'th': {'name': 'Thai', 'nativeName': 'ไทย'},
     'ti': {'name': 'Tigrinya', 'nativeName': 'ትግርኛ'},
-    'bo': {
-      'name': 'Tibetan Standard, Tibetan, Central',
-      'nativeName': 'བོད་ཡིག'
-    },
+    'bo': {'name': 'Tibetan Standard, Tibetan, Central', 'nativeName': 'བོད་ཡིག'},
     'tk': {'name': 'Turkmen', 'nativeName': 'Türkmen, Түркмен'},
     'tl': {'name': 'Tagalog', 'nativeName': 'Wikang Tagalog, ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔'},
     'tn': {'name': 'Tswana', 'nativeName': 'Setswana'},

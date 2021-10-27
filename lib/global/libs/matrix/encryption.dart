@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/values.dart';
@@ -15,12 +16,9 @@ class Algorithms {
 }
 
 class Keys {
-  static String fingerprintId({String? deviceId}) =>
-      '${Algorithms.ed25519}:$deviceId';
-  static String identityKeyId({String? deviceId}) =>
-      '${Algorithms.curve25591}:$deviceId';
-  static String oneTimeKeyId({String? keyId}) =>
-      '${Algorithms.signedcurve25519}:$keyId';
+  static String fingerprintId({String? deviceId}) => '${Algorithms.ed25519}:$deviceId';
+  static String identityKeyId({String? deviceId}) => '${Algorithms.curve25591}:$deviceId';
+  static String oneTimeKeyId({String? keyId}) => '${Algorithms.signedcurve25519}:$keyId';
 }
 
 abstract class Encryption {
@@ -50,7 +48,7 @@ abstract class Encryption {
       'token': lastSince,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -72,14 +70,13 @@ abstract class Encryption {
     String? lastSince,
     Map<String, dynamic> users = const {},
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/unstable/room_keys/version';
+    final String url = '$protocol$homeserver/_matrix/client/unstable/room_keys/version';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -111,7 +108,7 @@ abstract class Encryption {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );
@@ -143,7 +140,7 @@ abstract class Encryption {
       'one_time_keys': oneTimeKeys,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -165,7 +162,7 @@ abstract class Encryption {
       ...Values.defaultHeaders,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(data),

@@ -1,26 +1,22 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
-import 'package:syphon/views/widgets/appbars/appbar-search.dart';
-import 'package:syphon/views/widgets/lists/list-item-user.dart';
-import 'package:syphon/views/widgets/loader/index.dart';
-import 'package:syphon/views/widgets/modals/modal-user-details.dart';
-
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
+import 'package:syphon/views/widgets/lists/list-item-user.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
+import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class SearchUserScreen extends StatefulWidget {
   const SearchUserScreen({Key? key}) : super(key: key);
@@ -76,8 +72,7 @@ class SearchUserState extends State<SearchUserScreen> {
   }
 
   @protected
-  onCreateChat(
-      {required BuildContext context, _Props? props, User? user}) async {
+  onCreateChat({required BuildContext context, _Props? props, User? user}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -113,10 +108,7 @@ class SearchUserState extends State<SearchUserScreen> {
   /// attempt chating with a user by the name searched
   ///
   @protected
-  onAttemptChat(
-      {required User user,
-      required BuildContext context,
-      _Props? props}) async {
+  onAttemptChat({required User user, required BuildContext context, _Props? props}) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => DialogStartChat(
@@ -158,9 +150,8 @@ class SearchUserState extends State<SearchUserScreen> {
 
     final attemptableUser = User(
       displayName: searchable,
-      userId: searchable.isNotEmpty && searchable.contains(':')
-          ? searchable
-          : formatUserId(searchable),
+      userId:
+          searchable.isNotEmpty && searchable.contains(':') ? searchable : formatUserId(searchable),
     );
 
     return ListView(
@@ -180,8 +171,7 @@ class SearchUserState extends State<SearchUserScreen> {
         Visibility(
           visible: showManualUser,
           child: GestureDetector(
-            onTap: () => onAttemptChat(
-                props: props, context: context, user: attemptableUser),
+            onTap: () => onAttemptChat(props: props, context: context, user: attemptableUser),
             child: ListItemUser(
               user: attemptableUser,
               enabled: creatingRoomDisplayName != searchable,

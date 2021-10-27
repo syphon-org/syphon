@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/global/https.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 
 /// https://matrix.org/docs/spec/client_server/latest#id183
@@ -34,7 +36,7 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/login';
 
-    final response = await http.get(Uri.parse(url));
+    final response = await httpClient.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -73,7 +75,7 @@ abstract class Auth {
       body['initial_device_display_name'] = deviceName;
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -82,15 +84,15 @@ abstract class Auth {
     return await json.decode(response.body);
   }
 
-/**
-   * https://matrix.org/docs/spec/client_server/latest#id198
-   * 
-   * Login User
-   * 
-   *  Gets the homeserver's supported login types to authenticate
-   *  users. Clients should pick one of these and supply it as 
-   *  the type when logging in.
-   */
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#id198
+  ///
+  /// Login User
+  ///
+  /// Gets the homeserver's supported login types to authenticate
+  /// users. Clients should pick one of these and supply it as
+  /// the type when logging in.
+  ///
   static Future<dynamic> loginUserToken({
     String? protocol,
     String? homeserver,
@@ -117,7 +119,7 @@ abstract class Auth {
       body['initial_device_display_name'] = deviceName;
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -136,8 +138,7 @@ abstract class Auth {
     String? email,
     int? sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
+    final String url = '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
 
     final Map body = {
       'email': email,
@@ -145,7 +146,7 @@ abstract class Auth {
       'send_attempt': sendAttempt,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -230,7 +231,7 @@ abstract class Auth {
       body['initial_device_display_name'] = deviceName;
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -251,7 +252,7 @@ abstract class Auth {
       ...Values.defaultHeaders,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
     );
@@ -272,7 +273,7 @@ abstract class Auth {
       ...Values.defaultHeaders,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
     );
@@ -295,7 +296,7 @@ abstract class Auth {
     url += username != null ? '?username=$username' : '';
 
     // Specified timeout because servers can hang
-    final response = await http.get(Uri.parse(url)).timeout(
+    final response = await httpClient.get(Uri.parse(url)).timeout(
       Duration(seconds: 5),
       onTimeout: () {
         // Time has run out, do what you wanted to do.
@@ -317,9 +318,14 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/.well-known/matrix/client';
 
-    final response = await http.get(Uri.parse(url));
+    try {
+      final response = await httpClient.get(Uri.parse(url));
 
-    return await json.decode(response.body);
+      return await json.decode(response.body);
+    } catch (error) {
+      printError(error.toString());
+      rethrow;
+    }
   }
 
   ///  https://matrix.org/docs/spec/client_server/latest#id211
@@ -333,7 +339,7 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/.well-known/matrix/server';
 
-    final response = await http.get(Uri.parse(url));
+    final response = await httpClient.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -344,7 +350,7 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/versions';
 
-    final response = await http.get(Uri.parse(url));
+    final response = await httpClient.get(Uri.parse(url));
 
     return await json.decode(response.body);
   }
@@ -363,8 +369,7 @@ abstract class Auth {
     String? password,
     String? currentPassword,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -386,7 +391,7 @@ abstract class Auth {
       };
     }
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -408,8 +413,7 @@ abstract class Auth {
     String? session,
     int sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
 
     final Map body = {
       'auth': {
@@ -426,7 +430,7 @@ abstract class Auth {
       'new_password': passwordNew
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
@@ -447,8 +451,7 @@ abstract class Auth {
     String? email,
     int sendAttempt = 1,
   }) async {
-    final String url =
-        '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
+    final String url = '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
 
     final Map body = {
       'email': email,
@@ -456,7 +459,7 @@ abstract class Auth {
       'send_attempt': sendAttempt,
     };
 
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(url),
       headers: {...Values.defaultHeaders},
       body: json.encode(body),
