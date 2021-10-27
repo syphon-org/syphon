@@ -158,5 +158,6 @@
     "confirm-leave-chat-single-nonpublic": "Isto não é uma conversa pública. Não poderá voltar a esta conversa sem um convite.",
     "confirm-leave-chat-multi-nonpublic": "Algumas ou todas estas conversas não são públicas. Não poderá voltar a estas conversas sem um convite.",
     "confirm-block-user": "Se bloquear {}, não poderá ver as mensagens dessa pessoa e sairá imediatamente desta conversa.",
-    "label-back": "Voltar"
+    "label-back": "Voltar",
+    "alert-hidden-read-receipts": "Os recibos de leitura ocultos devem ser suportados pelo seu servidor doméstico, ou isso terá o mesmo efeito que alternar os recibos de leitura para 'Ativado'"
 }
