@@ -7,6 +7,11 @@ class ConnectionService {
   static ConnectivityResult? currentStatus;
   static StreamSubscription<ConnectivityResult>? connectivity;
 
+  static Future<bool> checkConnected() async {
+    currentStatus = await Connectivity().checkConnectivity();
+    return currentStatus != ConnectivityResult.none;
+  }
+
   static bool isConnected() {
     return currentStatus != null && currentStatus != ConnectivityResult.none;
   }
@@ -25,7 +30,7 @@ class ConnectionService {
   static Future<void> stopListener() async {
     if (connectivity != null) {
       await connectivity?.cancel();
-      currentStatus = null;
+      connectivity = null;
     }
   }
 }

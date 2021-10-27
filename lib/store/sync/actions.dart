@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:redux/redux.dart';
@@ -11,7 +10,6 @@ import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -104,7 +102,7 @@ ThunkAction<AppState> startSyncObserver() {
         lastAttemptMillis!,
       );
 
-      if (ConnectionService.isConnected() && backoff > 5) {
+      if (backoff > 5 && ConnectionService.isConnected()) {
         ConnectionService.checked = true;
         backoff = 0;
       }

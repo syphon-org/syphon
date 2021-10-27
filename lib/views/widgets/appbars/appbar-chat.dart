@@ -278,7 +278,9 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                         ),
                       ),
                       Visibility(
-                        visible: widget.badgesEnabled && widget.room.type == 'group' && !widget.room.invite,
+                        visible: widget.badgesEnabled &&
+                            widget.room.type == 'group' &&
+                            !widget.room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -298,7 +300,9 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                         ),
                       ),
                       Visibility(
-                        visible: widget.badgesEnabled && widget.room.type == 'public' && !widget.room.invite,
+                        visible: widget.badgesEnabled &&
+                            widget.room.type == 'public' &&
+                            !widget.room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,

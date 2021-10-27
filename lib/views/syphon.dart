@@ -107,9 +107,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store.state.authStore.authObserver?.add(
       currentUser,
     );
-
-    // ** system listeners **
-    await ConnectionService.startListener();
   }
 
   onDispatchListeners() async {
@@ -127,6 +124,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   }
 
   onStartListeners() async {
+    // ** system listeners **
+    await ConnectionService.startListener();
+
     // init auth listener
     store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
 
