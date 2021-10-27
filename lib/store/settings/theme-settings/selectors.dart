@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:syphon/global/algos.dart';
 
 import 'package:syphon/global/colours.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'model.dart';
 
 String selectMainFabType(ThemeSettings themeSettings) {
@@ -166,6 +167,10 @@ double? selectAppBarElevation(ThemeType themeType) {
     default:
       return null;
   }
+}
+
+String selectReadReceiptsString(ReadReceiptTypes readReceipts) {
+  return enumToString(readReceipts);
 }
 
 String selectFontNameString(FontName fontName) {

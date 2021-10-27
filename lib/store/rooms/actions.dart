@@ -20,6 +20,7 @@ import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
@@ -499,7 +500,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // mark read locally only
-      if (!store.state.settingsStore.readReceiptsEnabled) {
+      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
         await store.dispatch(UpdateRoom(
           id: roomId,
           lastRead: DateTime.now().millisecondsSinceEpoch,
@@ -507,7 +508,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // send read receipt remotely to mark locally on /sync
-      if (store.state.settingsStore.readReceiptsEnabled) {
+      if (store.state.settingsStore.readReceipts != ReadReceiptTypes.Off) {
         final messageLatest = latestMessage(
           roomMessages(store.state, roomId),
         );

@@ -114,9 +114,9 @@ SettingsStore settingsReducer(
       return state.copyWith(
         dismissKeyboardEnabled: !state.dismissKeyboardEnabled,
       );
-    case ToggleReadReceipts:
+    case SetReadReceipts:
       return state.copyWith(
-        readReceiptsEnabled: !state.readReceiptsEnabled,
+        readReceipts: action.readReceipts,
       );
     case ToggleMembershipEvents:
       return state.copyWith(

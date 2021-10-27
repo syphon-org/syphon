@@ -100,6 +100,7 @@
     "alert-feature-in-progress": "🛠 This feature is coming soon",
     "alert-message-failed": "Message Failed To Send",
     "alert-homeserver-invalid": "This server failed the 'well-known' check. Make sure the server is configured correctly.",
+    "alert-hidden-read-receipts": "Hidden Read Receipts must be supported by your homeserver, or this will have the same effect as switching Read Receipts 'On'",
     "prompt-homeserver-select": "Select your username and homeserver",
     "prompt-confirm-deactivate": "Enter your password below to confirm deactivation",
     "placeholder-topic": "No Topic Description",

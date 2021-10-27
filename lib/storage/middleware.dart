@@ -127,7 +127,7 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
       case ToggleNotifications:
       case ToggleTypingIndicators:
       case ToggleTimeFormat:
-      case ToggleReadReceipts:
+      case SetReadReceipts:
       case LogAppAgreement:
       case SetSyncInterval:
       case SetMainFabLocation:

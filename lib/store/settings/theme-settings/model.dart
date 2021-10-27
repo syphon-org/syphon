@@ -85,7 +85,7 @@ class ThemeSettings extends Equatable {
         messageSize,
         avatarShape,
         mainFabType,
-        mainFabLocation
+        mainFabLocation,
       ];
 
   ThemeSettings copyWith({

@@ -6,6 +6,7 @@ import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import './chat-settings/model.dart';
+import 'chat-settings/actions.dart';
 
 part 'state.g.dart';
 
@@ -16,12 +17,13 @@ class SettingsStore extends Equatable {
 
   final bool smsEnabled;
   final bool enterSendEnabled;
-  final bool readReceiptsEnabled;
   final bool typingIndicatorsEnabled;
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
   final bool timeFormat24Enabled;
   final bool dismissKeyboardEnabled;
+
+  final ReadReceiptTypes readReceipts;
 
   final String language;
 
@@ -50,7 +52,6 @@ class SettingsStore extends Equatable {
     this.globalSortOrder = SortOrder.Latest,
     this.enterSendEnabled = false,
     this.smsEnabled = false,
-    this.readReceiptsEnabled = false,
     this.typingIndicatorsEnabled = false,
     this.membershipEventsEnabled = true,
     this.roomTypeBadgesEnabled = true,
@@ -63,6 +64,7 @@ class SettingsStore extends Equatable {
     this.themeSettings = const ThemeSettings(),
     this.alphaAgreement,
     this.pusherToken,
+    this.readReceipts = ReadReceiptTypes.Off,
   });
 
   @override
@@ -70,7 +72,6 @@ class SettingsStore extends Equatable {
         language,
         smsEnabled,
         enterSendEnabled,
-        readReceiptsEnabled,
         typingIndicatorsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
@@ -83,13 +84,13 @@ class SettingsStore extends Equatable {
         themeSettings,
         alphaAgreement,
         pusherToken,
-      ];
+        readReceipts,
+  ];
 
   SettingsStore copyWith({
     String? language,
     bool? smsEnabled,
     bool? enterSendEnabled,
-    bool? readReceiptsEnabled,
     bool? typingIndicatorsEnabled,
     bool? membershipEventsEnabled,
     bool? roomTypeBadgesEnabled,
@@ -105,12 +106,12 @@ class SettingsStore extends Equatable {
     bool? loading,
     String? alphaAgreement,
     String? pusherToken, // NOTE: device token for APNS
+    ReadReceiptTypes? readReceipts,
   }) =>
       SettingsStore(
         language: language ?? this.language,
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
-        readReceiptsEnabled: readReceiptsEnabled ?? this.readReceiptsEnabled,
         typingIndicatorsEnabled:
             typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
@@ -130,6 +131,7 @@ class SettingsStore extends Equatable {
         loading: loading ?? this.loading,
         alphaAgreement: alphaAgreement ?? this.alphaAgreement,
         pusherToken: pusherToken ?? this.pusherToken,
+        readReceipts: readReceipts ?? this.readReceipts,
       );
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);

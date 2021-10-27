@@ -371,6 +371,7 @@ abstract class Events {
     String? messageId,
     String? lastRead,
     bool readAll = true,
+    bool hidden = false,
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/read_markers';
 
@@ -382,6 +383,7 @@ abstract class Events {
     final Map body = {
       'm.fully_read': readAll ? messageId : lastRead,
       'm.read': messageId,
+      'm.hidden' : hidden,
     };
 
     final response = await httpClient.post(
