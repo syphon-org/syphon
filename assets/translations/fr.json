@@ -153,5 +153,10 @@
     "confirm-archive-chat-single": "Êtes-vous sûr·e de vouloir archiver la discussion « {} » ?\n{} ne prend pas encore en charge la consultation des discussions archivées.",
     "content-captcha-warning": "Certains serveurs Matrix exigent une confirmation captcha fournie par Google via reCAPTCHA. \n\nSi vous préférez ne pas remplir ce captcha, vous devrez peut-être revenir à la sélection du serveur et choisir un autre serveur pour la création du compte.",
     "confirm-archive-chat-multi": "Êtes-vous sûr·e de vouloir archiver les {} discussions sélectionnées ?\n{} ne prend pas encore en charge la consultation des discussions archivées.",
-    "confirm-delete-chat-multi": "Êtes-vous sûr·e de vouloir supprimer les {} discussions sélectionnées « {} » ? Les messages de ces discussions seront perdus à jamais."
+    "confirm-delete-chat-multi": "Êtes-vous sûr·e de vouloir supprimer les {} discussions sélectionnées « {} » ? Les messages de ces discussions seront perdus à jamais.",
+    "confirm-block-user": "Si vous bloquez {}, vous ne pourrez plus consulter ses messages et vous quitterez immédiatement cette discussion.",
+    "confirm-leave-chat-single": "Êtes-vous sûr·e de vouloir quitter la discussion « {} » ?",
+    "confirm-leave-chat-single-nonpublic": "Ce n'est pas une discussion publique. Vous ne pourrez plus la rejoindre sans invitation.",
+    "confirm-leave-chat-multi": "Êtes-vous sûr·e de vouloir quitter les {} discussions sélectionnées ?",
+    "confirm-leave-chat-multi-nonpublic": "Certaines de ces discussions ne sont pas publiques. Vous ne pourrez plus les rejoindre sans invitation."
 }
