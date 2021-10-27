@@ -1,6 +1,6 @@
 {
     "confirm-terms-of-service": "CE LOGICIEL ({}) EST FOURNI PAR L'AUTEUR \" EN L'ÉTAT \" ET TOUTE GARANTIE EXPRESSE OU IMPLICITE, Y COMPRIS, MAIS SANS S'Y LIMITER, LES GARANTIES IMPLICITES DE QUALITÉ MARCHANDE ET D'ADÉQUATION À UN USAGE PARTICULIER, EST REJETÉE. EN AUCUN CAS, L'AUTEUR NE POURRA ÊTRE TENU RESPONSABLE DE TOUT DOMMAGE DIRECT, INDIRECT, ACCESSOIRE, SPÉCIFIQUE, EXEMPLAIRE OU CONSÉCUTIF (Y COMPRIS, MAIS SANS S'Y LIMITER, L'ACQUISITION DE BIENS OU DE SERVICES DE SUBSTITUTION, LA PERTE D'UTILISATION, DE DONNÉES OU DE BÉNÉFICES, OU L'INTERRUPTION D'ACTIVITÉ), QUELLE QU'EN SOIT LA CAUSE ET QUELLE QUE SOIT LA THÉORIE DE LA RESPONSABILITÉ, QU'IL S'AGISSE D'UN CONTRAT, D'UNE RESPONSABILITÉ STRICTE OU D'UN DÉLIT (Y COMPRIS LA NÉGLIGENCE OU AUTRE) DÉCOULANT DE QUELQUE MANIÈRE QUE CE SOIT DE L'UTILISATION DE CE LOGICIEL, MÊME S'IL A ÉTÉ INFORMÉ DE LA POSSIBILITÉ DE TELS DOMMAGES.",
-    "alert-homeserver-invalid": "La vérification « well-known » du serveur a échoué. Assurez-vous que le serveur est configuré correctement",
+    "alert-homeserver-invalid": "La vérification \"bien-connus\" du serveur a échoué. Assurez-vous que le serveur est configuré correctement.",
     "title-dialog-email-requirement": "Prérequis pour l'adresse e-mail",
     "title-view-invite": "Invitation",
     "semantics-image-signup-username": "Personne posant son coude sur une carte d'identité",
@@ -158,5 +158,6 @@
     "confirm-leave-chat-single": "Êtes-vous sûr·e de vouloir quitter la discussion « {} » ?",
     "confirm-leave-chat-single-nonpublic": "Ce n'est pas une discussion publique. Vous ne pourrez plus la rejoindre sans invitation.",
     "confirm-leave-chat-multi": "Êtes-vous sûr·e de vouloir quitter les {} discussions sélectionnées ?",
-    "confirm-leave-chat-multi-nonpublic": "Certaines de ces discussions ne sont pas publiques. Vous ne pourrez plus les rejoindre sans invitation."
+    "confirm-leave-chat-multi-nonpublic": "Certaines de ces discussions ne sont pas publiques. Vous ne pourrez plus les rejoindre sans invitation.",
+    "alert-hidden-read-receipts": "Les accusés de réception cachés doivent être pris en charge par votre serveur domestique, sinon cela aura le même effet que d'activer les accusés de réception"
 }
