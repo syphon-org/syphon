@@ -82,8 +82,6 @@ class Search {
       body: json.encode(body),
     );
 
-    printJson(json.decode(response.body));
-
     return json.decode(response.body);
   }
 }

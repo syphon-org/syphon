@@ -33,8 +33,7 @@ ThunkAction<AppState> encryptMessageContent({
 }) {
   return (Store<AppState> store) async {
     // Load and deserialize session
-    final olm.OutboundGroupSession outboundMessageSession =
-        await store.dispatch(
+    final olm.OutboundGroupSession outboundMessageSession = await store.dispatch(
       loadMessageSessionOutbound(roomId: roomId),
     );
 
@@ -99,8 +98,7 @@ ThunkAction<AppState> backfillDecryptMessages(
       final roomMessages = messages[roomId] ?? [];
       final roomDecrypted = messagesDecrypted[roomId] ?? [];
 
-      final undecrypted =
-          roomMessages.where((msg) => roomDecrypted.contains(msg)).toList();
+      final undecrypted = roomMessages.where((msg) => roomDecrypted.contains(msg)).toList();
 
       final decrypted = await store.dispatch(decryptMessages(
         room,
@@ -186,8 +184,7 @@ ThunkAction<AppState> decryptMessage({
     // Pull out event data
     final ciphertext = message.ciphertext;
     final identityKey = message.senderKey;
-    final roomMessageIndexs =
-        store.state.cryptoStore.messageSessionIndex[roomId];
+    final roomMessageIndexs = store.state.cryptoStore.messageSessionIndex[roomId];
 
     // return already decrypted events
     if (ciphertext == null || identityKey == null) {
@@ -213,15 +210,13 @@ ThunkAction<AppState> decryptMessage({
     final messageIndexNew = payloadDecrypted.message_index;
 
     // protection against replay attacks
-    if ((messageIndexNew <= identityMessageIndex &&
-            identityMessageIndex != 0) &&
+    if ((messageIndexNew <= identityMessageIndex && identityMessageIndex != 0) &&
         !forceDecryption) {
       throw '[decryptMessage] messageIndex invalid $messageIndexNew <= $identityMessageIndex';
     }
 
     final decryptedJson = json.decode(payloadScrubbed);
 
-    printJson(decryptedJson);
     final decryptedMessage = Message.fromEvent(
       Event.fromMatrix(decryptedJson),
     );
@@ -284,8 +279,7 @@ ThunkAction<AppState> encryptKeyContent({
     final userCurrent = store.state.authStore.user;
     final deviceId = userCurrent.deviceId!;
     final userOlmAccount = store.state.cryptoStore.olmAccount!;
-    final currentIdentityKeys =
-        await json.decode(userOlmAccount.identity_keys());
+    final currentIdentityKeys = await json.decode(userOlmAccount.identity_keys());
     final currentFingerprint = currentIdentityKeys[Algorithms.ed25519];
 
     // pull recipient key data and id
