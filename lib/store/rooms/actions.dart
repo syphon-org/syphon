@@ -21,6 +21,7 @@ import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/settings/chat-settings/actions.dart';
+import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';

@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/settings/chat-settings/actions.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/models.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
 class SetThemeType {
@@ -112,7 +110,10 @@ class SetPollTimeout {
   });
 }
 
+
 class ToggleEnterSend {}
+
+class ToggleAutoDownload {}
 
 class ToggleDismissKeyboard {}
 
@@ -150,9 +151,8 @@ ThunkAction<AppState> fetchDevices() {
       }
 
       final List<dynamic> jsonDevices = data['devices'];
-      final List<Device> devices = jsonDevices
-          .map((jsonDevice) => Device.fromMatrix(jsonDevice))
-          .toList();
+      final List<Device> devices =
+          jsonDevices.map((jsonDevice) => Device.fromMatrix(jsonDevice)).toList();
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
@@ -197,8 +197,7 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
     try {
       store.dispatch(SetLoading(loading: true));
 
-      final currentCredential =
-          store.state.authStore.credential ?? Credential();
+      final currentCredential = store.state.authStore.credential ?? Credential();
 
       final data = await MatrixApi.deleteDevices(
         protocol: store.state.authStore.protocol,
@@ -289,12 +288,10 @@ ThunkAction<AppState> incrementFontSize() {
 ThunkAction<AppState> incrementMessageSize() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.themeSettings;
-    final messageSizeIndex =
-        MessageSize.values.indexOf(currentTheme.messageSize);
+    final messageSizeIndex = MessageSize.values.indexOf(currentTheme.messageSize);
 
     store.dispatch(SetMessageSize(
-      messageSize: MessageSize
-          .values[(messageSizeIndex + 1) % MessageSize.values.length],
+      messageSize: MessageSize.values[(messageSizeIndex + 1) % MessageSize.values.length],
     ));
   };
 }
@@ -304,8 +301,7 @@ ThunkAction<AppState> incrementThemeType() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.themeSettings;
     final themeTypeIndex = ThemeType.values.indexOf(currentTheme.themeType);
-    final nextThemeType =
-        ThemeType.values[(themeTypeIndex + 1) % ThemeType.values.length];
+    final nextThemeType = ThemeType.values[(themeTypeIndex + 1) % ThemeType.values.length];
 
     // update system navbar theme to match
     setSystemTheme(nextThemeType);
@@ -318,12 +314,10 @@ ThunkAction<AppState> incrementThemeType() {
 ThunkAction<AppState> incrementAvatarShape() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.themeSettings;
-    final avatarShapeIndex =
-        AvatarShape.values.indexOf(currentTheme.avatarShape);
+    final avatarShapeIndex = AvatarShape.values.indexOf(currentTheme.avatarShape);
 
     store.dispatch(SetAvatarShape(
-      avatarShape: AvatarShape
-          .values[(avatarShapeIndex + 1) % AvatarShape.values.length],
+      avatarShape: AvatarShape.values[(avatarShapeIndex + 1) % AvatarShape.values.length],
     ));
   };
 }
@@ -335,8 +329,7 @@ ThunkAction<AppState> incrementFabType() {
     final fabTypeIndex = MainFabType.values.indexOf(currentTheme.mainFabType);
 
     store.dispatch(SetMainFabType(
-      fabType:
-          MainFabType.values[(fabTypeIndex + 1) % MainFabType.values.length],
+      fabType: MainFabType.values[(fabTypeIndex + 1) % MainFabType.values.length],
     ));
   };
 }
@@ -345,12 +338,10 @@ ThunkAction<AppState> incrementFabType() {
 ThunkAction<AppState> incrementFabLocation() {
   return (Store<AppState> store) async {
     final currentTheme = store.state.settingsStore.themeSettings;
-    final fabTypeIndex =
-        MainFabLocation.values.indexOf(currentTheme.mainFabLocation);
+    final fabTypeIndex = MainFabLocation.values.indexOf(currentTheme.mainFabLocation);
 
     store.dispatch(SetMainFabLocation(
-      fabLocation: MainFabLocation
-          .values[(fabTypeIndex + 1) % MainFabLocation.values.length],
+      fabLocation: MainFabLocation.values[(fabTypeIndex + 1) % MainFabLocation.values.length],
     ));
   };
 }
@@ -363,7 +354,7 @@ ThunkAction<AppState> setLanguage(String? languageCode) {
 
 ThunkAction<AppState> incrementLanguage() {
   return (Store<AppState> store) async {
-    final languages = SupportedLanguages.all;
+    const languages = SupportedLanguages.all;
     final languageIndex = languages.indexWhere(
       (name) => name == store.state.settingsStore.language,
     );
@@ -375,16 +366,23 @@ ThunkAction<AppState> incrementLanguage() {
 
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
-    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
+    final readReceiptsIndex =
+        ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
 
     store.dispatch(SetReadReceipts(
       readReceipts:
-      ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length],
+          ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length],
     ));
 
     if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
       store.dispatch(addInfo(message: Strings.alertHiddenReadReceipts));
     }
+  };
+}
+
+ThunkAction<AppState> toggleAutoDownload() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleAutoDownload());
   };
 }
 

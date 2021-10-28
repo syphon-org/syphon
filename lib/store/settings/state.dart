@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/store/settings/chat-settings/chat-lists/model.dart';
-
-import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
+import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
+
 import './chat-settings/model.dart';
-import 'chat-settings/actions.dart';
 
 part 'state.g.dart';
 
@@ -15,6 +15,9 @@ class SettingsStore extends Equatable {
   @JsonKey(ignore: true)
   final bool loading;
 
+  final String language;
+  final String? alphaAgreement; // a timestamp of agreement for alpha TOS
+
   final bool smsEnabled;
   final bool enterSendEnabled;
   final bool typingIndicatorsEnabled;
@@ -22,24 +25,19 @@ class SettingsStore extends Equatable {
   final bool roomTypeBadgesEnabled;
   final bool timeFormat24Enabled;
   final bool dismissKeyboardEnabled;
-
-  final ReadReceiptTypes readReceipts;
-
-  final String language;
+  final bool autoDownloadEnabled;
 
   final int syncInterval;
   final int syncPollTimeout;
 
   final SortOrder globalSortOrder;
   final List<ChatList> chatLists;
+  final ReadReceiptTypes readReceipts;
 
   final List<Device> devices;
+  final ThemeSettings themeSettings;
   final Map<String, ChatSetting> chatSettings; // roomId
   final NotificationSettings notificationSettings;
-
-  final ThemeSettings themeSettings;
-
-  final String? alphaAgreement; // a timestamp of agreement for alpha TOS
 
   @JsonKey(ignore: true)
   final String? pusherToken; // NOTE: can be device token for APNS
@@ -57,6 +55,7 @@ class SettingsStore extends Equatable {
     this.roomTypeBadgesEnabled = true,
     this.timeFormat24Enabled = false,
     this.dismissKeyboardEnabled = false,
+    this.autoDownloadEnabled = false,
     this.chatSettings = const <String, ChatSetting>{},
     this.devices = const [],
     this.loading = false,
@@ -76,6 +75,7 @@ class SettingsStore extends Equatable {
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
         dismissKeyboardEnabled,
+        autoDownloadEnabled,
         chatSettings,
         chatLists,
         devices,
@@ -85,7 +85,7 @@ class SettingsStore extends Equatable {
         alphaAgreement,
         pusherToken,
         readReceipts,
-  ];
+      ];
 
   SettingsStore copyWith({
     String? language,
@@ -96,6 +96,7 @@ class SettingsStore extends Equatable {
     bool? roomTypeBadgesEnabled,
     bool? timeFormat24Enabled,
     bool? dismissKeyboardEnabled,
+    bool? autoDownloadEnabled,
     int? syncInterval,
     int? syncPollTimeout,
     Map<String, ChatSetting>? chatSettings,
@@ -112,15 +113,12 @@ class SettingsStore extends Equatable {
         language: language ?? this.language,
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
-        typingIndicatorsEnabled:
-            typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
+        typingIndicatorsEnabled: typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
-        dismissKeyboardEnabled:
-            dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
-        membershipEventsEnabled:
-            membershipEventsEnabled ?? this.membershipEventsEnabled,
-        roomTypeBadgesEnabled:
-            roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
+        dismissKeyboardEnabled: dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
+        membershipEventsEnabled: membershipEventsEnabled ?? this.membershipEventsEnabled,
+        roomTypeBadgesEnabled: roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
+        autoDownloadEnabled: autoDownloadEnabled ?? this.autoDownloadEnabled,
         syncInterval: syncInterval ?? this.syncInterval,
         syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
         chatSettings: chatSettings ?? this.chatSettings,
@@ -136,6 +134,5 @@ class SettingsStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
 
-  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
-      _$SettingsStoreFromJson(json);
+  factory SettingsStore.fromJson(Map<String, dynamic> json) => _$SettingsStoreFromJson(json);
 }

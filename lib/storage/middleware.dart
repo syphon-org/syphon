@@ -39,7 +39,8 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
     next(action);
 
     if (storageOld == null) {
-      printWarning('storage is null, skipping saving cold storage data!!!', title: 'storageMiddleware');
+      printWarning('storage is null, skipping saving cold storage data!!!',
+          title: 'storageMiddleware');
       return;
     }
 
@@ -57,10 +58,12 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
         final _action = action as UpdateMediaCache;
 
         // dont save decrypted images
-        final decrypting = store.state.mediaStore.mediaStatus[_action.mxcUri] == MediaStatus.DECRYPTING.value;
+        final decrypting =
+            store.state.mediaStore.mediaStatus[_action.mxcUri] == MediaStatus.DECRYPTING.value;
         if (decrypting) return;
 
-        saveMedia(_action.mxcUri, _action.data, info: _action.info, type: _action.type, storage: storage!);
+        saveMedia(_action.mxcUri, _action.data,
+            info: _action.info, type: _action.type, storage: storage!);
         break;
       case UpdateRoom:
         final _action = action as UpdateRoom;
@@ -132,6 +135,7 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
       case SetSyncInterval:
       case SetMainFabLocation:
       case SetMainFabType:
+      case ToggleAutoDownload:
         saveSettings(store.state.settingsStore, storage: storageOld);
         break;
       case SetOlmAccountBackup:

@@ -11,6 +11,13 @@ enum LastUpdateType {
   State,
 }
 
+///
+/// Chat Setting (not plural)
+///
+/// TODO:
+/// convert to "ChatSetting(s)" and make chat specific
+/// customizations nested within a customChats object
+///
 @JsonSerializable()
 class ChatSetting extends Equatable {
   final String roomId;
@@ -53,6 +60,5 @@ class ChatSetting extends Equatable {
       );
   Map<String, dynamic> toJson() => _$ChatSettingToJson(this);
 
-  factory ChatSetting.fromJson(Map<String, dynamic> json) =>
-      _$ChatSettingFromJson(json);
+  factory ChatSetting.fromJson(Map<String, dynamic> json) => _$ChatSettingFromJson(json);
 }

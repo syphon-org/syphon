@@ -1,13 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -55,8 +52,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                             GestureDetector(
                               onTap: () => props.onDisabled(),
                               child: ListTile(
-                                onTap: () => Navigator.pushNamed(
-                                    context, Routes.settingsLanguages),
+                                onTap: () => Navigator.pushNamed(context, Routes.settingsLanguages),
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
                                   'Language',
@@ -78,8 +74,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 ),
                                 trailing: Switch(
                                   value: false,
-                                  inactiveThumbColor:
-                                      Color(Colours.greyDisabled),
+                                  inactiveThumbColor: Color(Colours.greyDisabled),
                                   onChanged: (showMembershipEvents) {},
                                 ),
                               ),
@@ -95,9 +90,8 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
-                                value: props.enterSend!,
-                                onChanged: (enterSend) =>
-                                    props.onToggleEnterSend(),
+                                value: props.enterSend,
+                                onChanged: (enterSend) => props.onToggleEnterSend(),
                               ),
                             ),
                             ListTile(
@@ -111,9 +105,8 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
-                                value: props.timeFormat24!,
-                                onChanged: (value) =>
-                                    props.onToggleTimeFormat(),
+                                value: props.timeFormat24,
+                                onChanged: (value) => props.onToggleTimeFormat(),
                               ),
                             ),
                             ListTile(
@@ -127,9 +120,8 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
-                                value: props.dismissKeyboard!,
-                                onChanged: (value) =>
-                                    props.onToggleDismissKeyboard(),
+                                value: props.dismissKeyboard,
+                                onChanged: (value) => props.onToggleDismissKeyboard(),
                               ),
                             ),
                           ],
@@ -217,6 +209,21 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
                             ),
+                            ListTile(
+                              onTap: () => props.onToggleAutoDownload(),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Auto Download',
+                              ),
+                              subtitle: Text(
+                                props.autoDownload ? 'On' : 'Off',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: props.autoDownload,
+                                onChanged: (enabled) => props.onToggleAutoDownload(),
+                              ),
+                            ),
                             GestureDetector(
                               onTap: () => props.onDisabled(),
                               child: ListTile(
@@ -226,7 +233,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                                   'When using mobile data',
                                 ),
                                 subtitle: Text(
-                                  'Images, Audio, Video, Documents, Other',
+                                  'Images, Audio, Video, Files',
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
@@ -240,7 +247,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                                   'When using Wi-Fi',
                                 ),
                                 subtitle: Text(
-                                  'Images, Audio, Video, Documents, Other',
+                                  'Images, Audio, Video, Files',
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
@@ -254,7 +261,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                                   'When Roaming',
                                 ),
                                 subtitle: Text(
-                                  'Images, Audio, Video, Documents, Other',
+                                  'Images, Audio, Video, Files',
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
@@ -272,14 +279,17 @@ class ChatsSettingsScreen extends StatelessWidget {
 
 class Props extends Equatable {
   final String? language;
-  final bool? enterSend;
-  final bool? timeFormat24;
-  final bool? dismissKeyboard;
+
+  final bool enterSend;
+  final bool timeFormat24;
+  final bool dismissKeyboard;
+  final bool autoDownload;
 
   final Function onDisabled;
   final Function onIncrementLanguage;
   final Function onToggleEnterSend;
   final Function onToggleTimeFormat;
+  final Function onToggleAutoDownload;
   final Function onToggleDismissKeyboard;
 
   const Props({
@@ -287,27 +297,30 @@ class Props extends Equatable {
     required this.enterSend,
     required this.timeFormat24,
     required this.dismissKeyboard,
+    required this.autoDownload,
     required this.onDisabled,
     required this.onIncrementLanguage,
     required this.onToggleEnterSend,
     required this.onToggleTimeFormat,
     required this.onToggleDismissKeyboard,
+    required this.onToggleAutoDownload,
   });
 
   @override
   List<Object?> get props => [
         language,
         enterSend,
+        autoDownload,
         timeFormat24,
         dismissKeyboard,
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        language: DisplayName(Locale(store.state.settingsStore.language))
-            .toDisplayName(),
+        language: DisplayName(Locale(store.state.settingsStore.language)).toDisplayName(),
         enterSend: store.state.settingsStore.enterSendEnabled,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
         dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
+        autoDownload: store.state.settingsStore.autoDownloadEnabled,
         onIncrementLanguage: () {
           store.dispatch(addInfo(
             message: Strings.alertAppRestartEffect,
@@ -315,9 +328,10 @@ class Props extends Equatable {
           ));
           store.dispatch(incrementLanguage());
         },
-        onToggleDismissKeyboard: () => store.dispatch(toggleDismissKeyboard()),
-        onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),
-        onToggleEnterSend: () => store.dispatch(toggleEnterSend()),
         onDisabled: () => store.dispatch(addInProgress()),
+        onToggleEnterSend: () => store.dispatch(toggleEnterSend()),
+        onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),
+        onToggleAutoDownload: () => store.dispatch(toggleAutoDownload()),
+        onToggleDismissKeyboard: () => store.dispatch(toggleDismissKeyboard()),
       );
 }

@@ -15,6 +15,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/chat-settings/actions.dart';
+import 'package:syphon/store/settings/models.dart';
 
 class ResetEvents {}
 

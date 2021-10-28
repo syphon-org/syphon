@@ -7,10 +7,12 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/model.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
+import 'package:touchable_opacity/touchable_opacity.dart';
 
 ///
 /// Matrix Image
@@ -23,16 +25,20 @@ import 'package:syphon/views/widgets/lifecycle.dart';
 ///
 class MatrixImage extends StatefulWidget {
   final String? mxcUri;
+  final String? imageType;
+
   final double width;
   final double height;
   final double? size;
   final double strokeWidth;
   final double loadingPadding;
-  final String? imageType;
-  final BoxFit fit;
-  final bool thumbnail;
+
   final bool rebuild;
+  final bool thumbnail;
+  final bool autodownload;
   final bool forceLoading;
+
+  final BoxFit fit;
   final Widget? fallback;
   final Color fallbackColor;
 
@@ -47,6 +53,7 @@ class MatrixImage extends StatefulWidget {
     this.loadingPadding = 0,
     this.fit = BoxFit.fill,
     this.thumbnail = true,
+    this.autodownload = true,
     this.rebuild = true,
     this.forceLoading = false,
     this.fallbackColor = Colors.grey,
@@ -60,12 +67,14 @@ class MatrixImage extends StatefulWidget {
 class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
   Uint8List? finalUriData;
 
+  bool localLoading = false;
+
   @override
   void onMounted({bool rebuild = true}) {
     final store = StoreProvider.of<AppState>(context);
     final mediaCache = store.state.mediaStore.mediaCache;
 
-    if (!mediaCache.containsKey(widget.mxcUri)) {
+    if (!mediaCache.containsKey(widget.mxcUri) && widget.autodownload) {
       store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
     }
 
@@ -84,13 +93,54 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
     onMounted(rebuild: true);
   }
 
+  onManualLoad() async {
+    final store = StoreProvider.of<AppState>(context);
+    localLoading = true;
+    await store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
+    localLoading = false;
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
         builder: (context, props) {
-          final failed = props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
+          final failed =
+              props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
           final loading = widget.forceLoading || !props.exists;
+
+          // allows user option to manually load images on tap
+          if (!widget.autodownload && !props.exists && !localLoading) {
+            return TouchableOpacity(
+              onTap: () => onManualLoad(),
+              child: Container(
+                width: widget.size ?? widget.width,
+                height: widget.size ?? widget.height,
+                child: Padding(
+                  padding: EdgeInsets.all(widget.loadingPadding),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.photo,
+                        size: Dimensions.avatarSizeLarge,
+                        color: Colors.white,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: Text(
+                          Strings.labelDownloadImage,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
 
           if (failed) {
             return CircleAvatar(

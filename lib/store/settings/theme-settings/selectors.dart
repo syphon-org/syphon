@@ -4,6 +4,7 @@ import 'package:syphon/global/algos.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/chat-settings/actions.dart';
+import 'package:syphon/store/settings/models.dart';
 import 'model.dart';
 
 String selectMainFabType(ThemeSettings themeSettings) {

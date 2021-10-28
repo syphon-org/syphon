@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:swipeable/swipeable.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -9,6 +10,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
@@ -471,6 +473,10 @@ class MessageWidget extends StatelessWidget {
                                       child: MatrixImage(
                                         mxcUri: message.url,
                                         thumbnail: false,
+                                        autodownload: StoreProvider.of<AppState>(context)
+                                            .state
+                                            .settingsStore
+                                            .autoDownloadEnabled,
                                         fit: BoxFit.cover,
                                         rebuild: true,
                                         width: Dimensions.mediaSizeMaxMessage,

@@ -51,6 +51,9 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       primaryColorBrightness: brightness,
       primaryColorDark: primaryColor,
       primaryColorLight: primaryColor,
+      // TODO: remove when secondary / primary color scheme works for Switch() widgets
+      // ignore: deprecated_member_use
+      accentColor: secondaryColor,
       brightness: brightness,
       colorScheme: ThemeData().colorScheme.copyWith(
             primary: primaryColor,
@@ -75,7 +78,8 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       ),
       selectedRowColor: Color(selectedRowColor),
       iconTheme: IconThemeData(color: iconColor),
-      scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
+      scaffoldBackgroundColor:
+          scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
           color: invertedPrimaryColor,

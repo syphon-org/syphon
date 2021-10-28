@@ -40,8 +40,7 @@ class Strings {
   static final titleDialogTerms = tr('title-dialog-terms');
   static final titleDialogTermsAlpha = tr('title-dialog-terms-alpha');
   static final titleDialogCaptcha = tr('title-dialog-captcha');
-  static final titleDialogSignupEmailVerification =
-      tr('title-dialog-email-requirement-verified');
+  static final titleDialogSignupEmailVerification = tr('title-dialog-email-requirement-verified');
   static final titleConfirmPassword = tr('title-confirm-password');
   static final titleConfirmDeleteKeys = tr('title-dialog-delete-keys');
   static final titleConfirmEmail = tr('title-confirm-email');
@@ -66,23 +65,20 @@ class Strings {
   static final labelUsersResults = tr('label-users-results');
   static final labelMessagesEmpty = tr('label-messages-empty');
   static final labelSendEncrypted = tr('label-send-encrypted');
+  static final labelDownloadImage = tr('label-download-image');
   static final labelSendUnencrypted = tr('label-send-unencrypted');
   static final labelSearchHomeservers = tr('label-search-homeservers');
-  static final labelSearchResults =
-      tr('label-search-results'); // 'Search Results'
+  static final labelSearchResults = tr('label-search-results'); // 'Search Results'
   static final labelRoomNameDefault = tr('label-chat-default'); // 'New Chat'
-  static final labelEncryptedMessage =
-      tr('label-message-encrypted'); //  'Encrypted Message';
-  static final labelDeletedMessage =
-      tr('label-deleted-message'); // 'This message was deleted';
+  static final labelEncryptedMessage = tr('label-message-encrypted'); //  'Encrypted Message';
+  static final labelDeletedMessage = tr('label-deleted-message'); // 'This message was deleted';
   static final labelOn = tr('label-on'); // 'On';
   static final labelOff = tr('label-off'); // 'Off';
   static final labelTermsOfService = tr('label-terms-of-service');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
-  static final listItemSettingsNotification =
-      tr('list-item-settings-notification');
+  static final listItemSettingsNotification = tr('list-item-settings-notification');
   static final listItemSettingsPrivacy = tr('list-item-settings-privacy');
   static final listItemSettingsLogout = tr('list-item-settings-logout');
 
@@ -91,11 +87,9 @@ class Strings {
   static final buttonNext = tr('button-next');
   static final buttonFinish = tr('button-finish');
   static final buttonLoginSSO = tr('button-login-sso');
-  static final buttonSave = tr('button-save'); // 'save';
-  static final buttonSendVerification =
-      tr('button-send-verification'); // 'send verification email';
-  static final buttonConfirmVerification =
-      tr('button-confirm-verification'); //  'confirm verification';
+  static final buttonSave = tr('button-save');
+  static final buttonSendVerification = tr('button-send-verification');
+  static final buttonConfirmVerification = tr('button-confirm-verification');
   static final buttonStartChat = tr('button-start-chat'); // 'let\'s chat';
   static final buttonCreate = tr('button-create'); // 'create';
   static final buttonCancel = tr('button-cancel'); //'cancel';
@@ -111,22 +105,18 @@ class Strings {
   static final buttonArchiveChat = tr('button-archive-chat');
   static final buttonSelectAll = tr('button-select-all');
   static final buttonRoomDetails = tr('button-room-details');
-  static final buttonResetPassword =
-      tr('button-reset-password'); // 'reset password';
+  static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
 
   // Buttons (Text)
   static final buttonTextLogin = tr('button-text-login'); // 'Login';
-  static final buttonTextLoginQuestion =
-      tr('button-text-login-question'); // 'Already have a username?';
+  static final buttonTextLoginQuestion = tr('button-text-login-question');
   static final buttonTextSignupAction = tr('button-text-signup-action');
   static final buttonTextSignupQuestion = tr('button-text-signup-question');
   static final buttonTextAgreement = tr('button-text-agreement'); // 'I Agree';
-  static final buttonTextSeeAllUsers =
-      tr('button-text-see-users'); // ; 'See All Users';
+  static final buttonTextSeeAllUsers = tr('button-text-see-users'); // ; 'See All Users';
   static final buttonTextLoadCaptcha = tr('button-text-load-captcha');
   static final buttonTextConfirmed = tr('button-text-confirmed');
-  static final buttonTextDeleteKeys =
-      tr('button-delete-keys'); //  'delete keys';
+  static final buttonTextDeleteKeys = tr('button-delete-keys'); //  'delete keys';
 
   // Buttons (Options)
   static final buttonTextCreateGroup = tr('button-text-create-group');
@@ -138,21 +128,17 @@ class Strings {
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');
   static final placeholderMatrixEncrypted = tr('label-message-matrix');
-  static final placeholderMatrixUnencrypted =
-      tr('label-message-matrix-unencrypted');
+  static final placeholderMatrixUnencrypted = tr('label-message-matrix-unencrypted');
 
   // Warnings
   static final warningDeactivateAccount = tr('warning-deactivate-account');
-  static final warrningDeactivateAccountFinal =
-      tr('warning-deactivate-account-final');
+  static final warrningDeactivateAccountFinal = tr('warning-deactivate-account-final');
 
   // Alerts
   static final alertAppRestartEffect = tr('alert-restart-app-effect');
   static final alertInviteUnknownUser = tr('alert-invite-user-unknown');
-  static final alertMessageSendingFailed =
-      tr('alert-message-failed'); // 'Message Failed To Send';
-  static final alertCheckHomeserver =
-      tr('alert-homeserver-invalid'); // 'Message Failed To Send';
+  static final alertMessageSendingFailed = tr('alert-message-failed'); // 'Message Failed To Send';
+  static final alertCheckHomeserver = tr('alert-homeserver-invalid'); // 'Message Failed To Send';
   static final alertFeatureInProgress = tr('alert-feature-in-progress');
   static final alertHiddenReadReceipts = tr('alert-hidden-read-receipts');
 
@@ -161,34 +147,22 @@ class Strings {
 
   // Content
   static final contentCaptchaWarning = tr('content-captcha-warning');
-  static final contentPasswordRecommendation =
-      tr('content-password-recommendation');
+  static final contentPasswordRecommendation = tr('content-password-recommendation');
   static final contentDeleteDevices = tr('content-dialog-devices-delete');
-  static final contentKeyExportWarning =
-      tr('content-dialog-devices-key-export');
+  static final contentKeyExportWarning = tr('content-dialog-devices-key-export');
   static final contentEmailRequirement = tr('content-signup-email-requirement');
-  static final contentEmailVerification =
-      tr('content-signup-email-verification');
-  static final contentForgotEmailVerification =
-      tr('content-forgot-email-verification');
-  static final contentConfirmPasswordReset =
-      tr('content-confirm-password-reset');
-  static final contentPasswordRequirements =
-      tr('content-password-requirements');
-  static final contentCaptchaRequirement =
-      tr('content-signup-captcha-requirement');
+  static final contentEmailVerification = tr('content-signup-email-verification');
+  static final contentForgotEmailVerification = tr('content-forgot-email-verification');
+  static final contentConfirmPasswordReset = tr('content-confirm-password-reset');
+  static final contentPasswordRequirements = tr('content-password-requirements');
+  static final contentCaptchaRequirement = tr('content-signup-captcha-requirement');
 
-  static final contentIntroFirstPartOne =
-      tr('content-intro-section-one', args: [Values.appName]);
+  static final contentIntroFirstPartOne = tr('content-intro-section-one', args: [Values.appName]);
   static final contentIntroSecondPartOne = tr('content-intro-section-two');
-  static final contentIntroSecondPartBold =
-      tr('content-intro-section-two-part-two');
-  static final contentIntroSecondPartTwo =
-      tr('content-intro-section-two-part-three');
-  static final contentIntroThird =
-      tr('content-intro-section-three', args: [Values.appName]);
-  static final contentIntroFinal =
-      tr('content-intro-section-four', args: [Values.appName]);
+  static final contentIntroSecondPartBold = tr('content-intro-section-two-part-two');
+  static final contentIntroSecondPartTwo = tr('content-intro-section-two-part-three');
+  static final contentIntroThird = tr('content-intro-section-three', args: [Values.appName]);
+  static final contentIntroFinal = tr('content-intro-section-four', args: [Values.appName]);
 
   // Confirmations (use confirm*)
   static final confirmInvite = tr('confirm-invite');
@@ -210,32 +184,23 @@ class Strings {
   static final confirmAlphaVersion = tr('confirm-alpha-version');
   static final confirmAlphaWarning = tr('confirm-alpha-warning');
   static final confirmAlphaWarningAlt = tr('confirm-alpha-warning-alt');
-  static final confirmAppTermsOfService =
-      tr('confirm-terms-of-service', args: [Values.appName]);
-  static final confirmTermsOfServiceConclusion =
-      tr('confirm-terms-of-service-alt');
+  static final confirmAppTermsOfService = tr('confirm-terms-of-service', args: [Values.appName]);
+  static final confirmTermsOfServiceConclusion = tr('confirm-terms-of-service-alt');
 
-  static String confirmArchiveRooms({required Iterable<Room> rooms}) =>
-      rooms.length == 1
-          ? tr('confirm-archive-chat-single',
-              args: ['${rooms.first.name}', Values.appName])
-          : tr('confirm-archive-chat-multi',
-              args: ['${rooms.length}', Values.appName]);
+  static String confirmArchiveRooms({required Iterable<Room> rooms}) => rooms.length == 1
+      ? tr('confirm-archive-chat-single', args: ['${rooms.first.name}', Values.appName])
+      : tr('confirm-archive-chat-multi', args: ['${rooms.length}', Values.appName]);
 
-  static String confirmDeleteRooms(
-          {required Iterable<Room> rooms}) =>
-      rooms.length == 1
-          ? tr('confirm-delete-chat-single',
-              args: ['${rooms.first.name}', Values.appName])
-          : tr('confirm-delete-chat-multi',
-              args: ['${rooms.length}', Values.appName]);
+  static String confirmDeleteRooms({required Iterable<Room> rooms}) => rooms.length == 1
+      ? tr('confirm-delete-chat-single', args: ['${rooms.first.name}', Values.appName])
+      : tr('confirm-delete-chat-multi', args: ['${rooms.length}', Values.appName]);
 
   static String confirmLeaveRooms({required Iterable<Room> rooms}) {
     final singleOrMulti = rooms.length == 1 ? 'single' : 'multi';
 
     var s = tr(
       'confirm-leave-chat-$singleOrMulti',
-      args: [rooms.length == 1 ? '${rooms.first.name}' : '${rooms.length}'],
+      args: [if (rooms.length == 1) '${rooms.first.name}' else '${rooms.length}'],
     );
 
     if (rooms.where((element) => element.type != 'public').isNotEmpty) {
@@ -245,8 +210,7 @@ class Strings {
     return s;
   }
 
-  static String confirmBlockUser({String? name}) =>
-      tr('confirm-block-user', args: ['$name']);
+  static String confirmBlockUser({String? name}) => tr('confirm-block-user', args: ['$name']);
 
   // Accessibility
   static final semanticsImageIntro = tr('semnatics-image-intro');
@@ -254,8 +218,6 @@ class Strings {
   static final semanticsIntroFinal = tr('semnatics-image-intro-section-four');
   static final semanticsIntroThird = tr('semnatics-image-intro-section-third');
   static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');
-  static final semanticsImageSignupUsername =
-      tr('semantics-image-signup-username');
-  static final semanticsImagePasswordReset =
-      tr('semantics-image-password-reset');
+  static final semanticsImageSignupUsername = tr('semantics-image-signup-username');
+  static final semanticsImagePasswordReset = tr('semantics-image-password-reset');
 }
