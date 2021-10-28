@@ -9,6 +9,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
@@ -27,6 +28,7 @@ class AppBarMessageOptions extends StatefulWidget
     this.onCopy,
     this.onDelete,
     this.onDismiss,
+    required this.user,
   }) : super(key: key);
 
   final String title;
@@ -34,6 +36,8 @@ class AppBarMessageOptions extends StatefulWidget
   final String tooltip;
 
   final Room? room;
+  final User user;
+
   final Message? message;
   final double? elevation;
   final Brightness brightness;
@@ -106,18 +110,35 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               }
             },
           ),
-          IconButton(
-              icon: Icon(Icons.delete),
-              iconSize: 28.0,
-              tooltip: 'Delete Message',
-              color: Colors.white,
-              onPressed: () {
-                if (widget.onDelete != null) {
-                  widget.onDelete!();
+          FutureBuilder<bool>(
+              future: isMessageDeletable(
+                  room: widget.room,
+                  message: widget.message,
+                  user: widget.user), // async work
+              builder: (context, snapshot) {
+                final deleteButton = IconButton(
+                    icon: Icon(Icons.delete),
+                    iconSize: 28.0,
+                    tooltip: 'Delete Message',
+                    color: Colors.white,
+                    onPressed: () {
+                      if (widget.onDelete != null) {
+                        widget.onDelete!();
+                      }
+                      if (widget.onDismiss != null) {
+                        widget.onDismiss!();
+                      }
+                    });
+
+                if (snapshot.hasData) {
+                  return Visibility(
+                      visible: snapshot.data!, child: deleteButton);
                 }
-                if (widget.onDismiss != null) {
-                  widget.onDismiss!();
-                }
+
+                return Visibility(
+                  visible: false,
+                  child: deleteButton,
+                );
               }),
           Visibility(
             visible: isTextMessage(message: widget.message!),

@@ -548,10 +548,12 @@ class ChatScreenState extends State<ChatScreen> {
 
           if (selectedMessage != null) {
             appBar = AppBarMessageOptions(
+              user: props.currentUser,
               room: props.room,
               message: selectedMessage,
               onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
+                room: props.room,
                 message: selectedMessage,
               ),
             );
@@ -654,6 +656,7 @@ class ChatScreenState extends State<ChatScreen> {
 }
 
 class _Props extends Equatable {
+  final User currentUser;
   final Room room;
   final String? userId;
   final bool loading;
@@ -679,6 +682,7 @@ class _Props extends Equatable {
   final Function onMarkRead;
   final Function onSelectReply;
 
+
   const _Props({
     required this.room,
     required this.themeType,
@@ -703,6 +707,7 @@ class _Props extends Equatable {
     required this.onToggleReaction,
     required this.onMarkRead,
     required this.onSelectReply,
+    required this.currentUser
   });
 
   @override
@@ -715,6 +720,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+        currentUser: store.state.authStore.currentUser,
         room: selectRoom(id: roomId, state: store.state),
         showAvatars: roomUsers(store.state, roomId).length > 2,
         themeType: store.state.settingsStore.themeSettings.themeType,
@@ -773,9 +779,9 @@ class _Props extends Equatable {
             message: message,
           ));
         },
-        onDeleteMessage: ({Message? message}) {
-          if (message != null) {
-            store.dispatch(deleteMessage(message: message));
+        onDeleteMessage: ({Message? message, Room? room}) {
+          if (message != null && room != null) {
+            store.dispatch(deleteMessage(message: message, room: room));
           }
         },
         onAcceptInvite: () {

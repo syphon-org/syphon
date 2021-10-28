@@ -1,3 +1,4 @@
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
@@ -145,6 +146,30 @@ EventStore eventReducer(
       outboxNew[roomId] = outbox;
 
       return state.copyWith(outbox: outboxNew);
+
+    case DeleteMessage:
+      final room = action.room;
+      final roomId = room.id;
+      final message = (action as DeleteMessage).message;
+
+      final messages = Map<String, List<Message>>.from(
+        state.messages,
+      );
+
+      final messagesRoom = messages[roomId];
+
+      if (messagesRoom == null) {
+        return state;
+      }
+
+      for (final rMessage in messagesRoom) {
+        if (rMessage.id == message.id){
+          rMessage.body = Strings.labelDeletedMessage;
+        }
+      }
+
+      return state.copyWith(messages: messages);
+
 
     case SetRedactions:
       if (action.redactions.isEmpty) {

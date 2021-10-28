@@ -34,7 +34,7 @@ class Message extends Event implements drift.Insertable<Message> {
   final int received;
 
   // Message Only
-  final String? body;
+  String? body;
   final String? msgtype;
   final String? format;
   final String? formattedBody;
@@ -58,7 +58,7 @@ class Message extends Event implements drift.Insertable<Message> {
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
 
-  const Message({
+  Message({
     String? id,
     String? userId,
     String? roomId,

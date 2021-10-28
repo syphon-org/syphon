@@ -394,4 +394,32 @@ abstract class Events {
 
     return await json.decode(response.body);
   }
+
+  /// Delete Message - PUT
+  /// https://matrix.org/docs/spec/client_server/r0.6.1#m-room-redaction
+  static Future<dynamic> deleteMessage({
+    String? protocol = 'https://',
+    String? homeserver = Values.homeserverDefault,
+    String? accessToken,
+    String? roomId,
+    String? eventId,
+    String? txnId,
+
+  })async{
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/';
+
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
+    };
+
+    final Map body = {};
+
+    final response = await http.put(Uri.parse(url), headers:  headers, body: json.encode(body));
+
+    return await json.decode(
+      response.body,
+    );
+  }
+
 }

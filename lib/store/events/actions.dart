@@ -94,6 +94,13 @@ class DeleteOutboxMessage {
   DeleteOutboxMessage({required this.message});
 }
 
+class DeleteMessage{
+  final Room room;
+  final Message message;
+
+  DeleteMessage({required this.room, required this.message});
+}
+
 ThunkAction<AppState> addMessages({
   required Room room,
   List<Message> messages = const [],
@@ -393,11 +400,19 @@ ThunkAction<AppState> sendTyping({
 }
 
 /// Delete Room Event (For Outbox, Local, and Remote)
-ThunkAction<AppState> deleteMessage({required Message message}) {
+ThunkAction<AppState> deleteMessage({required Message message, required Room room}) {
   return (Store<AppState> store) async {
     try {
       if (message.pending || message.failed) {
         return store.dispatch(DeleteOutboxMessage(message: message));
+      }
+      else {
+        await MatrixApi.deleteMessage(
+            roomId: room.id,
+            eventId: message.id,
+            accessToken: store.state.authStore.user.accessToken,
+            homeserver: store.state.authStore.user.homeserver);
+        return store.dispatch(DeleteMessage(room: room, message: message));
       }
     } catch (error) {
       debugPrint('[deleteMessage] $error');
