@@ -112,11 +112,14 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
           ),
           FutureBuilder<bool>(
               future: isMessageDeletable(
-                  room: widget.room,
-                  message: widget.message,
-                  user: widget.user), // async work
+                room: widget.room,
+                message: widget.message,
+                user: widget.user,
+              ),
               builder: (context, snapshot) {
-                final deleteButton = IconButton(
+                return Visibility(
+                  visible: snapshot.hasData && (snapshot.data ?? false),
+                  child: IconButton(
                     icon: Icon(Icons.delete),
                     iconSize: 28.0,
                     tooltip: 'Delete Message',
@@ -128,16 +131,8 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                       if (widget.onDismiss != null) {
                         widget.onDismiss!();
                       }
-                    });
-
-                if (snapshot.hasData) {
-                  return Visibility(
-                      visible: snapshot.data!, child: deleteButton);
-                }
-
-                return Visibility(
-                  visible: false,
-                  child: deleteButton,
+                    },
+                  ),
                 );
               }),
           Visibility(

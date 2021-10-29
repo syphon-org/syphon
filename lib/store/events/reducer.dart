@@ -150,7 +150,7 @@ EventStore eventReducer(
     case DeleteMessage:
       final room = action.room;
       final roomId = room.id;
-      final message = (action as DeleteMessage).message;
+      final messageDeleted = (action as DeleteMessage).message;
 
       final messages = Map<String, List<Message>>.from(
         state.messages,
@@ -162,14 +162,14 @@ EventStore eventReducer(
         return state;
       }
 
-      for (final rMessage in messagesRoom) {
-        if (rMessage.id == message.id){
-          rMessage.body = Strings.labelDeletedMessage;
+      messages[roomId] = messagesRoom.map((message) {
+        if (message.id == messageDeleted.id) {
+          return message.copyWith(body: Strings.labelDeletedMessage);
         }
-      }
+        return message;
+      }).toList();
 
       return state.copyWith(messages: messages);
-
 
     case SetRedactions:
       if (action.redactions.isEmpty) {

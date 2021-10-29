@@ -406,14 +406,13 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
       if (message.pending || message.failed) {
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
-      else {
-        await MatrixApi.deleteMessage(
-            roomId: room.id,
-            eventId: message.id,
-            accessToken: store.state.authStore.user.accessToken,
-            homeserver: store.state.authStore.user.homeserver);
+
+      await MatrixApi.deleteMessage(
+          roomId: room.id,
+          eventId: message.id,
+          accessToken: store.state.authStore.user.accessToken,
+          homeserver: store.state.authStore.user.homeserver);
         return store.dispatch(DeleteMessage(room: room, message: message));
-      }
     } catch (error) {
       debugPrint('[deleteMessage] $error');
     }
