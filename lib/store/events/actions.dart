@@ -4,8 +4,11 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/events/model.dart';
@@ -94,7 +97,7 @@ class DeleteOutboxMessage {
   DeleteOutboxMessage({required this.message});
 }
 
-class DeleteMessage{
+class DeleteMessage {
   final Room room;
   final Message message;
 
@@ -407,12 +410,37 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
 
-      await MatrixApi.deleteMessage(
-          roomId: room.id,
-          eventId: message.id,
-          accessToken: store.state.authStore.user.accessToken,
-          homeserver: store.state.authStore.user.homeserver);
-        return store.dispatch(DeleteMessage(room: room, message: message));
+      final currentUser = store.state.authStore.currentUser;
+
+      final canDelete = await isMessageDeletable(
+        message: message,
+        user: currentUser,
+        room: room,
+      );
+
+      if (!canDelete) {
+        store.dispatch(addInfo(
+          message: 'You don\'t have permissions to delete this message.',
+          action: 'Dismiss',
+        ));
+        return;
+      }
+
+      final result = await MatrixApi.deleteMessage(
+        roomId: room.id,
+        eventId: message.id,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+      );
+
+      if (!result) {
+        throw 'Failed to delete message, try again soon';
+      }
+
+      // deleted messages returned remotely will have empty 'body' fields
+      final messageDeleted = message.copyWith(body: '');
+
+      return store.dispatch(DeleteMessage(room: room, message: messageDeleted));
     } catch (error) {
       debugPrint('[deleteMessage] $error');
     }

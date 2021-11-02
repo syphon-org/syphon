@@ -31,7 +31,8 @@ List<Message> roomMessages(AppState state, String? roomId) {
 
     messages = messagesNormal.keys
         .map((id) =>
-            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? Message())
+            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ??
+            Message())
         .toList();
   }
 
@@ -106,7 +107,8 @@ Map<String, Message?> appendReactions(
   required Map<String, List<Reaction>> reactions,
 }) {
   // get a list message ids (also reaction keys) that have values in 'reactions'
-  final List<String> reactionedMessageIds = reactions.keys.where((k) => messages.containsKey(k)).toList();
+  final List<String> reactionedMessageIds =
+      reactions.keys.where((k) => messages.containsKey(k)).toList();
 
   // add the parsed list to the message to be handled in the UI
   for (final String messageId in reactionedMessageIds) {
@@ -217,28 +219,4 @@ bool isTextMessage({required Message message}) {
       message.msgtype == MatrixMessageTypes.emote ||
       message.msgtype == MatrixMessageTypes.notice ||
       message.type == EventTypes.encrypted;
-}
-
-Future<bool> isMessageDeletable({Message? message, User? user, Room? room})async{
-  try{
-    final powerLevels = await MatrixApi.fetchPowerLevels(room: room, homeserver: user!.homeserver,
-        accessToken: user.accessToken);
-
-    final powerLevelUser = powerLevels['users'];
-    final userLevel = powerLevelUser[user.userId];
-
-    if (userLevel == null && message!.sender != user.userId){
-      return false;
-    }
-
-    if (message!.sender == user.userId || userLevel > 0){
-      return true;
-    }
-
-    return false;
-  }
-  catch(error){
-    debugPrint('[deleteMessage] $error');
-    return false;
-  }
 }

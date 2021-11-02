@@ -682,7 +682,6 @@ class _Props extends Equatable {
   final Function onMarkRead;
   final Function onSelectReply;
 
-
   const _Props({
     required this.room,
     required this.themeType,
@@ -707,7 +706,7 @@ class _Props extends Equatable {
     required this.onToggleReaction,
     required this.onMarkRead,
     required this.onSelectReply,
-    required this.currentUser
+    required this.currentUser,
   });
 
   @override

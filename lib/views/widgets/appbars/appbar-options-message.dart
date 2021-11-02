@@ -13,8 +13,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
-class AppBarMessageOptions extends StatefulWidget
-    implements PreferredSizeWidget {
+class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget {
   const AppBarMessageOptions({
     Key? key,
     this.title = 'title:',
@@ -110,31 +109,20 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               }
             },
           ),
-          FutureBuilder<bool>(
-              future: isMessageDeletable(
-                room: widget.room,
-                message: widget.message,
-                user: widget.user,
-              ),
-              builder: (context, snapshot) {
-                return Visibility(
-                  visible: snapshot.hasData && (snapshot.data ?? false),
-                  child: IconButton(
-                    icon: Icon(Icons.delete),
-                    iconSize: 28.0,
-                    tooltip: 'Delete Message',
-                    color: Colors.white,
-                    onPressed: () {
-                      if (widget.onDelete != null) {
-                        widget.onDelete!();
-                      }
-                      if (widget.onDismiss != null) {
-                        widget.onDismiss!();
-                      }
-                    },
-                  ),
-                );
-              }),
+          IconButton(
+            icon: Icon(Icons.delete),
+            iconSize: 28.0,
+            tooltip: 'Delete Message',
+            color: Colors.white,
+            onPressed: () {
+              if (widget.onDelete != null) {
+                widget.onDelete!();
+              }
+              if (widget.onDismiss != null) {
+                widget.onDismiss!();
+              }
+            },
+          ),
           Visibility(
             visible: isTextMessage(message: widget.message!),
             child: IconButton(
