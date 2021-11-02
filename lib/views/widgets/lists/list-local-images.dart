@@ -1,13 +1,11 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_image_provider/device_image.dart';
 import 'package:local_image_provider/local_image.dart';
-import 'package:path/path.dart' as path;
-
 import 'package:local_image_provider/local_image_provider.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -34,8 +32,7 @@ class ListLocalImages extends StatefulWidget {
   _ListLocalImagesState createState() => _ListLocalImagesState();
 }
 
-class _ListLocalImagesState extends State<ListLocalImages>
-    with Lifecycle<ListLocalImages> {
+class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLocalImages> {
   List<LocalImage> images = [];
   LocalImageProvider imageProvider = LocalImageProvider();
 
@@ -53,13 +50,16 @@ class _ListLocalImagesState extends State<ListLocalImages>
 
   onSelected(LocalImage image) async {
     final imageBytes = await imageProvider.imageBytes(
-        image.id!, image.pixelHeight!, image.pixelWidth!);
+      image.id!,
+      image.pixelHeight!,
+      image.pixelWidth!,
+    );
 
     final directory = await getTemporaryDirectory();
-    final filepath = image.fileName;
-    final file = File(path.join(directory.path, filepath));
+    final filename = image.id;
+    final file = File(path.join(directory.path, filename));
 
-    file.writeAsBytes(imageBytes);
+    await file.writeAsBytes(imageBytes);
 
     widget.onSelectImage(file);
   }
