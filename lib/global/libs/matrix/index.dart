@@ -43,6 +43,7 @@ abstract class MatrixApi {
   static const forgetRoom = Rooms.forgetRoom;
   static const fetchFilter = Rooms.fetchFilter;
   static const createFilter = Rooms.createFilter;
+  static const fetchPowerLevels = Rooms.fetchPowerLevels;
 
   // Events
   static const sendEvent = Events.sendEvent;
@@ -56,6 +57,7 @@ abstract class MatrixApi {
   static const fetchMessageEvents = Events.fetchMessageEvents;
   static const fetchMessageEventsThreaded = Events.fetchMessageEventsThreaded;
   static const redactEvent = Events.redactEvent;
+  static const deleteMessage = Events.deleteMessage;
 
   // Account Data & User Management
   static const fetchAccountData = Users.fetchAccountData;

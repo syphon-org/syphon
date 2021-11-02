@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
@@ -105,8 +107,13 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
         final room = _action.room;
         saveRooms({room.id: room}, storage: storage!);
         break;
+      case DeleteMessage:
+      case DeleteOutboxMessage:
+        saveMessages([action.message], storage: storage!);
+        break;
       case AddMessages:
         final _action = action as AddMessages;
+
         saveMessages(_action.messages, storage: storage!);
         break;
       case AddMessagesDecrypted:
