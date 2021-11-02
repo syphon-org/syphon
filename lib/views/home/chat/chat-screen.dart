@@ -682,33 +682,31 @@ class _Props extends Equatable {
   final Function onMarkRead;
   final Function onSelectReply;
 
-
-  const _Props({
-    required this.room,
-    required this.themeType,
-    required this.userId,
-    required this.loading,
-    required this.showAvatars,
-    required this.messagesLength,
-    required this.enterSendEnabled,
-    required this.chatColorPrimary,
-    required this.roomTypeBadgesEnabled,
-    required this.dismissKeyboardEnabled,
-    required this.onUpdateDeviceKeys,
-    required this.onSendMessage,
-    required this.onDeleteMessage,
-    required this.onSaveDraftMessage,
-    required this.onClearDraftMessage,
-    required this.onLoadMoreMessages,
-    required this.onFetchNewest,
-    required this.onAcceptInvite,
-    required this.onRejectInvite,
-    required this.onToggleEncryption,
-    required this.onToggleReaction,
-    required this.onMarkRead,
-    required this.onSelectReply,
-    required this.currentUser
-  });
+  const _Props(
+      {required this.room,
+      required this.themeType,
+      required this.userId,
+      required this.loading,
+      required this.showAvatars,
+      required this.messagesLength,
+      required this.enterSendEnabled,
+      required this.chatColorPrimary,
+      required this.roomTypeBadgesEnabled,
+      required this.dismissKeyboardEnabled,
+      required this.onUpdateDeviceKeys,
+      required this.onSendMessage,
+      required this.onDeleteMessage,
+      required this.onSaveDraftMessage,
+      required this.onClearDraftMessage,
+      required this.onLoadMoreMessages,
+      required this.onFetchNewest,
+      required this.onAcceptInvite,
+      required this.onRejectInvite,
+      required this.onToggleEncryption,
+      required this.onToggleReaction,
+      required this.onMarkRead,
+      required this.onSelectReply,
+      required this.currentUser});
 
   @override
   List<Object?> get props => [
