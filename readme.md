@@ -85,7 +85,7 @@ Syphon will always be a not for profit, community driven application.
 
 ## 📝 Contributing
 - Instructions can be found under our [contributing.md](./contributing.md). Please fully read the document before beginning to write code or produce any material contribution for Syphon.
-- Donations are always welcome! The best way to donate is through the [Syphon creator's Pateron](https://patreon.com/ereio).
+- Donations are always welcome! The best way to donate is through the [Syphon creator's Patreon](https://patreon.com/ereio).
 - Coming soon, we'll have a merch store! If you'd like to support the project but want a little something in return, this is the way to do it!
 
 ## 🏗️ Building
