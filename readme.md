@@ -81,7 +81,7 @@ Syphon will always be a not for profit, community driven application.
  
 ## 🌙 Nightlies
 - Nightly dev builds - per pushed commit builds - can be found under our [Gitea Releases](https://git.syphon.org/syphon-org/syphon/releases)
-- Unofficial "community" Windows x64 builds can be found under [@EdGeraghty](https://github.com/EdGeraghty/syphon/releases)'s fork
+- Unofficial "community" Windows x64 builds can be found under [@EdGeraghty's fork](https://github.com/EdGeraghty/syphon/releases)
 
 ## 📝 Contributing
 - Instructions can be found under our [contributing.md](./contributing.md). Please fully read the document before beginning to write code or produce any material contribution for Syphon.
