@@ -114,7 +114,9 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
 ThunkAction<AppState> sendMessage({
   required String roomId,
   required Message message,
+  Message? related,
   File? file,
+  bool edit = false,
 }) {
   return (Store<AppState> store) async {
     final room = store.state.roomStore.rooms[roomId]!;
@@ -132,8 +134,10 @@ ThunkAction<AppState> sendMessage({
         tempId: tempId,
         userId: userId,
         message: message,
+        related: related,
         room: room,
         file: file,
+        edit: edit,
       );
 
       if (reply != null && reply.body != null) {

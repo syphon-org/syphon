@@ -23,6 +23,8 @@ import 'package:syphon/views/widgets/messages/typing-indicator.dart';
 
 class MessageList extends StatefulWidget {
   final String? roomId;
+
+  final bool editing;
   final bool showAvatars;
   final Message? selectedMessage;
   final ScrollController scrollController;
@@ -36,6 +38,7 @@ class MessageList extends StatefulWidget {
     required this.roomId,
     required this.scrollController,
     this.showAvatars = true,
+    this.editing = false,
     this.selectedMessage,
     this.onSelectReply,
     this.onViewUserDetails,
@@ -47,7 +50,6 @@ class MessageList extends StatefulWidget {
 }
 
 class MessageListState extends State<MessageList> {
-  MessageListState() : super();
   final TextEditingController controller = TextEditingController();
 
   @protected
@@ -113,7 +115,8 @@ class MessageListState extends State<MessageList> {
                   roomUsers: props.users,
                   typing: props.room.userTyping,
                   usersTyping: props.room.usersTyping,
-                  selectedMessageId: widget.selectedMessage != null ? widget.selectedMessage!.id : null,
+                  selectedMessageId:
+                      widget.selectedMessage != null ? widget.selectedMessage!.id : null,
                 ),
                 ListView.builder(
                   reverse: true,
@@ -127,10 +130,13 @@ class MessageListState extends State<MessageList> {
                   itemBuilder: (BuildContext context, int index) {
                     final message = props.messages[index];
                     final lastMessage = index != 0 ? props.messages[index - 1] : null;
-                    final nextMessage = index + 1 < props.messages.length ? props.messages[index + 1] : null;
+                    final nextMessage =
+                        index + 1 < props.messages.length ? props.messages[index + 1] : null;
 
-                    final isLastSender = lastMessage != null && lastMessage.sender == message.sender;
-                    final isNextSender = nextMessage != null && nextMessage.sender == message.sender;
+                    final isLastSender =
+                        lastMessage != null && lastMessage.sender == message.sender;
+                    final isNextSender =
+                        nextMessage != null && nextMessage.sender == message.sender;
                     final isUserSent = props.currentUser.userId == message.sender;
 
                     final selectedMessageId =
@@ -142,6 +148,7 @@ class MessageListState extends State<MessageList> {
 
                     return MessageWidget(
                       message: message,
+                      isEditing: widget.editing,
                       isUserSent: isUserSent,
                       isLastSender: isLastSender,
                       isNextSender: isNextSender,

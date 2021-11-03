@@ -63,10 +63,12 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen> {
   bool sending = false;
+  bool loadMore = false;
+  bool editing = false;
+
   Message? selectedMessage;
   Map<String, Color>? senderColors;
 
-  bool loadMore = false;
   String? mediumType = MediumType.plaintext;
 
   final inputFieldNode = FocusNode();
@@ -503,6 +505,14 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  onToggleEdit() {
+    if (selectedMessage == null) return;
+
+    setState(() {
+      editing = !editing;
+    });
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -550,6 +560,7 @@ class ChatScreenState extends State<ChatScreen> {
             appBar = AppBarMessageOptions(
               room: props.room,
               message: selectedMessage,
+              onEdit: () => onToggleEdit(),
               onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
                 message: selectedMessage,
@@ -577,6 +588,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: Stack(
                         children: [
                           MessageList(
+                            editing: editing,
                             roomId: props.room.id,
                             showAvatars: props.showAvatars,
                             selectedMessage: selectedMessage,

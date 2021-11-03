@@ -14,6 +14,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
+import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
 
 class MessageWidget extends StatelessWidget {
@@ -24,6 +25,7 @@ class MessageWidget extends StatelessWidget {
     this.messageOnly = false,
     this.isLastSender = false,
     this.isNextSender = false,
+    this.isEditing = false,
     this.lastRead = 0,
     this.selectedMessageId,
     this.avatarUri,
@@ -39,19 +41,22 @@ class MessageWidget extends StatelessWidget {
     this.onSwipe,
   }) : super(key: key);
 
-  final Message message;
-  final ThemeType themeType;
-  final int lastRead;
-  final double fontSize;
+  final bool messageOnly;
   final bool isLastSender;
   final bool isNextSender;
   final bool isUserSent;
-  final bool messageOnly;
+  final bool isEditing;
+
+  final int lastRead;
+  final double fontSize;
   final String timeFormat;
   final String? avatarUri;
   final String? selectedMessageId;
   final String? displayName;
   final Color? color;
+
+  final Message message;
+  final ThemeType themeType;
 
   final Function? onSwipe;
   final Function? onPressAvatar;
@@ -493,27 +498,73 @@ class MessageWidget extends StatelessWidget {
                                       left: isMedia ? 12 : 0,
                                       right: isMedia ? 12 : 0,
                                     ),
-                                    child: MarkdownBody(
-                                      data: body.trim(),
-                                      styleSheet: MarkdownStyleSheet(
-                                        blockquote: TextStyle(
-                                          backgroundColor: bubbleColor,
-                                        ),
-                                        blockquoteDecoration: BoxDecoration(
-                                          color: replyColor,
-                                          borderRadius: const BorderRadius.only(
-                                            //TODO: shape similar to bubbleBorder
-                                            topLeft: Radius.circular(12),
-                                            topRight: Radius.circular(12),
-                                            bottomLeft: Radius.circular(4),
-                                            bottomRight: Radius.circular(4),
+                                    child: AnimatedCrossFade(
+                                      duration: const Duration(milliseconds: 250),
+                                      crossFadeState: isEditing && selected
+                                          ? CrossFadeState.showSecond
+                                          : CrossFadeState.showFirst,
+                                      firstChild: MarkdownBody(
+                                        data: body.trim(),
+                                        styleSheet: MarkdownStyleSheet(
+                                          blockquote: TextStyle(
+                                            backgroundColor: bubbleColor,
+                                          ),
+                                          blockquoteDecoration: BoxDecoration(
+                                            color: replyColor,
+                                            borderRadius: const BorderRadius.only(
+                                              //TODO: shape similar to bubbleBorder
+                                              topLeft: Radius.circular(12),
+                                              topRight: Radius.circular(12),
+                                              bottomLeft: Radius.circular(4),
+                                              bottomRight: Radius.circular(4),
+                                            ),
+                                          ),
+                                          p: TextStyle(
+                                            color: textColor,
+                                            fontStyle: fontStyle,
+                                            fontWeight: FontWeight.w300,
+                                            fontSize:
+                                                Theme.of(context).textTheme.subtitle2!.fontSize,
                                           ),
                                         ),
-                                        p: TextStyle(
-                                          color: textColor,
-                                          fontStyle: fontStyle,
-                                          fontWeight: FontWeight.w300,
-                                          fontSize: Theme.of(context).textTheme.subtitle2!.fontSize,
+                                      ),
+                                      secondChild: TextField(
+                                        maxLines: 1,
+                                        autocorrect: false,
+                                        enableSuggestions: false,
+                                        controller: TextEditingController(
+                                          text: body.trim(),
+                                        ),
+                                        decoration: InputDecoration(
+                                          filled: true,
+                                          labelStyle: TextStyle(
+                                              color: Theme.of(context).colorScheme.secondary),
+                                          contentPadding:
+                                              Dimensions.inputContentPadding.copyWith(right: 36),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Theme.of(context).colorScheme.secondary,
+                                              width: 1,
+                                            ),
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(24),
+                                              topRight: Radius.circular(24),
+                                              bottomLeft: Radius.circular(24),
+                                              bottomRight: Radius.circular(24),
+                                            ),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Theme.of(context).colorScheme.secondary,
+                                              width: 1,
+                                            ),
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(24),
+                                              topRight: Radius.circular(24),
+                                              bottomLeft: Radius.circular(24),
+                                              bottomRight: Radius.circular(24),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
