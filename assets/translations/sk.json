@@ -34,8 +34,8 @@
     "content-confirm-password-reset": "Kliknite na odkaz zaslaný na váš email. Po kliknutí na odkaz zmeníte heslo stlačením tlačidla pokračovať.",
     "content-forgot-email-verification": "Email pre overenie vám bude zaslaný do vašej schranky pred resetovaním vášho hesla. Po overení, budete schopní zadať a potvrdiť nové heslo.",
     "content-signup-captcha-requirement": "Tento homeserver vyžaduje captcha\n pred vytvorením účtu.",
-    "content-signup-email-verification": "Tento domáci server vyžaduje na registráciu overenú e-mailovú adresu, musíte kliknúť na odkaz odoslaný na tento e-mail pre pokračovanie. Pred kliknutím na odkaz sa uistite, že dôverujete tomuto serveru.",
-    "content-signup-email-requirement": "Tento domovský server vyžaduje na registráciu e-mailovú adresu, Váš e-mail bude viditeľný pre správcu domovského servera. Pred zadaním týchto údajov sa uistite, že tomuto serveru dôverujete",
+    "content-signup-email-verification": "Tento domáci server vyžaduje na registráciu overenú e-mailovú adresu. Pre pokračovanie, musíte kliknúť na odkaz odoslaný na tento e-mail. Pred kliknutím na odkaz sa uistite, že dôverujete tomuto serveru.",
+    "content-signup-email-requirement": "Tento domovský server vyžaduje na registráciu e-mailovú adresu. Váš e-mail bude viditeľný pre správcu domovského servera. Pred zadaním týchto údajov sa uistite, že tomuto serveru dôverujete",
     "content-notification-background": "Pripojenie na pozadí povolené",
     "content-dialog-devices-key-export": "Ste si istý, že chcete exportovať zašifrované kľúče tohto zariadenia ? Neoprávnené osoby ho môžu použiť na dešifrovanie vašich správ!",
     "content-dialog-devices-delete": "Po odstránení bude potrebné sa znova prihlásiť na tieto zariadenia.",
@@ -158,5 +158,7 @@
     "confirm-delete-chat-single": "Ste si istý, že chcete zmazať konverzáciu \"{}\"? Správy tak budú nenávratne odstránené.",
     "confirm-leave-chat-single-nonpublic": "Toto nieje verejná konverzácia. Znovupripojenie Vám nebude umožnené bez pozvnania.",
     "confirm-leave-chat-multi": "Ste si istý, že chcete opustiť {} vybranú konverzáciu ?",
-    "confirm-block-user": "Ak zablokujete {}, nebudete schopný vidieť správy dotyčného a okamžite opustíte túto konverzáciu."
+    "confirm-block-user": "Ak zablokujete {}, nebudete schopný vidieť správy dotyčného a okamžite opustíte túto konverzáciu.",
+    "alert-hidden-read-receipts": "Skryté potvrdenia o prečítaní musia byť podporované Vaším home-serverom, inak to má rovnaký účinok ako zapnutie potvrdenia o prečítaní",
+    "content-captcha-warning": "Niekteré servery Matrix vyžadujú captcha vo forme reCAPTCHA od spoločnosti Google.\n\nPokiaľ nechcete vyplňovat captcha, možno sa budete musieť vrátiť k výberu serveru a vybrať si iní server pre dokončenie registrácie."
 }
