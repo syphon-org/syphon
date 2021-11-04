@@ -13,9 +13,10 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
-import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MessageWidget extends StatelessWidget {
   const MessageWidget({
@@ -64,11 +65,7 @@ class MessageWidget extends StatelessWidget {
   final Function? onToggleReaction;
   final void Function(Message)? onLongPress;
 
-  @protected
-  Widget buildReactions(
-    BuildContext context,
-    MainAxisAlignment alignment,
-  ) {
+  buildReactions(BuildContext context, MainAxisAlignment alignment) {
     final reactionsMap = message.reactions.fold<Map<String, int>>(
       {},
       (mapped, reaction) => mapped
@@ -143,12 +140,7 @@ class MessageWidget extends StatelessWidget {
     );
   }
 
-  @protected
-  Widget buildReactionsInput(
-    BuildContext context,
-    MainAxisAlignment alignment,
-    bool isUserSent,
-  ) {
+  buildReactionsInput(BuildContext context, MainAxisAlignment alignment, bool isUserSent) {
     final buildEmojiButton = GestureDetector(
       onTap: () {
         if (onInputReaction != null) {
@@ -196,6 +188,28 @@ class MessageWidget extends StatelessWidget {
     if (onSwipe != null) {
       onSwipe!(message);
     }
+  }
+
+  onConfirmLink(BuildContext context, String? url) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.titleDialogConfirmLinkout.capitalize(),
+        content: Strings.confirmLinkout(url!),
+        confirmStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+
+          if (await canLaunch(url)) {
+            return launch(url, forceSafariVC: false);
+          } else {
+            throw 'Could not launch $url';
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -505,6 +519,8 @@ class MessageWidget extends StatelessWidget {
                                           : CrossFadeState.showFirst,
                                       firstChild: MarkdownBody(
                                         data: body.trim(),
+                                        onTapLink: (text, href, title) =>
+                                            onConfirmLink(context, href),
                                         styleSheet: MarkdownStyleSheet(
                                           blockquote: TextStyle(
                                             backgroundColor: bubbleColor,
