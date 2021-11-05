@@ -304,8 +304,8 @@ class _Props extends Equatable {
                 text: Duration(
                   milliseconds: store.state.settingsStore.syncInterval,
                 ).inSeconds.toString(),
-                : 'seconds',
               ),
+              label: 'seconds',
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
