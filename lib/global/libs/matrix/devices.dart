@@ -125,7 +125,7 @@ abstract class Devices {
       'display_name': displayName,
     };
 
-    final response = await http.post(
+    final response = await http.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
