@@ -363,29 +363,6 @@ class _Props extends Equatable {
               },
             ),
           );
-
-          await store.dispatch(renameDevice(deviceId: device.deviceId));
-
-          final authSession = store.state.authStore.authSession;
-          if (authSession != null) {
-            showDialog(
-              context: context,
-              builder: (dialogContext) => DialogConfirmPassword(
-                key: Key(authSession),
-                title: Strings.titleConfirmPassword,
-                content: Strings.contentRenameDevice,
-                onConfirm: () async {
-                  await store.dispatch(renameDevice(deviceId: device.deviceId));
-                  store.dispatch(resetInteractiveAuth());
-                  Navigator.of(dialogContext).pop();
-                },
-                onCancel: () async {
-                  store.dispatch(resetInteractiveAuth());
-                  Navigator.of(dialogContext).pop();
-                },
-              ),
-            );
-          }
         },
       );
 }
