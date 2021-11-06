@@ -352,6 +352,7 @@ class _Props extends Equatable {
             builder: (dialogContext) => DialogTextInput(
               title: Strings.titleRenameDevice,
               content: Strings.contentRenameDevice,
+              label: device.displayName ?? '',
               onConfirm: (String newDisplayName) async {
                 await store.dispatch(renameDevice(deviceId: device.deviceId, displayName: newDisplayName));
                 store.dispatch(resetInteractiveAuth());
