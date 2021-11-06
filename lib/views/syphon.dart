@@ -118,11 +118,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     ]);
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
   onStartListeners() async {
     // ** system listeners **
     await ConnectionService.startListener();
@@ -282,6 +277,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   onAuthStateChanged(User? user) async {
     final allContexts = await loadContexts();
     final defaultScreen = defaultHome.runtimeType;
+    final currentRoute = NavigationService.currentRoute();
 
     // No user is present and no contexts are availble to jump to
     if (user == null && allContexts.isEmpty && defaultScreen == HomeScreen) {
@@ -305,7 +301,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     if (user != null &&
         user.accessToken != null &&
         user.accessToken!.isNotEmpty &&
-        defaultScreen == HomeScreen) {
+        defaultScreen == HomeScreen &&
+        currentRoute != Routes.root) {
       return NavigationService.clearTo(Routes.home, context);
     }
   }

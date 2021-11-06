@@ -145,10 +145,12 @@ ThunkAction<AppState> sendMessage({
       }
 
       // Save unsent message to outbox
-      store.dispatch(SaveOutboxMessage(
-        tempId: tempId,
-        pendingMessage: pending,
-      ));
+      if (!edit) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending,
+        ));
+      }
 
       final data = await MatrixApi.sendMessage(
         protocol: store.state.authStore.protocol,
@@ -160,17 +162,23 @@ ThunkAction<AppState> sendMessage({
       );
 
       if (data['errcode'] != null) {
-        store.dispatch(SaveOutboxMessage(
-          tempId: tempId,
-          pendingMessage: pending.copyWith(
-            timestamp: DateTime.now().millisecondsSinceEpoch,
-            pending: false,
-            syncing: false,
-            failed: true,
-          ),
-        ));
+        if (!edit) {
+          store.dispatch(SaveOutboxMessage(
+            tempId: tempId,
+            pendingMessage: pending.copyWith(
+              timestamp: DateTime.now().millisecondsSinceEpoch,
+              pending: false,
+              syncing: false,
+              failed: true,
+            ),
+          ));
+        }
 
         throw data['error'];
+      }
+
+      if (edit) {
+        return true;
       }
 
       // Update sent message with event id but needs
