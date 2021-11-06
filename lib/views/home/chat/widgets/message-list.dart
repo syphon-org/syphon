@@ -29,6 +29,7 @@ class MessageList extends StatefulWidget {
   final Message? selectedMessage;
   final ScrollController scrollController;
 
+  final Function? onSendEdit;
   final Function? onSelectReply;
   final void Function({Message? message, User? user, String? userId})? onViewUserDetails;
   final void Function(Message?)? onToggleSelectedMessage;
@@ -40,6 +41,7 @@ class MessageList extends StatefulWidget {
     this.showAvatars = true,
     this.editing = false,
     this.selectedMessage,
+    this.onSendEdit,
     this.onSelectReply,
     this.onViewUserDetails,
     this.onToggleSelectedMessage,
@@ -160,6 +162,7 @@ class MessageListState extends State<MessageList> {
                       themeType: props.themeType,
                       color: props.chatColorPrimary,
                       timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
+                      onSendEdit: widget.onSendEdit,
                       onSwipe: props.onSelectReply,
                       onPressAvatar: () => widget.onViewUserDetails!(
                         message: message,

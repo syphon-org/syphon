@@ -15,6 +15,7 @@ import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
+import 'package:syphon/views/widgets/input/text-field-edit.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -35,6 +36,7 @@ class MessageWidget extends StatelessWidget {
     this.fontSize = 14.0,
     this.timeFormat = '12hr',
     this.color,
+    this.onSendEdit,
     this.onLongPress,
     this.onPressAvatar,
     this.onInputReaction,
@@ -60,6 +62,7 @@ class MessageWidget extends StatelessWidget {
   final ThemeType themeType;
 
   final Function? onSwipe;
+  final Function? onSendEdit;
   final Function? onPressAvatar;
   final Function? onInputReaction;
   final Function? onToggleReaction;
@@ -222,6 +225,7 @@ class MessageWidget extends StatelessWidget {
     final isRead = message.timestamp < lastRead;
     final showAvatar = !isLastSender && !isUserSent && !messageOnly;
     final isMedia = message.url != null;
+    final removePadding = isMedia || (isEditing && selected);
 
     var textColor = Colors.white;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
@@ -443,8 +447,10 @@ class MessageWidget extends StatelessWidget {
                                     !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
                               ),
                               padding: EdgeInsets.only(
-                                left: isMedia ? 0 : 12, // make an image span the message width
-                                right: isMedia ? 0 : 12, // make an image span the message width
+                                // make an image span the message width
+                                left: removePadding ? 0 : 12,
+                                // make an image span the message width
+                                right: removePadding ? 0 : 12,
                                 top: isMedia && !showSender ? 0 : 8,
                                 bottom: isMedia ? 12 : 8,
                               ),
@@ -544,42 +550,12 @@ class MessageWidget extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      secondChild: TextField(
-                                        maxLines: 1,
-                                        autocorrect: false,
-                                        enableSuggestions: false,
-                                        controller: TextEditingController(
-                                          text: body.trim(),
-                                        ),
-                                        decoration: InputDecoration(
-                                          filled: true,
-                                          labelStyle: TextStyle(
-                                              color: Theme.of(context).colorScheme.secondary),
-                                          contentPadding:
-                                              Dimensions.inputContentPadding.copyWith(right: 36),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Theme.of(context).colorScheme.secondary,
-                                              width: 1,
-                                            ),
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(24),
-                                              topRight: Radius.circular(24),
-                                              bottomLeft: Radius.circular(24),
-                                              bottomRight: Radius.circular(24),
-                                            ),
-                                          ),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Theme.of(context).colorScheme.secondary,
-                                              width: 1,
-                                            ),
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(24),
-                                              topRight: Radius.circular(24),
-                                              bottomLeft: Radius.circular(24),
-                                              bottomRight: Radius.circular(24),
-                                            ),
+                                      secondChild: Padding(
+                                        padding: EdgeInsets.only(left: 12, right: 12),
+                                        child: IntrinsicWidth(
+                                          child: TextFieldInline(
+                                            body: body,
+                                            onEdit: (text) => onSendEdit!(text, message),
                                           ),
                                         ),
                                       ),
@@ -587,7 +563,7 @@ class MessageWidget extends StatelessWidget {
                                   ),
                                   Padding(
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: isMedia ? 12 : 0,
+                                      horizontal: removePadding ? 12 : 0,
                                     ),
                                     child: Flex(
                                       /// *** Message Status Row ***

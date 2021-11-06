@@ -210,6 +210,38 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  onToggleEdit() {
+    if (selectedMessage == null) return;
+
+    setState(() {
+      editing = !editing;
+    });
+  }
+
+  onSendEdit(_Props props,
+      {String? text, String? type = MatrixMessageTypes.text, Message? related}) async {
+    setState(() {
+      sending = true;
+    });
+
+    await props.onSendMessage(
+      body: text,
+      type: type,
+      related: related,
+      edit: true,
+    );
+
+    onToggleEdit();
+
+    editorController.clear();
+    if (props.dismissKeyboardEnabled) {
+      FocusScope.of(context).unfocus();
+    }
+    setState(() {
+      sending = false;
+    });
+  }
+
   onSendMessage(_Props props) async {
     setState(() {
       sending = true;
@@ -219,6 +251,8 @@ class ChatScreenState extends State<ChatScreen> {
       body: editorController.text,
       type: MatrixMessageTypes.text,
     );
+
+    onToggleEdit();
 
     editorController.clear();
     if (props.dismissKeyboardEnabled) {
@@ -505,14 +539,6 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  onToggleEdit() {
-    if (selectedMessage == null) return;
-
-    setState(() {
-      editing = !editing;
-    });
-  }
-
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -593,6 +619,11 @@ class ChatScreenState extends State<ChatScreen> {
                             showAvatars: props.showAvatars,
                             selectedMessage: selectedMessage,
                             scrollController: messagesController,
+                            onSendEdit: (text, related) => onSendEdit(
+                              props,
+                              text: text,
+                              related: related,
+                            ),
                             onSelectReply: props.onSelectReply,
                             onViewUserDetails: onViewUserDetails,
                             onToggleSelectedMessage: onToggleSelectedMessage,
@@ -763,7 +794,8 @@ class _Props extends Equatable {
             room: store.state.roomStore.rooms[roomId],
           ));
         },
-        onSendMessage: ({required String body, String? type}) async {
+        onSendMessage: (
+            {required String body, String? type, bool edit = false, Message? related}) async {
           if (roomId == null || body.isEmpty) return;
 
           final room = store.state.roomStore.rooms[roomId]!;
@@ -783,6 +815,8 @@ class _Props extends Equatable {
           return store.dispatch(sendMessage(
             roomId: room.id,
             message: message,
+            related: related,
+            edit: edit,
           ));
         },
         onDeleteMessage: ({Message? message}) {
