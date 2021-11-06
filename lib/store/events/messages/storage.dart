@@ -55,6 +55,20 @@ Future<void> saveMessages(
   await storage.insertMessagesBatched(messages);
 }
 
+Future<List<Message>> loadMessagesRoom(
+  String roomId, {
+  required StorageDatabase storage,
+  int offset = 0,
+  int limit = 25,
+}) async {
+  try {
+    return storage.selectMessagesRoom(roomId, limit: 25); //  TODO: offset: offset, limit: limit);
+  } catch (error) {
+    printError(error.toString(), title: 'loadMessages');
+    return [];
+  }
+}
+
 Future<List<Message>> loadMessages(
   List<String> eventIds, {
   required StorageDatabase storage,
@@ -133,6 +147,20 @@ Future<List<Message>> loadDecrypted(
 }) async {
   try {
     return storage.selectDecrypted(eventIds); // TODO: // offset: offset, limit: limit);
+  } catch (error) {
+    printError(error.toString(), title: 'loadMessages');
+    return [];
+  }
+}
+
+Future<List<Message>> loadDecryptedRoom(
+  String roomId, {
+  required StorageDatabase storage,
+  int offset = 0,
+  int limit = 25, // default amount loaded
+}) async {
+  try {
+    return storage.selectDecryptedRoom(roomId, limit: 25);
   } catch (error) {
     printError(error.toString(), title: 'loadMessages');
     return [];

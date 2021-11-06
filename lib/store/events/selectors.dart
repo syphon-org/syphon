@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
@@ -28,7 +31,8 @@ List<Message> roomMessages(AppState state, String? roomId) {
 
     messages = messagesNormal.keys
         .map((id) =>
-            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? Message())
+            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ??
+            Message())
         .toList();
   }
 
@@ -103,7 +107,8 @@ Map<String, Message?> appendReactions(
   required Map<String, List<Reaction>> reactions,
 }) {
   // get a list message ids (also reaction keys) that have values in 'reactions'
-  final List<String> reactionedMessageIds = reactions.keys.where((k) => messages.containsKey(k)).toList();
+  final List<String> reactionedMessageIds =
+      reactions.keys.where((k) => messages.containsKey(k)).toList();
 
   // add the parsed list to the message to be handled in the UI
   for (final String messageId in reactionedMessageIds) {
@@ -125,6 +130,8 @@ Map<String, Message?> appendReactions(
 Map<String, Message?> replaceEdited(List<Message> messages) {
   final replacements = <Message>[];
 
+  printJson(jsonDecode(jsonEncode({'replacements': replacements})));
+
   // create a map of messages for O(1) when replacing O(N)
   final messagesMap = Map<String, Message>.fromIterable(
     messages,
@@ -137,6 +144,8 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
       return message;
     },
   );
+
+  printJson(jsonDecode(jsonEncode({'replacements': replacements})));
 
   // sort replacements so they replace each other in order
   // iterate through replacements and modify messages as needed O(M + M)

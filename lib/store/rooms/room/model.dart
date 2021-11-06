@@ -61,6 +61,7 @@ class Room implements drift.Insertable<Room> {
   final List<String> userIds;
   final List<String> messageIds;
   final List<String> reactionIds;
+
   @JsonKey(ignore: true)
   final List<Message> outbox;
 

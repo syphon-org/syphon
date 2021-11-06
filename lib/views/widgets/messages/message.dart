@@ -519,7 +519,7 @@ class MessageWidget extends StatelessWidget {
                                       right: isMedia ? 12 : 0,
                                     ),
                                     child: AnimatedCrossFade(
-                                      duration: const Duration(milliseconds: 250),
+                                      duration: const Duration(milliseconds: 150),
                                       crossFadeState: isEditing && selected
                                           ? CrossFadeState.showSecond
                                           : CrossFadeState.showFirst,

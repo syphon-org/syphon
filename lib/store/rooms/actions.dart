@@ -103,7 +103,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         if (json.isEmpty) return;
 
         // TODO: remove with parsers - parse room and events
-        room = await compute(parseRoom, {
+        room = await compute(parseSync, {
           'json': json,
           'room': room,
           'currentUser': user,
@@ -124,9 +124,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         await store.dispatch(mutateMessagesRoom(room: room));
 
         // handles editing newly fetched messages
-        final messages = await store.dispatch(mutateMessages(
-          messages: room.messagesNew,
-        )) as List<Message>;
+        var messages;
 
         // update encrypted messages (updating before normal messages prevents flicker)
         if (room.encryptionEnabled) {
@@ -145,6 +143,11 @@ ThunkAction<AppState> syncRooms(Map roomData) {
             messages: decryptedMutated,
             outbox: room.outbox,
           ));
+        } else {
+          // handles editing newly fetched messages
+          messages = await store.dispatch(mutateMessages(
+            messages: room.messagesNew,
+          )) as List<Message>;
         }
 
         // save normal or encrypted messages
