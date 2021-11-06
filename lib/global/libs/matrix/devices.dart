@@ -114,7 +114,7 @@ abstract class Devices {
     String? deviceId,
     String? displayName,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/v3/devices/$deviceId';
+    final String url = '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
