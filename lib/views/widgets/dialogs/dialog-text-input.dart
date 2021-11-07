@@ -41,15 +41,26 @@ class DialogTextInput extends StatefulWidget {
 }
 
 class _DialogTextInputState extends State<DialogTextInput> {
-  final editingControllerDefault = TextEditingController();
+  bool isEmpty = true;
+  TextEditingController editingControllerDefault = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    editingControllerDefault.addListener(() {
+      setState(() {
+        isEmpty = editingControllerDefault.text.isEmpty;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double defaultWidgetScaling = width * 0.725;
 
-    final editingController =
-        widget.editingController ?? editingControllerDefault;
+    final editingController = widget.editingController ?? editingControllerDefault;
 
     return SimpleDialog(
       shape: RoundedRectangleBorder(
@@ -117,7 +128,6 @@ class _DialogTextInputState extends State<DialogTextInput> {
                   if (widget.onConfirm != null) {
                     widget.onConfirm!(value);
                   }
-                  Navigator.of(context).pop();
                 },
               ),
             ),
@@ -133,23 +143,18 @@ class _DialogTextInputState extends State<DialogTextInput> {
                       if (widget.onCancel != null) {
                         widget.onCancel!();
                       }
-                      Navigator.of(context).pop();
                     },
               child: Text(Strings.buttonCancel),
             ),
             TextButton(
-              onPressed: !editingController.value.text.isNotEmpty
+              onPressed: isEmpty
                   ? null
                   : () {
-                      if (widget.onConfirm != null &&
-                          editingController.value.text.isNotEmpty) {
-                        widget.onConfirm!(editingController.value.text);
+                      if (widget.onConfirm != null && !isEmpty) {
+                        widget.onConfirm!(editingController.text);
                       }
-                      Navigator.of(context).pop();
                     },
-              child: !widget.loading
-                  ? Text(Strings.buttonSave)
-                  : LoadingIndicator(size: 16),
+              child: !widget.loading ? Text(Strings.buttonSave) : LoadingIndicator(size: 16),
             ),
           ],
         )
