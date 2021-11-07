@@ -66,7 +66,6 @@ List<Message> reviseMessagesThreaded(Map params) {
   final Map<String, Redaction> redactions = params['redactions'];
   final Map<String, List<Reaction>> reactions = params['reactions'];
 
-  httpClient = createClient();
   return reviseMessagesFilter(messages, redactions, reactions);
 }
 
@@ -130,8 +129,6 @@ Map<String, Message?> appendReactions(
 Map<String, Message?> replaceEdited(List<Message> messages) {
   final replacements = <Message>[];
 
-  printJson(jsonDecode(jsonEncode({'replacements': replacements})));
-
   // create a map of messages for O(1) when replacing O(N)
   final messagesMap = Map<String, Message>.fromIterable(
     messages,
@@ -144,8 +141,6 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
       return message;
     },
   );
-
-  printJson(jsonDecode(jsonEncode({'replacements': replacements})));
 
   // sort replacements so they replace each other in order
   // iterate through replacements and modify messages as needed O(M + M)

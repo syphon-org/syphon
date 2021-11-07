@@ -71,8 +71,6 @@ ThunkAction<AppState> mutateMessagesAll() {
 ///
 ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
   return (Store<AppState> store) async {
-    if (room.messagesNew.isEmpty) return;
-
     final messages = store.state.eventStore.messages[room.id];
     final decrypted = store.state.eventStore.messagesDecrypted[room.id];
     final reactions = store.state.eventStore.reactions;
@@ -96,17 +94,17 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
 
     final messagesLists = await Future.wait(mutations);
 
+    await store.dispatch(addMessages(
+      room: Room(id: room.id),
+      messages: messagesLists[0],
+    ));
+
     if (room.encryptionEnabled) {
       await store.dispatch(addMessagesDecrypted(
         room: Room(id: room.id),
         messages: messagesLists[1],
       ));
     }
-
-    await store.dispatch(addMessages(
-      room: Room(id: room.id),
-      messages: messagesLists[0],
-    ));
   };
 }
 

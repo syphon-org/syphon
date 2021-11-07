@@ -219,7 +219,7 @@ Future backgroundSyncLoop({
         currentUser: User(userId: currentUserId),
       );
 
-      if (room.messagesNew.isEmpty) {
+      if (room.messagesTEMP.isEmpty) {
         return;
       }
 
@@ -276,7 +276,7 @@ Future backgroundSyncLoop({
       /// Inbox Style Notifications Only
       ///
       if (settings.styleType == StyleType.Inbox) {
-        for (final message in room.messagesNew) {
+        for (final message in room.messagesTEMP) {
           final messageBody = parseMessageNotification(
             room: room,
             message: message,
@@ -309,7 +309,7 @@ Future backgroundSyncLoop({
       }
 
       // Run all the room messages at once once room name is confirmed
-      await Future.wait(room.messagesNew.map((message) async {
+      await Future.wait(room.messagesTEMP.map((message) async {
         final title = parseMessageTitle(
           room: room,
           message: message,

@@ -10,23 +10,23 @@ import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/model.dart';
 
-class ParsedSync {
-  final List<Event> state;
+class Sync {
+  final Room room;
+  // final List<Event> state; // TODO:
   final List<Message> messages;
   final List<Reaction> reactions;
   final List<Redaction> redactions;
-  final List<String> usersTyping;
   final Map<String, User> users;
   final Map<String, ReadReceipt> readReceipts;
 
-  const ParsedSync({
-    this.state = const [],
+  const Sync({
+    required this.room,
+    // this.state = const [], // TODO:
     this.reactions = const [],
     this.redactions = const [],
     this.messages = const [],
     this.readReceipts = const {},
     this.users = const {},
-    this.usersTyping = const [],
   });
 }
 
@@ -38,17 +38,44 @@ class ParsedSync {
 /// events. You'd need to pass back both an updated room AND a list of messages
 /// to save seperately, or sacrific iterating through the message list again
 ///
-Room parseSync(Map params) {
+Sync parseSync(Map params) {
   final Map json = params['json'];
-  final Room room = params['room'];
+  final Room roomExisting = params['room'];
   final User currentUser = params['currentUser'];
   final String? lastSince = params['lastSince'];
 
   // TODO: eventually remove the need for this with modular parsers
-  return room.fromSync(
+  final room = roomExisting.fromSync(
     json: json as Map<String, dynamic>,
     currentUser: currentUser,
     lastSince: lastSince,
+  );
+
+  // final state = roomNew.state ?? [];
+  final users = Map<String, User>.from(room.usersTEMP);
+  final messages = List<Message>.from(room.messagesTEMP);
+  final reactions = List<Reaction>.from(room.reactionsTEMP);
+  final redactions = List<Redaction>.from(room.redactionsTEMP);
+  final readReceipts = Map<String, ReadReceipt>.from(room.readReceiptsTEMP ?? {});
+
+  // TODO: remove with parsers - clear users from parsed room objects
+  final roomUpdated = room.copyWith(
+    outbox: [],
+    reactionsTEMP: [],
+    messagesTEMP: [],
+    redactionsTEMP: [],
+    usersTEMP: <String, User>{},
+    readReceiptsTEMP: <String, ReadReceipt>{},
+  );
+
+  return Sync(
+    // state: state,
+    users: users,
+    room: roomUpdated,
+    messages: messages,
+    reactions: reactions,
+    redactions: redactions,
+    readReceipts: readReceipts,
   );
 }
 

@@ -70,19 +70,19 @@ class Room implements drift.Insertable<Room> {
   final List<Event>? state;
 
   @JsonKey(ignore: true)
-  final List<Reaction> reactions;
+  final List<Reaction> reactionsTEMP;
 
   @JsonKey(ignore: true)
-  final List<Redaction> redactions;
+  final List<Redaction> redactionsTEMP;
 
   @JsonKey(ignore: true)
-  final List<Message> messagesNew;
+  final List<Message> messagesTEMP;
 
   @JsonKey(ignore: true)
-  final Map<String, ReadReceipt>? readReceipts;
+  final Map<String, ReadReceipt>? readReceiptsTEMP;
 
   @JsonKey(ignore: true)
-  final Map<String, User> usersNew;
+  final Map<String, User> usersTEMP;
 
   @JsonKey(ignore: true)
   final bool userTyping;
@@ -133,12 +133,12 @@ class Room implements drift.Insertable<Room> {
     this.reply,
     this.userIds = const [],
     this.outbox = const [],
-    this.usersNew = const {},
-    this.reactions = const [],
-    this.messagesNew = const [],
+    this.usersTEMP = const {},
+    this.reactionsTEMP = const [],
+    this.messagesTEMP = const [],
     this.messageIds = const [],
     this.reactionIds = const [],
-    this.redactions = const [],
+    this.redactionsTEMP = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -151,7 +151,7 @@ class Room implements drift.Insertable<Room> {
     this.lastHash,
     this.nextHash,
     this.prevHash,
-    this.readReceipts,
+    this.readReceiptsTEMP,
     this.state,
   });
 
@@ -182,15 +182,15 @@ class Room implements drift.Insertable<Room> {
     draft,
     reply,
     List<String>? userIds,
-    Map<String, User>? users,
     events,
-    List<Message>? outbox,
-    List<Message>? messagesNew,
-    List<Reaction>? reactions,
     List<String>? messageIds,
     List<String>? reactionIds,
-    List<Redaction>? redactions,
-    Map<String, ReadReceipt>? readReceipts,
+    List<Message>? outbox,
+    List<Message>? messagesTEMP,
+    List<Reaction>? reactionsTEMP,
+    List<Redaction>? redactionsTEMP,
+    Map<String, User>? usersTEMP,
+    Map<String, ReadReceipt>? readReceiptsTEMP,
     lastHash,
     prevHash,
     nextHash,
@@ -222,18 +222,18 @@ class Room implements drift.Insertable<Room> {
         usersTyping: usersTyping ?? this.usersTyping,
         draft: draft ?? this.draft,
         reply: reply == Null ? null : reply ?? this.reply,
+        state: state ?? this.state,
         outbox: outbox ?? this.outbox,
-        messageIds: messageIds ?? this.messageIds,
-        messagesNew: messagesNew ?? this.messagesNew,
-        reactions: reactions ?? this.reactions,
-        redactions: redactions ?? this.redactions,
-        usersNew: users ?? usersNew,
         userIds: userIds ?? this.userIds,
-        readReceipts: readReceipts ?? this.readReceipts,
+        messageIds: messageIds ?? this.messageIds,
         lastHash: lastHash ?? this.lastHash,
         prevHash: prevHash ?? this.prevHash,
         nextHash: nextHash ?? this.nextHash,
-        state: state ?? this.state,
+        usersTEMP: usersTEMP ?? this.usersTEMP,
+        messagesTEMP: messagesTEMP ?? this.messagesTEMP,
+        reactionsTEMP: reactionsTEMP ?? this.reactionsTEMP,
+        redactionsTEMP: redactionsTEMP ?? this.redactionsTEMP,
+        readReceiptsTEMP: readReceiptsTEMP ?? this.readReceiptsTEMP,
       );
 
   Map<String, dynamic> toJson() => _$RoomToJson(this);
@@ -403,7 +403,7 @@ class Room implements drift.Insertable<Room> {
     int? lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority;
 
-    final Map<String, User> usersAdd = Map.from(usersNew);
+    final Map<String, User> usersAdd = Map.from(usersTEMP);
     Set<String> userIds = Set<String>.from(this.userIds);
     final List<String> userIdsRemove = [];
 
@@ -525,7 +525,6 @@ class Room implements drift.Insertable<Room> {
     return copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
-      users: usersAdd,
       direct: direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,
@@ -535,8 +534,9 @@ class Room implements drift.Insertable<Room> {
       lastUpdate: lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
-      reactions: reactions,
-      redactions: redactions,
+      usersTEMP: usersAdd,
+      reactionsTEMP: reactions,
+      redactionsTEMP: redactions,
     );
   }
 
@@ -605,7 +605,7 @@ class Room implements drift.Insertable<Room> {
 
       // Save values to room
       return copyWith(
-        messagesNew: messagesNew,
+        messagesTEMP: messagesNew,
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
         encryptionEnabled: encryptionEnabled || hasEncrypted != null,
@@ -631,7 +631,7 @@ class Room implements drift.Insertable<Room> {
   }) {
     bool userTyping = false;
     List<String> usersTyping = this.usersTyping;
-    final readReceipts = Map<String, ReadReceipt>.from(this.readReceipts ?? {});
+    final readReceipts = Map<String, ReadReceipt>.from(readReceiptsTEMP ?? {});
 
     try {
       for (final event in events) {
@@ -676,7 +676,7 @@ class Room implements drift.Insertable<Room> {
     return copyWith(
       userTyping: userTyping,
       usersTyping: usersTyping,
-      readReceipts: readReceipts,
+      readReceiptsTEMP: readReceipts,
     );
   }
 

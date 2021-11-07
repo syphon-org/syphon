@@ -17,6 +17,7 @@ import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/parsers.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
@@ -98,38 +99,44 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     await Future.wait(roomData.keys.map((id) async {
       try {
         final Map json = roomData[id] ?? {};
-        Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+        final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
 
         if (json.isEmpty) return;
 
-        // TODO: remove with parsers - parse room and events
-        room = await compute(parseSync, {
+        final sync = await compute(parseSync, {
           'json': json,
-          'room': room,
+          'room': roomExisting,
           'currentUser': user,
           'lastSince': lastSince,
         });
 
+        // overwrite room with updated one from sync
+        final roomSynced = sync.room;
+
         printInfo(
-          '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
+          // ignore: prefer_interpolation_to_compose_strings
+          '[syncRooms] ${roomSynced.name} ' +
+              'full_synced: $synced ' +
+              'limited: ${roomSynced.limited}' +
+              'total messages: ${roomSynced.messageIds.length}',
         );
 
+        printJson({'reactions': sync.reactions});
         // update various message mutations and meta data
-        await store.dispatch(setUsers(room.usersNew));
-        await store.dispatch(setReactions(reactions: room.reactions));
-        await store.dispatch(setRedactions(redactions: room.redactions));
-        await store.dispatch(setReceipts(room: room, receipts: room.readReceipts));
-
-        // mutation filters - handles backfilling mutations for old messages
-        await store.dispatch(mutateMessagesRoom(room: room));
+        await store.dispatch(setUsers(sync.users));
+        await store.dispatch(setReactions(reactions: sync.reactions));
+        await store.dispatch(setRedactions(redactions: sync.redactions));
+        await store.dispatch(setReceipts(room: roomSynced, receipts: sync.readReceipts));
 
         // handles editing newly fetched messages
-        var messages;
+        final messages = await store.dispatch(mutateMessages(
+          messages: sync.messages,
+        )) as List<Message>;
 
         // update encrypted messages (updating before normal messages prevents flicker)
-        if (room.encryptionEnabled) {
+        if (roomSynced.encryptionEnabled) {
           final decrypted = await store.dispatch(decryptMessages(
-            room,
+            roomSynced,
             messages,
           )) as List<Message>;
 
@@ -139,41 +146,29 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           )) as List<Message>;
 
           await store.dispatch(addMessagesDecrypted(
-            room: room,
+            room: roomSynced,
             messages: decryptedMutated,
-            outbox: room.outbox,
+            outbox: roomSynced.outbox,
           ));
-        } else {
-          // handles editing newly fetched messages
-          messages = await store.dispatch(mutateMessages(
-            messages: room.messagesNew,
-          )) as List<Message>;
         }
 
         // save normal or encrypted messages
         await store.dispatch(addMessages(
-          room: room,
+          room: roomSynced,
           messages: messages,
-          outbox: room.outbox,
+          outbox: roomSynced.outbox,
         ));
 
-        // TODO: remove with parsers - clear users from parsed room objects
-        room = room.copyWith(
-          outbox: [],
-          reactions: [],
-          redactions: [],
-          messagesNew: [],
-          users: <String, User>{},
-          readReceipts: <String, ReadReceipt>{},
-        );
-
         // update room
-        store.dispatch(SetRoom(room: room));
+        store.dispatch(SetRoom(room: roomSynced));
+
+        // mutation filters - handles backfilling mutations for old messages
+        await store.dispatch(mutateMessagesRoom(room: roomSynced));
 
         // fetch avatar if a uri was found
-        if (room.avatarUri != null) {
+        if (roomSynced.avatarUri != null) {
           store.dispatch(fetchMedia(
-            mxcUri: room.avatarUri,
+            mxcUri: roomSynced.avatarUri,
             thumbnail: true,
           ));
         }
@@ -182,12 +177,14 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         // the end would be room.prevHash == room.lastHash
         // fetch previous messages since last /sync (a gap)
         // determined by the fromSync function of room
-        final roomUpdated = store.state.roomStore.rooms[room.id];
-        if (roomUpdated != null && room.limited) {
-          printWarning('[fetchMessageEvents] ${room.name} LIMITED TRUE - Fetching more messages');
+        final roomUpdated = store.state.roomStore.rooms[roomSynced.id];
+        if (roomUpdated != null && roomUpdated.limited) {
+          printWarning(
+            '[fetchMessageEvents] ${roomUpdated.name} LIMITED TRUE - Fetching more messages',
+          );
           store.dispatch(fetchMessageEvents(
-            room: room,
-            from: room.prevHash,
+            room: roomUpdated,
+            from: roomUpdated.prevHash,
           ));
         }
       } catch (error) {
@@ -411,7 +408,7 @@ ThunkAction<AppState> createRoom({
       );
 
       // generate user invite map to cache recent users
-      room = room.copyWith(users: userInviteMap);
+      room = room.copyWith(usersTEMP: userInviteMap);
 
       if (isDirect) {
         final User directUser = invites[0];
@@ -424,7 +421,7 @@ ThunkAction<AppState> createRoom({
             currentUser.userId!,
           ] as List<String>,
           // ignore: unnecessary_cast
-          users: {
+          usersTEMP: {
             directUser.userId!: directUser,
             currentUser.userId!: currentUser,
           } as Map<String, User>,
