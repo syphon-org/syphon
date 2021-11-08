@@ -15,6 +15,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/sync/background/parsers.dart';
 import 'package:syphon/store/sync/background/storage.dart';
+import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
 /// Background Sync Service (Android Only)
@@ -211,17 +212,28 @@ Future backgroundSyncLoop({
 
     // Run all the rooms at once
     await Future.forEach(rooms.keys, (String roomId) async {
-      final roomData = rooms[roomId];
+      final roomJson = rooms[roomId];
 
-      final room = Room(id: roomId).fromSync(
-        json: roomData,
-        lastSince: nextLastSince,
-        currentUser: User(userId: currentUserId),
+      // Don't parse room if there are no message events found
+      final events = parseEvents(
+        roomJson,
       );
 
-      if (room.messagesTEMP.isEmpty) {
+      if (events.messages.isEmpty) {
         return;
       }
+      final details = parseDetails(
+        roomJson,
+      );
+
+      final room = Room(id: roomId).fromEvents(
+        events: events,
+        currentUser: User(userId: currentUserId),
+        lastSince: lastSince,
+        limited: details.limited,
+        lastHash: details.lastHash,
+        prevHash: details.prevHash,
+      );
 
       final chatOptions = settings.notificationOptions;
       final hasOptions = chatOptions.containsKey(roomId);
@@ -276,7 +288,7 @@ Future backgroundSyncLoop({
       /// Inbox Style Notifications Only
       ///
       if (settings.styleType == StyleType.Inbox) {
-        for (final message in room.messagesTEMP) {
+        for (final message in events.messages) {
           final messageBody = parseMessageNotification(
             room: room,
             message: message,
@@ -309,7 +321,7 @@ Future backgroundSyncLoop({
       }
 
       // Run all the room messages at once once room name is confirmed
-      await Future.wait(room.messagesTEMP.map((message) async {
+      await Future.wait(events.messages.map((message) async {
         final title = parseMessageTitle(
           room: room,
           message: message,

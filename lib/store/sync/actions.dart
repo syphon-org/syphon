@@ -79,8 +79,6 @@ ThunkAction<AppState> startSyncObserver() {
       final lastSince = store.state.syncStore.lastSince;
       final syncing = store.state.syncStore.syncing;
 
-      final currentStatus = ConnectionService.currentStatus;
-
       if (accessToken == null) {
         debugPrint('[syncObserver] skipping sync, context not authenticated');
         return;

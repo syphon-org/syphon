@@ -58,11 +58,16 @@ Future<void> saveMessages(
 Future<List<Message>> loadMessagesRoom(
   String roomId, {
   required StorageDatabase storage,
+  int timestamp = 0,
   int offset = 0,
   int limit = 25,
 }) async {
   try {
-    return storage.selectMessagesRoom(roomId, limit: 25); //  TODO: offset: offset, limit: limit);
+    return storage.selectMessagesRoom(
+      roomId,
+      offset: offset,
+      limit: limit,
+    );
   } catch (error) {
     printError(error.toString(), title: 'loadMessages');
     return [];
@@ -160,7 +165,11 @@ Future<List<Message>> loadDecryptedRoom(
   int limit = 25, // default amount loaded
 }) async {
   try {
-    return storage.selectDecryptedRoom(roomId, limit: 25);
+    return storage.selectDecryptedRoom(
+      roomId,
+      offset: offset,
+      limit: limit,
+    );
   } catch (error) {
     printError(error.toString(), title: 'loadMessages');
     return [];

@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -145,6 +142,8 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   // sort replacements so they replace each other in order
   // iterate through replacements and modify messages as needed O(M + M)
   replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
+
+  printJson({'replacements': replacements});
 
   for (final Message messageEdited in replacements) {
     final messageIdOriginal = messageEdited.relatedEventId!;

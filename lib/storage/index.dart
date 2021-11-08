@@ -196,15 +196,13 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
     final receipts = <String, Map<String, ReadReceipt>>{};
 
     for (final Room room in rooms.values) {
-      // TODO: convert to loadMessagesRoom after mutation edits are fixed
-      messages[room.id] = await loadMessages(
-        room.messageIds,
+      messages[room.id] = await loadMessagesRoom(
+        room.id,
         storage: storage,
       );
 
-      // TODO: convert to loadDecryptedRoom after mutation edits are fixed
-      decrypted[room.id] = await loadDecrypted(
-        room.messageIds,
+      decrypted[room.id] = await loadDecryptedRoom(
+        room.id,
         storage: storage,
       );
 

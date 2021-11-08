@@ -13,17 +13,14 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/parsers.dart';
-import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 
@@ -121,7 +118,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
               'total messages: ${roomSynced.messageIds.length}',
         );
 
-        printJson({'reactions': sync.reactions});
         // update various message mutations and meta data
         await store.dispatch(setUsers(sync.users));
         await store.dispatch(setReactions(reactions: sync.reactions));

@@ -56,14 +56,14 @@ class Event {
   Map<String, dynamic> toJson() => _$EventToJson(this);
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
 
-  factory Event.fromMatrix(Map<String, dynamic> json) {
+  factory Event.fromMatrix(Map<String, dynamic> json, {String? roomId}) {
     // HACK: redact is the only matrix event with unique top level data values
     final data = json.containsKey('redacts') ? json : null;
 
     return Event(
       id: json['event_id'] as String?,
       userId: json['user_id'] as String?,
-      roomId: json['room_id'] as String?,
+      roomId: json['room_id'] as String? ?? roomId,
       type: json['type'] as String?,
       sender: json['sender'] as String?,
       stateKey: json['state_key'] as String?,
