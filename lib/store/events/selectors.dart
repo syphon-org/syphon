@@ -146,14 +146,18 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   printJson({'replacements': replacements});
 
   for (final Message messageEdited in replacements) {
-    final messageIdOriginal = messageEdited.relatedEventId!;
-    final messageOriginal = messagesMap[messageIdOriginal];
+    final relatedEventId = messageEdited.relatedEventId!;
+    final messageOriginal = messagesMap[relatedEventId];
+
+    printJson({'original': messageOriginal, 'relatedEventId': relatedEventId});
 
     if (messageOriginal != null) {
       final validEdit = messageEdited.sender == messageOriginal.sender;
 
+      printJson({'validEdit': validEdit});
+
       if (validEdit) {
-        messagesMap[messageIdOriginal] = messageOriginal.copyWith(
+        messagesMap[relatedEventId] = messageOriginal.copyWith(
           edited: true,
           body: messageEdited.body,
           msgtype: messageEdited.msgtype,

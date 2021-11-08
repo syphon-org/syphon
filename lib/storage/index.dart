@@ -26,6 +26,7 @@ import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/settings/storage.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/storage.dart';
 
 class Storage {
@@ -187,9 +188,10 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
     final redactions = await loadRedactions(storage: storageOld);
 
     final rooms = await loadRooms(storage: storage);
-    final users = await loadUsers(storage: storage);
+    // final users = await loadUsers(storage: storage);
     final media = await loadMediaAll(storage: storage);
 
+    final userIds = <String>[];
     final messages = <String, List<Message>>{};
     final decrypted = <String, List<Message>>{};
     final reactions = <String, List<Reaction>>{};
@@ -206,6 +208,10 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
         storage: storage,
       );
 
+      final currentUserIds = messages[room.id]!.map((message) => message.sender ?? '').toList();
+
+      userIds.addAll(currentUserIds);
+
       reactions.addAll(await loadReactions(
         room.messageIds,
         storage: storageOld,
@@ -216,6 +222,11 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
         storage: storageOld,
       );
     }
+
+    final users = await loadUsers(
+      storage: storage,
+      ids: userIds,
+    );
 
     return {
       StorageKeys.AUTH: auth,

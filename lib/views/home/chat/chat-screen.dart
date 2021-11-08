@@ -17,7 +17,6 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
@@ -149,10 +148,11 @@ class ChatScreenState extends State<ChatScreen> {
 
   onCheatCode(_Props props) async {
     final store = StoreProvider.of<AppState>(context);
-    final keySessions = store.state.cryptoStore.keySessions;
 
-    printInfo(SupportedLanguages.rtl.contains(store.state.settingsStore.language).toString());
-    try {} catch (error) {
+    try {
+      final roomId = (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments).roomId;
+      store.dispatch(fetchRoomMembers(room: Room(id: roomId!)));
+    } catch (error) {
       printDebug(error.toString());
     }
   }

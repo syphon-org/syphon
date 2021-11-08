@@ -16,8 +16,9 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
       return state.copyWith(rooms: rooms);
 
     case SetRoom:
+      final _action = action as SetRoom;
       final rooms = Map<String, Room>.from(state.rooms);
-      rooms[action.room.id] = action.room;
+      rooms[_action.room.id] = _action.room;
       return state.copyWith(rooms: rooms);
 
     case UpdateRoom:

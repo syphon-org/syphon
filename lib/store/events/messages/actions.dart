@@ -78,17 +78,17 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
 
     final mutations = [
       compute(reviseMessagesThreaded, {
+        'messages': messages,
         'reactions': reactions,
         'redactions': redactions,
-        'messages': messages,
       })
     ];
 
     if (room.encryptionEnabled) {
       mutations.add(compute(reviseMessagesThreaded, {
+        'messages': decrypted,
         'reactions': reactions,
         'redactions': redactions,
-        'messages': decrypted,
       }));
     }
 

@@ -151,7 +151,7 @@ Future<List<Message>> loadDecrypted(
   int limit = 25, // default amount loaded
 }) async {
   try {
-    return storage.selectDecrypted(eventIds); // TODO: // offset: offset, limit: limit);
+    return storage.selectDecrypted(eventIds);
   } catch (error) {
     printError(error.toString(), title: 'loadMessages');
     return [];

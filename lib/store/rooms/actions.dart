@@ -155,7 +155,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           outbox: roomSynced.outbox,
         ));
 
-        // update room
+        // update rooma
         store.dispatch(SetRoom(room: roomSynced));
 
         // mutation filters - handles backfilling mutations for old messages
@@ -292,6 +292,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
       await Future.wait(joinedRoomsList.map((room) async {
         try {
           await store.dispatch(fetchRoom(room.id, fetchState: syncState));
+          await store.dispatch(fetchRoomMembers(room: room));
         } catch (error) {
           debugPrint('[fetchRoom(s)] ${room.id} $error');
         } finally {
@@ -345,6 +346,52 @@ ThunkAction<AppState> fetchDirectRooms() {
       }));
     } catch (error) {
       debugPrint('[fetchDirectRooms] $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+///
+/// Fetch Room Members
+///
+/// Get a map of all the current members of a room
+///
+ThunkAction<AppState> fetchRoomMembers({
+  required Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final _room = store.state.roomStore.rooms[room.id]!;
+
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.fetchMembersAll(
+        protocol: store.state.authStore.protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: _room.id,
+      );
+
+      final members = data['joined'] as Map<String, dynamic>;
+
+      await store.dispatch(setUsers(Map.from(members).map(
+        (key, value) => MapEntry(
+          key,
+          User(
+            userId: key,
+            avatarUri: value['avatar_url'],
+            displayName: value['display_name'],
+          ),
+        ),
+      )));
+
+      store.dispatch(SetRoom(
+        room: _room.copyWith(userIds: members.keys.toList()),
+      ));
+    } catch (error) {
+      debugPrint('[updateRoom] $error');
+      return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -452,32 +499,6 @@ ThunkAction<AppState> createRoom({
       return room?.id;
     } finally {
       await store.dispatch(startSyncObserver());
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-/// Update Room
-///
-/// stop / start the /sync session for this to run,
-/// otherwise it will appear like the room does
-/// not exist for the seconds between the response from
-/// matrix and caching in the app
-ThunkAction<AppState> updateRoom({
-  String? name,
-  String? alias,
-  String? topic,
-  File? avatarFile,
-  String? avatarUri,
-  List<User>? invites,
-  bool isDirect = false,
-  String preset = RoomPresets.private,
-}) {
-  return (Store<AppState> store) async {
-    try {} catch (error) {
-      debugPrint('[updateRoom] $error');
-      return null;
-    } finally {
       store.dispatch(SetLoading(loading: false));
     }
   };
