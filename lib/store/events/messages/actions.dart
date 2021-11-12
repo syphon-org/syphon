@@ -26,7 +26,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 /// mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessages({List<Message>? messages}) {
+ThunkAction<AppState> mutateMessages({List<Message>? messages, List<Message>? existing}) {
   return (Store<AppState> store) async {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
@@ -34,7 +34,7 @@ ThunkAction<AppState> mutateMessages({List<Message>? messages}) {
     final revisedMessages = await compute(reviseMessagesThreaded, {
       'reactions': reactions,
       'redactions': redactions,
-      'messages': messages,
+      'messages': (messages ?? []) + (existing ?? []),
     });
 
     return revisedMessages;

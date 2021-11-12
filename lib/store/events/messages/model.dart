@@ -11,7 +11,7 @@ part 'model.g.dart';
 /// Message Model
 ///
 /// Allows converting to Json or Database Entity using
-/// JsonSerializable and Moor conversions respectively
+/// JsonSerializable and Drift conversions respectively
 ///
 @JsonSerializable()
 class Message extends Event implements drift.Insertable<Message> {
@@ -42,6 +42,8 @@ class Message extends Event implements drift.Insertable<Message> {
   final Map<String, dynamic>? file;
   final Map<String, dynamic>? info;
 
+  final List<String> editIds;
+
   // Encrypted Messages only
   final String? typeDecrypted; // inner type of decrypted event
   final String? ciphertext;
@@ -50,10 +52,6 @@ class Message extends Event implements drift.Insertable<Message> {
   final String? senderKey; // Curve25519 device key which initiated the session
   final String? deviceId;
   final String? relatedEventId;
-
-  // Ephemeral - helper vars
-  @JsonKey(ignore: true)
-  final List<Message> edits;
 
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
@@ -87,7 +85,7 @@ class Message extends Event implements drift.Insertable<Message> {
     this.pending = false,
     this.failed = false,
     this.replacement = false,
-    this.edits = const [],
+    this.editIds = const [],
     this.reactions = const [],
   }) : super(
           id: id,
@@ -131,7 +129,7 @@ class Message extends Event implements drift.Insertable<Message> {
     String? algorithm,
     String? sessionId,
     String? relatedEventId,
-    edits,
+    List<String>? editIds,
     reactions,
   }) =>
       Message(
@@ -162,7 +160,7 @@ class Message extends Event implements drift.Insertable<Message> {
         replacement: replacement ?? this.replacement,
         edited: edited ?? this.edited,
         relatedEventId: relatedEventId ?? this.relatedEventId,
-        edits: edits ?? this.edits,
+        editIds: editIds ?? this.editIds,
         reactions: reactions ?? this.reactions,
       );
 
@@ -196,6 +194,7 @@ class Message extends Event implements drift.Insertable<Message> {
       algorithm: drift.Value(algorithm),
       sessionId: drift.Value(sessionId),
       relatedEventId: drift.Value(relatedEventId),
+      editIds: drift.Value(editIds),
     ).toColumns(nullToAbsent);
   }
 

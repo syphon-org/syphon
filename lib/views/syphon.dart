@@ -79,6 +79,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     onInitListeners();
 
     // mutate messages
+    // TODO: deprecate this
     store.dispatch(mutateMessagesAll());
 
     final currentUser = store.state.authStore.user;

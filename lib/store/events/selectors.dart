@@ -1,5 +1,4 @@
 import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
@@ -123,6 +122,12 @@ Map<String, Message?> appendReactions(
   return messages;
 }
 
+/// Replace Edited
+///
+/// Modify the original messsage and append the replacement event ID
+/// to the editIds list. Edits will still be saved as individual messages
+/// in storage, but will be filtered out at the view layer
+///
 Map<String, Message?> replaceEdited(List<Message> messages) {
   final replacements = <Message>[];
 
@@ -141,33 +146,24 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
 
   // sort replacements so they replace each other in order
   // iterate through replacements and modify messages as needed O(M + M)
-  replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
-
-  printJson({'replacements': replacements});
+  replacements.sort((b, a) => b.timestamp.compareTo(a.timestamp));
 
   for (final Message messageEdited in replacements) {
     final relatedEventId = messageEdited.relatedEventId!;
     final messageOriginal = messagesMap[relatedEventId];
 
-    printJson({'original': messageOriginal, 'relatedEventId': relatedEventId});
-
     if (messageOriginal != null) {
       final validEdit = messageEdited.sender == messageOriginal.sender;
-
-      printJson({'validEdit': validEdit});
 
       if (validEdit) {
         messagesMap[relatedEventId] = messageOriginal.copyWith(
           edited: true,
           body: messageEdited.body,
           msgtype: messageEdited.msgtype,
-          edits: [messageOriginal, ...messageOriginal.edits],
+          editIds: [messageEdited.id!, ...messageOriginal.editIds],
         );
       }
     }
-
-    // remove replacements from the returned messages
-    messagesMap.remove(messageEdited.id);
   }
 
   return messagesMap;

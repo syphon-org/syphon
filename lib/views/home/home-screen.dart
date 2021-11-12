@@ -552,7 +552,8 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
+                        visible:
+                            props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -572,7 +573,8 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
+                        visible:
+                            props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,

@@ -47,9 +47,13 @@ class Messages extends Table {
   TextColumn get ciphertext => text().nullable()();
   TextColumn get algorithm => text().nullable()();
   TextColumn get sessionId => text().nullable()();
-  TextColumn get senderKey => text().nullable()(); // Curve25519 device key which initiated the session
+  TextColumn get senderKey =>
+      text().nullable()(); // Curve25519 device key which initiated the session
   TextColumn get deviceId => text().nullable()();
   TextColumn get relatedEventId => text().nullable()();
+
+  TextColumn get editIds =>
+      text().map(const ListToTextConverter()).withDefault(const Constant('[]'))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -101,9 +105,13 @@ class Decrypted extends Table {
   TextColumn get ciphertext => text().nullable()();
   TextColumn get algorithm => text().nullable()();
   TextColumn get sessionId => text().nullable()();
-  TextColumn get senderKey => text().nullable()(); // Curve25519 device key which initiated the session
+  TextColumn get senderKey =>
+      text().nullable()(); // Curve25519 device key which initiated the session
   TextColumn get deviceId => text().nullable()();
   TextColumn get relatedEventId => text().nullable()();
+
+  TextColumn get editIds =>
+      text().map(const ListToTextConverter()).withDefault(const Constant('[]'))();
 
   @override
   Set<Column> get primaryKey => {id};

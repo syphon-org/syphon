@@ -36,7 +36,7 @@ class Storage {
   // storage identifiers
   static const databaseLocation = '${Values.appLabel}-main-storage.db';
 
-  // storage identifiers - NEW - MOOR
+  // storage identifiers
   static const sqliteLocation = '${Values.appLabel}-cold-storage.db';
 
   // cold storage references

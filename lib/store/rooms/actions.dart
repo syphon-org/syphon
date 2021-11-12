@@ -98,6 +98,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         final Map json = roomData[id] ?? {};
         final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
 
+        final existing = store.state.eventStore.messages[id];
+        final existingDecrypted = store.state.eventStore.messagesDecrypted[id];
+
         if (json.isEmpty) return;
 
         final sync = await compute(parseSync, {
@@ -127,6 +130,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         // handles editing newly fetched messages
         final messages = await store.dispatch(mutateMessages(
           messages: sync.messages,
+          existing: existing,
         )) as List<Message>;
 
         // update encrypted messages (updating before normal messages prevents flicker)
@@ -139,6 +143,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           // handles editing newly fetched decrypted messages
           final decryptedMutated = await store.dispatch(mutateMessages(
             messages: decrypted,
+            existing: existingDecrypted,
           )) as List<Message>;
 
           await store.dispatch(addMessagesDecrypted(
@@ -157,9 +162,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         // update rooma
         store.dispatch(SetRoom(room: roomSynced));
-
-        // mutation filters - handles backfilling mutations for old messages
-        await store.dispatch(mutateMessagesRoom(room: roomSynced));
 
         // fetch avatar if a uri was found
         if (roomSynced.avatarUri != null) {

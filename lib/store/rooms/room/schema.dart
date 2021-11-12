@@ -1,26 +1,9 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:syphon/storage/drift/converters.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-
-class ListToTextConverter extends TypeConverter<List<String>, String> {
-  const ListToTextConverter();
-
-  @override
-  List<String> mapToDart(String? fromDb) {
-    return List<String>.from(json.decode(fromDb!) ?? const []);
-  }
-
-  @override
-  String mapToSql(List<String>? value) {
-    try {
-      return json.encode(value);
-    } catch (error) {
-      return '[]';
-    }
-  }
-}
 
 class MessageToJsonConverter extends TypeConverter<Message?, String> {
   const MessageToJsonConverter();
@@ -51,8 +34,7 @@ class Rooms extends Table {
   TextColumn get homeserver => text().nullable()();
   TextColumn get avatarUri => text().nullable()();
   TextColumn get topic => text().nullable()();
-  TextColumn get joinRule =>
-      text().nullable()(); // "public", "knock", "invite", "private"
+  TextColumn get joinRule => text().nullable()(); // "public", "knock", "invite", "private"
 
   BoolColumn get drafting => boolean()();
   BoolColumn get direct => boolean()();
@@ -65,8 +47,7 @@ class Rooms extends Table {
   BoolColumn get archived => boolean()();
 
   TextColumn get lastHash => text().nullable()(); // oldest hash in timeline
-  TextColumn get prevHash =>
-      text().nullable()(); // most recent prev_batch (not the lastHash)
+  TextColumn get prevHash => text().nullable()(); // most recent prev_batch (not the lastHash)
   TextColumn get nextHash => text().nullable()(); // most recent next_batch
 
   IntColumn get lastRead => integer().withDefault(const Constant(0))();
@@ -75,21 +56,16 @@ class Rooms extends Table {
   IntColumn get namePriority => integer().withDefault(const Constant(4))();
 
   // Event lists and handlers
-  TextColumn get draft =>
-      text().map(const MessageToJsonConverter()).nullable()();
-  TextColumn get reply =>
-      text().map(const MessageToJsonConverter()).nullable()();
+  TextColumn get draft => text().map(const MessageToJsonConverter()).nullable()();
+  TextColumn get reply => text().map(const MessageToJsonConverter()).nullable()();
 
   // Associated user ids
-  TextColumn get userIds => text()
-      .map(const ListToTextConverter())
-      .withDefault(const Constant('[]'))();
-  TextColumn get messageIds => text()
-      .map(const ListToTextConverter())
-      .withDefault(const Constant('[]'))();
-  TextColumn get reactionIds => text()
-      .map(const ListToTextConverter())
-      .withDefault(const Constant('[]'))();
+  TextColumn get userIds =>
+      text().map(const ListToTextConverter()).withDefault(const Constant('[]'))();
+  TextColumn get messageIds =>
+      text().map(const ListToTextConverter()).withDefault(const Constant('[]'))();
+  TextColumn get reactionIds =>
+      text().map(const ListToTextConverter()).withDefault(const Constant('[]'))();
 
   @override
   Set<Column> get primaryKey => {id};

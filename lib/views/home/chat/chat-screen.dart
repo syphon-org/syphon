@@ -150,8 +150,9 @@ class ChatScreenState extends State<ChatScreen> {
     final store = StoreProvider.of<AppState>(context);
 
     try {
-      final roomId = (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments).roomId;
-      store.dispatch(fetchRoomMembers(room: Room(id: roomId!)));
+      await store.dispatch(mutateMessagesRoom(
+        room: props.room,
+      ));
     } catch (error) {
       printDebug(error.toString());
     }
@@ -366,6 +367,12 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       selectedMessage = message;
     });
+
+    if (message == null) {
+      setState(() {
+        editing = false;
+      });
+    }
   }
 
   onChangeMediumType({String? newMediumType, _Props? props}) {

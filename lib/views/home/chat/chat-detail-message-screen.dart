@@ -1,17 +1,14 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
@@ -31,12 +28,10 @@ class MessageDetailsScreen extends StatelessWidget {
 
   @protected
   Widget buildUserReadList(_Props props, double width) {
-    final ReadReceipt readReceipts =
-        props.readReceipts[props.message!.id!] ?? ReadReceipt();
+    final ReadReceipt readReceipts = props.readReceipts[props.message!.id!] ?? ReadReceipt();
     final Map<String, int> userReads = readReceipts.userReads ?? {};
 
-    final List<User?> users =
-        userReads.keys.map((userId) => props.users[userId]).toList();
+    final List<User?> users = userReads.keys.map((userId) => props.users[userId]).toList();
 
     return ListUserBubbles(
       max: 4,
@@ -56,8 +51,7 @@ class MessageDetailsScreen extends StatelessWidget {
           final double width = MediaQuery.of(context).size.width;
           final Message message = props.message!;
 
-          final timestamp =
-              DateTime.fromMillisecondsSinceEpoch(message.timestamp);
+          final timestamp = DateTime.fromMillisecondsSinceEpoch(message.timestamp);
           final received = DateTime.fromMillisecondsSinceEpoch(
             message.received == 0 ? message.timestamp : message.received,
           );
@@ -96,10 +90,8 @@ class MessageDetailsScreen extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 1,
                     itemBuilder: (BuildContext context, int index) {
-                      final current =
-                          index == 0 ? message : message.edits[index - 1];
                       return MessageWidget(
-                        message: current,
+                        message: message,
                         isUserSent: isUserSent,
                         messageOnly: true,
                         themeType: props.themeType,
@@ -181,21 +173,39 @@ class MessageDetailsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                // ListTile(
+                //   contentPadding: Dimensions.listPadding,
+                //   title: Text(
+                //     'Read By',
+                //     style: TextStyle(
+                //       fontSize: 14.0,
+                //       fontWeight: FontWeight.w600,
+                //     ),
+                //   ),
+                //   trailing: Container(
+                //     constraints: BoxConstraints(
+                //       maxWidth: width / 2,
+                //       maxHeight: 100,
+                //     ),
+                //     child: buildUserReadList(props, width),
+                //   ),
+                // ),
                 ListTile(
+                  dense: true,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Read By',
+                    'Event ID',
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  trailing: Container(
-                    constraints: BoxConstraints(
-                      maxWidth: width / 2,
-                      maxHeight: 100,
+                  trailing: Text(
+                    message.id.toString(),
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w300,
                     ),
-                    child: buildUserReadList(props, width),
                   ),
                 ),
               ],
@@ -213,7 +223,7 @@ class _Props extends Equatable {
   final Map<String, User> users;
   final Map<String, ReadReceipt> readReceipts;
 
-  _Props({
+  const _Props({
     required this.users,
     required this.themeType,
     required this.roomId,
@@ -230,8 +240,7 @@ class _Props extends Equatable {
         roomId: args.roomId,
         message: args.message,
         users: store.state.userStore.users,
-        readReceipts: store.state.eventStore.receipts[args.roomId!] ??
-            <String, ReadReceipt>{},
+        readReceipts: store.state.eventStore.receipts[args.roomId!] ?? <String, ReadReceipt>{},
         userId: store.state.authStore.user.userId,
         themeType: store.state.settingsStore.themeSettings.themeType,
       );
