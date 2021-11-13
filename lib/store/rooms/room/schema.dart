@@ -46,9 +46,9 @@ class Rooms extends Table {
   BoolColumn get hidden => boolean()();
   BoolColumn get archived => boolean()();
 
-  TextColumn get lastHash => text().nullable()(); // oldest hash in timeline
-  TextColumn get prevHash => text().nullable()(); // most recent prev_batch (not the lastHash)
-  TextColumn get nextHash => text().nullable()(); // most recent next_batch
+  TextColumn get lastBatch => text().nullable()(); // oldest hash in timeline
+  TextColumn get prevBatch => text().nullable()(); // most recent prev_batch (not the lastBatch)
+  TextColumn get nextBatch => text().nullable()(); // most recent next_batch
 
   IntColumn get lastRead => integer().withDefault(const Constant(0))();
   IntColumn get lastUpdate => integer().withDefault(const Constant(0))();

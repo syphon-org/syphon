@@ -642,7 +642,7 @@ class ChatScreenState extends State<ChatScreen> {
                           ),
                           Positioned(
                             child: Visibility(
-                              visible: props.room.lastHash == null,
+                              visible: props.room.lastBatch == null,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
                                 child: Container(
@@ -849,7 +849,7 @@ class _Props extends Equatable {
 
           store.dispatch(fetchMessageEvents(
             room: room,
-            from: room.nextHash,
+            from: room.nextBatch,
             limit: 25,
           ));
         },
@@ -869,25 +869,9 @@ class _Props extends Equatable {
         onLoadMoreMessages: () {
           final room = selectRoom(state: store.state, id: roomId);
 
-          // load message from cold storage
-          // TODO: paginate cold storage messages
-          // final messages = roomMessages(store.state, roomId);
-          // if (messages.length < room.messageIds.length) {
-          //   printDebug(
-          //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
-          //   return store.dispatch(
-          //     loadMessageEvents(
-          //       room: room,
-          //       offset: messages.length,
-          //     ),
-          //   );
-          // }
-
-          // fetch messages beyond the oldest known message - lastHash
+          // fetch messages from the oldest cached batch
           return store.dispatch(fetchMessageEvents(
             room: room,
-            from: room.lastHash,
-            oldest: true,
           ));
         },
       );

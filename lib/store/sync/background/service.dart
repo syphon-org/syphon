@@ -231,8 +231,8 @@ Future backgroundSyncLoop({
         currentUser: User(userId: currentUserId),
         lastSince: lastSince,
         limited: details.limited,
-        lastHash: details.lastHash,
-        prevHash: details.prevHash,
+        lastBatch: details.lastBatch,
+        prevBatch: details.prevBatch,
       );
 
       final chatOptions = settings.notificationOptions;

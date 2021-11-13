@@ -31,14 +31,14 @@ class Sync {
 class SyncDetails {
   final bool? invite;
   final bool? limited;
-  final String? lastHash;
-  final String? prevHash;
+  final String? lastBatch;
+  final String? prevBatch;
 
   const SyncDetails({
     this.invite,
     this.limited,
-    this.lastHash,
-    this.prevHash,
+    this.lastBatch,
+    this.prevBatch,
   });
 }
 
@@ -72,12 +72,12 @@ Sync parseSync(Map params) {
   final User currentUser = params['currentUser'];
   final String? lastSince = params['lastSince'];
 
-  final events = parseEvents(json, roomId: roomExisting.id);
   final details = parseDetails(json);
+  final events = parseEvents(json, roomId: roomExisting.id);
 
   if (details.limited != null) {
     printInfo(
-      '[parseSync] ${roomExisting.id} limited ${details.limited} lastHash ${details.lastHash != null} prevHash ${details.prevHash != null}',
+      '[parseSync] ${roomExisting.id} limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
     );
   }
 
@@ -86,8 +86,8 @@ Sync parseSync(Map params) {
     lastSince: lastSince,
     currentUser: currentUser,
     limited: details.limited,
-    lastHash: details.lastHash,
-    prevHash: details.prevHash,
+    lastBatch: details.lastBatch,
+    prevBatch: details.prevBatch,
   );
 
   // TODO: remove with separate parsers, solve the issue of redundant passes over this data
@@ -114,22 +114,22 @@ Sync parseSync(Map params) {
 SyncDetails parseDetails(Map<String, dynamic> json) {
   bool invite;
   bool? limited;
-  String? lastHash;
-  String? prevHash;
+  String? lastBatch;
+  String? prevBatch;
 
   invite = json['invite_state'] != null;
 
   if (json['timeline'] != null) {
     limited = json['timeline']['limited'];
-    lastHash = json['timeline']['last_hash'];
-    prevHash = json['timeline']['prev_batch'];
+    lastBatch = json['timeline']['last_batch'];
+    prevBatch = json['timeline']['prev_batch'];
   }
 
   return SyncDetails(
     invite: invite,
     limited: limited,
-    lastHash: lastHash,
-    prevHash: prevHash,
+    lastBatch: lastBatch,
+    prevBatch: prevBatch,
   );
 }
 
@@ -141,7 +141,11 @@ SyncDetails parseDetails(Map<String, dynamic> json) {
 /// the room itself. Relatively safe to remove from the message object
 /// if the message class in terms of cruft or for performance.
 ///
-SyncEvents parseEvents(Map<String, dynamic> json, {String? roomId}) {
+SyncEvents parseEvents(
+  Map<String, dynamic> json, {
+  String? roomId,
+  String? prevBatch,
+}) {
   List<Event> stateEvents = [];
   List<Event> accountEvents = [];
   List<Event> ephemeralEvents = [];

@@ -12,6 +12,8 @@ extension Version5 on StorageDatabase {
           printInfo('[MIGRATION] VERSION $from to $to');
           if (from == 4) {
             await m.addColumn(messages, messages.editIds);
+            await m.addColumn(messages, messages.batch);
+            // await m.renameColumn(rooms, 'last_hash', rooms.lastBatch);
           }
         },
       );

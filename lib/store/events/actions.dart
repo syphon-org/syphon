@@ -81,12 +81,6 @@ class SaveOutboxMessage {
   });
 }
 
-///
-/// Save Outbox Message
-///
-/// tempId is for messages that have attempted sending but
-/// are still in an unknown state remotely
-///
 class DeleteOutboxMessage {
   final Message message; // room id
 
@@ -160,21 +154,28 @@ ThunkAction<AppState> setReceipts({
 ThunkAction<AppState> loadMessagesCached({
   Room? room,
   int offset = 0,
-  int limit = 20,
+  int limit = 25,
 }) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
+      final messages = store.state.eventStore.messages[room.id] ?? [];
+      final oldestCached = messages.isNotEmpty ? messages[messages.length - 1] : Message();
+
       final messagesStored = await loadMessages(
-        room.messageIds,
         storage: Storage.database!,
-        offset: offset, // offset from the most recent eventId found
+        roomId: room.id,
         limit: !room.encryptionEnabled ? limit : room.messageIds.length,
+        batch: oldestCached.batch,
       );
 
       // load cold storage messages to state
-      store.dispatch(AddMessages(roomId: room.id, messages: messagesStored));
+      if (messagesStored.isNotEmpty) {
+        store.dispatch(AddMessages(roomId: room.id, messages: messagesStored));
+      }
+
+      return messagesStored;
     } catch (error) {
       printError('[fetchMessageEvents] $error');
     } finally {
@@ -193,24 +194,34 @@ ThunkAction<AppState> fetchMessageEvents({
   Room? room,
   String? to,
   String? from,
-  bool oldest = false,
-  int limit = 20,
+  int limit = 25,
 }) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
+
+      final cached = await store.dispatch(
+        loadMessagesCached(room: room, limit: limit),
+      ) as List<Message>;
+
+      if (cached.isNotEmpty) {
+        return;
+      }
+
+      final oldest = cached.isEmpty;
 
       final messagesJson = await compute(MatrixApi.fetchMessageEventsThreaded, {
         'protocol': store.state.authStore.protocol,
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'roomId': room.id,
-        'to': to,
-        'from': from,
         'limit': limit,
+        'from': from,
+        'to': to,
       });
 
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
+      // WARNING: this will be null if there are no more events or batches left to fetch
       final String? end = messagesJson['end'];
 
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
@@ -220,18 +231,17 @@ ThunkAction<AppState> fetchMessageEvents({
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
       // reuse the logic for syncing
-      await store.dispatch(
-        syncRooms({
-          room.id: {
-            'timeline': {
-              'events': messages,
-              'last_hash': oldest ? end : null,
-              'prev_batch': end,
-              'limited': end == start ? false : null,
-            }
-          },
-        }),
-      );
+      await store.dispatch(syncRooms({
+        room.id: {
+          'timeline': {
+            'events': messages,
+            // end will be null if no more batches are available to fetch
+            'last_batch': oldest ? end ?? from : null,
+            'prev_batch': end,
+            'limited': end == start ? false : null,
+          }
+        },
+      }));
     } catch (error) {
       debugPrint('[fetchMessageEvents] error $error');
     } finally {

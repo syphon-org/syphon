@@ -160,7 +160,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           outbox: roomSynced.outbox,
         ));
 
-        // update rooma
+        // update room
         store.dispatch(SetRoom(room: roomSynced));
 
         // fetch avatar if a uri was found
@@ -172,7 +172,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         }
 
         // and is not already at the end of the last known batch
-        // the end would be room.prevHash == room.lastHash
+        // the end would be room.prevBatch == room.lastBatch
         // fetch previous messages since last /sync (a gap)
         // determined by the fromSync function of room
         final roomUpdated = store.state.roomStore.rooms[roomSynced.id];
@@ -182,7 +182,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           );
           store.dispatch(fetchMessageEvents(
             room: roomUpdated,
-            from: roomUpdated.prevHash,
+            from: roomUpdated.prevBatch,
           ));
         }
       } catch (error) {

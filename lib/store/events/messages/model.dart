@@ -42,8 +42,6 @@ class Message extends Event implements drift.Insertable<Message> {
   final Map<String, dynamic>? file;
   final Map<String, dynamic>? info;
 
-  final List<String> editIds;
-
   // Encrypted Messages only
   final String? typeDecrypted; // inner type of decrypted event
   final String? ciphertext;
@@ -52,6 +50,8 @@ class Message extends Event implements drift.Insertable<Message> {
   final String? senderKey; // Curve25519 device key which initiated the session
   final String? deviceId;
   final String? relatedEventId;
+  // References
+  final List<String> editIds;
 
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
@@ -63,6 +63,7 @@ class Message extends Event implements drift.Insertable<Message> {
     String? type,
     String? sender,
     String? stateKey,
+    String? batch,
     dynamic content,
     int timestamp = 0,
     this.body,
@@ -94,6 +95,7 @@ class Message extends Event implements drift.Insertable<Message> {
           type: type,
           sender: sender,
           stateKey: stateKey,
+          batch: batch,
           timestamp: timestamp,
           content: content,
           data: null,
@@ -106,6 +108,7 @@ class Message extends Event implements drift.Insertable<Message> {
     String? sender,
     String? roomId,
     String? stateKey,
+    String? batch,
     dynamic content,
     dynamic data,
     bool? syncing,
@@ -139,6 +142,7 @@ class Message extends Event implements drift.Insertable<Message> {
         sender: sender ?? this.sender,
         roomId: roomId ?? this.roomId,
         stateKey: stateKey ?? this.stateKey,
+        batch: batch ?? this.batch,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
         body: body ?? this.body,
@@ -174,6 +178,7 @@ class Message extends Event implements drift.Insertable<Message> {
       type: drift.Value(type),
       sender: drift.Value(sender),
       stateKey: drift.Value(stateKey),
+      batch: drift.Value(batch),
       syncing: drift.Value(syncing),
       pending: drift.Value(pending),
       failed: drift.Value(failed),

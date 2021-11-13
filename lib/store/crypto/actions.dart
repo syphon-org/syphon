@@ -616,7 +616,8 @@ ThunkAction<AppState> updateKeySessions({
         },
       ));
     } catch (error) {
-      store.dispatch(addAlert(origin: 'updateKeySessions', message: error.toString(), error: error));
+      store
+          .dispatch(addAlert(origin: 'updateKeySessions', message: error.toString(), error: error));
     }
   };
 }
@@ -788,7 +789,8 @@ ThunkAction<AppState> loadKeySessionOutbound({
 
           final keySessionType = keySession.encrypt_message_type();
 
-          printInfo('[loadKeySessionOutbound] found $keySessionId for $identityKey of type $keySessionType');
+          printInfo(
+              '[loadKeySessionOutbound] found $keySessionId for $identityKey of type $keySessionType');
           return keySession;
         } catch (error) {
           printInfo('[loadKeySessionOutbound] unsuccessful $identityKey $error');
