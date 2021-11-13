@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
@@ -315,15 +316,25 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   onAddMedia(File file, MessageType type, _Props props) async {
-    Navigator.pushNamed(
-      context,
-      Routes.chatMediaPreview,
-      arguments: MediaPreviewArguments(
-        roomId: props.room.id,
-        mediaList: [file],
-        onConfirmSend: () => onSendMedia(file, type, props),
-      ),
-    );
+    final String? mimeType = lookupMimeType(file.path);
+
+    if (mimeType != null){
+      if (mimeType.startsWith('image/')){
+        Navigator.pushNamed(
+          context,
+          Routes.chatMediaPreview,
+          arguments: MediaPreviewArguments(
+            roomId: props.room.id,
+            mediaList: [file],
+            onConfirmSend: () => sendMedia(file, type, props),
+          ),
+        );
+      }
+      else{
+        // if no image send without preview
+        sendMedia(file, type, props);
+      }
+    }
   }
 
   onToggleSelectedMessage(Message? message) {
