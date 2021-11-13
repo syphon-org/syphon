@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -491,17 +492,23 @@ class MessageWidget extends StatelessWidget {
                                   Container(
                                     margin: EdgeInsets.only(
                                       bottom: 6,
-                                      top: isMedia ? 8 : 0,
-                                      left: isMedia ? 12 : 0,
-                                      right: isMedia ? 12 : 0,
+                                      top: isImage ? 8 : 0,
+                                      left: isImage ? 12 : 0,
+                                      right: isImage ? 12 : 0,
                                     ),
-                                    child: MarkdownBody(
-                                      data: body.trim(),
-                                      styleSheet: MarkdownStyleSheet(
-                                        blockquote: TextStyle(
-                                          backgroundColor: bubbleColor,
-                                        ),
-                                        blockquoteDecoration: BoxDecoration(
+                                    child: GestureDetector(
+                                        onTap: (){
+                                           if (isFile){
+
+                                           }
+                                         },
+                                        child: MarkdownBody(
+                                          data: body.trim(),
+                                          styleSheet: MarkdownStyleSheet(
+                                            blockquote: TextStyle(
+                                              backgroundColor: bubbleColor,
+                                            ),
+                                          blockquoteDecoration: BoxDecoration(
                                           color: replyColor,
                                           borderRadius: const BorderRadius.only(
                                             //TODO: shape similar to bubbleBorder
@@ -512,17 +519,17 @@ class MessageWidget extends StatelessWidget {
                                           ),
                                         ),
                                         p: TextStyle(
+                                          decoration: isFile? TextDecoration.underline : TextDecoration.none,
                                           color: textColor,
                                           fontStyle: fontStyle,
                                           fontWeight: FontWeight.w300,
                                           fontSize: Theme.of(context).textTheme.subtitle2!.fontSize,
                                         ),
-                                      ),
-                                    ),
-                                  ),
+                                      )
+                                  ,))),
                                   Padding(
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: isMedia ? 12 : 0,
+                                      horizontal: isImage ? 12 : 0,
                                     ),
                                     child: Flex(
                                       /// *** Message Status Row ***
