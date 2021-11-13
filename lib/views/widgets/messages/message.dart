@@ -202,7 +202,9 @@ class MessageWidget extends StatelessWidget {
     final hasReactions = message.reactions.isNotEmpty || selected;
     final isRead = message.timestamp < lastRead;
     final showAvatar = !isLastSender && !isUserSent && !messageOnly;
-    final isMedia = message.url != null;
+
+    final isImage = message.msgtype == MatrixMessageTypes.image;
+    final isFile = message.msgtype == MatrixMessageTypes.file;
 
     var textColor = Colors.white;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
@@ -421,13 +423,13 @@ class MessageWidget extends StatelessWidget {
                               constraints: BoxConstraints(
                                 // TODO: issue shrinking the message based on width
                                 maxWidth:
-                                    !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
+                                    !isImage ? double.infinity : Dimensions.mediaSizeMaxMessage,
                               ),
                               padding: EdgeInsets.only(
-                                left: isMedia ? 0 : 12, // make an image span the message width
-                                right: isMedia ? 0 : 12, // make an image span the message width
-                                top: isMedia && !showSender ? 0 : 8,
-                                bottom: isMedia ? 12 : 8,
+                                left: isImage ? 0 : 12, // make an image span the message width
+                                right: isImage ? 0 : 12, // make an image span the message width
+                                top: isImage && !showSender ? 0 : 8,
+                                bottom: isImage ? 12 : 8,
                               ),
                               margin: EdgeInsets.only(
                                 bottom: hasReactions ? 14 : 0,
@@ -447,8 +449,8 @@ class MessageWidget extends StatelessWidget {
                                     child: Container(
                                       margin: EdgeInsets.only(
                                         bottom: 4,
-                                        left: isMedia ? 12 : 0,
-                                        right: isMedia ? 12 : 0,
+                                        left: isImage ? 12 : 0,
+                                        right: isImage ? 12 : 0,
                                       ), // make an image span the message width
                                       child: Text(
                                         displayName ?? formatSender(message.sender!),
@@ -461,7 +463,7 @@ class MessageWidget extends StatelessWidget {
                                     ),
                                   ),
                                   Visibility(
-                                    visible: isMedia,
+                                    visible: isImage,
                                     maintainState: false,
                                     child: ClipRRect(
                                       borderRadius: showSender
