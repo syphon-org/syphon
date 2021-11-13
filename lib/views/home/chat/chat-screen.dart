@@ -227,7 +227,7 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  onSendMedia(File file, MessageType type, _Props props) async {
+  sendMedia(File file, MessageType type, _Props props) async {
     final store = StoreProvider.of<AppState>(context);
     final encryptionEnabled = props.room.encryptionEnabled;
 
