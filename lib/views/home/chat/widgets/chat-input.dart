@@ -225,8 +225,9 @@ class ChatInputState extends State<ChatInput> {
 
   onAddFile() async {
     final pickerResult = await FilePicker.platform.pickFiles(
-      type: FileType.any,
+      type: FileType.custom,
       allowMultiple: false,
+      allowedExtensions: ['pdf', 'doc', 'txt'],
     );
 
     if (pickerResult == null) return;
@@ -527,7 +528,7 @@ class ChatInputState extends State<ChatInput> {
                           child: MediaCard(
                             text: 'File',
                             icon: Icons.note_add,
-                            onPress: () => onAddInProgress(),
+                            onPress: () => onAddFile(),
                           ),
                         ),
                         Padding(
