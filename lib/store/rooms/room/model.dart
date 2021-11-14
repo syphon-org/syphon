@@ -457,6 +457,7 @@ class Room implements drift.Insertable<Room> {
       bool? limited;
       int lastUpdate = this.lastUpdate;
       final messageIds = this.messageIds;
+      final limitedCurrent = this.limited;
 
       // Converting only message events
       final hasEncrypted = messages.firstWhereOrNull(
@@ -473,15 +474,17 @@ class Room implements drift.Insertable<Room> {
       }
 
       // limited indicates need to fetch additional data for room timelines
-      if (this.limited) {
+      if (limitedCurrent) {
+        // TODO: deprecated - remove along with messageIds
+        // TODO: potentially reimplement, but with batch tokens instead
         // Check to see if the new messages contain those existing in cache
         if (messages.isNotEmpty && messageIds.isNotEmpty) {
           final messageKnown = messageIds.firstWhereOrNull(
             (id) => id == messages[0].id,
           );
 
-          // Set limited to false if they now exist
-          limited = messageKnown != null;
+          // still limited if messages are all unknown / new
+          limited = messageKnown == null;
         }
 
         // Set limited to false false if
@@ -489,6 +492,12 @@ class Room implements drift.Insertable<Room> {
         // - the previous batch (most recent) is non-existant
         // - the oldest batch equals the previously fetched hash
         if (lastBatch == null || prevBatch == null || lastBatch == prevBatch) {
+          limited = false;
+        }
+
+        // Set limitd to false if
+        // - this fetch's previous batch is equal to the room's historic previous batch
+        if (prevBatch == this.prevBatch) {
           limited = false;
         }
       }
