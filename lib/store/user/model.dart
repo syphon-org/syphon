@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/drift/database.dart';
 
 part 'model.g.dart';
@@ -87,7 +88,7 @@ class User extends Equatable implements drift.Insertable<User> {
         avatarUri: json['avatar_url'] as String?,
       );
     } catch (error) {
-      debugPrint('[User.fromMatrix] $error');
+      printError('[User.fromMatrix] $error');
       return User();
     }
   }

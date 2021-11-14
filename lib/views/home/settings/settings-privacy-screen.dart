@@ -1,13 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -184,8 +181,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(
-                                  context, Routes.settingsPassword);
+                              Navigator.pushNamed(context, Routes.settingsPassword);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -198,8 +194,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(
-                                  context, Routes.settingsBlocked);
+                              Navigator.pushNamed(context, Routes.settingsBlocked);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -249,8 +244,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.typingIndicators!,
-                              onChanged: (enterSend) =>
-                                  props.onToggleTypingIndicators(),
+                              onChanged: (enterSend) => props.onToggleTypingIndicators(),
                             ),
                           ),
                         ],
@@ -313,8 +307,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap:
-                                  props.onImportDeviceKey as void Function()?,
+                              onTap: props.onImportDeviceKey as void Function()?,
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Import Keys',
@@ -325,8 +318,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap: () => onExportDeviceKey(
-                                  context: context, props: props),
+                              onTap: () => onExportDeviceKey(context: context, props: props),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Export Keys',
@@ -334,8 +326,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onDeleteDeviceKey(
-                                context: context, props: props),
+                            onTap: () => onDeleteDeviceKey(context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Delete Keys',
@@ -428,8 +419,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
-        readReceipts: selectReadReceiptsString(
-          store.state.settingsStore.readReceipts),
+        readReceipts: selectReadReceiptsString(store.state.settingsStore.readReceipts),
         sessionId: store.state.authStore.user.deviceId ?? Values.EMPTY,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),

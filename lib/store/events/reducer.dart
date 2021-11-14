@@ -1,6 +1,5 @@
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
@@ -9,12 +8,6 @@ import './state.dart';
 
 EventStore eventReducer([EventStore state = const EventStore(), dynamic action]) {
   switch (action.runtimeType) {
-    case SetEvents:
-      final roomId = action.roomId;
-      final events = Map<String, List<Event>>.from(state.events);
-      events[roomId] = action.state;
-      return state.copyWith(events: events);
-
     case SetReactions:
       final _action = action as SetReactions;
       final reactionsUpdated = Map<String, List<Reaction>>.from(

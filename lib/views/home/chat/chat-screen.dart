@@ -24,6 +24,7 @@ import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/encryption.dart';
@@ -113,7 +114,7 @@ class ChatScreenState extends State<ChatScreen> {
       onAttemptDecryption(props);
     }
 
-    if (props.messagesLength! < 10) {
+    if (props.messagesLength < 10) {
       props.onFetchNewest();
     }
 
@@ -642,7 +643,7 @@ class ChatScreenState extends State<ChatScreen> {
                           ),
                           Positioned(
                             child: Visibility(
-                              visible: props.room.lastHash == null,
+                              visible: props.room.lastBatch == null && props.messagesLength < 10,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
                                 child: Container(
@@ -707,7 +708,7 @@ class _Props extends Equatable {
   final Room room;
   final String? userId;
   final bool loading;
-  final int? messagesLength;
+  final int messagesLength;
   final bool enterSendEnabled;
   final bool showAvatars;
   final ThemeType themeType;
@@ -774,7 +775,7 @@ class _Props extends Equatable {
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         loading: selectRoom(state: store.state, id: roomId).syncing,
         messagesLength: store.state.eventStore.messages.containsKey(roomId)
-            ? store.state.eventStore.messages[roomId]?.length
+            ? store.state.eventStore.messages[roomId]?.length ?? 0
             : 0,
         onSelectReply: (Message? message) {
           store.dispatch(selectReply(roomId: roomId, message: message));
@@ -849,8 +850,7 @@ class _Props extends Equatable {
 
           store.dispatch(fetchMessageEvents(
             room: room,
-            from: room.nextHash,
-            limit: 25,
+            from: room.nextBatch,
           ));
         },
         onToggleReaction: ({Message? message, String? emoji}) {
@@ -869,25 +869,16 @@ class _Props extends Equatable {
         onLoadMoreMessages: () {
           final room = selectRoom(state: store.state, id: roomId);
 
-          // load message from cold storage
-          // TODO: paginate cold storage messages
-          // final messages = roomMessages(store.state, roomId);
-          // if (messages.length < room.messageIds.length) {
-          //   printDebug(
-          //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
-          //   return store.dispatch(
-          //     loadMessageEvents(
-          //       room: room,
-          //       offset: messages.length,
-          //     ),
-          //   );
-          // }
+          // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
+          final messages = store.state.eventStore.messages[room.id] ?? [];
+          final oldest =
+              messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
 
-          // fetch messages beyond the oldest known message - lastHash
+          // fetch messages from the oldest cached batch
           return store.dispatch(fetchMessageEvents(
             room: room,
-            from: room.lastHash,
-            oldest: true,
+            from: oldest.prevBatch,
+            timestamp: oldest.timestamp,
           ));
         },
       );

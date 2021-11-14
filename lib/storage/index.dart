@@ -26,7 +26,6 @@ import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/settings/storage.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/storage.dart';
 
 class Storage {

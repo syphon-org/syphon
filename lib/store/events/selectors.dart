@@ -169,6 +169,24 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   return messagesMap;
 }
 
+///
+Message? selectOldestMessage(List<Message> messages, {List<Message>? decrypted}) {
+  if (messages.isEmpty) {
+    return null;
+  }
+
+  final Message oldestMessage = messages.fold(
+    messages.last,
+    (oldest, msg) => msg.timestamp < oldest.timestamp ? msg : oldest,
+  );
+
+  if (decrypted != null && decrypted.isNotEmpty) {
+    return decrypted.firstWhere((msg) => msg.id == oldestMessage.id, orElse: () => oldestMessage);
+  }
+
+  return oldestMessage;
+}
+
 Message? latestMessage(List<Message> messages, {Room? room, List<Message>? decrypted}) {
   if (messages.isEmpty) {
     return null;

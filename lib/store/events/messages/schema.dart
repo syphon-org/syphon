@@ -20,6 +20,8 @@ class Messages extends Table {
   TextColumn get type => text().nullable()();
   TextColumn get sender => text().nullable()();
   TextColumn get stateKey => text().nullable()();
+  TextColumn get prevBatch => text().nullable()();
+  TextColumn get batch => text().nullable()();
 
   // Message drafting
   BoolColumn get pending => boolean()();
@@ -78,6 +80,8 @@ class Decrypted extends Table {
   TextColumn get type => text().nullable()();
   TextColumn get sender => text().nullable()();
   TextColumn get stateKey => text().nullable()();
+  TextColumn get prevBatch => text().nullable()();
+  TextColumn get batch => text().nullable()();
 
   // Message drafting
   BoolColumn get pending => boolean()();

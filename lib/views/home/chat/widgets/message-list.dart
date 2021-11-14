@@ -123,6 +123,8 @@ class MessageListState extends State<MessageList> {
                 ListView.builder(
                   reverse: true,
                   shrinkWrap: true,
+                  // TODO: add padding based on widget height to allow
+                  // TODO: user to always pull down to load regardless of list size
                   padding: EdgeInsets.only(bottom: 0),
                   addRepaintBoundaries: true,
                   addAutomaticKeepAlives: true,

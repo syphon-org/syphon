@@ -1,7 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/store/events/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
 
 part 'model.g.dart';
 
@@ -18,6 +16,8 @@ class Reaction extends Event {
     type,
     sender,
     stateKey,
+    batch,
+    prevBatch,
     timestamp,
     content,
     data, //ignore
@@ -31,6 +31,8 @@ class Reaction extends Event {
           type: type,
           sender: sender,
           stateKey: stateKey,
+          batch: batch,
+          prevBatch: prevBatch,
           timestamp: timestamp,
           content: content,
         );
@@ -42,6 +44,8 @@ class Reaction extends Event {
     sender,
     roomId,
     stateKey,
+    batch,
+    prevBatch,
     content,
     timestamp,
     data, //ignore
@@ -55,6 +59,8 @@ class Reaction extends Event {
         sender: sender ?? this.sender,
         roomId: roomId ?? this.roomId,
         stateKey: stateKey ?? this.stateKey,
+        batch: batch ?? this.batch,
+        prevBatch: prevBatch ?? this.prevBatch,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
         body: body ?? this.body,
@@ -64,12 +70,10 @@ class Reaction extends Event {
 
   @override
   Map<String, dynamic> toJson() => _$ReactionToJson(this);
-  factory Reaction.fromJson(Map<String, dynamic> json) =>
-      _$ReactionFromJson(json);
+  factory Reaction.fromJson(Map<String, dynamic> json) => _$ReactionFromJson(json);
 
   factory Reaction.fromEvent(Event event) {
-    final content =
-        event.content != null ? event.content['m.relates_to'] ?? {} : {};
+    final content = event.content != null ? event.content['m.relates_to'] ?? {} : {};
 
     return Reaction(
       id: event.id,

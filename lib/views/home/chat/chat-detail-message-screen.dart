@@ -89,15 +89,13 @@ class MessageDetailsScreen extends StatelessWidget {
                     addAutomaticKeepAlives: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: 1,
-                    itemBuilder: (BuildContext context, int index) {
-                      return MessageWidget(
-                        message: message,
-                        isUserSent: isUserSent,
-                        messageOnly: true,
-                        themeType: props.themeType,
-                        timeFormat: 'full',
-                      );
-                    },
+                    itemBuilder: (BuildContext context, int index) => MessageWidget(
+                      message: message,
+                      isUserSent: isUserSent,
+                      messageOnly: true,
+                      themeType: props.themeType,
+                      timeFormat: 'full',
+                    ),
                   ),
                 ),
                 ListTile(
@@ -173,39 +171,21 @@ class MessageDetailsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                // ListTile(
-                //   contentPadding: Dimensions.listPadding,
-                //   title: Text(
-                //     'Read By',
-                //     style: TextStyle(
-                //       fontSize: 14.0,
-                //       fontWeight: FontWeight.w600,
-                //     ),
-                //   ),
-                //   trailing: Container(
-                //     constraints: BoxConstraints(
-                //       maxWidth: width / 2,
-                //       maxHeight: 100,
-                //     ),
-                //     child: buildUserReadList(props, width),
-                //   ),
-                // ),
                 ListTile(
-                  dense: true,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Event ID',
+                    'Read By',
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  trailing: Text(
-                    message.id.toString(),
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w300,
+                  trailing: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: width / 2,
+                      maxHeight: 100,
                     ),
+                    child: buildUserReadList(props, width),
                   ),
                 ),
               ],

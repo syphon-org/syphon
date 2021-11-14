@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/messages/model.dart';
 
@@ -21,18 +22,36 @@ extension MessageQueries on StorageDatabase {
     );
   }
 
-  Future<List<Message>> selectMessagesAll(List<String> ids) {
-    return (select(messages)..where((tbl) => tbl.id.isIn(ids))).get();
-  }
-
-  Future<List<Message>> selectMessages(List<String> ids, {int offset = 0, int limit = 25}) {
+  ///
+  /// Select Messages (Generic)
+  ///
+  /// Query messages that occured previous to the timestamp
+  /// sent in. This doesn't factor in batches or any matrix
+  /// paradigm in terms of DAG / state and just pulls messages
+  /// previous in time.
+  ///
+  Future<List<Message>> selectMessages(
+    String? roomId, {
+    int? timestamp,
+    int offset = 0,
+    int limit = LOAD_LIMIT,
+  }) {
     return (select(messages)
-          ..where((tbl) => tbl.id.isIn(ids))
+          ..where(
+              (tbl) => tbl.roomId.equals(roomId) & tbl.timestamp.isSmallerOrEqualValue(timestamp))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
           ..limit(limit, offset: offset))
         .get();
   }
 
-  Future<List<Message>> selectMessagesRoom(String roomId, {int offset = 0, int limit = 25}) {
+  ///
+  /// Select Messages (Room Only)
+  ///
+  /// Query the latest messages in time for a particular room
+  /// Helps for the initial load from cold storage
+  ///
+  Future<List<Message>> selectMessagesRoom(String roomId,
+      {int offset = 0, int limit = LOAD_LIMIT}) {
     return (select(messages)
           ..where((tbl) => tbl.roomId.equals(roomId))
           ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
@@ -40,7 +59,34 @@ extension MessageQueries on StorageDatabase {
         .get();
   }
 
-  Future<List<Message>> searchMessageBodys(String text, {int offset = 0, int limit = 25}) {
+  ///
+  /// Select Messages (Batch Based)
+  ///
+  /// Query messages that occured during the batch sent in
+  /// This is meant to help resolve gaps in syncing, if a
+  /// backfill sync fails to fetch all previous messages
+  ///
+  Future<List<Message>> selectMessagesBatch(
+    String? roomId, {
+    String? batch,
+  }) {
+    return (select(messages)
+          ..where(
+            (tbl) => tbl.roomId.equals(roomId) & tbl.batch.equals(batch),
+          ))
+        .get();
+  }
+
+  ///
+  /// Select Messages (All)
+  ///
+  /// Query every message known in a room
+  ///
+  Future<List<Message>> selectMessagesAll(String roomId) {
+    return (select(messages)..where((tbl) => tbl.roomId.equals(roomId))).get();
+  }
+
+  Future<List<Message>> searchMessageBodys(String text, {int offset = 0, int limit = LOAD_LIMIT}) {
     return (select(messages)
           ..where((tbl) => tbl.body.like('%$text%'))
           ..limit(limit, offset: offset))
@@ -55,16 +101,31 @@ Future<void> saveMessages(
   await storage.insertMessagesBatched(messages);
 }
 
-Future<List<Message>> loadMessagesRoom(
-  String roomId, {
+Future<List<Message>> loadMessages({
   required StorageDatabase storage,
+  required String roomId,
   int timestamp = 0,
   int offset = 0,
-  int limit = 25,
+  int limit = LOAD_LIMIT,
+  String? batch,
 }) async {
   try {
-    return storage.selectMessagesRoom(
+    // load everything
+    if (limit < 1) {
+      return storage.selectMessagesAll(roomId);
+    }
+
+    // load batch based messages
+    if (batch != null) {
+      return storage.selectMessagesBatch(
+        roomId,
+        batch: batch,
+      );
+    }
+
+    return storage.selectMessages(
       roomId,
+      timestamp: timestamp,
       offset: offset,
       limit: limit,
     );
@@ -74,14 +135,19 @@ Future<List<Message>> loadMessagesRoom(
   }
 }
 
-Future<List<Message>> loadMessages(
-  List<String> eventIds, {
+Future<List<Message>> loadMessagesRoom(
+  String roomId, {
   required StorageDatabase storage,
+  int timestamp = 0,
   int offset = 0,
-  int limit = 25,
+  int limit = LOAD_LIMIT,
 }) async {
   try {
-    return storage.selectMessagesAll(eventIds); //  TODO: offset: offset, limit: limit);
+    return storage.selectMessagesRoom(
+      roomId,
+      offset: offset,
+      limit: limit,
+    );
   } catch (error) {
     printError(error.toString(), title: 'loadMessages');
     return [];
@@ -114,14 +180,33 @@ extension DecryptedQueries on StorageDatabase {
     );
   }
 
-  Future<List<Message>> selectDecrypted(List<String> ids, {int offset = 0, int limit = 0}) {
+  ///
+  /// Select Messages (Generic)
+  ///
+  /// Query messages that occured previous to the timestamp
+  /// sent in. This doesn't factor in batches or any matrix
+  /// paradigm in terms of DAG / state and just pulls messages
+  /// previous in time.
+  ///
+  Future<List<Message>> selectDecrypted(
+    String? roomId, {
+    int? timestamp,
+    int offset = 0,
+    int limit = LOAD_LIMIT,
+  }) {
     return (select(decrypted)
-          ..where((tbl) => tbl.id.isIn(ids))
+          ..where(
+              (tbl) => tbl.roomId.equals(roomId) & tbl.timestamp.isSmallerOrEqualValue(timestamp))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
           ..limit(limit, offset: offset))
         .get();
   }
 
-  Future<List<Message>> selectDecryptedRoom(String roomId, {int offset = 0, int limit = 25}) {
+  Future<List<Message>> selectDecryptedRoom(
+    String roomId, {
+    int offset = 0,
+    int limit = LOAD_LIMIT,
+  }) {
     return (select(decrypted)
           ..where((tbl) => tbl.roomId.equals(roomId))
           ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
@@ -129,7 +214,20 @@ extension DecryptedQueries on StorageDatabase {
         .get();
   }
 
-  Future<List<Message>> searchDecryptedBodys(String text, {int offset = 0, int limit = 25}) {
+  ///
+  /// Select Messages (All)
+  ///
+  /// Query every message known in a room
+  ///
+  Future<List<Message>> selectDecryptedAll(String roomId) {
+    return (select(decrypted)..where((tbl) => tbl.roomId.equals(roomId))).get();
+  }
+
+  Future<List<Message>> searchDecryptedBodys(
+    String text, {
+    int offset = 0,
+    int limit = LOAD_LIMIT,
+  }) {
     return (select(decrypted)
           ..where((tbl) => tbl.body.like('%$text%'))
           ..limit(limit, offset: offset))
@@ -144,27 +242,39 @@ Future<void> saveDecrypted(
   await storage.insertDecryptedBatched(messages);
 }
 
-Future<List<Message>> loadDecrypted(
-  List<String> eventIds, {
+Future<List<Message>> loadDecrypted({
   required StorageDatabase storage,
+  String? roomId,
   int offset = 0,
-  int limit = 25, // default amount loaded
+  int limit = LOAD_LIMIT,
 }) async {
   try {
-    return storage.selectDecrypted(eventIds);
+    return storage.selectDecrypted(roomId);
   } catch (error) {
     printError(error.toString(), title: 'loadMessages');
     return [];
   }
 }
 
+///
+/// Load Decrypted Room
+///
+/// TODO: convert to cache only ephemeral runner
+/// that decrypts on the fly only after loading messages
+/// from cold storage -> redux
+///
 Future<List<Message>> loadDecryptedRoom(
   String roomId, {
   required StorageDatabase storage,
   int offset = 0,
-  int limit = 25, // default amount loaded
+  int limit = LOAD_LIMIT, // default amount loaded
 }) async {
   try {
+    // TODO: remove after 0.2.3 (sync overhaul)
+    if (true) {
+      return storage.selectDecryptedAll(roomId);
+    }
+
     return storage.selectDecryptedRoom(
       roomId,
       offset: offset,

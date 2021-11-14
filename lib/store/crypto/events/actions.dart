@@ -146,7 +146,7 @@ ThunkAction<AppState> decryptMessages(
 
             decryptedAll.add(decryptedMessage);
           } catch (error) {
-            debugPrint('[decryptMessage] $error');
+            printError('[decryptMessage] $error');
 
             if (!sentKeyRequest && verified) {
               sentKeyRequest = true;
@@ -160,7 +160,7 @@ ThunkAction<AppState> decryptMessages(
 
         return decryptedAll;
       } catch (error) {
-        printDebug(
+        printError(
           '[decryptMessage(s)] ${room.name ?? 'Unknown Room'} ${error.toString()}',
         );
       } finally {

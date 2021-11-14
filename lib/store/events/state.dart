@@ -9,16 +9,22 @@ import 'model.dart';
 
 part 'state.g.dart';
 
+///
+/// Event Store
+///
+/// Eventually, convert all to be indexed like the following
+///
+/// Map<RoomId, Map<EventId, Event>>
+///
 @JsonSerializable()
 class EventStore extends Equatable {
-  final Map<String, List<Event>> events; // roomId indexed
+  final Map<String, List<Event>> events; // roomId indexed - state events
   final Map<String, Redaction> redactions; // eventId indexed
   final Map<String, List<Message>> messages; // roomId indexed
   final Map<String, List<Reaction>> reactions; // eventId indexed
   final Map<String, Map<String, ReadReceipt>> receipts; // eventId indexed
   final Map<String, Map<String, Message>> outbox; // roomId and tempId subindex
-  final Map<String, List<Message>>
-      messagesDecrypted; // messages decrypted - in memory only
+  final Map<String, List<Message>> messagesDecrypted; // messages decrypted - in memory only
 
   const EventStore({
     this.events = const {},
@@ -61,6 +67,5 @@ class EventStore extends Equatable {
       );
 
   Map<String, dynamic> toJson() => _$EventStoreToJson(this);
-  factory EventStore.fromJson(Map<String, dynamic> json) =>
-      _$EventStoreFromJson(json);
+  factory EventStore.fromJson(Map<String, dynamic> json) => _$EventStoreFromJson(json);
 }

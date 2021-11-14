@@ -10,6 +10,7 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -117,8 +118,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           // ignore: prefer_interpolation_to_compose_strings
           '[syncRooms] ${roomSynced.name} ' +
               'full_synced: $synced ' +
-              'limited: ${roomSynced.limited}' +
-              'total messages: ${roomSynced.messageIds.length}',
+              'limited: ${roomSynced.limited} ' +
+              'total messages: ${roomSynced.messageIds.length} ' +
+              'roomPrevBatch: ${roomSynced.prevBatch}',
         );
 
         // update various message mutations and meta data
@@ -160,7 +162,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           outbox: roomSynced.outbox,
         ));
 
-        // update rooma
+        // update room
         store.dispatch(SetRoom(room: roomSynced));
 
         // fetch avatar if a uri was found
@@ -172,7 +174,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         }
 
         // and is not already at the end of the last known batch
-        // the end would be room.prevHash == room.lastHash
+        // the end would be room.prevBatch == room.lastBatch
         // fetch previous messages since last /sync (a gap)
         // determined by the fromSync function of room
         final roomUpdated = store.state.roomStore.rooms[roomSynced.id];
@@ -180,13 +182,18 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           printWarning(
             '[fetchMessageEvents] ${roomUpdated.name} LIMITED TRUE - Fetching more messages',
           );
+
           store.dispatch(fetchMessageEvents(
             room: roomUpdated,
-            from: roomUpdated.prevHash,
+            from: roomUpdated.prevBatch,
           ));
         }
       } catch (error) {
         printError('[syncRoom] error $id ${error.toString()}');
+
+        // prevents against recursive backfill from bombing attempts at fetching messages
+        final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+        store.dispatch(SetRoom(room: roomExisting.copyWith(limited: false)));
       }
     }));
   };
@@ -230,7 +237,7 @@ ThunkAction<AppState> fetchRoom(
             'homeserver': store.state.authStore.user.homeserver,
             'accessToken': store.state.authStore.user.accessToken,
             'roomId': roomId,
-            'limit': 20,
+            'limit': LOAD_LIMIT,
           },
         );
 
@@ -246,7 +253,8 @@ ThunkAction<AppState> fetchRoom(
           },
           'timeline': {
             'events': messageEvents['chunk'],
-            'prev_batch': messageEvents['from'],
+            'curr_batch': messageEvents['start'],
+            'prev_batch': messageEvents['end'],
           },
         },
       };
@@ -261,7 +269,7 @@ ThunkAction<AppState> fetchRoom(
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      debugPrint('[fetchRoom] $roomId $error');
+      printError('[fetchRoom] $roomId $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
@@ -276,7 +284,7 @@ ThunkAction<AppState> fetchRoom(
 ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
-      debugPrint('[fetchSync] *** starting fetch all rooms *** ');
+      printInfo('[fetchSync] *** starting fetch all rooms *** ');
       final data = await MatrixApi.fetchRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -296,14 +304,14 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
           await store.dispatch(fetchRoom(room.id, fetchState: syncState));
           await store.dispatch(fetchRoomMembers(room: room));
         } catch (error) {
-          debugPrint('[fetchRoom(s)] ${room.id} $error');
+          printError('[fetchRoom(s)] ${room.id} $error');
         } finally {
           store.dispatch(UpdateRoom(id: room.id, syncing: false));
         }
       }));
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
-      debugPrint('[fetchRoom(s)] $error');
+      printError('[fetchRoom(s)] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -320,7 +328,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
-      debugPrint('[fetchSync] *** starting fetch direct rooms *** ');
+      printInfo('[fetchSync] *** starting fetch direct rooms *** ');
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -343,11 +351,11 @@ ThunkAction<AppState> fetchDirectRooms() {
         try {
           await store.dispatch(fetchRoom(roomId, direct: true));
         } catch (error) {
-          debugPrint('[fetchDirectRooms] $error');
+          printError('[fetchDirectRooms] $error');
         }
       }));
     } catch (error) {
-      debugPrint('[fetchDirectRooms] $error');
+      printError('[fetchDirectRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -392,7 +400,7 @@ ThunkAction<AppState> fetchRoomMembers({
         room: _room.copyWith(userIds: members.keys.toList()),
       ));
     } catch (error) {
-      debugPrint('[updateRoom] $error');
+      printError('[updateRoom] $error');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -667,7 +675,7 @@ ThunkAction<AppState> toggleDirectRoom({
       // Refresh room information with toggle enabled
       await store.dispatch(fetchRoom(room.id, direct: enabled));
     } catch (error) {
-      debugPrint('[toggleDirectRoom] $error');
+      printError('[toggleDirectRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -895,7 +903,7 @@ ThunkAction<AppState> removeRoom({Room? room}) {
 
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      debugPrint('[removeRoom] $error');
+      printError('[removeRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -955,7 +963,7 @@ ThunkAction<AppState> archiveRoom({Room? room}) {
     try {
       store.dispatch(AddArchive(roomId: room!.id));
     } catch (error) {
-      debugPrint('[archiveRoom] $error');
+      printError('[archiveRoom] $error');
     }
   };
 }

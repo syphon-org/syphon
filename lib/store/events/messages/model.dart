@@ -42,8 +42,6 @@ class Message extends Event implements drift.Insertable<Message> {
   final Map<String, dynamic>? file;
   final Map<String, dynamic>? info;
 
-  final List<String> editIds;
-
   // Encrypted Messages only
   final String? typeDecrypted; // inner type of decrypted event
   final String? ciphertext;
@@ -52,6 +50,8 @@ class Message extends Event implements drift.Insertable<Message> {
   final String? senderKey; // Curve25519 device key which initiated the session
   final String? deviceId;
   final String? relatedEventId;
+  // References
+  final List<String> editIds;
 
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
@@ -63,6 +63,8 @@ class Message extends Event implements drift.Insertable<Message> {
     String? type,
     String? sender,
     String? stateKey,
+    String? batch,
+    String? prevBatch,
     dynamic content,
     int timestamp = 0,
     this.body,
@@ -94,6 +96,8 @@ class Message extends Event implements drift.Insertable<Message> {
           type: type,
           sender: sender,
           stateKey: stateKey,
+          batch: batch,
+          prevBatch: prevBatch,
           timestamp: timestamp,
           content: content,
           data: null,
@@ -106,6 +110,8 @@ class Message extends Event implements drift.Insertable<Message> {
     String? sender,
     String? roomId,
     String? stateKey,
+    String? prevBatch,
+    String? batch,
     dynamic content,
     dynamic data,
     bool? syncing,
@@ -139,6 +145,8 @@ class Message extends Event implements drift.Insertable<Message> {
         sender: sender ?? this.sender,
         roomId: roomId ?? this.roomId,
         stateKey: stateKey ?? this.stateKey,
+        batch: batch ?? this.batch,
+        prevBatch: prevBatch ?? this.prevBatch,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
         body: body ?? this.body,
@@ -174,6 +182,8 @@ class Message extends Event implements drift.Insertable<Message> {
       type: drift.Value(type),
       sender: drift.Value(sender),
       stateKey: drift.Value(stateKey),
+      batch: drift.Value(batch),
+      prevBatch: drift.Value(prevBatch),
       syncing: drift.Value(syncing),
       pending: drift.Value(pending),
       failed: drift.Value(failed),
@@ -216,8 +226,13 @@ class Message extends Event implements drift.Insertable<Message> {
       if (relatesTo != null && relatesTo['rel_type'] == 'm.replace') {
         replacement = true;
         relatedEventId = relatesTo['event_id'];
-        body = content['m.new_content']['body'];
-        msgtype = content['m.new_content']['msgtype'];
+
+        final newContent = content['m.new_content'];
+
+        if (newContent != null) {
+          body = content['m.new_content']['body'];
+          msgtype = content['m.new_content']['msgtype'];
+        }
       }
 
       var info;
@@ -237,6 +252,8 @@ class Message extends Event implements drift.Insertable<Message> {
         typeDecrypted: null,
         sender: event.sender,
         stateKey: event.stateKey,
+        batch: event.batch,
+        prevBatch: event.prevBatch,
         timestamp: event.timestamp,
         content: content,
         body: body,
@@ -269,6 +286,8 @@ class Message extends Event implements drift.Insertable<Message> {
         type: event.type,
         sender: event.sender,
         stateKey: event.stateKey,
+        batch: event.batch,
+        prevBatch: event.prevBatch,
         timestamp: event.timestamp,
         pending: false,
         syncing: false,

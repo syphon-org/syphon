@@ -7,6 +7,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
@@ -56,7 +57,7 @@ ThunkAction<AppState> mutateMessagesAll() {
       try {
         await store.dispatch(mutateMessagesRoom(room: room));
       } catch (error) {
-        debugPrint('[mutateMessagesAll] error ${room.id} ${error.toString()}');
+        printError('[mutateMessagesAll] error ${room.id} ${error.toString()}');
       }
     }));
   };
