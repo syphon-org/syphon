@@ -159,7 +159,7 @@ ThunkAction<AppState> setReceipts({
 ThunkAction<AppState> loadMessagesCached({
   Room? room,
   String? batch,
-  int offset = 0,
+  int timestamp = 0, // offset
   int limit = 25,
 }) {
   return (Store<AppState> store) async {
@@ -170,6 +170,7 @@ ThunkAction<AppState> loadMessagesCached({
         storage: Storage.database!,
         roomId: room.id,
         limit: !room.encryptionEnabled ? limit : 0,
+        timestamp: timestamp,
         batch: batch,
       );
 
@@ -197,12 +198,13 @@ ThunkAction<AppState> fetchMessageEvents({
   Room? room,
   String? to,
   String? from,
+  int timestamp = 0,
   int limit = 25,
 }) {
   return (Store<AppState> store) async {
     try {
       final cached = await store.dispatch(
-        loadMessagesCached(room: room, batch: from, limit: limit),
+        loadMessagesCached(room: room, batch: from, limit: limit, timestamp: timestamp),
       ) as List<Message>;
 
       final oldest = cached.isEmpty;

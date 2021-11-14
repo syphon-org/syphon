@@ -883,6 +883,7 @@ class _Props extends Equatable {
           return store.dispatch(fetchMessageEvents(
             room: room,
             from: oldestMessage.prevBatch,
+            timestamp: oldestMessage.timestamp,
           ));
         },
       );
