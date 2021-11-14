@@ -3,9 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:syphon/global/print.dart';
 
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
@@ -78,7 +77,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
      */
   }
 
-  debugPrint('[initNotifications] successfully initialized $pluginInstance');
+  printInfo('[initNotifications] successfully initialized $pluginInstance');
   return pluginInstance;
 }
 

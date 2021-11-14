@@ -12,6 +12,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -552,7 +553,8 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
+                        visible:
+                            props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -572,7 +574,8 @@ class HomeState extends State<HomeScreen> {
                         ),
                       ),
                       Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
+                        visible:
+                            props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -853,7 +856,7 @@ class _Props extends Equatable {
           } catch (error) {}
         },
         onDebug: () async {
-          debugPrint('[onDebug] trigged debug function @ home');
+          printDebug('[onDebug] trigged debug function @ home');
         },
       );
 }

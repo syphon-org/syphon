@@ -35,7 +35,7 @@ class Storage {
   // storage identifiers
   static const databaseLocation = '${Values.appLabel}-main-storage.db';
 
-  // storage identifiers - NEW - MOOR
+  // storage identifiers
   static const sqliteLocation = '${Values.appLabel}-cold-storage.db';
 
   // cold storage references
@@ -187,24 +187,29 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
     final redactions = await loadRedactions(storage: storageOld);
 
     final rooms = await loadRooms(storage: storage);
-    final users = await loadUsers(storage: storage);
+    // final users = await loadUsers(storage: storage);
     final media = await loadMediaAll(storage: storage);
 
+    final userIds = <String>[];
     final messages = <String, List<Message>>{};
     final decrypted = <String, List<Message>>{};
     final reactions = <String, List<Reaction>>{};
     final receipts = <String, Map<String, ReadReceipt>>{};
 
     for (final Room room in rooms.values) {
-      messages[room.id] = await loadMessages(
-        room.messageIds,
+      messages[room.id] = await loadMessagesRoom(
+        room.id,
         storage: storage,
       );
 
-      decrypted[room.id] = await loadDecrypted(
-        room.messageIds,
+      decrypted[room.id] = await loadDecryptedRoom(
+        room.id,
         storage: storage,
       );
+
+      final currentUserIds = messages[room.id]!.map((message) => message.sender ?? '').toList();
+
+      userIds.addAll(currentUserIds);
 
       reactions.addAll(await loadReactions(
         room.messageIds,
@@ -216,6 +221,11 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
         storage: storageOld,
       );
     }
+
+    final users = await loadUsers(
+      storage: storage,
+      ids: userIds,
+    );
 
     return {
       StorageKeys.AUTH: auth,

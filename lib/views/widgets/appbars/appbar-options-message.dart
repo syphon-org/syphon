@@ -12,8 +12,7 @@ import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
-class AppBarMessageOptions extends StatefulWidget
-    implements PreferredSizeWidget {
+class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget {
   const AppBarMessageOptions({
     Key? key,
     this.title = 'title:',
@@ -26,6 +25,7 @@ class AppBarMessageOptions extends StatefulWidget
     this.focusNode,
     this.onCopy,
     this.onDelete,
+    this.onEdit,
     this.onDismiss,
   }) : super(key: key);
 
@@ -40,6 +40,7 @@ class AppBarMessageOptions extends StatefulWidget
   final FocusNode? focusNode;
 
   final Function? onCopy;
+  final Function? onEdit;
   final Function? onDelete;
   final Function? onDismiss;
 
@@ -107,18 +108,30 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             },
           ),
           IconButton(
-              icon: Icon(Icons.delete),
-              iconSize: 28.0,
-              tooltip: 'Delete Message',
-              color: Colors.white,
-              onPressed: () {
-                if (widget.onDelete != null) {
-                  widget.onDelete!();
-                }
-                if (widget.onDismiss != null) {
-                  widget.onDismiss!();
-                }
-              }),
+            icon: Icon(Icons.delete),
+            iconSize: 28.0,
+            tooltip: 'Delete Message',
+            color: Colors.white,
+            onPressed: () {
+              if (widget.onDelete != null) {
+                widget.onDelete!();
+              }
+              if (widget.onDismiss != null) {
+                widget.onDismiss!();
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.edit_rounded),
+            iconSize: 28.0,
+            tooltip: 'Edit Message',
+            color: Colors.white,
+            onPressed: () {
+              if (widget.onEdit != null) {
+                widget.onEdit!();
+              }
+            },
+          ),
           Visibility(
             visible: isTextMessage(message: widget.message!),
             child: IconButton(

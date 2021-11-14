@@ -4,6 +4,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
@@ -110,7 +111,6 @@ class SetPollTimeout {
   });
 }
 
-
 class ToggleEnterSend {}
 
 class ToggleAutoDownload {}
@@ -156,7 +156,7 @@ ThunkAction<AppState> fetchDevices() {
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
-      debugPrint('[fetchRooms] error: $error');
+      printError('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

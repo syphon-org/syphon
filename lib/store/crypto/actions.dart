@@ -5,7 +5,6 @@ import 'dart:math';
 
 import 'package:canonical_json/canonical_json.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
@@ -204,7 +203,7 @@ ThunkAction<AppState> initOlmEncryption(User user) {
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
       }
     } catch (error) {
-      debugPrint('[initOlmEncryption] $error');
+      printError('[initOlmEncryption] $error');
     }
   };
 }
@@ -311,7 +310,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       // return the generated keys
       return deviceKeysOwned;
     } catch (error) {
-      debugPrint('[generateIdentityKeys] $error');
+      printError('[generateIdentityKeys] $error');
       return null;
     }
   };
@@ -609,14 +608,15 @@ ThunkAction<AppState> updateKeySessions({
               throw response['error'];
             }
 
-            debugPrint('[sendSessionKeys] success! $randomNumber');
+            printInfo('[sendSessionKeys] success! $randomNumber');
           } catch (error) {
             printError('[sendSessionKeys] $error');
           }
         },
       ));
     } catch (error) {
-      store.dispatch(addAlert(origin: 'updateKeySessions', message: error.toString(), error: error));
+      store
+          .dispatch(addAlert(origin: 'updateKeySessions', message: error.toString(), error: error));
     }
   };
 }
@@ -788,7 +788,8 @@ ThunkAction<AppState> loadKeySessionOutbound({
 
           final keySessionType = keySession.encrypt_message_type();
 
-          printInfo('[loadKeySessionOutbound] found $keySessionId for $identityKey of type $keySessionType');
+          printInfo(
+              '[loadKeySessionOutbound] found $keySessionId for $identityKey of type $keySessionType');
           return keySession;
         } catch (error) {
           printInfo('[loadKeySessionOutbound] unsuccessful $identityKey $error');
@@ -849,7 +850,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         // Return a fresh key session having not decrypted the payload
         return olm.Session()..unpickle(deviceId, session);
       } catch (error) {
-        debugPrint('[loadKeySessionInbound] unsuccessful $error');
+        printError('[loadKeySessionInbound] unsuccessful $error');
       }
     }
 
@@ -877,7 +878,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         return newKeySession;
       }
     } catch (error) {
-      debugPrint('[loadKeySessionInbound] $error');
+      printError('[loadKeySessionInbound] $error');
     }
 
     return null;

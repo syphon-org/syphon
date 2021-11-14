@@ -4,6 +4,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -14,7 +15,6 @@ import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/models.dart';
 
 class ResetEvents {}
@@ -82,12 +82,6 @@ class SaveOutboxMessage {
   });
 }
 
-///
-/// Save Outbox Message
-///
-/// tempId is for messages that have attempted sending but
-/// are still in an unknown state remotely
-///
 class DeleteOutboxMessage {
   final Message message; // room id
 
@@ -151,31 +145,42 @@ ThunkAction<AppState> setReceipts({
       return store.dispatch(SetReceipts(roomId: room!.id, receipts: receipts));
     };
 
-/// Load Message Events
+///
+/// Load Messages Cached
 ///
 /// Pulls initial messages from storage or paginates through
 /// those existing in cold storage depending on requests from client
 ///
 /// Make sure these have been exhausted before calling fetchMessageEvents
 ///
+/// TODO: will need to handle loading all encrypted messages under new
+/// sessions in order to decrypt correctly, at least up until the previous
+/// session was created
+///
 ThunkAction<AppState> loadMessagesCached({
   Room? room,
-  int offset = 0,
-  int limit = 20,
+  String? batch,
+  int timestamp = 0, // offset
+  int limit = LOAD_LIMIT,
 }) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
       final messagesStored = await loadMessages(
-        room.messageIds,
         storage: Storage.database!,
-        offset: offset, // offset from the most recent eventId found
-        limit: !room.encryptionEnabled ? limit : room.messageIds.length,
+        roomId: room.id,
+        limit: !room.encryptionEnabled ? limit : 0,
+        timestamp: timestamp,
+        batch: batch,
       );
 
       // load cold storage messages to state
-      store.dispatch(AddMessages(roomId: room.id, messages: messagesStored));
+      if (messagesStored.isNotEmpty) {
+        store.dispatch(AddMessages(roomId: room.id, messages: messagesStored));
+      }
+
+      return messagesStored;
     } catch (error) {
       printError('[fetchMessageEvents] $error');
     } finally {
@@ -194,11 +199,22 @@ ThunkAction<AppState> fetchMessageEvents({
   Room? room,
   String? to,
   String? from,
-  bool oldest = false,
-  int limit = 20,
+  int timestamp = 0,
+  int limit = LOAD_LIMIT,
 }) {
   return (Store<AppState> store) async {
     try {
+      final cached = await store.dispatch(
+        loadMessagesCached(room: room, batch: from, limit: limit, timestamp: timestamp),
+      ) as List<Message>;
+
+      final oldest = cached.isEmpty;
+
+      if (!oldest) {
+        return;
+      }
+
+      // mark syncing (to show loading indicators) since it needs to pull remotely
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
       final messagesJson = await compute(MatrixApi.fetchMessageEventsThreaded, {
@@ -206,12 +222,13 @@ ThunkAction<AppState> fetchMessageEvents({
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'roomId': room.id,
-        'to': to,
-        'from': from,
         'limit': limit,
+        'from': from ?? room.prevBatch,
+        'to': to,
       });
 
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
+      // WARNING: this will be null if there are no more events or batches left to fetch
       final String? end = messagesJson['end'];
 
       // The token the pagination starts from. If dir=b this will be the token supplied in from.
@@ -221,20 +238,20 @@ ThunkAction<AppState> fetchMessageEvents({
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
       // reuse the logic for syncing
-      await store.dispatch(
-        syncRooms({
-          room.id: {
-            'timeline': {
-              'events': messages,
-              'last_hash': oldest ? end : null,
-              'prev_batch': end,
-              'limited': end == start ? false : null,
-            }
-          },
-        }),
-      );
+      // end will be null if no more batches are available to fetch
+      await store.dispatch(syncRooms({
+        room.id: {
+          'timeline': {
+            'events': messages,
+            'curr_batch': start,
+            'last_batch': oldest ? end ?? from : null,
+            'prev_batch': end,
+            'limited': end == start || end == null ? false : null,
+          }
+        },
+      }));
     } catch (error) {
-      debugPrint('[fetchMessageEvents] error $error');
+      printError('[fetchMessageEvents] error $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -329,11 +346,11 @@ ThunkAction<AppState> sendReadReceipts({
     try {
       // Skip if typing indicators are disabled
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
-        return debugPrint('[sendReadReceipts] read receipts disabled');
+        return printInfo('[sendReadReceipts] read receipts disabled');
       }
 
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-        debugPrint('[sendReadReceipts] read receipts hidden');
+        printInfo('[sendReadReceipts] read receipts hidden');
       }
 
       final data = await MatrixApi.sendReadReceipts(
@@ -350,9 +367,9 @@ ThunkAction<AppState> sendReadReceipts({
         throw data['error'];
       }
 
-      debugPrint('[sendReadReceipts] sent ${message.id} $data');
+      printInfo('[sendReadReceipts] sent ${message.id} $data');
     } catch (error) {
-      debugPrint('[sendReadReceipts] failed $error');
+      printInfo('[sendReadReceipts] failed $error');
     }
   };
 }
@@ -370,7 +387,7 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicatorsEnabled) {
-        debugPrint('[sendTyping] typing indicators disabled');
+        printInfo('[sendTyping] typing indicators disabled');
         return;
       }
 
@@ -387,7 +404,7 @@ ThunkAction<AppState> sendTyping({
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[sendTyping] $error');
+      printError('[sendTyping] $error');
     }
   };
 }
@@ -400,7 +417,7 @@ ThunkAction<AppState> deleteMessage({required Message message}) {
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
     } catch (error) {
-      debugPrint('[deleteMessage] $error');
+      printError('[deleteMessage] $error');
     }
   };
 }
@@ -425,7 +442,7 @@ ThunkAction<AppState> redactEvent({
         eventId: event!.id,
       );
     } catch (error) {
-      debugPrint('[deleteMessage] $error');
+      printError('[deleteMessage] $error');
     }
   };
 }

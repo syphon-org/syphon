@@ -486,11 +486,11 @@ class ChatInputState extends State<ChatInput> {
                           maxHeight: imageWidth,
                         ),
                         child: ListLocalImages(
-                          imageSize: imageWidth,
+                          imageSize: imageWidth, 
                           onSelectImage: (file) => widget.onAddMedia(
                             file: file,
                             type: MessageType.image,
-                          ),
+                          ), 
                         ),
                       ),
                       Row(children: [

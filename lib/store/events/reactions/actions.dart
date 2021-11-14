@@ -1,15 +1,12 @@
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
 ThunkAction<AppState> toggleReaction({
@@ -20,8 +17,8 @@ ThunkAction<AppState> toggleReaction({
   return (Store<AppState> store) async {
     final user = store.state.authStore.user;
 
-    final reaction = message!.reactions.firstWhereOrNull(
-        (reaction) => reaction.sender == user.userId && reaction.body == emoji);
+    final reaction = message!.reactions
+        .firstWhereOrNull((reaction) => reaction.sender == user.userId && reaction.body == emoji);
 
     if (reaction == null) {
       store.dispatch(sendReaction(message: message, room: room, emoji: emoji));
@@ -53,7 +50,7 @@ ThunkAction<AppState> sendReaction({
 
       return true;
     } catch (error) {
-      debugPrint('[sendReaction] $error');
+      printError('[sendReaction] $error');
       return false;
     } finally {
       store.dispatch(UpdateRoom(id: room.id, sending: false));

@@ -1039,14 +1039,12 @@ packages:
     source: hosted
     version: "1.0.0"
   sqlparser:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: sqlparser
-      ref: cc7d98d110204acb72d415312a78ed7821382d69
-      resolved-ref: cc7d98d110204acb72d415312a78ed7821382d69
-      url: "https://github.com/simolus3/moor.git"
-    source: git
-    version: "0.17.2"
+      name: sqlparser
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.18.0"
   stack_trace:
     dependency: transitive
     description:

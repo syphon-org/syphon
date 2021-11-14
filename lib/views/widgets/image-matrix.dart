@@ -81,7 +81,6 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
     // Attempts to reduce framerate drop in chat details
     // not sure this actually works as it still drops on scroll
     if (rebuild && mediaCache.containsKey(widget.mxcUri)) {
-      printInfo('[onMounted] disabled rebuild');
       finalUriData = mediaCache[widget.mxcUri!];
     }
   }
