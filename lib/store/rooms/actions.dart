@@ -10,6 +10,7 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -189,6 +190,10 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         }
       } catch (error) {
         printError('[syncRoom] error $id ${error.toString()}');
+
+        // prevents against recursive backfill from bombing attempts at fetching messages
+        final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+        store.dispatch(SetRoom(room: roomExisting.copyWith(limited: false)));
       }
     }));
   };
@@ -232,7 +237,7 @@ ThunkAction<AppState> fetchRoom(
             'homeserver': store.state.authStore.user.homeserver,
             'accessToken': store.state.authStore.user.accessToken,
             'roomId': roomId,
-            'limit': 20,
+            'limit': LOAD_LIMIT,
           },
         );
 

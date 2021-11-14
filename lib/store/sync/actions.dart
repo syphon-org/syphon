@@ -166,7 +166,9 @@ ThunkAction<AppState> initialSync() {
 
     // Fetch All Room Ids - continue showing a sync
     if (lastSince != null) {
-      // await store.dispatch(fetchDirectRooms());
+      await store.dispatch(fetchDirectRooms());
+      // TODO: remove comment if sync does not return
+      // TODO: room information as it previously would not in some cases
       // await store.dispatch(fetchRooms());
     }
 

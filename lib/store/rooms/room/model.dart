@@ -528,6 +528,11 @@ class Room implements drift.Insertable<Room> {
           });
         }
 
+        // if a last known batch hasn't been set (full sync is not complete) stop limited pulls
+        if (this.lastBatch == null) {
+          limited = false;
+        }
+
         printJson({
           'LIMITED': true,
           'LIMITED_NEW': limited,

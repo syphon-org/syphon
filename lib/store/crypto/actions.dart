@@ -5,7 +5,6 @@ import 'dart:math';
 
 import 'package:canonical_json/canonical_json.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';

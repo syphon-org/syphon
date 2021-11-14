@@ -38,4 +38,4 @@ enum StorageKey {
   redactions
 }
 
-const int LOAD_LIMIT = 10;
+const int LOAD_LIMIT = 25;

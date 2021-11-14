@@ -237,15 +237,6 @@ ThunkAction<AppState> fetchMessageEvents({
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
-      printJson({
-        'from': from,
-        'roomPrevBatch': room.prevBatch,
-        'start': start,
-        'end': end,
-        'lastMessage': messages.last,
-        'first': messages.first
-      });
-
       // reuse the logic for syncing
       // end will be null if no more batches are available to fetch
       await store.dispatch(syncRooms({
