@@ -490,54 +490,27 @@ class Room implements drift.Insertable<Room> {
 
           // still limited if messages are all unknown / new
           limited = messageKnown == null;
-
-          printJson({
-            'LIMITED': true,
-            'LIMITED_NEW': limited,
-            'messageUnknown': messageKnown == null,
-          });
         }
 
         // current previous batch is equal to the room's historical previous batch
         if (prevBatch == this.prevBatch) {
           limited = false;
-          printJson({
-            'LIMITED': true,
-            'LIMITED_NEW': limited,
-            'prevBatchEqualsPrevPrevBatch': true,
-          });
         }
 
         // if the previous batch is the last known batch, skip pulling it
         if (prevBatch == this.lastBatch) {
           limited = false;
-          printJson({
-            'LIMITED': true,
-            'LIMITED_NEW': limited,
-            'prevBatchEqualsLastBatch': true,
-          });
         }
 
         // will be null if no other events are available / batched in the timeline (also "end")
         if (prevBatch == null) {
           limited = false;
-          printJson({
-            'LIMITED': true,
-            'LIMITED_NEW': limited,
-            'prevBatchNull': true,
-          });
         }
 
         // if a last known batch hasn't been set (full sync is not complete) stop limited pulls
         if (this.lastBatch == null) {
           limited = false;
         }
-
-        printJson({
-          'LIMITED': true,
-          'LIMITED_NEW': limited,
-          'PREVIOUS_BATCH_NEW': prevBatch,
-        });
       }
 
       // Combine current and existing messages on unique ids
