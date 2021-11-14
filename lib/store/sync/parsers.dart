@@ -82,13 +82,9 @@ Sync parseSync(Map params) {
     prevBatch: details.prevBatch,
   );
 
-  printInfo(
-    '[parseSync] ${roomExisting.id} prevBatch ${details.prevBatch != null}',
-  );
-
   if (details.limited != null) {
     printInfo(
-      '[parseSync] ${roomExisting.id} lastSince $lastSince limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
+      '[parseSync] ${roomExisting.id} limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
     );
   }
 

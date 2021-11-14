@@ -204,7 +204,7 @@ ThunkAction<AppState> initOlmEncryption(User user) {
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
       }
     } catch (error) {
-      debugPrint('[initOlmEncryption] $error');
+      printError('[initOlmEncryption] $error');
     }
   };
 }

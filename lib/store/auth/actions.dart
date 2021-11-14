@@ -313,8 +313,11 @@ ThunkAction<AppState> generateDeviceId({String? salt}) {
       // hash it
       final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
 
-      final deviceIdHash =
-          base64.encode(deviceIdDigest.bytes).toUpperCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
+      final deviceIdHash = base64
+          .encode(deviceIdDigest.bytes)
+          .toUpperCase()
+          .replaceAll(RegExp(r'[^\w]'), '')
+          .substring(0, 10);
 
       return Device(
         deviceId: deviceIdHash,
@@ -606,7 +609,7 @@ ThunkAction<AppState> setInteractiveAuths({Map? auths}) {
         }
       }
     } catch (error) {
-      debugPrint('[setInteractiveAuth] $error');
+      printError('[setInteractiveAuth] $error');
     }
   };
 }
@@ -850,7 +853,8 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       );
 
       if (data['errcode'] != null) {
-        if (data['errcode'] == MatrixErrors.not_authorized && credential!.type == MatrixAuthTypes.EMAIL) {
+        if (data['errcode'] == MatrixErrors.not_authorized &&
+            credential!.type == MatrixAuthTypes.EMAIL) {
           store.dispatch(SetVerificationNeeded(needed: true));
           return false;
         }
@@ -1186,7 +1190,8 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
     } catch (error) {
       store.dispatch(addAlert(
         origin: 'fetchHomeserver',
-        message: 'Having trouble connecting to this Matrix server, try again later or pick another server.',
+        message:
+            'Having trouble connecting to this Matrix server, try again later or pick another server.',
         error: error,
       ));
     }

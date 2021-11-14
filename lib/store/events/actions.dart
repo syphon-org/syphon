@@ -214,11 +214,6 @@ ThunkAction<AppState> fetchMessageEvents({
       // mark syncing (to show loading indicators) since it needs to pull remotely
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
-      printJson({
-        'oldest': oldest,
-        'from': from,
-      });
-
       final messagesJson = await compute(MatrixApi.fetchMessageEventsThreaded, {
         'protocol': store.state.authStore.protocol,
         'homeserver': store.state.authStore.user.homeserver,
@@ -238,13 +233,6 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
-
-      printJson({
-        'oldest': oldest,
-        'start': start,
-        'end': end,
-        'messages': messages.length,
-      });
 
       // reuse the logic for syncing
       // end will be null if no more batches are available to fetch
@@ -355,11 +343,11 @@ ThunkAction<AppState> sendReadReceipts({
     try {
       // Skip if typing indicators are disabled
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
-        return debugPrint('[sendReadReceipts] read receipts disabled');
+        return printInfo('[sendReadReceipts] read receipts disabled');
       }
 
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-        debugPrint('[sendReadReceipts] read receipts hidden');
+        printInfo('[sendReadReceipts] read receipts hidden');
       }
 
       final data = await MatrixApi.sendReadReceipts(
@@ -376,9 +364,9 @@ ThunkAction<AppState> sendReadReceipts({
         throw data['error'];
       }
 
-      debugPrint('[sendReadReceipts] sent ${message.id} $data');
+      printInfo('[sendReadReceipts] sent ${message.id} $data');
     } catch (error) {
-      debugPrint('[sendReadReceipts] failed $error');
+      printInfo('[sendReadReceipts] failed $error');
     }
   };
 }
@@ -396,7 +384,7 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicatorsEnabled) {
-        debugPrint('[sendTyping] typing indicators disabled');
+        printInfo('[sendTyping] typing indicators disabled');
         return;
       }
 
@@ -413,7 +401,7 @@ ThunkAction<AppState> sendTyping({
         throw data['error'];
       }
     } catch (error) {
-      debugPrint('[sendTyping] $error');
+      printError('[sendTyping] $error');
     }
   };
 }

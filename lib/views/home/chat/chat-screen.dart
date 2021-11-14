@@ -872,11 +872,13 @@ class _Props extends Equatable {
           final messages = store.state.eventStore.messages[room.id] ?? [];
           final oldestMessage = messages.isNotEmpty ? messages[messages.length - 1] : Message();
 
-          printJson({
-            'roomPrevBatch': room.prevBatch,
-            'messagePrevBatch': oldestMessage.prevBatch,
-            'messageId': oldestMessage.id,
-          });
+          // TODO: DELETE: after 0.2.2
+          // printJson({
+          //   'roomPrevBatch': room.prevBatch,
+          //   'messagePrevBatch': oldestMessage.prevBatch,
+          //   'messageId': oldestMessage.id,
+          // });
+
           // fetch messages from the oldest cached batch
           return store.dispatch(fetchMessageEvents(
             room: room,
