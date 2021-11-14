@@ -37,3 +37,5 @@ enum StorageKey {
   reactions,
   redactions
 }
+
+const int LOAD_LIMIT = 10;

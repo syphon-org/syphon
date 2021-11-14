@@ -8,6 +8,7 @@ import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/middleware.dart';
 import 'package:syphon/cache/serializer.dart';
 import 'package:syphon/cache/storage.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/middleware.dart';
@@ -177,7 +178,7 @@ Future<Store<AppState>> initStore(
       initialState = existingState ?? await persistor.load();
     }
   } catch (error) {
-    debugPrint('[persistor.load] error $error');
+    printError('[persistor.load] error $error');
   }
 
   return Store<AppState>(

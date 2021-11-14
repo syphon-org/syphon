@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/messages/model.dart';
 
@@ -33,7 +34,7 @@ extension MessageQueries on StorageDatabase {
     String? roomId, {
     int? timestamp,
     int offset = 0,
-    int limit = 25,
+    int limit = LOAD_LIMIT,
   }) {
     return (select(messages)
           ..where(
@@ -49,7 +50,8 @@ extension MessageQueries on StorageDatabase {
   /// Query the latest messages in time for a particular room
   /// Helps for the initial load from cold storage
   ///
-  Future<List<Message>> selectMessagesRoom(String roomId, {int offset = 0, int limit = 25}) {
+  Future<List<Message>> selectMessagesRoom(String roomId,
+      {int offset = 0, int limit = LOAD_LIMIT}) {
     return (select(messages)
           ..where((tbl) => tbl.roomId.equals(roomId))
           ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
@@ -84,7 +86,7 @@ extension MessageQueries on StorageDatabase {
     return (select(messages)..where((tbl) => tbl.roomId.equals(roomId))).get();
   }
 
-  Future<List<Message>> searchMessageBodys(String text, {int offset = 0, int limit = 25}) {
+  Future<List<Message>> searchMessageBodys(String text, {int offset = 0, int limit = LOAD_LIMIT}) {
     return (select(messages)
           ..where((tbl) => tbl.body.like('%$text%'))
           ..limit(limit, offset: offset))
@@ -104,7 +106,7 @@ Future<List<Message>> loadMessages({
   required String roomId,
   int timestamp = 0,
   int offset = 0,
-  int limit = 25,
+  int limit = LOAD_LIMIT,
   String? batch,
 }) async {
   try {
@@ -138,7 +140,7 @@ Future<List<Message>> loadMessagesRoom(
   required StorageDatabase storage,
   int timestamp = 0,
   int offset = 0,
-  int limit = 25,
+  int limit = LOAD_LIMIT,
 }) async {
   try {
     return storage.selectMessagesRoom(
@@ -190,7 +192,7 @@ extension DecryptedQueries on StorageDatabase {
     String? roomId, {
     int? timestamp,
     int offset = 0,
-    int limit = 25,
+    int limit = LOAD_LIMIT,
   }) {
     return (select(decrypted)
           ..where(
@@ -200,7 +202,11 @@ extension DecryptedQueries on StorageDatabase {
         .get();
   }
 
-  Future<List<Message>> selectDecryptedRoom(String roomId, {int offset = 0, int limit = 25}) {
+  Future<List<Message>> selectDecryptedRoom(
+    String roomId, {
+    int offset = 0,
+    int limit = LOAD_LIMIT,
+  }) {
     return (select(decrypted)
           ..where((tbl) => tbl.roomId.equals(roomId))
           ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
@@ -217,7 +223,11 @@ extension DecryptedQueries on StorageDatabase {
     return (select(decrypted)..where((tbl) => tbl.roomId.equals(roomId))).get();
   }
 
-  Future<List<Message>> searchDecryptedBodys(String text, {int offset = 0, int limit = 25}) {
+  Future<List<Message>> searchDecryptedBodys(
+    String text, {
+    int offset = 0,
+    int limit = LOAD_LIMIT,
+  }) {
     return (select(decrypted)
           ..where((tbl) => tbl.body.like('%$text%'))
           ..limit(limit, offset: offset))
@@ -236,7 +246,7 @@ Future<List<Message>> loadDecrypted({
   required StorageDatabase storage,
   String? roomId,
   int offset = 0,
-  int limit = 25,
+  int limit = LOAD_LIMIT,
 }) async {
   try {
     return storage.selectDecrypted(roomId);
@@ -257,7 +267,7 @@ Future<List<Message>> loadDecryptedRoom(
   String roomId, {
   required StorageDatabase storage,
   int offset = 0,
-  int limit = 25, // default amount loaded
+  int limit = LOAD_LIMIT, // default amount loaded
 }) async {
   try {
     // TODO: remove after 0.2.3 (sync overhaul)

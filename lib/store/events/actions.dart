@@ -4,6 +4,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -160,7 +161,7 @@ ThunkAction<AppState> loadMessagesCached({
   Room? room,
   String? batch,
   int timestamp = 0, // offset
-  int limit = 25,
+  int limit = LOAD_LIMIT,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -199,7 +200,7 @@ ThunkAction<AppState> fetchMessageEvents({
   String? to,
   String? from,
   int timestamp = 0,
-  int limit = 25,
+  int limit = LOAD_LIMIT,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -236,6 +237,15 @@ ThunkAction<AppState> fetchMessageEvents({
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
+      printJson({
+        'from': from,
+        'roomPrevBatch': room.prevBatch,
+        'start': start,
+        'end': end,
+        'lastMessage': messages.last,
+        'first': messages.first
+      });
+
       // reuse the logic for syncing
       // end will be null if no more batches are available to fetch
       await store.dispatch(syncRooms({
@@ -245,12 +255,12 @@ ThunkAction<AppState> fetchMessageEvents({
             'curr_batch': start,
             'last_batch': oldest ? end ?? from : null,
             'prev_batch': end,
-            'limited': end == start ? false : null,
+            'limited': end == start || end == null ? false : null,
           }
         },
       }));
     } catch (error) {
-      debugPrint('[fetchMessageEvents] error $error');
+      printError('[fetchMessageEvents] error $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -416,7 +426,7 @@ ThunkAction<AppState> deleteMessage({required Message message}) {
         return store.dispatch(DeleteOutboxMessage(message: message));
       }
     } catch (error) {
-      debugPrint('[deleteMessage] $error');
+      printError('[deleteMessage] $error');
     }
   };
 }
@@ -441,7 +451,7 @@ ThunkAction<AppState> redactEvent({
         eventId: event!.id,
       );
     } catch (error) {
-      debugPrint('[deleteMessage] $error');
+      printError('[deleteMessage] $error');
     }
   };
 }

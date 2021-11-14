@@ -311,7 +311,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       // return the generated keys
       return deviceKeysOwned;
     } catch (error) {
-      debugPrint('[generateIdentityKeys] $error');
+      printError('[generateIdentityKeys] $error');
       return null;
     }
   };
@@ -609,7 +609,7 @@ ThunkAction<AppState> updateKeySessions({
               throw response['error'];
             }
 
-            debugPrint('[sendSessionKeys] success! $randomNumber');
+            printInfo('[sendSessionKeys] success! $randomNumber');
           } catch (error) {
             printError('[sendSessionKeys] $error');
           }
@@ -851,7 +851,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         // Return a fresh key session having not decrypted the payload
         return olm.Session()..unpickle(deviceId, session);
       } catch (error) {
-        debugPrint('[loadKeySessionInbound] unsuccessful $error');
+        printError('[loadKeySessionInbound] unsuccessful $error');
       }
     }
 
@@ -879,7 +879,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         return newKeySession;
       }
     } catch (error) {
-      debugPrint('[loadKeySessionInbound] $error');
+      printError('[loadKeySessionInbound] $error');
     }
 
     return null;

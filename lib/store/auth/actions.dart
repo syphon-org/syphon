@@ -599,7 +599,7 @@ ThunkAction<AppState> setInteractiveAuths({Map? auths}) {
         );
 
         if (currentStage.length > 0) {
-          debugPrint('[SetCredential] $currentStage');
+          printInfo('[SetCredential] $currentStage');
           store.dispatch(SetCredential(
             credential: Credential(
               type: currentStage,
@@ -773,7 +773,7 @@ ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
       ));
       return true;
     } catch (error) {
-      debugPrint('[submitEmail] $error');
+      printError('[submitEmail] $error');
       store.dispatch(SetEmailValid(valid: false));
       store.dispatch(SetEmailAvailability(available: false));
       return false;
@@ -1064,7 +1064,7 @@ ThunkAction<AppState> updateCredential({
         ),
       ));
     } catch (error) {
-      debugPrint('[updateCredential] $error');
+      printError('[updateCredential] $error');
     }
   };
 }

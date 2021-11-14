@@ -244,6 +244,7 @@ class Room implements drift.Insertable<Room> {
     String? lastBatch,
     String? prevBatch,
     String? lastSince,
+    List<String> existingIds = const [],
   }) {
     return fromAccountData(events.account)
         .fromStateEvents(
@@ -257,6 +258,7 @@ class Room implements drift.Insertable<Room> {
           nextBatch: lastSince,
           prevBatch: prevBatch,
           messages: events.messages,
+          existingIds: existingIds,
         )
         .fromEphemeralEvents(
           currentUser: currentUser,
@@ -382,7 +384,7 @@ class Room implements drift.Insertable<Room> {
             break;
         }
       } catch (error) {
-        debugPrint('[Room.fromStateEvents] $error ${event.type}');
+        printError('[Room.fromStateEvents] $error ${event.type}');
       }
     }
 
@@ -449,6 +451,7 @@ class Room implements drift.Insertable<Room> {
   /// outside displaying messages
   Room fromMessageEvents({
     List<Message> messages = const [],
+    List<String> existingIds = const [],
     String? lastBatch,
     String? prevBatch, // previously fetched batch
     String? nextBatch,
@@ -477,6 +480,8 @@ class Room implements drift.Insertable<Room> {
       if (limitedCurrent) {
         // TODO: deprecated - remove along with messageIds
         // TODO: potentially reimplement, but with batch tokens instead
+        // TODO: consider also using another "existingIds" param instead to prevent
+        // TODO: needing room to have some state value
         // Check to see if the new messages contain those existing in cache
         if (messages.isNotEmpty && messageIds.isNotEmpty) {
           final messageKnown = messageIds.firstWhereOrNull(
@@ -485,21 +490,49 @@ class Room implements drift.Insertable<Room> {
 
           // still limited if messages are all unknown / new
           limited = messageKnown == null;
+
+          printJson({
+            'LIMITED': true,
+            'LIMITED_NEW': limited,
+            'messageUnknown': messageKnown == null,
+          });
         }
 
-        // Set limited to false false if
-        // - the oldest batch (lastBatch) is non-existant
-        // - the previous batch (most recent) is non-existant
-        // - the oldest batch equals the previously fetched hash
-        if (lastBatch == null || prevBatch == null || lastBatch == prevBatch) {
-          limited = false;
-        }
-
-        // Set limitd to false if
-        // - this fetch's previous batch is equal to the room's historic previous batch
+        // current previous batch is equal to the room's historical previous batch
         if (prevBatch == this.prevBatch) {
           limited = false;
+          printJson({
+            'LIMITED': true,
+            'LIMITED_NEW': limited,
+            'prevBatchEqualsPrevPrevBatch': true,
+          });
         }
+
+        // if the previous batch is the last known batch, skip pulling it
+        if (prevBatch == this.lastBatch) {
+          limited = false;
+          printJson({
+            'LIMITED': true,
+            'LIMITED_NEW': limited,
+            'prevBatchEqualsLastBatch': true,
+          });
+        }
+
+        // will be null if no other events are available / batched in the timeline (also "end")
+        if (prevBatch == null) {
+          limited = false;
+          printJson({
+            'LIMITED': true,
+            'LIMITED_NEW': limited,
+            'prevBatchNull': true,
+          });
+        }
+
+        printJson({
+          'LIMITED': true,
+          'LIMITED_NEW': limited,
+          'PREVIOUS_BATCH_NEW': prevBatch,
+        });
       }
 
       // Combine current and existing messages on unique ids
@@ -521,6 +554,7 @@ class Room implements drift.Insertable<Room> {
         lastUpdate: lastUpdate,
         // oldest hash in the timeline
         lastBatch: lastBatch ?? this.lastBatch ?? prevBatch,
+        // TODO: fetchMessages maks this temporarily misassigned
         // most recent prev_batch from the last /sync
         prevBatch: prevBatch ?? this.prevBatch,
         // next hash in the timeline

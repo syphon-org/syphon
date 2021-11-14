@@ -10,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
@@ -33,7 +34,7 @@ class BackgroundSync {
     try {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
-      debugPrint('[BackgroundSync.init] $error');
+      printError('[BackgroundSync.init] $error');
       return false;
     }
   }
@@ -76,7 +77,7 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      debugPrint('[BackgroundSync] $error');
+      printError('[BackgroundSync] $error');
     }
   }
 }
@@ -113,7 +114,7 @@ Future notificationSyncIsolate() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        debugPrint(
+        printDebug(
           '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
         );
         return Future.value(true);

@@ -117,7 +117,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           // ignore: prefer_interpolation_to_compose_strings
           '[syncRooms] ${roomSynced.name} ' +
               'full_synced: $synced ' +
-              'limited: ${roomSynced.limited}' +
+              'limited: ${roomSynced.limited} ' +
               'total messages: ${roomSynced.messageIds.length} ' +
               'roomPrevBatch: ${roomSynced.prevBatch}',
         );
@@ -264,7 +264,7 @@ ThunkAction<AppState> fetchRoom(
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      debugPrint('[fetchRoom] $roomId $error');
+      printError('[fetchRoom] $roomId $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
@@ -279,7 +279,7 @@ ThunkAction<AppState> fetchRoom(
 ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
-      debugPrint('[fetchSync] *** starting fetch all rooms *** ');
+      printInfo('[fetchSync] *** starting fetch all rooms *** ');
       final data = await MatrixApi.fetchRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -299,14 +299,14 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
           await store.dispatch(fetchRoom(room.id, fetchState: syncState));
           await store.dispatch(fetchRoomMembers(room: room));
         } catch (error) {
-          debugPrint('[fetchRoom(s)] ${room.id} $error');
+          printError('[fetchRoom(s)] ${room.id} $error');
         } finally {
           store.dispatch(UpdateRoom(id: room.id, syncing: false));
         }
       }));
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
-      debugPrint('[fetchRoom(s)] $error');
+      printError('[fetchRoom(s)] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -323,7 +323,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
-      debugPrint('[fetchSync] *** starting fetch direct rooms *** ');
+      printInfo('[fetchSync] *** starting fetch direct rooms *** ');
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -346,11 +346,11 @@ ThunkAction<AppState> fetchDirectRooms() {
         try {
           await store.dispatch(fetchRoom(roomId, direct: true));
         } catch (error) {
-          debugPrint('[fetchDirectRooms] $error');
+          printError('[fetchDirectRooms] $error');
         }
       }));
     } catch (error) {
-      debugPrint('[fetchDirectRooms] $error');
+      printError('[fetchDirectRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -395,7 +395,7 @@ ThunkAction<AppState> fetchRoomMembers({
         room: _room.copyWith(userIds: members.keys.toList()),
       ));
     } catch (error) {
-      debugPrint('[updateRoom] $error');
+      printError('[updateRoom] $error');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -670,7 +670,7 @@ ThunkAction<AppState> toggleDirectRoom({
       // Refresh room information with toggle enabled
       await store.dispatch(fetchRoom(room.id, direct: enabled));
     } catch (error) {
-      debugPrint('[toggleDirectRoom] $error');
+      printError('[toggleDirectRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -898,7 +898,7 @@ ThunkAction<AppState> removeRoom({Room? room}) {
 
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      debugPrint('[removeRoom] $error');
+      printError('[removeRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -958,7 +958,7 @@ ThunkAction<AppState> archiveRoom({Room? room}) {
     try {
       store.dispatch(AddArchive(roomId: room!.id));
     } catch (error) {
-      debugPrint('[archiveRoom] $error');
+      printError('[archiveRoom] $error');
     }
   };
 }

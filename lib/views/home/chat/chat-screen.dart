@@ -24,6 +24,7 @@ import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/encryption.dart';
@@ -850,7 +851,6 @@ class _Props extends Equatable {
           store.dispatch(fetchMessageEvents(
             room: room,
             from: room.nextBatch,
-            limit: 25,
           ));
         },
         onToggleReaction: ({Message? message, String? emoji}) {
@@ -869,21 +869,16 @@ class _Props extends Equatable {
         onLoadMoreMessages: () {
           final room = selectRoom(state: store.state, id: roomId);
 
+          // TODO:  need to account for 25 reactions, for example. "Messages" are different to spec
           final messages = store.state.eventStore.messages[room.id] ?? [];
-          final oldestMessage = messages.isNotEmpty ? messages[messages.length - 1] : Message();
-
-          // TODO: DELETE: after 0.2.2
-          // printJson({
-          //   'roomPrevBatch': room.prevBatch,
-          //   'messagePrevBatch': oldestMessage.prevBatch,
-          //   'messageId': oldestMessage.id,
-          // });
+          final oldest =
+              messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
 
           // fetch messages from the oldest cached batch
           return store.dispatch(fetchMessageEvents(
             room: room,
-            from: oldestMessage.prevBatch,
-            timestamp: oldestMessage.timestamp,
+            from: oldest.prevBatch,
+            timestamp: oldest.timestamp,
           ));
         },
       );
