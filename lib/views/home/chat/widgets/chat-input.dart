@@ -211,7 +211,7 @@ class ChatInputState extends State<ChatInput> {
   }
 
   onAddPhoto() async {
-    final pickerResult = await ImagePicker().getImage(
+    final pickerResult = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       maxWidth: Dimensions.avatarSizeMax,
       maxHeight: Dimensions.avatarSizeMax,
@@ -486,9 +486,11 @@ class ChatInputState extends State<ChatInput> {
                           maxHeight: imageWidth,
                         ),
                         child: ListLocalImages(
-                          imageSize: imageWidth,
-                          onSelectImage: (file) =>
-                              widget.onAddMedia(file: file, type: MessageType.image),
+                          imageSize: imageWidth, 
+                          onSelectImage: (file) => widget.onAddMedia(
+                            file: file,
+                            type: MessageType.image,
+                          ), 
                         ),
                       ),
                       Row(children: [
