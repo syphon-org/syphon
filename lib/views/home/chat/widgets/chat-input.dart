@@ -249,7 +249,10 @@ class ChatInputState extends State<ChatInput> {
           final double messageInputWidth = width - 72;
           final bool replying = widget.quotable != null && widget.quotable!.sender != null;
           final double maxInputHeight = replying ? height * 0.45 : height * 0.5;
-          final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight - 24 : height * 0.38;
+          final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight + 4 : height * 0.38;
+
+          final imageHeight =
+              imageWidth > maxMediaHeight ? maxMediaHeight : imageWidth; // 2 images in view
 
           final isSendable = sendable && !widget.sending;
 
@@ -483,14 +486,14 @@ class ChatInputState extends State<ChatInput> {
                       Container(
                         constraints: BoxConstraints(
                           maxWidth: width,
-                          maxHeight: imageWidth,
+                          maxHeight: imageHeight, // HACK: figure out why it overflows on Nexus 5x
                         ),
                         child: ListLocalImages(
-                          imageSize: imageWidth, 
+                          imageSize: imageWidth,
                           onSelectImage: (file) => widget.onAddMedia(
                             file: file,
                             type: MessageType.image,
-                          ), 
+                          ),
                         ),
                       ),
                       Row(children: [

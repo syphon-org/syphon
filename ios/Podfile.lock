@@ -170,7 +170,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
-  image_picker: 50e7c7ff960e5f58faa4d1f4af84a771c671bc4a
+  image_picker: 9aa50e1d8cdacdbed739e925b7eea16d014367e6
   local_image_provider: 05b1af32561482c0ca5a440fbc7f489ad818c962
   OLMKit: 4ee0159d63feeb86d836fdcfefe418e163511639
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
