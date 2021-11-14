@@ -1,17 +1,13 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/notifications.dart';
-
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -103,8 +99,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                       );
                     },
                     contentPadding: Dimensions.listPadding,
-                    title: Text('Test Notifications',
-                        style: Theme.of(context).textTheme.subtitle1),
+                    title: Text('Test Notifications', style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 Visibility(
@@ -115,8 +110,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     onTap: () {
                       props.onForceFunction();
                     },
-                    title: Text('Force Function',
-                        style: Theme.of(context).textTheme.subtitle1),
+                    title: Text('Force Function', style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 ListTile(
@@ -144,9 +138,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      Duration(milliseconds: props.syncInterval)
-                          .inSeconds
-                          .toString(),
+                      Duration(milliseconds: props.syncInterval).inSeconds.toString(),
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -174,29 +166,23 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.syncing
-                        ? null
-                        : props.onManualSync as void Function()?,
+                    onTap: props.syncing ? null : props.onManualSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Manual Sync',
                       style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                            color: props.syncing
-                                ? Color(Colours.greyDisabled)
-                                : null,
+                            color: props.syncing ? Color(Colours.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
                       'Perform a forced matrix sync based on last sync timestamp',
                       style: TextStyle(
-                        color:
-                            props.syncing ? Color(Colours.greyDisabled) : null,
+                        color: props.syncing ? Color(Colours.greyDisabled) : null,
                       ),
                     ),
                     trailing: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: CircularProgressIndicator(
-                          value: props.syncing ? null : 0),
+                      child: CircularProgressIndicator(value: props.syncing ? null : 0),
                     ),
                   ),
                 ),
@@ -204,16 +190,12 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.syncing
-                        ? null
-                        : props.onForceFullSync as void Function()?,
+                    onTap: props.syncing ? null : props.onForceFullSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       'Force Full Sync',
                       style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                            color: props.syncing
-                                ? Color(Colours.greyDisabled)
-                                : null,
+                            color: props.syncing ? Color(Colours.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
@@ -297,7 +279,7 @@ class _Props extends Equatable {
           return showDialog(
             context: context,
             barrierDismissible: true,
-            builder: (context) => DialogTextInput(
+            builder: (dialogContext) => DialogTextInput(
               title: 'Modify Sync Interval',
               content: Strings.confirmModifySyncInterval,
               editingController: TextEditingController(
@@ -305,11 +287,15 @@ class _Props extends Equatable {
                   milliseconds: store.state.settingsStore.syncInterval,
                 ).inSeconds.toString(),
               ),
+              label: 'seconds',
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 FilteringTextInputFormatter.singleLineFormatter
               ],
+              onCancel: () {
+                Navigator.of(dialogContext).pop();
+              },
               onConfirm: (String interval) async {
                 store.dispatch(SetSyncInterval(
                     syncInterval: Duration(
@@ -318,6 +304,7 @@ class _Props extends Equatable {
 
                 await store.dispatch(stopSyncObserver());
                 await store.dispatch(startSyncObserver());
+                Navigator.of(dialogContext).pop();
               },
             ),
           );

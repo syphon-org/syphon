@@ -232,6 +232,44 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
   };
 }
 
+/// Rename a single device
+ThunkAction<AppState> renameDevice({String? deviceId, String? displayName, bool? disableLoading}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.renameDevice(
+        protocol: store.state.authStore.protocol,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        deviceId: deviceId,
+        displayName: displayName,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      // If a flow exists, more authentication is needed before
+      // attempting to delete again
+      if (data['flows'] != null) {
+        return store.dispatch(setInteractiveAuths(auths: data));
+      }
+
+      store.dispatch(fetchDevices());
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        error: error,
+        message: error.toString(),
+        origin: 'renameDevice',
+      ));
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
 /// Send in a hex value to be used as the primary color
 ThunkAction<AppState> acceptAgreement() {
   return (Store<AppState> store) async {
