@@ -642,7 +642,7 @@ class ChatScreenState extends State<ChatScreen> {
                           ),
                           Positioned(
                             child: Visibility(
-                              visible: props.room.lastBatch == null,
+                              visible: props.room.lastBatch == null && props.messagesLength == 0,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
                                 child: Container(
@@ -869,9 +869,18 @@ class _Props extends Equatable {
         onLoadMoreMessages: () {
           final room = selectRoom(state: store.state, id: roomId);
 
+          final messages = store.state.eventStore.messages[room.id] ?? [];
+          final oldestMessage = messages.isNotEmpty ? messages[messages.length - 1] : Message();
+
+          printJson({
+            'roomPrevBatch': room.prevBatch,
+            'messagePrevBatch': oldestMessage.prevBatch,
+            'messageId': oldestMessage.id,
+          });
           // fetch messages from the oldest cached batch
           return store.dispatch(fetchMessageEvents(
             room: room,
+            from: oldestMessage.prevBatch,
           ));
         },
       );

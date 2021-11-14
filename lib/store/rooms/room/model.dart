@@ -45,7 +45,7 @@ class Room implements drift.Insertable<Room> {
   final bool hidden;
   final bool archived;
 
-  final String? lastBatch; // oldest hash in timeline
+  final String? lastBatch; // oldest batch in timeline
   final String? prevBatch; // most recent prev_batch (not the lastBatch)
   final String? nextBatch; // most recent next_batch
 
@@ -208,9 +208,9 @@ class Room implements drift.Insertable<Room> {
         outbox: outbox ?? this.outbox,
         userIds: userIds ?? this.userIds,
         messageIds: messageIds ?? this.messageIds,
-        lastBatch: lastBatch ?? lastBatch,
-        prevBatch: prevBatch ?? prevBatch,
-        nextBatch: nextBatch ?? nextBatch,
+        lastBatch: lastBatch ?? this.lastBatch,
+        prevBatch: prevBatch ?? this.prevBatch,
+        nextBatch: nextBatch ?? this.nextBatch,
         usersTEMP: usersTEMP ?? this.usersTEMP,
         readReceiptsTEMP: readReceiptsTEMP ?? this.readReceiptsTEMP,
       );
@@ -255,7 +255,7 @@ class Room implements drift.Insertable<Room> {
         .fromMessageEvents(
           lastBatch: lastBatch,
           nextBatch: lastSince,
-          prevBatch: prevBatch ?? prevBatch,
+          prevBatch: prevBatch,
           messages: events.messages,
         )
         .fromEphemeralEvents(
@@ -511,9 +511,9 @@ class Room implements drift.Insertable<Room> {
         encryptionEnabled: encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate,
         // oldest hash in the timeline
-        lastBatch: lastBatch ?? prevBatch,
+        lastBatch: lastBatch ?? this.lastBatch ?? prevBatch,
         // most recent prev_batch from the last /sync
-        prevBatch: prevBatch ?? prevBatch,
+        prevBatch: prevBatch ?? this.prevBatch,
         // next hash in the timeline
         nextBatch: nextBatch ?? nextBatch,
       );

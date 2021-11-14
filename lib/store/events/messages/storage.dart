@@ -237,7 +237,6 @@ Future<List<Message>> loadDecrypted({
   String? roomId,
   int offset = 0,
   int limit = 25,
-  String? batch,
 }) async {
   try {
     return storage.selectDecrypted(roomId);
@@ -247,6 +246,13 @@ Future<List<Message>> loadDecrypted({
   }
 }
 
+///
+/// Load Decrypted Room
+///
+/// TODO: convert to cache only ephemeral runner
+/// that decrypts on the fly only after loading messages
+/// from cold storage -> redux
+///
 Future<List<Message>> loadDecryptedRoom(
   String roomId, {
   required StorageDatabase storage,
@@ -254,6 +260,11 @@ Future<List<Message>> loadDecryptedRoom(
   int limit = 25, // default amount loaded
 }) async {
   try {
+    // TODO: remove after 0.2.3 (sync overhaul)
+    if (true) {
+      return storage.selectDecryptedAll(roomId);
+    }
+
     return storage.selectDecryptedRoom(
       roomId,
       offset: offset,

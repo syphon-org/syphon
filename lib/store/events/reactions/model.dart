@@ -17,6 +17,7 @@ class Reaction extends Event {
     sender,
     stateKey,
     batch,
+    prevBatch,
     timestamp,
     content,
     data, //ignore
@@ -31,6 +32,7 @@ class Reaction extends Event {
           sender: sender,
           stateKey: stateKey,
           batch: batch,
+          prevBatch: prevBatch,
           timestamp: timestamp,
           content: content,
         );
@@ -43,6 +45,7 @@ class Reaction extends Event {
     roomId,
     stateKey,
     batch,
+    prevBatch,
     content,
     timestamp,
     data, //ignore
@@ -57,6 +60,7 @@ class Reaction extends Event {
         roomId: roomId ?? this.roomId,
         stateKey: stateKey ?? this.stateKey,
         batch: batch ?? this.batch,
+        prevBatch: prevBatch ?? this.prevBatch,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
         body: body ?? this.body,

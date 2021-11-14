@@ -118,7 +118,8 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           '[syncRooms] ${roomSynced.name} ' +
               'full_synced: $synced ' +
               'limited: ${roomSynced.limited}' +
-              'total messages: ${roomSynced.messageIds.length}',
+              'total messages: ${roomSynced.messageIds.length} ' +
+              'roomPrevBatch: ${roomSynced.prevBatch}',
         );
 
         // update various message mutations and meta data
@@ -180,6 +181,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           printWarning(
             '[fetchMessageEvents] ${roomUpdated.name} LIMITED TRUE - Fetching more messages',
           );
+
           store.dispatch(fetchMessageEvents(
             room: roomUpdated,
             from: roomUpdated.prevBatch,
@@ -246,7 +248,8 @@ ThunkAction<AppState> fetchRoom(
           },
           'timeline': {
             'events': messageEvents['chunk'],
-            'prev_batch': messageEvents['from'],
+            'curr_batch': messageEvents['start'],
+            'prev_batch': messageEvents['end'],
           },
         },
       };

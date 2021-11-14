@@ -31,12 +31,14 @@ class Sync {
 class SyncDetails {
   final bool? invite;
   final bool? limited;
+  final String? currBatch; // current batch, if known from fetchMessages
   final String? lastBatch;
   final String? prevBatch;
 
   const SyncDetails({
     this.invite,
     this.limited,
+    this.currBatch,
     this.lastBatch,
     this.prevBatch,
   });
@@ -73,11 +75,20 @@ Sync parseSync(Map params) {
   final String? lastSince = params['lastSince'];
 
   final details = parseDetails(json);
-  final events = parseEvents(json, roomId: roomExisting.id);
+  final events = parseEvents(
+    json,
+    roomId: roomExisting.id,
+    batch: details.currBatch ?? lastSince,
+    prevBatch: details.prevBatch,
+  );
+
+  printInfo(
+    '[parseSync] ${roomExisting.id} prevBatch ${details.prevBatch != null}',
+  );
 
   if (details.limited != null) {
     printInfo(
-      '[parseSync] ${roomExisting.id} limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
+      '[parseSync] ${roomExisting.id} lastSince $lastSince limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
     );
   }
 
@@ -114,6 +125,7 @@ Sync parseSync(Map params) {
 SyncDetails parseDetails(Map<String, dynamic> json) {
   bool invite;
   bool? limited;
+  String? currBatch;
   String? lastBatch;
   String? prevBatch;
 
@@ -122,12 +134,14 @@ SyncDetails parseDetails(Map<String, dynamic> json) {
   if (json['timeline'] != null) {
     limited = json['timeline']['limited'];
     lastBatch = json['timeline']['last_batch'];
+    currBatch = json['timeline']['curr_batch'];
     prevBatch = json['timeline']['prev_batch'];
   }
 
   return SyncDetails(
     invite: invite,
     limited: limited,
+    currBatch: currBatch,
     lastBatch: lastBatch,
     prevBatch: prevBatch,
   );
@@ -144,6 +158,7 @@ SyncDetails parseDetails(Map<String, dynamic> json) {
 SyncEvents parseEvents(
   Map<String, dynamic> json, {
   String? roomId,
+  String? batch,
   String? prevBatch,
 }) {
   List<Event> stateEvents = [];
@@ -183,7 +198,12 @@ SyncEvents parseEvents(
     final List<dynamic> timelineEventsRaw = json['timeline']['events'];
 
     final List<Event> timelineEvents = List.from(
-      timelineEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)),
+      timelineEventsRaw.map((event) => Event.fromMatrix(
+            event,
+            roomId: roomId,
+            batch: batch,
+            prevBatch: prevBatch,
+          )),
     );
 
     for (final Event event in timelineEvents) {

@@ -144,15 +144,21 @@ ThunkAction<AppState> setReceipts({
       return store.dispatch(SetReceipts(roomId: room!.id, receipts: receipts));
     };
 
-/// Load Message Events
+///
+/// Load Messages Cached
 ///
 /// Pulls initial messages from storage or paginates through
 /// those existing in cold storage depending on requests from client
 ///
 /// Make sure these have been exhausted before calling fetchMessageEvents
 ///
+/// TODO: will need to handle loading all encrypted messages under new
+/// sessions in order to decrypt correctly, at least up until the previous
+/// session was created
+///
 ThunkAction<AppState> loadMessagesCached({
   Room? room,
+  String? batch,
   int offset = 0,
   int limit = 25,
 }) {
@@ -160,14 +166,11 @@ ThunkAction<AppState> loadMessagesCached({
     try {
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
 
-      final messages = store.state.eventStore.messages[room.id] ?? [];
-      final oldestCached = messages.isNotEmpty ? messages[messages.length - 1] : Message();
-
       final messagesStored = await loadMessages(
         storage: Storage.database!,
         roomId: room.id,
-        limit: !room.encryptionEnabled ? limit : room.messageIds.length,
-        batch: oldestCached.batch,
+        limit: !room.encryptionEnabled ? limit : 0,
+        batch: batch,
       );
 
       // load cold storage messages to state
@@ -198,17 +201,23 @@ ThunkAction<AppState> fetchMessageEvents({
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(UpdateRoom(id: room!.id, syncing: true));
-
       final cached = await store.dispatch(
-        loadMessagesCached(room: room, limit: limit),
+        loadMessagesCached(room: room, batch: from, limit: limit),
       ) as List<Message>;
 
-      if (cached.isNotEmpty) {
+      final oldest = cached.isEmpty;
+
+      if (!oldest) {
         return;
       }
 
-      final oldest = cached.isEmpty;
+      // mark syncing (to show loading indicators) since it needs to pull remotely
+      store.dispatch(UpdateRoom(id: room!.id, syncing: true));
+
+      printJson({
+        'oldest': oldest,
+        'from': from,
+      });
 
       final messagesJson = await compute(MatrixApi.fetchMessageEventsThreaded, {
         'protocol': store.state.authStore.protocol,
@@ -216,7 +225,7 @@ ThunkAction<AppState> fetchMessageEvents({
         'accessToken': store.state.authStore.user.accessToken,
         'roomId': room.id,
         'limit': limit,
-        'from': from,
+        'from': from ?? room.prevBatch,
         'to': to,
       });
 
@@ -230,12 +239,20 @@ ThunkAction<AppState> fetchMessageEvents({
       // The messages themselves
       final List<dynamic> messages = messagesJson['chunk'] ?? [];
 
+      printJson({
+        'oldest': oldest,
+        'start': start,
+        'end': end,
+        'messages': messages.length,
+      });
+
       // reuse the logic for syncing
+      // end will be null if no more batches are available to fetch
       await store.dispatch(syncRooms({
         room.id: {
           'timeline': {
             'events': messages,
-            // end will be null if no more batches are available to fetch
+            'curr_batch': start,
             'last_batch': oldest ? end ?? from : null,
             'prev_batch': end,
             'limited': end == start ? false : null,

@@ -222,6 +222,7 @@ Future backgroundSyncLoop({
       if (events.messages.isEmpty) {
         return;
       }
+
       final details = parseDetails(
         roomJson,
       );
