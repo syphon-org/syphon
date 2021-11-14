@@ -9,6 +9,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 
@@ -27,6 +28,7 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
     this.onDelete,
     this.onEdit,
     this.onDismiss,
+    required this.user,
   }) : super(key: key);
 
   final String title;
@@ -34,6 +36,8 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
   final String tooltip;
 
   final Room? room;
+  final User user;
+
   final Message? message;
   final double? elevation;
   final Brightness brightness;
