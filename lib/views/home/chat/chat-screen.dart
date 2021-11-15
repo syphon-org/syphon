@@ -17,7 +17,6 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
@@ -25,6 +24,7 @@ import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/encryption.dart';
@@ -63,10 +63,12 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen> {
   bool sending = false;
+  bool loadMore = false;
+  bool editing = false;
+
   Message? selectedMessage;
   Map<String, Color>? senderColors;
 
-  bool loadMore = false;
   String? mediumType = MediumType.plaintext;
 
   final inputFieldNode = FocusNode();
@@ -112,7 +114,7 @@ class ChatScreenState extends State<ChatScreen> {
       onAttemptDecryption(props);
     }
 
-    if (props.messagesLength! < 10) {
+    if (props.messagesLength < 10) {
       props.onFetchNewest();
     }
 
@@ -147,10 +149,12 @@ class ChatScreenState extends State<ChatScreen> {
 
   onCheatCode(_Props props) async {
     final store = StoreProvider.of<AppState>(context);
-    final keySessions = store.state.cryptoStore.keySessions;
 
-    printInfo(SupportedLanguages.rtl.contains(store.state.settingsStore.language).toString());
-    try {} catch (error) {
+    try {
+      await store.dispatch(mutateMessagesRoom(
+        room: props.room,
+      ));
+    } catch (error) {
       printDebug(error.toString());
     }
   }
@@ -208,6 +212,38 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  onToggleEdit() {
+    if (selectedMessage == null) return;
+
+    setState(() {
+      editing = !editing;
+    });
+  }
+
+  onSendEdit(_Props props,
+      {String? text, String? type = MatrixMessageTypes.text, Message? related}) async {
+    setState(() {
+      sending = true;
+    });
+
+    await props.onSendMessage(
+      body: text,
+      type: type,
+      related: related,
+      edit: true,
+    );
+
+    onToggleEdit();
+
+    editorController.clear();
+    if (props.dismissKeyboardEnabled) {
+      FocusScope.of(context).unfocus();
+    }
+    setState(() {
+      sending = false;
+    });
+  }
+
   onSendMessage(_Props props) async {
     setState(() {
       sending = true;
@@ -217,6 +253,8 @@ class ChatScreenState extends State<ChatScreen> {
       body: editorController.text,
       type: MatrixMessageTypes.text,
     );
+
+    onToggleEdit();
 
     editorController.clear();
     if (props.dismissKeyboardEnabled) {
@@ -330,6 +368,12 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       selectedMessage = message;
     });
+
+    if (message == null) {
+      setState(() {
+        editing = false;
+      });
+    }
   }
 
   onChangeMediumType({String? newMediumType, _Props? props}) {
@@ -551,6 +595,7 @@ class ChatScreenState extends State<ChatScreen> {
               user: props.currentUser,
               room: props.room,
               message: selectedMessage,
+              onEdit: () => onToggleEdit(),
               onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
                 room: props.room,
@@ -579,10 +624,16 @@ class ChatScreenState extends State<ChatScreen> {
                       child: Stack(
                         children: [
                           MessageList(
+                            editing: editing,
                             roomId: props.room.id,
                             showAvatars: props.showAvatars,
                             selectedMessage: selectedMessage,
                             scrollController: messagesController,
+                            onSendEdit: (text, related) => onSendEdit(
+                              props,
+                              text: text,
+                              related: related,
+                            ),
                             onSelectReply: props.onSelectReply,
                             onViewUserDetails: onViewUserDetails,
                             onToggleSelectedMessage: onToggleSelectedMessage,
@@ -594,7 +645,7 @@ class ChatScreenState extends State<ChatScreen> {
                           ),
                           Positioned(
                             child: Visibility(
-                              visible: props.room.lastHash == null,
+                              visible: props.room.lastBatch == null && props.messagesLength < 10,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
                                 child: Container(
@@ -660,7 +711,7 @@ class _Props extends Equatable {
   final Room room;
   final String? userId;
   final bool loading;
-  final int? messagesLength;
+  final int messagesLength;
   final bool enterSendEnabled;
   final bool showAvatars;
   final ThemeType themeType;
@@ -729,7 +780,7 @@ class _Props extends Equatable {
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         loading: selectRoom(state: store.state, id: roomId).syncing,
         messagesLength: store.state.eventStore.messages.containsKey(roomId)
-            ? store.state.eventStore.messages[roomId]?.length
+            ? store.state.eventStore.messages[roomId]?.length ?? 0
             : 0,
         onSelectReply: (Message? message) {
           store.dispatch(selectReply(roomId: roomId, message: message));
@@ -756,7 +807,8 @@ class _Props extends Equatable {
             room: store.state.roomStore.rooms[roomId],
           ));
         },
-        onSendMessage: ({required String body, String? type}) async {
+        onSendMessage: (
+            {required String body, String? type, bool edit = false, Message? related}) async {
           if (roomId == null || body.isEmpty) return;
 
           final room = store.state.roomStore.rooms[roomId]!;
@@ -776,6 +828,8 @@ class _Props extends Equatable {
           return store.dispatch(sendMessage(
             roomId: room.id,
             message: message,
+            related: related,
+            edit: edit,
           ));
         },
         onDeleteMessage: ({Message? message, Room? room}) {
@@ -801,8 +855,7 @@ class _Props extends Equatable {
 
           store.dispatch(fetchMessageEvents(
             room: room,
-            from: room.nextHash,
-            limit: 25,
+            from: room.nextBatch,
           ));
         },
         onToggleReaction: ({Message? message, String? emoji}) {
@@ -821,25 +874,16 @@ class _Props extends Equatable {
         onLoadMoreMessages: () {
           final room = selectRoom(state: store.state, id: roomId);
 
-          // load message from cold storage
-          // TODO: paginate cold storage messages
-          // final messages = roomMessages(store.state, roomId);
-          // if (messages.length < room.messageIds.length) {
-          //   printDebug(
-          //       '[onLoadMoreMessages] loading from cold storage ${messages.length} ${room.messageIds.length}');
-          //   return store.dispatch(
-          //     loadMessageEvents(
-          //       room: room,
-          //       offset: messages.length,
-          //     ),
-          //   );
-          // }
+          // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
+          final messages = store.state.eventStore.messages[room.id] ?? [];
+          final oldest =
+              messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
 
-          // fetch messages beyond the oldest known message - lastHash
+          // fetch messages from the oldest cached batch
           return store.dispatch(fetchMessageEvents(
             room: room,
-            from: room.lastHash,
-            oldest: true,
+            from: oldest.prevBatch,
+            timestamp: oldest.timestamp,
           ));
         },
       );

@@ -26,6 +26,7 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
     this.focusNode,
     this.onCopy,
     this.onDelete,
+    this.onEdit,
     this.onDismiss,
     required this.user,
   }) : super(key: key);
@@ -43,6 +44,7 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
   final FocusNode? focusNode;
 
   final Function? onCopy;
+  final Function? onEdit;
   final Function? onDelete;
   final Function? onDismiss;
 
@@ -120,6 +122,17 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               }
               if (widget.onDismiss != null) {
                 widget.onDismiss!();
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.edit_rounded),
+            iconSize: 28.0,
+            tooltip: 'Edit Message',
+            color: Colors.white,
+            onPressed: () {
+              if (widget.onEdit != null) {
+                widget.onEdit!();
               }
             },
           ),

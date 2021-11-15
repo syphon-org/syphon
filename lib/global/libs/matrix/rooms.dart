@@ -125,6 +125,26 @@ abstract class Rooms {
     return await json.decode(response.body);
   }
 
+  static Future<dynamic> fetchMembersAll({
+    String? protocol = 'https://',
+    String? homeserver = Values.homeserverDefault,
+    String? accessToken,
+    String? roomId,
+  }) async {
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/joined_members';
+
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    final response = await httpClient.get(
+      Uri.parse(url),
+      headers: headers,
+    );
+
+    return await json.decode(response.body);
+  }
+
   static Future<dynamic> fetchDirectRoomIds({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
@@ -161,7 +181,8 @@ abstract class Rooms {
     final serverName = parts.isNotEmpty ? parts[1] : homeserver;
     final roomIdFormatted = Uri.encodeComponent(roomId);
 
-    final String url = '$protocol$homeserver/_matrix/client/r0/join/$roomIdFormatted?server_name=$serverName';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/join/$roomIdFormatted?server_name=$serverName';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

@@ -14,6 +14,7 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
+import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -44,9 +45,9 @@ class Room implements drift.Insertable<Room> {
   final bool hidden;
   final bool archived;
 
-  final String? lastHash; // oldest hash in timeline
-  final String? prevHash; // most recent prev_batch (not the lastHash)
-  final String? nextHash; // most recent next_batch
+  final String? lastBatch; // oldest batch in timeline
+  final String? prevBatch; // most recent prev_batch (not the lastBatch)
+  final String? nextBatch; // most recent next_batch
 
   final int lastRead;
   final int lastUpdate;
@@ -60,7 +61,7 @@ class Room implements drift.Insertable<Room> {
   // Associated user ids
   final List<String> userIds;
   final List<String> messageIds;
-  final List<String> reactionIds;
+
   @JsonKey(ignore: true)
   final List<Message> outbox;
 
@@ -69,19 +70,10 @@ class Room implements drift.Insertable<Room> {
   final List<Event>? state;
 
   @JsonKey(ignore: true)
-  final List<Reaction> reactions;
+  final Map<String, ReadReceipt>? readReceiptsTEMP;
 
   @JsonKey(ignore: true)
-  final List<Redaction> redactions;
-
-  @JsonKey(ignore: true)
-  final List<Message> messagesNew;
-
-  @JsonKey(ignore: true)
-  final Map<String, ReadReceipt>? readReceipts;
-
-  @JsonKey(ignore: true)
-  final Map<String, User> usersNew;
+  final Map<String, User> usersTEMP;
 
   @JsonKey(ignore: true)
   final bool userTyping;
@@ -132,12 +124,8 @@ class Room implements drift.Insertable<Room> {
     this.reply,
     this.userIds = const [],
     this.outbox = const [],
-    this.usersNew = const {},
-    this.reactions = const [],
-    this.messagesNew = const [],
+    this.usersTEMP = const {},
     this.messageIds = const [],
-    this.reactionIds = const [],
-    this.redactions = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -147,10 +135,10 @@ class Room implements drift.Insertable<Room> {
     this.worldReadable = false,
     this.userTyping = false,
     this.usersTyping = const [],
-    this.lastHash,
-    this.nextHash,
-    this.prevHash,
-    this.readReceipts,
+    this.lastBatch,
+    this.nextBatch,
+    this.prevBatch,
+    this.readReceiptsTEMP,
     this.state,
   });
 
@@ -158,9 +146,8 @@ class Room implements drift.Insertable<Room> {
     String? id,
     String? name,
     String? homeserver,
-    avatar,
     String? avatarUri,
-    topic,
+    String? topic,
     bool? invite,
     bool? direct,
     bool? limited,
@@ -181,18 +168,14 @@ class Room implements drift.Insertable<Room> {
     draft,
     reply,
     List<String>? userIds,
-    Map<String, User>? users,
     events,
-    List<Message>? outbox,
-    List<Message>? messagesNew,
-    List<Reaction>? reactions,
     List<String>? messageIds,
-    List<String>? reactionIds,
-    List<Redaction>? redactions,
-    Map<String, ReadReceipt>? readReceipts,
-    lastHash,
-    prevHash,
-    nextHash,
+    List<Message>? outbox,
+    Map<String, User>? usersTEMP,
+    Map<String, ReadReceipt>? readReceiptsTEMP,
+    String? lastBatch,
+    String? prevBatch,
+    String? nextBatch,
     state,
   }) =>
       Room(
@@ -221,18 +204,15 @@ class Room implements drift.Insertable<Room> {
         usersTyping: usersTyping ?? this.usersTyping,
         draft: draft ?? this.draft,
         reply: reply == Null ? null : reply ?? this.reply,
-        outbox: outbox ?? this.outbox,
-        messageIds: messageIds ?? this.messageIds,
-        messagesNew: messagesNew ?? this.messagesNew,
-        reactions: reactions ?? this.reactions,
-        redactions: redactions ?? this.redactions,
-        usersNew: users ?? usersNew,
-        userIds: userIds ?? this.userIds,
-        readReceipts: readReceipts ?? this.readReceipts,
-        lastHash: lastHash ?? this.lastHash,
-        prevHash: prevHash ?? this.prevHash,
-        nextHash: nextHash ?? this.nextHash,
         state: state ?? this.state,
+        outbox: outbox ?? this.outbox,
+        userIds: userIds ?? this.userIds,
+        messageIds: messageIds ?? this.messageIds,
+        lastBatch: lastBatch ?? this.lastBatch,
+        prevBatch: prevBatch ?? this.prevBatch,
+        nextBatch: nextBatch ?? this.nextBatch,
+        usersTEMP: usersTEMP ?? this.usersTEMP,
+        readReceiptsTEMP: readReceiptsTEMP ?? this.readReceiptsTEMP,
       );
 
   Map<String, dynamic> toJson() => _$RoomToJson(this);
@@ -256,105 +236,33 @@ class Room implements drift.Insertable<Room> {
     }
   }
 
-  Room fromSync({
+  Room fromEvents({
     required User currentUser,
-    required Map<String, dynamic> json,
+    required SyncEvents events,
+    bool? invite,
+    bool? limited,
+    String? lastBatch,
+    String? prevBatch,
     String? lastSince,
+    List<String> existingIds = const [],
   }) {
-    bool? invite;
-    bool? limited;
-    String? lastHash;
-    String? prevHash = this.prevHash;
-
-    List<Event> stateEvents = [];
-    List<Event> accountEvents = [];
-    List<Event> ephemeralEvents = [];
-    final List<Reaction> reactionEvents = [];
-    final List<Message> messageEvents = [];
-    final List<Redaction> redactionEvents = [];
-
-    // Find state only updates
-    if (json['state'] != null) {
-      final List<dynamic> stateEventsRaw = json['state']['events'];
-
-      stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
-    }
-
-    if (json['invite_state'] != null) {
-      final List<dynamic> stateEventsRaw = json['invite_state']['events'];
-
-      stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event)).toList();
-      invite = true;
-    }
-
-    if (json['ephemeral'] != null) {
-      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
-
-      ephemeralEvents = ephemeralEventsRaw.map((event) => Event.fromMatrix(event)).toList();
-    }
-
-    if (json['account_data'] != null) {
-      final List<dynamic> accountEventsRaw = json['account_data']['events'];
-
-      accountEvents = accountEventsRaw.map((event) => Event.fromMatrix(event)).toList();
-    }
-
-    // Find state and message updates from timeline
-    // Encryption events are not transfered in the state section of /sync
-    if (json['timeline'] != null) {
-      limited = json['timeline']['limited'];
-      lastHash = json['timeline']['last_hash'];
-      prevHash = json['timeline']['prev_batch'];
-
-      if (limited != null) {
-        printInfo(
-          '[fromSync] $id limited $limited lastHash ${lastHash != null} prevHash ${prevHash != null}',
-        );
-      }
-
-      final List<dynamic> timelineEventsRaw = json['timeline']['events'];
-
-      final List<Event> timelineEvents = List.from(
-        timelineEventsRaw.map((event) => Event.fromMatrix(event)),
-      );
-
-      for (final Event event in timelineEvents) {
-        switch (event.type) {
-          case EventTypes.message:
-          case EventTypes.encrypted:
-            messageEvents.add(Message.fromEvent(event));
-            break;
-          case EventTypes.reaction:
-            reactionEvents.add(Reaction.fromEvent(event));
-            break;
-          case EventTypes.redaction:
-            redactionEvents.add(Redaction.fromEvent(event));
-            break;
-          default:
-            stateEvents.add(event);
-            break;
-        }
-      }
-    }
-
-    return fromAccountData(accountEvents)
+    return fromAccountData(events.account)
         .fromStateEvents(
           invite: invite,
           limited: limited,
-          events: stateEvents,
           currentUser: currentUser,
-          reactions: reactionEvents,
-          redactions: redactionEvents,
+          events: events.state,
         )
         .fromMessageEvents(
-          messages: messageEvents,
-          lastHash: lastHash,
-          prevHash: prevHash,
-          nextHash: lastSince,
+          lastBatch: lastBatch,
+          nextBatch: lastSince,
+          prevBatch: prevBatch,
+          messages: events.messages,
+          existingIds: existingIds,
         )
         .fromEphemeralEvents(
-          events: ephemeralEvents,
           currentUser: currentUser,
+          events: events.ephemeral,
         );
   }
 
@@ -385,10 +293,10 @@ class Room implements drift.Insertable<Room> {
   /// Find details of room based on state events
   /// follows spec naming priority and thumbnail downloading
   Room fromStateEvents({
-    bool? invite,
-    bool? limited,
     required User currentUser,
     required List<Event> events,
+    bool? invite,
+    bool? limited,
     List<Reaction>? reactions,
     List<Redaction>? redactions,
     LastUpdateType lastUpdateType = LastUpdateType.Message,
@@ -402,7 +310,7 @@ class Room implements drift.Insertable<Room> {
     int? lastUpdate = this.lastUpdate;
     int namePriority = this.namePriority;
 
-    final Map<String, User> usersAdd = Map.from(usersNew);
+    final Map<String, User> usersAdd = Map.from(usersTEMP);
     Set<String> userIds = Set<String>.from(this.userIds);
     final List<String> userIdsRemove = [];
 
@@ -441,8 +349,7 @@ class Room implements drift.Insertable<Room> {
             }
             break;
           case 'm.room.avatar':
-            final avatarFile = event.content['thumbnail_file'];
-            if (avatarFile == null) {
+            if (avatarUri == null) {
               avatarUri = event.content['url'];
             }
             break;
@@ -477,7 +384,7 @@ class Room implements drift.Insertable<Room> {
             break;
         }
       } catch (error) {
-        debugPrint('[Room.fromStateEvents] $error ${event.type}');
+        printError('[Room.fromStateEvents] $error ${event.type}');
       }
     }
 
@@ -524,7 +431,6 @@ class Room implements drift.Insertable<Room> {
     return copyWith(
       name: name ?? this.name ?? Strings.labelRoomNameDefault,
       topic: topic ?? this.topic,
-      users: usersAdd,
       direct: direct,
       invite: invite ?? this.invite,
       limited: limited ?? this.limited,
@@ -534,8 +440,7 @@ class Room implements drift.Insertable<Room> {
       lastUpdate: lastUpdate,
       encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
       namePriority: namePriority,
-      reactions: reactions,
-      redactions: redactions,
+      usersTEMP: usersAdd,
     );
   }
 
@@ -546,14 +451,16 @@ class Room implements drift.Insertable<Room> {
   /// outside displaying messages
   Room fromMessageEvents({
     List<Message> messages = const [],
-    String? lastHash,
-    String? prevHash, // previously fetched hash
-    String? nextHash,
+    List<String> existingIds = const [],
+    String? lastBatch,
+    String? prevBatch, // previously fetched batch
+    String? nextBatch,
   }) {
     try {
       bool? limited;
       int lastUpdate = this.lastUpdate;
       final messageIds = this.messageIds;
+      final limitedCurrent = this.limited;
 
       // Converting only message events
       final hasEncrypted = messages.firstWhereOrNull(
@@ -570,22 +477,38 @@ class Room implements drift.Insertable<Room> {
       }
 
       // limited indicates need to fetch additional data for room timelines
-      if (this.limited) {
+      if (limitedCurrent) {
+        // TODO: deprecated - remove along with messageIds
+        // TODO: potentially reimplement, but with batch tokens instead
+        // TODO: consider also using another "existingIds" param instead to prevent
+        // TODO: needing room to have some state value
         // Check to see if the new messages contain those existing in cache
         if (messages.isNotEmpty && messageIds.isNotEmpty) {
           final messageKnown = messageIds.firstWhereOrNull(
             (id) => id == messages[0].id,
           );
 
-          // Set limited to false if they now exist
-          limited = messageKnown != null;
+          // still limited if messages are all unknown / new
+          limited = messageKnown == null;
         }
 
-        // Set limited to false false if
-        // - the oldest hash (lastHash) is non-existant
-        // - the previous hash (most recent) is non-existant
-        // - the oldest hash equals the previously fetched hash
-        if (this.lastHash == null || this.prevHash == null || this.lastHash == this.prevHash) {
+        // current previous batch is equal to the room's historical previous batch
+        if (prevBatch == this.prevBatch) {
+          limited = false;
+        }
+
+        // if the previous batch is the last known batch, skip pulling it
+        if (prevBatch == this.lastBatch) {
+          limited = false;
+        }
+
+        // will be null if no other events are available / batched in the timeline (also "end")
+        if (prevBatch == null) {
+          limited = false;
+        }
+
+        // if a last known batch hasn't been set (full sync is not complete) stop limited pulls
+        if (this.lastBatch == null) {
           limited = false;
         }
       }
@@ -599,22 +522,21 @@ class Room implements drift.Insertable<Room> {
 
       // save messages and unique message id updates
       final messageIdsNew = Set<String>.from(messagesMap.keys);
-      final messagesNew = List<Message>.from(messagesMap.values);
       final messageIdsAll = Set<String>.from(messageIds)..addAll(messageIdsNew);
 
       // Save values to room
       return copyWith(
-        messagesNew: messagesNew,
         messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
         encryptionEnabled: encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate,
         // oldest hash in the timeline
-        lastHash: lastHash ?? this.lastHash ?? prevHash,
+        lastBatch: lastBatch ?? this.lastBatch ?? prevBatch,
+        // TODO: fetchMessages maks this temporarily misassigned
         // most recent prev_batch from the last /sync
-        prevHash: prevHash ?? this.prevHash,
+        prevBatch: prevBatch ?? this.prevBatch,
         // next hash in the timeline
-        nextHash: nextHash ?? this.nextHash,
+        nextBatch: nextBatch ?? nextBatch,
       );
     } catch (error) {
       printError('[fromMessageEvents] $error');
@@ -630,7 +552,7 @@ class Room implements drift.Insertable<Room> {
   }) {
     bool userTyping = false;
     List<String> usersTyping = this.usersTyping;
-    final readReceipts = Map<String, ReadReceipt>.from(this.readReceipts ?? {});
+    final readReceipts = Map<String, ReadReceipt>.from(readReceiptsTEMP ?? {});
 
     try {
       for (final event in events) {
@@ -675,7 +597,7 @@ class Room implements drift.Insertable<Room> {
     return copyWith(
       userTyping: userTyping,
       usersTyping: usersTyping,
-      readReceipts: readReceipts,
+      readReceiptsTEMP: readReceipts,
     );
   }
 
@@ -699,9 +621,9 @@ class Room implements drift.Insertable<Room> {
       worldReadable: drift.Value(worldReadable),
       hidden: drift.Value(hidden),
       archived: drift.Value(archived),
-      lastHash: drift.Value(lastHash),
-      prevHash: drift.Value(prevHash),
-      nextHash: drift.Value(nextHash),
+      lastBatch: drift.Value(lastBatch),
+      prevBatch: drift.Value(prevBatch),
+      nextBatch: drift.Value(nextBatch),
       lastRead: drift.Value(lastRead),
       lastUpdate: drift.Value(lastUpdate),
       totalJoinedUsers: drift.Value(totalJoinedUsers),
@@ -710,7 +632,6 @@ class Room implements drift.Insertable<Room> {
       reply: drift.Value(reply),
       userIds: drift.Value(userIds),
       messageIds: drift.Value(messageIds),
-      reactionIds: drift.Value(reactionIds),
     ).toColumns(nullToAbsent);
   }
 }

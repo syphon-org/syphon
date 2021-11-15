@@ -35,7 +35,7 @@ abstract class Events {
   }
 
   /// Fetch Message Events
-  /// https://matrix.org/docs/spec/client_server/latest#id261
+  /// https://spec.matrix.org/latest/client-server-api/#get_matrixclientv3roomsroomidmessages
   static Future<dynamic> fetchMessageEvents({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
@@ -107,7 +107,8 @@ abstract class Events {
     String? sessionId,
     String? deviceId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.encrypted/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.encrypted/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -188,7 +189,8 @@ abstract class Events {
     String? trxId,
     Map? message,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.message/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.room.message/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -239,7 +241,8 @@ abstract class Events {
     String? messageId,
     String? trxId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.reaction/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/send/m.reaction/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -272,7 +275,8 @@ abstract class Events {
     String? eventId,
     String? trxId,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$trxId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/$trxId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -383,7 +387,7 @@ abstract class Events {
     final Map body = {
       'm.fully_read': readAll ? messageId : lastRead,
       'm.read': messageId,
-      'm.hidden' : hidden,
+      'm.hidden': hidden,
     };
 
     final response = await httpClient.post(

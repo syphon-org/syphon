@@ -36,6 +36,7 @@ class Strings {
   static final titleHomeserverSearch = tr('title-view-homeserver-search');
 
   // Titles (Dialogs)
+  static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
   static final titleDialogEncryption = tr('title-dialog-encryption');
   static final titleDialogTerms = tr('title-dialog-terms');
   static final titleDialogTermsAlpha = tr('title-dialog-terms-alpha');
@@ -167,6 +168,7 @@ class Strings {
   static final contentIntroFinal = tr('content-intro-section-four', args: [Values.appName]);
 
   // Confirmations (use confirm*)
+
   static final confirmInvite = tr('confirm-invite');
   static final confirmInvites = tr('confirm-invite-multiple');
   static final confirmStartChat = tr('confirm-start-chat');
@@ -188,6 +190,8 @@ class Strings {
   static final confirmAlphaWarningAlt = tr('confirm-alpha-warning-alt');
   static final confirmAppTermsOfService = tr('confirm-terms-of-service', args: [Values.appName]);
   static final confirmTermsOfServiceConclusion = tr('confirm-terms-of-service-alt');
+
+  static String confirmLinkout(String url) => tr('confirm-linkout', args: [url]);
 
   static String confirmArchiveRooms({required Iterable<Room> rooms}) => rooms.length == 1
       ? tr('confirm-archive-chat-single', args: ['${rooms.first.name}', Values.appName])

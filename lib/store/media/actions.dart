@@ -196,7 +196,7 @@ ThunkAction<AppState> fetchMedia({
         UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.SUCCESS),
       );
     } catch (error) {
-      debugPrint('[fetchMedia] $mxcUri $error');
+      printError('[fetchMedia] $mxcUri $error');
       store.dispatch(
         UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.FAILURE),
       );

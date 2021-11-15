@@ -7,6 +7,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
@@ -27,7 +28,7 @@ import 'package:syphon/store/user/model.dart';
 /// mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessages({List<Message>? messages}) {
+ThunkAction<AppState> mutateMessages({List<Message>? messages, List<Message>? existing}) {
   return (Store<AppState> store) async {
     final reactions = store.state.eventStore.reactions;
     final redactions = store.state.eventStore.redactions;
@@ -35,7 +36,7 @@ ThunkAction<AppState> mutateMessages({List<Message>? messages}) {
     final revisedMessages = await compute(reviseMessagesThreaded, {
       'reactions': reactions,
       'redactions': redactions,
-      'messages': messages,
+      'messages': (messages ?? []) + (existing ?? []),
     });
 
     return revisedMessages;
@@ -57,7 +58,7 @@ ThunkAction<AppState> mutateMessagesAll() {
       try {
         await store.dispatch(mutateMessagesRoom(room: room));
       } catch (error) {
-        debugPrint('[mutateMessagesAll] error ${room.id} ${error.toString()}');
+        printError('[mutateMessagesAll] error ${room.id} ${error.toString()}');
       }
     }));
   };
@@ -72,8 +73,6 @@ ThunkAction<AppState> mutateMessagesAll() {
 ///
 ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
   return (Store<AppState> store) async {
-    if (room.messagesNew.isEmpty) return;
-
     final messages = store.state.eventStore.messages[room.id];
     final decrypted = store.state.eventStore.messagesDecrypted[room.id];
     final reactions = store.state.eventStore.reactions;
@@ -81,21 +80,26 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
 
     final mutations = [
       compute(reviseMessagesThreaded, {
+        'messages': messages,
         'reactions': reactions,
         'redactions': redactions,
-        'messages': messages,
       })
     ];
 
     if (room.encryptionEnabled) {
       mutations.add(compute(reviseMessagesThreaded, {
+        'messages': decrypted,
         'reactions': reactions,
         'redactions': redactions,
-        'messages': decrypted,
       }));
     }
 
     final messagesLists = await Future.wait(mutations);
+
+    await store.dispatch(addMessages(
+      room: Room(id: room.id),
+      messages: messagesLists[0],
+    ));
 
     if (room.encryptionEnabled) {
       await store.dispatch(addMessagesDecrypted(
@@ -103,11 +107,6 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
         messages: messagesLists[1],
       ));
     }
-
-    await store.dispatch(addMessages(
-      room: Room(id: room.id),
-      messages: messagesLists[0],
-    ));
   };
 }
 
@@ -115,7 +114,9 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
 ThunkAction<AppState> sendMessage({
   required String roomId,
   required Message message,
+  Message? related,
   File? file,
+  bool edit = false,
 }) {
   return (Store<AppState> store) async {
     final room = store.state.roomStore.rooms[roomId]!;
@@ -133,8 +134,10 @@ ThunkAction<AppState> sendMessage({
         tempId: tempId,
         userId: userId,
         message: message,
+        related: related,
         room: room,
         file: file,
+        edit: edit,
       );
 
       if (reply != null && reply.body != null) {
@@ -142,10 +145,12 @@ ThunkAction<AppState> sendMessage({
       }
 
       // Save unsent message to outbox
-      store.dispatch(SaveOutboxMessage(
-        tempId: tempId,
-        pendingMessage: pending,
-      ));
+      if (!edit) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending,
+        ));
+      }
 
       final data = await MatrixApi.sendMessage(
         protocol: store.state.authStore.protocol,
@@ -157,17 +162,23 @@ ThunkAction<AppState> sendMessage({
       );
 
       if (data['errcode'] != null) {
-        store.dispatch(SaveOutboxMessage(
-          tempId: tempId,
-          pendingMessage: pending.copyWith(
-            timestamp: DateTime.now().millisecondsSinceEpoch,
-            pending: false,
-            syncing: false,
-            failed: true,
-          ),
-        ));
+        if (!edit) {
+          store.dispatch(SaveOutboxMessage(
+            tempId: tempId,
+            pendingMessage: pending.copyWith(
+              timestamp: DateTime.now().millisecondsSinceEpoch,
+              pending: false,
+              syncing: false,
+              failed: true,
+            ),
+          ));
+        }
 
         throw data['error'];
+      }
+
+      if (edit) {
+        return true;
       }
 
       // Update sent message with event id but needs

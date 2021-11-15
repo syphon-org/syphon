@@ -11,7 +11,7 @@ part 'model.g.dart';
 /// Message Model
 ///
 /// Allows converting to Json or Database Entity using
-/// JsonSerializable and Moor conversions respectively
+/// JsonSerializable and Drift conversions respectively
 ///
 @JsonSerializable()
 class Message extends Event implements drift.Insertable<Message> {
@@ -50,10 +50,8 @@ class Message extends Event implements drift.Insertable<Message> {
   final String? senderKey; // Curve25519 device key which initiated the session
   final String? deviceId;
   final String? relatedEventId;
-
-  // Ephemeral - helper vars
-  @JsonKey(ignore: true)
-  final List<Message> edits;
+  // References
+  final List<String> editIds;
 
   @JsonKey(ignore: true)
   final List<Reaction> reactions;
@@ -65,6 +63,8 @@ class Message extends Event implements drift.Insertable<Message> {
     String? type,
     String? sender,
     String? stateKey,
+    String? batch,
+    String? prevBatch,
     dynamic content,
     int timestamp = 0,
     this.body,
@@ -87,7 +87,7 @@ class Message extends Event implements drift.Insertable<Message> {
     this.pending = false,
     this.failed = false,
     this.replacement = false,
-    this.edits = const [],
+    this.editIds = const [],
     this.reactions = const [],
   }) : super(
           id: id,
@@ -96,6 +96,8 @@ class Message extends Event implements drift.Insertable<Message> {
           type: type,
           sender: sender,
           stateKey: stateKey,
+          batch: batch,
+          prevBatch: prevBatch,
           timestamp: timestamp,
           content: content,
           data: null,
@@ -108,6 +110,8 @@ class Message extends Event implements drift.Insertable<Message> {
     String? sender,
     String? roomId,
     String? stateKey,
+    String? prevBatch,
+    String? batch,
     dynamic content,
     dynamic data,
     bool? syncing,
@@ -131,7 +135,7 @@ class Message extends Event implements drift.Insertable<Message> {
     String? algorithm,
     String? sessionId,
     String? relatedEventId,
-    edits,
+    List<String>? editIds,
     reactions,
   }) =>
       Message(
@@ -141,6 +145,8 @@ class Message extends Event implements drift.Insertable<Message> {
         sender: sender ?? this.sender,
         roomId: roomId ?? this.roomId,
         stateKey: stateKey ?? this.stateKey,
+        batch: batch ?? this.batch,
+        prevBatch: prevBatch ?? this.prevBatch,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
         body: body ?? this.body,
@@ -162,7 +168,7 @@ class Message extends Event implements drift.Insertable<Message> {
         replacement: replacement ?? this.replacement,
         edited: edited ?? this.edited,
         relatedEventId: relatedEventId ?? this.relatedEventId,
-        edits: edits ?? this.edits,
+        editIds: editIds ?? this.editIds,
         reactions: reactions ?? this.reactions,
       );
 
@@ -176,6 +182,8 @@ class Message extends Event implements drift.Insertable<Message> {
       type: drift.Value(type),
       sender: drift.Value(sender),
       stateKey: drift.Value(stateKey),
+      batch: drift.Value(batch),
+      prevBatch: drift.Value(prevBatch),
       syncing: drift.Value(syncing),
       pending: drift.Value(pending),
       failed: drift.Value(failed),
@@ -196,6 +204,7 @@ class Message extends Event implements drift.Insertable<Message> {
       algorithm: drift.Value(algorithm),
       sessionId: drift.Value(sessionId),
       relatedEventId: drift.Value(relatedEventId),
+      editIds: drift.Value(editIds),
     ).toColumns(nullToAbsent);
   }
 
@@ -217,8 +226,13 @@ class Message extends Event implements drift.Insertable<Message> {
       if (relatesTo != null && relatesTo['rel_type'] == 'm.replace') {
         replacement = true;
         relatedEventId = relatesTo['event_id'];
-        body = content['m.new_content']['body'];
-        msgtype = content['m.new_content']['msgtype'];
+
+        final newContent = content['m.new_content'];
+
+        if (newContent != null) {
+          body = content['m.new_content']['body'];
+          msgtype = content['m.new_content']['msgtype'];
+        }
       }
 
       var info;
@@ -238,6 +252,8 @@ class Message extends Event implements drift.Insertable<Message> {
         typeDecrypted: null,
         sender: event.sender,
         stateKey: event.stateKey,
+        batch: event.batch,
+        prevBatch: event.prevBatch,
         timestamp: event.timestamp,
         content: content,
         body: body,
@@ -270,6 +286,8 @@ class Message extends Event implements drift.Insertable<Message> {
         type: event.type,
         sender: event.sender,
         stateKey: event.stateKey,
+        batch: event.batch,
+        prevBatch: event.prevBatch,
         timestamp: event.timestamp,
         pending: false,
         syncing: false,

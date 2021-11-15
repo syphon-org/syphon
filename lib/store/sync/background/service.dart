@@ -10,11 +10,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/sync/background/parsers.dart';
 import 'package:syphon/store/sync/background/storage.dart';
+import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
 /// Background Sync Service (Android Only)
@@ -32,7 +34,7 @@ class BackgroundSync {
     try {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
-      debugPrint('[BackgroundSync.init] $error');
+      printError('[BackgroundSync.init] $error');
       return false;
     }
   }
@@ -75,7 +77,7 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      debugPrint('[BackgroundSync] $error');
+      printError('[BackgroundSync] $error');
     }
   }
 }
@@ -112,7 +114,7 @@ Future notificationSyncIsolate() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        debugPrint(
+        printDebug(
           '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
         );
         return Future.value(true);
@@ -211,17 +213,29 @@ Future backgroundSyncLoop({
 
     // Run all the rooms at once
     await Future.forEach(rooms.keys, (String roomId) async {
-      final roomData = rooms[roomId];
+      final roomJson = rooms[roomId];
 
-      final room = Room(id: roomId).fromSync(
-        json: roomData,
-        lastSince: nextLastSince,
-        currentUser: User(userId: currentUserId),
+      // Don't parse room if there are no message events found
+      final events = parseEvents(
+        roomJson,
       );
 
-      if (room.messagesNew.isEmpty) {
+      if (events.messages.isEmpty) {
         return;
       }
+
+      final details = parseDetails(
+        roomJson,
+      );
+
+      final room = Room(id: roomId).fromEvents(
+        events: events,
+        currentUser: User(userId: currentUserId),
+        lastSince: lastSince,
+        limited: details.limited,
+        lastBatch: details.lastBatch,
+        prevBatch: details.prevBatch,
+      );
 
       final chatOptions = settings.notificationOptions;
       final hasOptions = chatOptions.containsKey(roomId);
@@ -276,7 +290,7 @@ Future backgroundSyncLoop({
       /// Inbox Style Notifications Only
       ///
       if (settings.styleType == StyleType.Inbox) {
-        for (final message in room.messagesNew) {
+        for (final message in events.messages) {
           final messageBody = parseMessageNotification(
             room: room,
             message: message,
@@ -309,7 +323,7 @@ Future backgroundSyncLoop({
       }
 
       // Run all the room messages at once once room name is confirmed
-      await Future.wait(room.messagesNew.map((message) async {
+      await Future.wait(events.messages.map((message) async {
         final title = parseMessageTitle(
           room: room,
           message: message,

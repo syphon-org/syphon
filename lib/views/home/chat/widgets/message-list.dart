@@ -23,10 +23,13 @@ import 'package:syphon/views/widgets/messages/typing-indicator.dart';
 
 class MessageList extends StatefulWidget {
   final String? roomId;
+
+  final bool editing;
   final bool showAvatars;
   final Message? selectedMessage;
   final ScrollController scrollController;
 
+  final Function? onSendEdit;
   final Function? onSelectReply;
   final void Function({Message? message, User? user, String? userId})? onViewUserDetails;
   final void Function(Message?)? onToggleSelectedMessage;
@@ -36,7 +39,9 @@ class MessageList extends StatefulWidget {
     required this.roomId,
     required this.scrollController,
     this.showAvatars = true,
+    this.editing = false,
     this.selectedMessage,
+    this.onSendEdit,
     this.onSelectReply,
     this.onViewUserDetails,
     this.onToggleSelectedMessage,
@@ -47,7 +52,6 @@ class MessageList extends StatefulWidget {
 }
 
 class MessageListState extends State<MessageList> {
-  MessageListState() : super();
   final TextEditingController controller = TextEditingController();
 
   @protected
@@ -113,11 +117,14 @@ class MessageListState extends State<MessageList> {
                   roomUsers: props.users,
                   typing: props.room.userTyping,
                   usersTyping: props.room.usersTyping,
-                  selectedMessageId: widget.selectedMessage != null ? widget.selectedMessage!.id : null,
+                  selectedMessageId:
+                      widget.selectedMessage != null ? widget.selectedMessage!.id : null,
                 ),
                 ListView.builder(
                   reverse: true,
                   shrinkWrap: true,
+                  // TODO: add padding based on widget height to allow
+                  // TODO: user to always pull down to load regardless of list size
                   padding: EdgeInsets.only(bottom: 0),
                   addRepaintBoundaries: true,
                   addAutomaticKeepAlives: true,
@@ -127,10 +134,13 @@ class MessageListState extends State<MessageList> {
                   itemBuilder: (BuildContext context, int index) {
                     final message = props.messages[index];
                     final lastMessage = index != 0 ? props.messages[index - 1] : null;
-                    final nextMessage = index + 1 < props.messages.length ? props.messages[index + 1] : null;
+                    final nextMessage =
+                        index + 1 < props.messages.length ? props.messages[index + 1] : null;
 
-                    final isLastSender = lastMessage != null && lastMessage.sender == message.sender;
-                    final isNextSender = nextMessage != null && nextMessage.sender == message.sender;
+                    final isLastSender =
+                        lastMessage != null && lastMessage.sender == message.sender;
+                    final isNextSender =
+                        nextMessage != null && nextMessage.sender == message.sender;
                     final isUserSent = props.currentUser.userId == message.sender;
 
                     final selectedMessageId =
@@ -142,6 +152,7 @@ class MessageListState extends State<MessageList> {
 
                     return MessageWidget(
                       message: message,
+                      isEditing: widget.editing,
                       isUserSent: isUserSent,
                       isLastSender: isLastSender,
                       isNextSender: isNextSender,
@@ -153,6 +164,7 @@ class MessageListState extends State<MessageList> {
                       themeType: props.themeType,
                       color: props.chatColorPrimary,
                       timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
+                      onSendEdit: widget.onSendEdit,
                       onSwipe: props.onSelectReply,
                       onPressAvatar: () => widget.onViewUserDetails!(
                         message: message,
