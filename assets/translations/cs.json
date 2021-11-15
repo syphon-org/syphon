@@ -17,7 +17,7 @@
     "label-send-encrypted": "Šipka vpravo naznačující odeslání zprávy",
     "label-send-unencrypted": "Pošlete nezašifrovanou zprávu",
     "warning-deactivate-account-final": "Není možné obnovit účet po jeho odstranění. Okamžitě budete odhlášen ze svého účtu, který se následně stane nedostupným.\n\nToto je poslední varování ohledně deaktivace. Pokud jste si opravdu jistý, stiskněte tlačítko deaktivovat.",
-    "warning-deactivate-account": "TATO AKCE VYMAŽE VÁŠ ÚČET NATRVALO\n\nPo deaktivaci nebude možné se přihlásit ani obnovit vaše data\nProsím, před tímto činem si to důkladně promyslete!",
+    "warning-deactivate-account": "TATO AKCE VYMAŽE VÁŠ ÚČET NATRVALO\n\nPo deaktivaci nebude možné se přihlásit ani obnovit vaše data\nProsíme aby ste si tenhle úkon důkladně promysleli!",
     "confirm-advanced-colors": "Jste si jisti, že chcete použít rozšířený výběr barev?\n\nVýběr stejné barvy\njak je samotné pozadí, vám může zabránit vidět části aplikace!",
     "confirm-encryption-group": "Šifrování chatu je nevratné. Opravdu chcete zašifrovat tento skupinový chat?\n\nUpozorňujeme, že skupinové E2E-šifrování je experimentální a může vést ke ztrátě dat!",
     "confirm-encryption": "Po zapnutí už nepůjde šifrování vypnout. Jste si jisti, že chcete zašifrovat tuto konverzaci?",
@@ -160,5 +160,7 @@
     "confirm-leave-chat-single": "Jste si jistý, že chcete opustit tuto konverzaci \"{}\"?",
     "confirm-leave-chat-single-nonpublic": "Nejedná se o veřejnou konverzaci. Nebudete mít možnost se znovu připojit bez pozvání.",
     "confirm-leave-chat-multi": "Jste si jistý, že chcete opustit {} zvolenou konverzaci?",
-    "confirm-block-user": "Pokud zablokujete {}, nebude nadále možné zobrazit zprávy uživatele a ihned opustíte tuto konverzaci."
+    "confirm-block-user": "Pokud zablokujete {}, nebude nadále možné zobrazit zprávy uživatele a ihned opustíte tuto konverzaci.",
+    "title-device-rename": "Přejmenovat zařízení",
+    "content-dialog-device-rename": "Zadejte nový název, který se bude zobrazovat pro toto zařízení."
 }
