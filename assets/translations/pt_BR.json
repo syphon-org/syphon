@@ -109,10 +109,10 @@
     "semnatics-image-intro": "Usuário relaxado e descansado",
     "label-send-encrypted": "Seta direita solicita para enviar uma mensagem",
     "confirm-terms-of-service": "Este software ({}) é fornecido pelo autor ''como está'' e quaisquer garantias expressas ou implícitas, incluindo, mas não se limitando a, garantias implícitas de comercialização e adequação a um determinado fim são rejeitadas. em nenhuma hipótese o autor será responsável por quaisquer danos diretos, indiretos, incidentais, especiais, exemplares ou consequenciais (incluindo, mas não se limitando a, aquisição de bens ou serviços substitutos; perda de uso, dados ou lucros; ou interrupção de negócios; ou interrupção de negócios) no entanto, causado e sobre qualquer teoria de responsabilidade, seja em contrato, responsabilidade estrita ou delito (incluindo negligência ou outro) decorrente de qualquer forma do uso deste software, mesmo se avisado da possibilidade de tais danos.",
-    "content-sync-interval": "A sincronização funciona enviando uma solicitação de pesquisa longa a um servidor matrix. O intervalo de sincronização não é com que frequência ele irá sincronizar, mas com que frequência ele tentará uma nova solicitação de pesquisa longa.",
+    "content-sync-interval": "A sincronização funciona submetendo um requisito de **poll** para o servidor Matrix. O intervalo de sincronização não é o quão frequentemente será sincronizado, mas sim o quão frequentemente ele tentará um novo requisito de **poll**.",
     "content-intro-section-two-part-three": "onde as\nmensagens são armazenadas",
     "content-intro-section-two-part-two": "privacidade e controle ",
-    "alert-homeserver-invalid": "Este servidor falhou na verificação 'bem conhecida', certifique-se de que o servidor está configurado corretamente",
+    "alert-homeserver-invalid": "Este servidor falhou na verificação 'bem conhecida'. Certifique-se de que o servidor está configurado corretamente.",
     "button-reset-password": "redefinir senha",
     "button-deactivate": "desativar",
     "button-confirm-verification": "confirmar verificação",
@@ -149,5 +149,7 @@
     "button-room-details": "detalhes da sala",
     "button-text-create-group": "Novo grupo",
     "button-text-mark-all-read": "Marcar todos como lidos",
-    "button-text-invite": "Convidar Amigos"
+    "button-text-invite": "Convidar Amigos",
+    "button-text-settings": "Configurações",
+    "button-text-support": "Ajuda"
 }
