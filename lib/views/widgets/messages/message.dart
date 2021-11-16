@@ -232,8 +232,7 @@ class MessageWidget extends StatelessWidget {
 
     final isImage = message.msgtype == MatrixMessageTypes.image;
     final isFile = message.msgtype == MatrixMessageTypes.file;
-    final isMedia = message.url != null;
-    final removePadding = isMedia || (isEditing && selected);
+    final removePadding = isFile || isImage || (isEditing && selected);
 
     var textColor = Colors.white;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
@@ -531,30 +530,46 @@ class MessageWidget extends StatelessWidget {
                                       crossFadeState: isEditing && selected
                                           ? CrossFadeState.showSecond
                                           : CrossFadeState.showFirst,
-                                      firstChild: MarkdownBody(
-                                        data: body.trim(),
-                                        onTapLink: (text, href, title) =>
-                                            onConfirmLink(context, href),
-                                        styleSheet: MarkdownStyleSheet(
-                                          blockquote: TextStyle(
-                                            backgroundColor: bubbleColor,
-                                          ),
-                                          blockquoteDecoration: BoxDecoration(
-                                            color: replyColor,
-                                            borderRadius: const BorderRadius.only(
-                                              //TODO: shape similar to bubbleBorder
-                                              topLeft: Radius.circular(12),
-                                              topRight: Radius.circular(12),
-                                              bottomLeft: Radius.circular(4),
-                                              bottomRight: Radius.circular(4),
+                                      firstChild: GestureDetector(
+                                        onTap: () async{
+                                          if (isFile){
+                                            final media = await MatrixApi.fetchMedia(mediaUri: message.url!);
+
+                                            final tempDir = await getTemporaryDirectory();
+                                            final filePath = '${tempDir.path}/${message.body}';
+
+                                            final File file = File(filePath);
+                                            file.writeAsBytes(media['bodyBytes']);
+
+                                            OpenFile.open(filePath);
+                                          }
+                                        },
+                                        child: MarkdownBody(
+                                          data: body.trim(),
+                                          onTapLink: (text, href, title) =>
+                                              onConfirmLink(context, href),
+                                          styleSheet: MarkdownStyleSheet(
+                                            blockquote: TextStyle(
+                                              backgroundColor: bubbleColor,
                                             ),
-                                          ),
-                                          p: TextStyle(
-                                            color: textColor,
-                                            fontStyle: fontStyle,
-                                            fontWeight: FontWeight.w300,
-                                            fontSize:
-                                                Theme.of(context).textTheme.subtitle2!.fontSize,
+                                            blockquoteDecoration: BoxDecoration(
+                                              color: replyColor,
+                                              borderRadius: const BorderRadius.only(
+                                                //TODO: shape similar to bubbleBorder
+                                                topLeft: Radius.circular(12),
+                                                topRight: Radius.circular(12),
+                                                bottomLeft: Radius.circular(4),
+                                                bottomRight: Radius.circular(4),
+                                              ),
+                                            ),
+                                            p: TextStyle(
+                                              decoration: isFile? TextDecoration.underline : TextDecoration.none,
+                                              color: textColor,
+                                              fontStyle: fontStyle,
+                                              fontWeight: FontWeight.w300,
+                                              fontSize:
+                                              Theme.of(context).textTheme.subtitle2!.fontSize,
+                                            ),
                                           ),
                                         ),
                                       ),
