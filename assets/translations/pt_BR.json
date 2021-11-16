@@ -135,5 +135,6 @@
     "title-dialog-email-requirement": "Requerimento de e-mail",
     "title-verification": "Verificação",
     "header-login": "retome o controle de seus bate-papos",
-    "button-login-sso": "entrar através de terceiros"
+    "button-login-sso": "entrar através de terceiros",
+    "title-dialog-confirm-linkout": "Confirmar a Abertura do Link"
 }
