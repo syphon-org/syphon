@@ -10,19 +10,18 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/parsers.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/sync/actions.dart';
+import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 
@@ -98,97 +97,103 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     await Future.wait(roomData.keys.map((id) async {
       try {
         final Map json = roomData[id] ?? {};
-        Room room = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+        final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+
+        final existing = store.state.eventStore.messages[id];
+        final existingDecrypted = store.state.eventStore.messagesDecrypted[id];
 
         if (json.isEmpty) return;
 
-        // TODO: remove with parsers - parse room and events
-        room = await compute(parseRoom, {
+        final sync = await compute(parseSync, {
           'json': json,
-          'room': room,
+          'room': roomExisting,
           'currentUser': user,
           'lastSince': lastSince,
         });
 
+        // overwrite room with updated one from sync
+        final roomSynced = sync.room;
+
         printInfo(
-          '[syncRooms] ${room.name} full_synced: $synced limited: ${room.limited} total messages: ${room.messageIds.length}',
+          // ignore: prefer_interpolation_to_compose_strings
+          '[syncRooms] ${roomSynced.name} ' +
+              'full_synced: $synced ' +
+              'limited: ${roomSynced.limited} ' +
+              'total messages: ${roomSynced.messageIds.length} ' +
+              'roomPrevBatch: ${roomSynced.prevBatch}',
         );
 
         // update various message mutations and meta data
-        await store.dispatch(setUsers(room.usersNew));
-        await store.dispatch(setReactions(reactions: room.reactions));
-        await store.dispatch(setRedactions(redactions: room.redactions));
-        await store.dispatch(setReceipts(room: room, receipts: room.readReceipts));
-
-        // mutation filters - handles backfilling mutations for old messages
-        await store.dispatch(mutateMessagesRoom(room: room));
+        await store.dispatch(setUsers(sync.users));
+        await store.dispatch(setReactions(reactions: sync.reactions));
+        await store.dispatch(setRedactions(redactions: sync.redactions));
+        await store.dispatch(setReceipts(room: roomSynced, receipts: sync.readReceipts));
 
         // handles editing newly fetched messages
         final messages = await store.dispatch(mutateMessages(
-          messages: room.messagesNew,
+          messages: sync.messages,
+          existing: existing,
         )) as List<Message>;
 
         // update encrypted messages (updating before normal messages prevents flicker)
-        if (room.encryptionEnabled) {
+        if (roomSynced.encryptionEnabled) {
           final decrypted = await store.dispatch(decryptMessages(
-            room,
+            roomSynced,
             messages,
           )) as List<Message>;
 
           // handles editing newly fetched decrypted messages
           final decryptedMutated = await store.dispatch(mutateMessages(
             messages: decrypted,
+            existing: existingDecrypted,
           )) as List<Message>;
 
           await store.dispatch(addMessagesDecrypted(
-            room: room,
+            room: roomSynced,
             messages: decryptedMutated,
-            outbox: room.outbox,
+            outbox: roomSynced.outbox,
           ));
         }
 
         // save normal or encrypted messages
         await store.dispatch(addMessages(
-          room: room,
+          room: roomSynced,
           messages: messages,
-          outbox: room.outbox,
+          outbox: roomSynced.outbox,
         ));
 
-        // TODO: remove with parsers - clear users from parsed room objects
-        room = room.copyWith(
-          outbox: [],
-          reactions: [],
-          redactions: [],
-          messagesNew: [],
-          users: <String, User>{},
-          readReceipts: <String, ReadReceipt>{},
-        );
-
         // update room
-        store.dispatch(SetRoom(room: room));
+        store.dispatch(SetRoom(room: roomSynced));
 
         // fetch avatar if a uri was found
-        if (room.avatarUri != null) {
+        if (roomSynced.avatarUri != null) {
           store.dispatch(fetchMedia(
-            mxcUri: room.avatarUri,
+            mxcUri: roomSynced.avatarUri,
             thumbnail: true,
           ));
         }
 
         // and is not already at the end of the last known batch
-        // the end would be room.prevHash == room.lastHash
+        // the end would be room.prevBatch == room.lastBatch
         // fetch previous messages since last /sync (a gap)
         // determined by the fromSync function of room
-        final roomUpdated = store.state.roomStore.rooms[room.id];
-        if (roomUpdated != null && room.limited) {
-          printWarning('[fetchMessageEvents] ${room.name} LIMITED TRUE - Fetching more messages');
+        final roomUpdated = store.state.roomStore.rooms[roomSynced.id];
+        if (roomUpdated != null && roomUpdated.limited) {
+          printWarning(
+            '[fetchMessageEvents] ${roomUpdated.name} LIMITED TRUE - Fetching more messages',
+          );
+
           store.dispatch(fetchMessageEvents(
-            room: room,
-            from: room.prevHash,
+            room: roomUpdated,
+            from: roomUpdated.prevBatch,
           ));
         }
       } catch (error) {
         printError('[syncRoom] error $id ${error.toString()}');
+
+        // prevents against recursive backfill from bombing attempts at fetching messages
+        final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+        store.dispatch(SetRoom(room: roomExisting.copyWith(limited: false)));
       }
     }));
   };
@@ -232,7 +237,7 @@ ThunkAction<AppState> fetchRoom(
             'homeserver': store.state.authStore.user.homeserver,
             'accessToken': store.state.authStore.user.accessToken,
             'roomId': roomId,
-            'limit': 20,
+            'limit': LOAD_LIMIT,
           },
         );
 
@@ -248,7 +253,8 @@ ThunkAction<AppState> fetchRoom(
           },
           'timeline': {
             'events': messageEvents['chunk'],
-            'prev_batch': messageEvents['from'],
+            'curr_batch': messageEvents['start'],
+            'prev_batch': messageEvents['end'],
           },
         },
       };
@@ -263,7 +269,7 @@ ThunkAction<AppState> fetchRoom(
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      debugPrint('[fetchRoom] $roomId $error');
+      printError('[fetchRoom] $roomId $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
@@ -278,7 +284,7 @@ ThunkAction<AppState> fetchRoom(
 ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
-      debugPrint('[fetchSync] *** starting fetch all rooms *** ');
+      printInfo('[fetchSync] *** starting fetch all rooms *** ');
       final data = await MatrixApi.fetchRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -296,15 +302,16 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
       await Future.wait(joinedRoomsList.map((room) async {
         try {
           await store.dispatch(fetchRoom(room.id, fetchState: syncState));
+          await store.dispatch(fetchRoomMembers(room: room));
         } catch (error) {
-          debugPrint('[fetchRoom(s)] ${room.id} $error');
+          printError('[fetchRoom(s)] ${room.id} $error');
         } finally {
           store.dispatch(UpdateRoom(id: room.id, syncing: false));
         }
       }));
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
-      debugPrint('[fetchRoom(s)] $error');
+      printError('[fetchRoom(s)] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -321,7 +328,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
-      debugPrint('[fetchSync] *** starting fetch direct rooms *** ');
+      printInfo('[fetchSync] *** starting fetch direct rooms *** ');
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -344,11 +351,57 @@ ThunkAction<AppState> fetchDirectRooms() {
         try {
           await store.dispatch(fetchRoom(roomId, direct: true));
         } catch (error) {
-          debugPrint('[fetchDirectRooms] $error');
+          printError('[fetchDirectRooms] $error');
         }
       }));
     } catch (error) {
-      debugPrint('[fetchDirectRooms] $error');
+      printError('[fetchDirectRooms] $error');
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+///
+/// Fetch Room Members
+///
+/// Get a map of all the current members of a room
+///
+ThunkAction<AppState> fetchRoomMembers({
+  required Room room,
+}) {
+  return (Store<AppState> store) async {
+    try {
+      final _room = store.state.roomStore.rooms[room.id]!;
+
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.fetchMembersAll(
+        protocol: store.state.authStore.protocol,
+        accessToken: store.state.authStore.user.accessToken,
+        homeserver: store.state.authStore.user.homeserver,
+        roomId: _room.id,
+      );
+
+      final members = data['joined'] as Map<String, dynamic>;
+
+      await store.dispatch(setUsers(Map.from(members).map(
+        (key, value) => MapEntry(
+          key,
+          User(
+            userId: key,
+            avatarUri: value['avatar_url'],
+            displayName: value['display_name'],
+          ),
+        ),
+      )));
+
+      store.dispatch(SetRoom(
+        room: _room.copyWith(userIds: members.keys.toList()),
+      ));
+    } catch (error) {
+      printError('[updateRoom] $error');
+      return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -408,7 +461,7 @@ ThunkAction<AppState> createRoom({
       );
 
       // generate user invite map to cache recent users
-      room = room.copyWith(users: userInviteMap);
+      room = room.copyWith(usersTEMP: userInviteMap);
 
       if (isDirect) {
         final User directUser = invites[0];
@@ -421,7 +474,7 @@ ThunkAction<AppState> createRoom({
             currentUser.userId!,
           ] as List<String>,
           // ignore: unnecessary_cast
-          users: {
+          usersTEMP: {
             directUser.userId!: directUser,
             currentUser.userId!: currentUser,
           } as Map<String, User>,
@@ -456,32 +509,6 @@ ThunkAction<AppState> createRoom({
       return room?.id;
     } finally {
       await store.dispatch(startSyncObserver());
-      store.dispatch(SetLoading(loading: false));
-    }
-  };
-}
-
-/// Update Room
-///
-/// stop / start the /sync session for this to run,
-/// otherwise it will appear like the room does
-/// not exist for the seconds between the response from
-/// matrix and caching in the app
-ThunkAction<AppState> updateRoom({
-  String? name,
-  String? alias,
-  String? topic,
-  File? avatarFile,
-  String? avatarUri,
-  List<User>? invites,
-  bool isDirect = false,
-  String preset = RoomPresets.private,
-}) {
-  return (Store<AppState> store) async {
-    try {} catch (error) {
-      debugPrint('[updateRoom] $error');
-      return null;
-    } finally {
       store.dispatch(SetLoading(loading: false));
     }
   };
@@ -648,7 +675,7 @@ ThunkAction<AppState> toggleDirectRoom({
       // Refresh room information with toggle enabled
       await store.dispatch(fetchRoom(room.id, direct: enabled));
     } catch (error) {
-      debugPrint('[toggleDirectRoom] $error');
+      printError('[toggleDirectRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -876,7 +903,7 @@ ThunkAction<AppState> removeRoom({Room? room}) {
 
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      debugPrint('[removeRoom] $error');
+      printError('[removeRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -936,7 +963,7 @@ ThunkAction<AppState> archiveRoom({Room? room}) {
     try {
       store.dispatch(AddArchive(roomId: room!.id));
     } catch (error) {
-      debugPrint('[archiveRoom] $error');
+      printError('[archiveRoom] $error');
     }
   };
 }

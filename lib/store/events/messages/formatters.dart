@@ -9,6 +9,7 @@ import 'package:syphon/store/media/converters.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
+///
 /// Format Message Content (Encrypted / Unencrypted)
 ///
 /// A real shame the content properties have to be fundamentally different
@@ -26,8 +27,10 @@ Future<Message> formatMessageContent({
   required String userId,
   required Room room,
   required Message message,
-  File? file,
+  Message? related,
+  bool edit = false,
   EncryptInfo? info = const EncryptInfo(),
+  File? file,
 }) async {
   final formatted = Message(
     id: tempId,
@@ -142,6 +145,21 @@ Future<Message> formatMessageContent({
     case MatrixMessageTypes.text:
     default:
       {
+        if (edit && related != null) {
+          return formatted.copyWith(content: {
+            'body': '* ${message.body}',
+            'msgtype': message.type ?? MatrixMessageTypes.text,
+            'm.new_content': {
+              'body': message.body,
+              'msgtype': MatrixMessageTypes.text,
+            },
+            'm.relates_to': {
+              'event_id': related.id,
+              'rel_type': RelationTypes.replace,
+            }
+          });
+        }
+
         return formatted.copyWith(content: {
           'body': message.body,
           'msgtype': message.type ?? MatrixMessageTypes.text,

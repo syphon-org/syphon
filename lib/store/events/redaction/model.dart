@@ -14,6 +14,8 @@ class Redaction extends Event {
     type,
     sender,
     stateKey,
+    batch,
+    prevBatch,
     timestamp,
     content,
     data,
@@ -25,6 +27,8 @@ class Redaction extends Event {
           type: type,
           sender: sender,
           stateKey: stateKey,
+          batch: batch,
+          prevBatch: prevBatch,
           timestamp: timestamp,
           content: content,
         );
@@ -36,6 +40,8 @@ class Redaction extends Event {
     sender,
     roomId,
     stateKey,
+    batch,
+    prevBatch,
     content,
     timestamp,
     redactId,
@@ -47,6 +53,8 @@ class Redaction extends Event {
         sender: sender ?? this.sender,
         roomId: roomId ?? this.roomId,
         stateKey: stateKey ?? this.stateKey,
+        batch: batch ?? this.batch,
+        prevBatch: prevBatch ?? this.prevBatch,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
         redactId: redactId ?? this.redactId,
@@ -55,8 +63,7 @@ class Redaction extends Event {
 
   @override
   Map<String, dynamic> toJson() => _$RedactionToJson(this);
-  factory Redaction.fromJson(Map<String, dynamic> json) =>
-      _$RedactionFromJson(json);
+  factory Redaction.fromJson(Map<String, dynamic> json) => _$RedactionFromJson(json);
 
   factory Redaction.fromEvent(Event event) {
     return Redaction(
@@ -66,6 +73,8 @@ class Redaction extends Event {
       type: event.type,
       sender: event.sender,
       stateKey: event.stateKey,
+      batch: event.batch,
+      prevBatch: event.prevBatch,
       timestamp: event.timestamp,
       redactId: event.data != null ? event.data['redacts'] : null,
     );

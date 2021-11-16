@@ -35,8 +35,17 @@ import 'package:syphon/views/intro/signup/signup-screen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
 class NavigationService {
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  static String? currentRoute() {
+    String? currentPath;
+    navigatorKey.currentState?.popUntil((route) {
+      currentPath = route.settings.name;
+      return true;
+    });
+
+    return currentPath;
+  }
 
   static Future navigateTo(String routeName) {
     return navigatorKey.currentState!.pushNamed(routeName);
@@ -63,6 +72,7 @@ class Routes {
   static const searchHomeservers = '/search/homeservers';
 
   // Main (Authed)
+  static const root = '/';
   static const home = '/home';
 
   // Search
@@ -107,54 +117,38 @@ class Routes {
 }
 
 class NavigationProvider {
-  static Map<String, Widget Function(BuildContext)> getRoutes() =>
-      <String, WidgetBuilder>{
+  static Map<String, Widget Function(BuildContext)> getRoutes() => <String, WidgetBuilder>{
         Routes.intro: (BuildContext context) => const IntroScreen(),
         Routes.login: (BuildContext context) => const LoginScreen(),
         Routes.signup: (BuildContext context) => const SignupScreen(),
         Routes.forgot: (BuildContext context) => const ForgotPasswordScreen(),
         Routes.reset: (BuildContext context) => const ResetPasswordScreen(),
-        Routes.searchHomeservers: (BuildContext context) =>
-            const SearchHomeserverScreen(),
-        Routes.verification: (BuildContext context) =>
-            const VerificationScreen(),
+        Routes.searchHomeservers: (BuildContext context) => const SearchHomeserverScreen(),
+        Routes.verification: (BuildContext context) => const VerificationScreen(),
         Routes.home: (BuildContext context) => const HomeScreen(),
         Routes.chat: (BuildContext context) => const ChatScreen(),
         Routes.chatDetails: (BuildContext context) => const ChatDetailsScreen(),
-        Routes.chatMediaPreview: (BuildContext context) =>
-            const MediaPreviewScreen(),
-        Routes.messageDetails: (BuildContext context) =>
-            const MessageDetailsScreen(),
-        Routes.chatUsers: (BuildContext context) =>
-            const ChatUsersDetailScreen(),
+        Routes.chatMediaPreview: (BuildContext context) => const MediaPreviewScreen(),
+        Routes.messageDetails: (BuildContext context) => const MessageDetailsScreen(),
+        Routes.chatUsers: (BuildContext context) => const ChatUsersDetailScreen(),
         Routes.searchUsers: (BuildContext context) => const SearchUserScreen(),
         Routes.userDetails: (BuildContext context) => const UserProfileScreen(),
         Routes.userInvite: (BuildContext context) => const InviteUsersScreen(),
         Routes.searchChats: (BuildContext context) => const ChatSearchScreen(),
-        Routes.searchGroups: (BuildContext context) =>
-            const GroupSearchScreen(),
+        Routes.searchGroups: (BuildContext context) => const GroupSearchScreen(),
         Routes.groupCreate: (BuildContext context) => const CreateGroupScreen(),
-        Routes.groupCreatePublic: (BuildContext context) =>
-            const CreatePublicGroupScreen(),
+        Routes.groupCreatePublic: (BuildContext context) => const CreatePublicGroupScreen(),
         Routes.settingsProfile: (BuildContext context) => const ProfileScreen(),
-        Routes.settingsNotifications: (BuildContext context) =>
-            const NotificationSettingsScreen(),
-        Routes.settingsLanguages: (BuildContext context) =>
-            const LanguageSettingsScreen(),
-        Routes.settingsAdvanced: (BuildContext context) =>
-            const AdvancedSettingsScreen(),
-        Routes.settingsStorage: (BuildContext context) =>
-            const StorageSettingsScreen(),
-        Routes.settingsPassword: (BuildContext context) =>
-            const PasswordUpdateScreen(),
+        Routes.settingsNotifications: (BuildContext context) => const NotificationSettingsScreen(),
+        Routes.settingsLanguages: (BuildContext context) => const LanguageSettingsScreen(),
+        Routes.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),
+        Routes.settingsStorage: (BuildContext context) => const StorageSettingsScreen(),
+        Routes.settingsPassword: (BuildContext context) => const PasswordUpdateScreen(),
         Routes.licenses: (BuildContext context) =>
             const LicensePage(applicationName: Values.appName),
-        Routes.settingsPrivacy: (BuildContext context) =>
-            const PrivacySettingsScreen(),
-        Routes.settingsChat: (BuildContext context) =>
-            const ChatsSettingsScreen(),
-        Routes.settingsTheme: (BuildContext context) =>
-            const ThemeSettingsScreen(),
+        Routes.settingsPrivacy: (BuildContext context) => const PrivacySettingsScreen(),
+        Routes.settingsChat: (BuildContext context) => const ChatsSettingsScreen(),
+        Routes.settingsTheme: (BuildContext context) => const ThemeSettingsScreen(),
         Routes.settingsDevices: (BuildContext context) => DevicesScreen(),
         Routes.settings: (BuildContext context) => const SettingsScreen(),
         Routes.settingsBlocked: (BuildContext context) => const BlockedScreen(),

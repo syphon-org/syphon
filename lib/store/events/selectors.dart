@@ -1,13 +1,9 @@
-import 'package:flutter/cupertino.dart';
-import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/user/model.dart';
 
 List<Message> roomMessages(AppState state, String? roomId) {
   final room = state.roomStore.rooms[roomId] ?? Room(id: '');
@@ -66,7 +62,6 @@ List<Message> reviseMessagesThreaded(Map params) {
   final Map<String, Redaction> redactions = params['redactions'];
   final Map<String, List<Reaction>> reactions = params['reactions'];
 
-  httpClient = createClient();
   return reviseMessagesFilter(messages, redactions, reactions);
 }
 
@@ -127,6 +122,12 @@ Map<String, Message?> appendReactions(
   return messages;
 }
 
+/// Replace Edited
+///
+/// Modify the original messsage and append the replacement event ID
+/// to the editIds list. Edits will still be saved as individual messages
+/// in storage, but will be filtered out at the view layer
+///
 Map<String, Message?> replaceEdited(List<Message> messages) {
   final replacements = <Message>[];
 
@@ -145,30 +146,45 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
 
   // sort replacements so they replace each other in order
   // iterate through replacements and modify messages as needed O(M + M)
-  replacements.sort((b, a) => a.timestamp.compareTo(b.timestamp));
+  replacements.sort((b, a) => b.timestamp.compareTo(a.timestamp));
 
   for (final Message messageEdited in replacements) {
-    final messageIdOriginal = messageEdited.relatedEventId!;
-    final messageOriginal = messagesMap[messageIdOriginal];
+    final relatedEventId = messageEdited.relatedEventId!;
+    final messageOriginal = messagesMap[relatedEventId];
 
     if (messageOriginal != null) {
       final validEdit = messageEdited.sender == messageOriginal.sender;
 
       if (validEdit) {
-        messagesMap[messageIdOriginal] = messageOriginal.copyWith(
+        messagesMap[relatedEventId] = messageOriginal.copyWith(
           edited: true,
           body: messageEdited.body,
           msgtype: messageEdited.msgtype,
-          edits: [messageOriginal, ...messageOriginal.edits],
+          editIds: [messageEdited.id!, ...messageOriginal.editIds],
         );
       }
     }
-
-    // remove replacements from the returned messages
-    messagesMap.remove(messageEdited.id);
   }
 
   return messagesMap;
+}
+
+///
+Message? selectOldestMessage(List<Message> messages, {List<Message>? decrypted}) {
+  if (messages.isEmpty) {
+    return null;
+  }
+
+  final Message oldestMessage = messages.fold(
+    messages.last,
+    (oldest, msg) => msg.timestamp < oldest.timestamp ? msg : oldest,
+  );
+
+  if (decrypted != null && decrypted.isNotEmpty) {
+    return decrypted.firstWhere((msg) => msg.id == oldestMessage.id, orElse: () => oldestMessage);
+  }
+
+  return oldestMessage;
 }
 
 Message? latestMessage(List<Message> messages, {Room? room, List<Message>? decrypted}) {

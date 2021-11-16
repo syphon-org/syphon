@@ -113,8 +113,9 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
     case SetReadReceipts:
+      final _action = action as SetReadReceipts;
       return state.copyWith(
-        readReceipts: action.readReceipts,
+        readReceipts: _action.readReceipts,
       );
     case ToggleMembershipEvents:
       return state.copyWith(

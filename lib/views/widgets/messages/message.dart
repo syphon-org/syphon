@@ -18,8 +18,11 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
+import 'package:syphon/views/widgets/input/text-field-edit.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MessageWidget extends StatelessWidget {
   const MessageWidget({
@@ -29,6 +32,7 @@ class MessageWidget extends StatelessWidget {
     this.messageOnly = false,
     this.isLastSender = false,
     this.isNextSender = false,
+    this.isEditing = false,
     this.lastRead = 0,
     this.selectedMessageId,
     this.avatarUri,
@@ -37,6 +41,7 @@ class MessageWidget extends StatelessWidget {
     this.fontSize = 14.0,
     this.timeFormat = '12hr',
     this.color,
+    this.onSendEdit,
     this.onLongPress,
     this.onPressAvatar,
     this.onInputReaction,
@@ -44,31 +49,31 @@ class MessageWidget extends StatelessWidget {
     this.onSwipe,
   }) : super(key: key);
 
-  final Message message;
-  final ThemeType themeType;
-  final int lastRead;
-  final double fontSize;
+  final bool messageOnly;
   final bool isLastSender;
   final bool isNextSender;
   final bool isUserSent;
-  final bool messageOnly;
+  final bool isEditing;
+
+  final int lastRead;
+  final double fontSize;
   final String timeFormat;
   final String? avatarUri;
   final String? selectedMessageId;
   final String? displayName;
   final Color? color;
 
+  final Message message;
+  final ThemeType themeType;
+
   final Function? onSwipe;
+  final Function? onSendEdit;
   final Function? onPressAvatar;
   final Function? onInputReaction;
   final Function? onToggleReaction;
   final void Function(Message)? onLongPress;
 
-  @protected
-  Widget buildReactions(
-    BuildContext context,
-    MainAxisAlignment alignment,
-  ) {
+  buildReactions(BuildContext context, MainAxisAlignment alignment) {
     final reactionsMap = message.reactions.fold<Map<String, int>>(
       {},
       (mapped, reaction) => mapped
@@ -143,12 +148,7 @@ class MessageWidget extends StatelessWidget {
     );
   }
 
-  @protected
-  Widget buildReactionsInput(
-    BuildContext context,
-    MainAxisAlignment alignment,
-    bool isUserSent,
-  ) {
+  buildReactionsInput(BuildContext context, MainAxisAlignment alignment, bool isUserSent) {
     final buildEmojiButton = GestureDetector(
       onTap: () {
         if (onInputReaction != null) {
@@ -198,6 +198,28 @@ class MessageWidget extends StatelessWidget {
     }
   }
 
+  onConfirmLink(BuildContext context, String? url) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.titleDialogConfirmLinkout.capitalize(),
+        content: Strings.confirmLinkout(url!),
+        confirmStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+
+          if (await canLaunch(url)) {
+            return launch(url, forceSafariVC: false);
+          } else {
+            throw 'Could not launch $url';
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final message = this.message;
@@ -210,6 +232,8 @@ class MessageWidget extends StatelessWidget {
 
     final isImage = message.msgtype == MatrixMessageTypes.image;
     final isFile = message.msgtype == MatrixMessageTypes.file;
+    final isMedia = message.url != null;
+    final removePadding = isMedia || (isEditing && selected);
 
     var textColor = Colors.white;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
@@ -431,8 +455,10 @@ class MessageWidget extends StatelessWidget {
                                     !isImage ? double.infinity : Dimensions.mediaSizeMaxMessage,
                               ),
                               padding: EdgeInsets.only(
-                                left: isImage ? 0 : 12, // make an image span the message width
-                                right: isImage ? 0 : 12, // make an image span the message width
+                                // make an image span the message width
+                                left: removePadding ? 0 : 12,
+                                // make an image span the message width
+                                right: removePadding ? 0 : 12,
                                 top: isImage && !showSender ? 0 : 8,
                                 bottom: isImage ? 12 : 8,
                               ),
@@ -500,48 +526,51 @@ class MessageWidget extends StatelessWidget {
                                       left: isImage ? 12 : 0,
                                       right: isImage ? 12 : 0,
                                     ),
-                                    child: GestureDetector(
-                                        onTap: () async{
-                                           if (isFile){
-                                            final media = await MatrixApi.fetchMedia(mediaUri: message.url!);
-
-                                            final tempDir = await getTemporaryDirectory();
-                                            final filePath = '${tempDir.path}/${message.body}';
-
-                                            final File file = File(filePath);
-                                            file.writeAsBytes(media['bodyBytes']);
-
-                                            OpenFile.open(filePath);
-                                           }
-                                         },
-                                        child: MarkdownBody(
-                                          data: body.trim(),
-                                          styleSheet: MarkdownStyleSheet(
-                                            blockquote: TextStyle(
-                                              backgroundColor: bubbleColor,
-                                            ),
+                                    child: AnimatedCrossFade(
+                                      duration: const Duration(milliseconds: 150),
+                                      crossFadeState: isEditing && selected
+                                          ? CrossFadeState.showSecond
+                                          : CrossFadeState.showFirst,
+                                      firstChild: MarkdownBody(
+                                        data: body.trim(),
+                                        onTapLink: (text, href, title) =>
+                                            onConfirmLink(context, href),
+                                        styleSheet: MarkdownStyleSheet(
+                                          blockquote: TextStyle(
+                                            backgroundColor: bubbleColor,
+                                          ),
                                           blockquoteDecoration: BoxDecoration(
-                                          color: replyColor,
-                                          borderRadius: const BorderRadius.only(
-                                            //TODO: shape similar to bubbleBorder
-                                            topLeft: Radius.circular(12),
-                                            topRight: Radius.circular(12),
-                                            bottomLeft: Radius.circular(4),
-                                            bottomRight: Radius.circular(4),
+                                            color: replyColor,
+                                            borderRadius: const BorderRadius.only(
+                                              //TODO: shape similar to bubbleBorder
+                                              topLeft: Radius.circular(12),
+                                              topRight: Radius.circular(12),
+                                              bottomLeft: Radius.circular(4),
+                                              bottomRight: Radius.circular(4),
+                                            ),
+                                          ),
+                                          p: TextStyle(
+                                            color: textColor,
+                                            fontStyle: fontStyle,
+                                            fontWeight: FontWeight.w300,
+                                            fontSize:
+                                                Theme.of(context).textTheme.subtitle2!.fontSize,
                                           ),
                                         ),
-                                        p: TextStyle(
-                                          decoration: isFile? TextDecoration.underline : TextDecoration.none,
-                                          color: textColor,
-                                          fontStyle: fontStyle,
-                                          fontWeight: FontWeight.w300,
-                                          fontSize: Theme.of(context).textTheme.subtitle2!.fontSize,
+                                      ),
+                                      secondChild: Padding(
+                                        padding: EdgeInsets.only(left: 12, right: 12),
+                                        child: IntrinsicWidth(
+                                          child: TextFieldInline(
+                                            body: body,
+                                            onEdit: (text) => onSendEdit!(text, message),
+                                          ),
                                         ),
                                       )
-                                  ,))),
+                                  ,)),
                                   Padding(
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: isImage ? 12 : 0,
+                                      horizontal: removePadding ? 12 : 0,
                                     ),
                                     child: Flex(
                                       /// *** Message Status Row ***

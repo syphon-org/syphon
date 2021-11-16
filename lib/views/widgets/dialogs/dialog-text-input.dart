@@ -12,6 +12,7 @@ class DialogTextInput extends StatefulWidget {
     Key? key,
     this.title = '',
     this.content = '',
+    this.label = '',
     this.loading = false,
     this.valid = false,
     this.keyboardType = TextInputType.text,
@@ -24,6 +25,7 @@ class DialogTextInput extends StatefulWidget {
 
   final String title;
   final String content;
+  final String label;
   final bool loading;
   final bool valid;
   final TextInputType keyboardType;
@@ -39,15 +41,26 @@ class DialogTextInput extends StatefulWidget {
 }
 
 class _DialogTextInputState extends State<DialogTextInput> {
-  final editingControllerDefault = TextEditingController();
+  bool isEmpty = true;
+  TextEditingController editingControllerDefault = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    editingControllerDefault.addListener(() {
+      setState(() {
+        isEmpty = editingControllerDefault.text.isEmpty;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double defaultWidgetScaling = width * 0.725;
 
-    final editingController =
-        widget.editingController ?? editingControllerDefault;
+    final editingController = widget.editingController ?? editingControllerDefault;
 
     return SimpleDialog(
       shape: RoundedRectangleBorder(
@@ -104,18 +117,17 @@ class _DialogTextInputState extends State<DialogTextInput> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
-                  labelText: 'seconds',
+                  labelText: widget.label,
                 ),
-                onChanged: (seconds) {
+                onChanged: (value) {
                   if (widget.onChange != null) {
-                    widget.onChange!(seconds);
+                    widget.onChange!(value);
                   }
                 },
-                onSubmitted: (seconds) {
+                onSubmitted: (value) {
                   if (widget.onConfirm != null) {
-                    widget.onConfirm!(seconds);
+                    widget.onConfirm!(value);
                   }
-                  Navigator.of(context).pop();
                 },
               ),
             ),
@@ -131,23 +143,18 @@ class _DialogTextInputState extends State<DialogTextInput> {
                       if (widget.onCancel != null) {
                         widget.onCancel!();
                       }
-                      Navigator.of(context).pop();
                     },
               child: Text(Strings.buttonCancel),
             ),
             TextButton(
-              onPressed: !editingController.value.text.isNotEmpty
+              onPressed: isEmpty
                   ? null
                   : () {
-                      if (widget.onConfirm != null &&
-                          editingController.value.text.isNotEmpty) {
-                        widget.onConfirm!(editingController.value.text);
+                      if (widget.onConfirm != null && !isEmpty) {
+                        widget.onConfirm!(editingController.text);
                       }
-                      Navigator.of(context).pop();
                     },
-              child: !widget.loading
-                  ? Text(Strings.buttonSave)
-                  : LoadingIndicator(size: 16),
+              child: !widget.loading ? Text(Strings.buttonSave) : LoadingIndicator(size: 16),
             ),
           ],
         )

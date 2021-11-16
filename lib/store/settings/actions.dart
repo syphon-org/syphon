@@ -4,6 +4,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
@@ -110,7 +111,6 @@ class SetPollTimeout {
   });
 }
 
-
 class ToggleEnterSend {}
 
 class ToggleAutoDownload {}
@@ -156,7 +156,7 @@ ThunkAction<AppState> fetchDevices() {
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
-      debugPrint('[fetchRooms] error: $error');
+      printError('[fetchRooms] error: $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -225,6 +225,44 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
         error: error,
         message: error.toString(),
         origin: 'deleteDevice(s)',
+      ));
+    } finally {
+      store.dispatch(SetLoading(loading: false));
+    }
+  };
+}
+
+/// Rename a single device
+ThunkAction<AppState> renameDevice({String? deviceId, String? displayName, bool? disableLoading}) {
+  return (Store<AppState> store) async {
+    try {
+      store.dispatch(SetLoading(loading: true));
+
+      final data = await MatrixApi.renameDevice(
+        protocol: store.state.authStore.protocol,
+        homeserver: store.state.authStore.user.homeserver,
+        accessToken: store.state.authStore.user.accessToken,
+        deviceId: deviceId,
+        displayName: displayName,
+      );
+
+      if (data['errcode'] != null) {
+        throw data['error'];
+      }
+
+      // If a flow exists, more authentication is needed before
+      // attempting to delete again
+      if (data['flows'] != null) {
+        return store.dispatch(setInteractiveAuths(auths: data));
+      }
+
+      store.dispatch(fetchDevices());
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        error: error,
+        message: error.toString(),
+        origin: 'renameDevice',
       ));
     } finally {
       store.dispatch(SetLoading(loading: false));

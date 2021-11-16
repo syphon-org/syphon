@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -47,13 +45,6 @@ extension RoomQueries on StorageDatabase {
   Future<List<Room>> selectRoomsArchived({int offset = 0, int limit = 0}) {
     return (select(rooms)..where((tbl) => tbl.archived.equals(true))).get();
   }
-
-  // Future<List<Room>> searchRooms(String text, {int offset = 0, int limit = 25}) {
-  //   return (select(rooms)
-  //         ..where((tbl) => tbl.topic.like('%$text%'))
-  //         ..limit(25, offset: offset))
-  //       .get();
-  // }
 }
 
 Future saveRoom(

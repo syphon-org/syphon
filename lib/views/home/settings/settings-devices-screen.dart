@@ -12,6 +12,7 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class DevicesScreen extends StatefulWidget {
@@ -107,7 +108,12 @@ class DeviceViewState extends State<DevicesScreen> {
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Rename Device',
           color: Colors.white,
-          onPressed: selectedDevices!.length != 1 ? null : () {},
+          onPressed: selectedDevices!.length != 1
+              ? null
+              : () => props!.onRenameDevice(
+                    context,
+                    selectedDevices![0]
+                  ),
         ),
         IconButton(
           icon: Icon(Icons.delete),
@@ -154,10 +160,9 @@ class DeviceViewState extends State<DevicesScreen> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final sectionBackgroundColor =
-              Theme.of(context).brightness == Brightness.dark
-                  ? const Color(Colours.blackDefault)
-                  : const Color(Colours.whiteDefault);
+          final sectionBackgroundColor = Theme.of(context).brightness == Brightness.dark
+              ? const Color(Colours.blackDefault)
+              : const Color(Colours.whiteDefault);
 
           Widget currentAppBar = AppBarNormal(title: Strings.titleDevices);
 
@@ -187,12 +192,9 @@ class DeviceViewState extends State<DevicesScreen> {
                       Color? iconColor;
                       Color? backgroundColor;
                       IconData deviceTypeIcon = Icons.phone_android;
-                      TextStyle textStyle = Theme.of(context)
-                          .textTheme
-                          .caption!
-                          .copyWith(fontSize: 12);
-                      final bool isCurrentDevice =
-                          props.currentDeviceId == device.deviceId;
+                      TextStyle textStyle =
+                          Theme.of(context).textTheme.caption!.copyWith(fontSize: 12);
+                      final bool isCurrentDevice = props.currentDeviceId == device.deviceId;
 
                       if (device.displayName!.contains('Firefox') ||
                           device.displayName!.contains('Mac')) {
@@ -201,8 +203,7 @@ class DeviceViewState extends State<DevicesScreen> {
                         deviceTypeIcon = Icons.phone_iphone;
                       }
 
-                      if (selectedDevices != null &&
-                          selectedDevices!.contains(device)) {
+                      if (selectedDevices != null && selectedDevices!.contains(device)) {
                         backgroundColor = Colours.hashedColor(device.deviceId);
                         backgroundColor = Color(Colours.greyDefault);
                         textStyle = textStyle.copyWith(color: Colors.white);
@@ -283,6 +284,7 @@ class _Props extends Equatable {
 
   final Function onFetchDevices;
   final Function onDeleteDevices;
+  final Function onRenameDevice;
 
   const _Props({
     required this.loading,
@@ -290,6 +292,7 @@ class _Props extends Equatable {
     required this.currentDeviceId,
     required this.onFetchDevices,
     required this.onDeleteDevices,
+    required this.onRenameDevice,
   });
 
   @override
@@ -305,8 +308,7 @@ class _Props extends Equatable {
         onDeleteDevices: (BuildContext context, List<Device> devices) async {
           if (devices.isEmpty) return;
 
-          final List<String?> deviceIds =
-              devices.map((device) => device.deviceId).toList();
+          final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
 
           await store.dispatch(deleteDevices(deviceIds: deviceIds));
 
@@ -319,8 +321,7 @@ class _Props extends Equatable {
                 title: Strings.titleConfirmPassword,
                 content: Strings.contentDeleteDevices,
                 onConfirm: () async {
-                  final List<String?> deviceIds =
-                      devices.map((device) => device.deviceId).toList();
+                  final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
 
                   await store.dispatch(deleteDevices(deviceIds: deviceIds));
 
@@ -337,6 +338,25 @@ class _Props extends Equatable {
         },
         onFetchDevices: () {
           store.dispatch(fetchDevices());
+        },
+        onRenameDevice: (BuildContext context, Device device) async {
+          showDialog(
+            context: context,
+            builder: (dialogContext) => DialogTextInput(
+              title: Strings.titleRenameDevice,
+              content: Strings.contentRenameDevice,
+              label: device.displayName ?? '',
+              onConfirm: (String newDisplayName) async {
+                await store.dispatch(renameDevice(deviceId: device.deviceId, displayName: newDisplayName));
+                store.dispatch(resetInteractiveAuth());
+                Navigator.of(dialogContext).pop();
+              },
+              onCancel: () async {
+                store.dispatch(resetInteractiveAuth());
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          );
         },
       );
 }

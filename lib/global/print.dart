@@ -7,23 +7,23 @@ typedef PrintDebug = void Function(String message, {String title});
 typedef PrintError = void Function(String message, {String? title});
 
 void _printInfo(String content, {String? title}) {
-  final body = title != null ? '[$title] $content' : content;
-  print(body);
+  final output = title != null ? '[$title] $content' : content;
+  print(output);
 }
 
 void _printWarning(String content, {String? title}) {
-  final body = title != null ? '[$title] $content' : content;
-  print(body);
+  final output = title != null ? '[$title] $content' : content;
+  print(output);
 }
 
 void _printError(String content, {String? title}) {
-  final body = title != null ? '[$title] $content' : content;
-  print(body);
+  final output = title != null ? '[$title] $content' : content;
+  print(output);
 }
 
 void _printDebug(String content, {String? title}) {
-  final body = title != null ? '[$title] $content' : content;
-  debugPrint(body);
+  final output = title != null ? '[$title] $content' : content;
+  debugPrint(output);
 }
 
 void _printJson(Map? jsonMap) {
