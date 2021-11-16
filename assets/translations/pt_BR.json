@@ -148,5 +148,6 @@
     "button-select-all": "selecionar todos",
     "button-room-details": "detalhes da sala",
     "button-text-create-group": "Novo grupo",
-    "button-text-mark-all-read": "Marcar Todos Como Lidos"
+    "button-text-mark-all-read": "Marcar Todos Como Lidos",
+    "button-text-invite": "Convidar Amigos"
 }
