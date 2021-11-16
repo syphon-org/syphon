@@ -141,5 +141,11 @@
     "label-back": "Voltar",
     "label-close": "fechar",
     "label-send": "Enviar",
-    "label-download-image": "Carregar Imagem"
+    "label-download-image": "Carregar Imagem",
+    "button-leave-chat": "sair do chat",
+    "button-delete-chat": "deletar chat",
+    "button-archive-chat": "arquivar chat",
+    "button-select-all": "selecionar todos",
+    "button-room-details": "detalhes da sala",
+    "button-text-create-group": "Novo Grupo"
 }
