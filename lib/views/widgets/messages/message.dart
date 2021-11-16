@@ -497,9 +497,17 @@ class MessageWidget extends StatelessWidget {
                                       right: isImage ? 12 : 0,
                                     ),
                                     child: GestureDetector(
-                                        onTap: (){
+                                        onTap: () async{
                                            if (isFile){
+                                            final media = await MatrixApi.fetchMedia(mediaUri: message.url!);
 
+                                            final tempDir = await getTemporaryDirectory();
+                                            final filePath = '${tempDir.path}/${message.body}';
+
+                                            final File file = File(filePath);
+                                            file.writeAsBytes(media['bodyBytes']);
+
+                                            OpenFile.open(filePath);
                                            }
                                          },
                                         child: MarkdownBody(
