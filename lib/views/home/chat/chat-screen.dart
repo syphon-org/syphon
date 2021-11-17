@@ -558,7 +558,11 @@ class ChatScreenState extends State<ChatScreen> {
         ),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
-          final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+          final viewInsets = EdgeInsets.fromWindowPadding(
+            WidgetsBinding.instance!.window.viewInsets,
+            WidgetsBinding.instance!.window.devicePixelRatio,
+          );
+          final keyboardInset = viewInsets.bottom;
           final closedInputPadding =
               !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
           final isScrolling = messagesController.hasClients && messagesController.offset != 0;

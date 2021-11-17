@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:drift/drift.dart' as drift;
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';

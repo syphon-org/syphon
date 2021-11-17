@@ -50,7 +50,6 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
     try {
       final firstImage = params.mediaList.first;
 
-      print(firstImage.path);
       setState(() {
         currentImage = firstImage;
       });
@@ -76,6 +75,9 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
         ),
         builder: (context, props) {
           final encryptionEnabled = props.room.encryptionEnabled;
+          final height = MediaQuery.of(context).size.height;
+          final imageHeight = height * 0.7;
+          final sending = props.room.sending && props.room.outbox.isNotEmpty;
 
           return Scaffold(
             appBar: AppBarNormal(
@@ -91,14 +93,16 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
             body: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(),
-                // ignore: prefer_if_elements_to_conditional_expressions
-                currentImage == null
-                    ? Container()
-                    : Image.file(
-                        currentImage!,
-                        fit: BoxFit.contain,
-                      ),
+                Container(
+                  padding: EdgeInsets.only(top: 24),
+                  child: currentImage == null
+                      ? Container()
+                      : Image.file(
+                          currentImage!,
+                          height: imageHeight,
+                          fit: BoxFit.contain,
+                        ),
+                ),
                 Padding(
                   padding: EdgeInsets.only(top: 24, right: 12, bottom: 32),
                   child: Row(
@@ -127,12 +131,12 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                           label: Strings.labelSendEncrypted,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(48),
-                            onTap: props.room.sending ? null : () => onConfirm(props),
+                            onTap: sending ? null : () => onConfirm(props),
                             child: CircleAvatar(
-                              backgroundColor: props.room.sending
+                              backgroundColor: sending
                                   ? Color(Colours.greyDisabled)
                                   : Theme.of(context).colorScheme.primary,
-                              child: props.room.sending
+                              child: sending
                                   ? Padding(
                                       padding: EdgeInsets.all(4),
                                       child: CircularProgressIndicator(
