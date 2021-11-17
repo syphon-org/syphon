@@ -207,7 +207,8 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
         storage: storage,
       );
 
-      final currentUserIds = messages[room.id]!.map((message) => message.sender ?? '').toList();
+      final currentUserIds =
+          (messages[room.id] ?? []).map((message) => message.sender ?? '').toList();
 
       userIds.addAll(currentUserIds);
 

@@ -131,6 +131,11 @@ class StorageDatabase extends _$StorageDatabase {
           printInfo('[MIGRATION] VERSION $from to $to');
           if (from == 4) {
             await m.addColumn(messages, messages.editIds);
+            await m.addColumn(messages, messages.batch);
+            await m.addColumn(messages, messages.prevBatch);
+            await m.renameColumn(rooms, 'last_hash', rooms.lastBatch);
+            await m.renameColumn(rooms, 'prev_hash', rooms.prevBatch);
+            await m.renameColumn(rooms, 'next_hash', rooms.nextBatch);
           }
         },
       );
