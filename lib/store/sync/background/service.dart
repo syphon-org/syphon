@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:android_alarm_manager/android_alarm_manager.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
@@ -79,6 +78,60 @@ class BackgroundSync {
     } catch (error) {
       printError('[BackgroundSync] $error');
     }
+  }
+}
+
+///
+/// Foreground Sync Job (TESTING ONLY)
+///
+/// Fetches data from matrix in background and displays
+/// notifications without needing google play services
+///
+/// NOTE: https://github.com/flutter/flutter/issues/32164
+///
+Future notificationSyncTEST() async {
+  try {
+    // Init notifiations for background service and new messages/events
+    final pluginInstance = await initNotifications(
+      onSelectNotification: (String? payload) {
+        printDebug(
+          '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
+        );
+        return Future.value(true);
+      },
+    );
+    String? protocol;
+    String? homeserver;
+    String? accessToken;
+    String? lastSince;
+    String? userId;
+
+    try {
+      final secureStorage = FlutterSecureStorage();
+      userId = await secureStorage.read(key: Cache.userIdKey);
+      protocol = await secureStorage.read(key: Cache.protocolKey);
+      lastSince = await secureStorage.read(key: Cache.lastSinceKey);
+      homeserver = await secureStorage.read(key: Cache.homeserverKey);
+      accessToken = await secureStorage.read(key: Cache.accessTokenKey);
+    } catch (error) {
+      print('[notificationSyncIsolate] $error');
+    }
+
+    final Map<String, String> roomNames = await loadRoomNames();
+
+    await backgroundSyncLoop(
+      pluginInstance: pluginInstance!,
+      params: {
+        'protocol': protocol,
+        'homeserver': homeserver,
+        'accessToken': accessToken,
+        'lastSince': lastSince,
+        'userId': userId,
+        'roomNames': roomNames,
+      },
+    );
+  } catch (error) {
+    printError('[notificationSyncTEST] $error');
   }
 }
 
@@ -206,14 +259,20 @@ Future backgroundSyncLoop({
     saveLastSince(lastSince: nextLastSince);
 
     // Filter each room through the parser
-    final Map<String, dynamic> roomsJoined = data['rooms']['join'];
-    final Map<String, dynamic> roomsInvited = data['rooms']['invite'];
+    final Map<String, dynamic> roomJson = data['rooms'] ?? {};
 
-    final rooms = roomsJoined..addAll(roomsInvited);
+    if (roomJson.isEmpty) {
+      return;
+    }
+
+    final Map<String, dynamic> joinedJson = roomJson['join'] ?? {};
+    final Map<String, dynamic> invitesJson = roomJson['invite'] ?? {};
+
+    final roomsJson = joinedJson..addAll(invitesJson);
 
     // Run all the rooms at once
-    await Future.forEach(rooms.keys, (String roomId) async {
-      final roomJson = rooms[roomId];
+    await Future.forEach(roomsJson.keys, (String roomId) async {
+      final roomJson = roomsJson[roomId];
 
       // Don't parse room if there are no message events found
       final events = parseEvents(

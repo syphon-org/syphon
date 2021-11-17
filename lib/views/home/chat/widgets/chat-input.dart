@@ -113,7 +113,11 @@ class ChatInputState extends State<ChatInput> {
   @override
   void didUpdateWidget(covariant ChatInput oldWidget) {
     super.didUpdateWidget(oldWidget);
-    keyboardHeight = widget.inset > 0 ? widget.inset : keyboardHeight;
+    if (widget.inset != keyboardHeight && widget.inset > keyboardHeight) {
+      setState(() {
+        keyboardHeight = widget.inset;
+      });
+    }
   }
 
   @override
@@ -248,11 +252,11 @@ class ChatInputState extends State<ChatInput> {
           // dynamic dimensions
           final double messageInputWidth = width - 72;
           final bool replying = widget.quotable != null && widget.quotable!.sender != null;
-          final double maxInputHeight = replying ? height * 0.45 : height * 0.5;
-          final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight + 4 : height * 0.38;
+          final double maxInputHeight = replying ? height * 0.45 : height * 0.65;
+          final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight : height * 0.38;
 
           final imageHeight =
-              imageWidth > maxMediaHeight ? maxMediaHeight : imageWidth; // 2 images in view
+              keyboardHeight > 0 ? maxMediaHeight * 0.65 : imageWidth; // 2 images in view
 
           final isSendable = sendable && !widget.sending;
 
@@ -475,7 +479,7 @@ class ChatInputState extends State<ChatInput> {
                 maintainState: false,
                 maintainAnimation: false,
                 child: Container(
-                  padding: EdgeInsets.only(top: 8),
+                  padding: EdgeInsets.only(top: 4),
                   constraints: BoxConstraints(
                     maxHeight: maxMediaHeight, // whole media field max height
                   ),

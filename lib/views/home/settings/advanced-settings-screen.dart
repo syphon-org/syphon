@@ -3,11 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -100,6 +102,18 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     },
                     contentPadding: Dimensions.listPadding,
                     title: Text('Test Notifications', style: Theme.of(context).textTheme.subtitle1),
+                  ),
+                ),
+                Visibility(
+                  visible: DEBUG_MODE,
+                  child: ListTile(
+                    dense: true,
+                    onTap: () async {
+                      await notificationSyncTEST();
+                    },
+                    contentPadding: Dimensions.listPadding,
+                    title: Text('Test Background Sync Loop',
+                        style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 Visibility(
