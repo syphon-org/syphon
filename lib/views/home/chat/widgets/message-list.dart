@@ -151,6 +151,7 @@ class MessageListState extends State<MessageList> {
                     final displayName = user?.displayName;
 
                     return MessageWidget(
+                      key: Key(message.id ?? ''),
                       message: message,
                       isEditing: widget.editing,
                       isUserSent: isUserSent,
