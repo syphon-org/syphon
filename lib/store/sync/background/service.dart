@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:android_alarm_manager/android_alarm_manager.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/cache/index.dart';
@@ -83,7 +82,7 @@ class BackgroundSync {
 }
 
 ///
-/// Background Sync Job (Android Only)
+/// Foreground Sync Job (TESTING ONLY)
 ///
 /// Fetches data from matrix in background and displays
 /// notifications without needing google play services
