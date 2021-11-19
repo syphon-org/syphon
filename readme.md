@@ -81,7 +81,7 @@ Syphon will always be a not for profit, community driven application.
  
 ## 🌙 Nightlies
 - Nightly dev builds - per pushed commit builds - can be found under our [Gitea Releases](https://git.syphon.org/syphon-org/syphon/releases)
-- Unofficial "community" Windows x64 builds can be found under [@EdGeraghty's fork](https://github.com/EdGeraghty/syphon/releases)
+- Unofficial "community" Windows x64 releases can be found under [@EdGeraghty's fork](https://github.com/EdGeraghty/syphon/releases)
 
 ## 📝 Contributing
 - Instructions can be found under our [contributing.md](./contributing.md). Please fully read the document before beginning to write code or produce any material contribution for Syphon.
@@ -93,8 +93,10 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 
 ### general
 - you'll to do several things to setup the environment for Syphon
-    - install flutter (stable channel for ios/android)
-    - install android studio
+    - install flutter (stable channel for all platforms)
+    - install necessary third party sdks and tooling
+        - ios -> xcode
+        - android -> android studio
     - install cmake version for workstation platform (for olm/megolm)
         - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 
         - [linux](https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh)
