@@ -2,8 +2,8 @@
 
 🔮 New Features:
 - Edit Messages
-- Rename Devices @EdGeraghty
-- Delete Messages @Florian-Sabonchi
+- Rename Devices
+- Delete Messages
 
 🐛 Bug Fixes
 - Cert issues on old devices
