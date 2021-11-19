@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "A privacy-centric Matrix client." "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "syphon" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2021 Syphon. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2021 Syphon Organization. All rights reserved." "\0"
             VALUE "OriginalFilename", "syphon.exe" "\0"
             VALUE "ProductName", "syphon" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
