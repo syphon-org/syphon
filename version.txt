@@ -1,2 +1,2 @@
-versionName=0.2.1
-versionCode=2001
+versionName=0.2.2
+versionCode=2003
