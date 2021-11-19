@@ -10,7 +10,6 @@ import 'package:syphon/views/syphon.dart';
 
 // ignore: avoid_void_async
 void main() async {
-  WidgetsFlutterBinding();
   WidgetsFlutterBinding.ensureInitialized();
 
   // init platform specific code
