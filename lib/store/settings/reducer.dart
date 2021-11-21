@@ -1,5 +1,6 @@
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/settings/http-proxy-settings/actions.dart';
 import './actions.dart';
 import './state.dart';
 
@@ -111,6 +112,10 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
     case ToggleAutoDownload:
       return state.copyWith(
         autoDownloadEnabled: !state.autoDownloadEnabled,
+      );
+    case ToggleProxy:
+      return state.copyWith(
+        httpProxySettings: state.httpProxySettings.copyWith(enabled: !state.httpProxySettings.enabled),
       );
     case SetReadReceipts:
       final _action = action as SetReadReceipts;

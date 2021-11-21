@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -136,6 +138,20 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   title: Text(
                     'Open Source Licenses',
                     style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
+                Visibility(
+                  visible: Platform.isAndroid || Platform.isIOS, //Mobile-only
+                  child: ListTile(
+                    dense: true,
+                    onTap: () {
+                      Navigator.pushNamed(context, Routes.settingsProxy);
+                    },
+                    contentPadding: Dimensions.listPadding,
+                    title: Text(
+                      Strings.listItemSettingsProxy,
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
                   ),
                 ),
                 ListTile(

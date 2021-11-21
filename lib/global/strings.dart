@@ -34,6 +34,8 @@ class Strings {
   static final titleCreateGroupPublic = tr('title-view-create-group-public');
   static final titleEmailRequirement = tr('title-dialog-email-requirement');
   static final titleHomeserverSearch = tr('title-view-homeserver-search');
+  static final titleProxySettings = tr('title-proxy-settings');
+  static final titleUseProxyServer = tr('title-proxy-use-proxy');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -46,6 +48,9 @@ class Strings {
   static final titleRenameDevice = tr('title-device-rename');
   static final titleConfirmDeleteKeys = tr('title-dialog-delete-keys');
   static final titleConfirmEmail = tr('title-confirm-email');
+
+  // Subtitles
+  static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
 
   // Headers
   static final headerIntro = tr('header-intro');
@@ -83,6 +88,9 @@ class Strings {
   static final listItemSettingsNotification = tr('list-item-settings-notification');
   static final listItemSettingsPrivacy = tr('list-item-settings-privacy');
   static final listItemSettingsLogout = tr('list-item-settings-logout');
+  static final listItemSettingsProxy = tr('list-item-settings-proxy');
+  static final listItemSettingsProxyHost = tr('list-item-settings-proxy-host');
+  static final listItemSettingsProxyPort = tr('list-item-settings-proxy-port');
 
   // Buttons
   static final buttonLogin = tr('button-login');

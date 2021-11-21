@@ -550,6 +550,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.0"
+  http_proxy_override:
+    dependency: "direct main"
+    description:
+      name: http_proxy_override
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   image:
     dependency: transitive
     description:
