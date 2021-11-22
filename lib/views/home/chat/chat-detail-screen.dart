@@ -20,12 +20,14 @@ import 'package:syphon/store/settings/notification-settings/options/types.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -46,20 +48,22 @@ class ChatDetailsScreen extends StatefulWidget {
   ChatDetailsState createState() => ChatDetailsState();
 }
 
-class ChatDetailsState extends State<ChatDetailsScreen> {
+class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetailsScreen> {
   ChatDetailsState() : super();
 
   final ScrollController scrollController = ScrollController(
     initialScrollOffset: 0,
   );
 
+  final double headerSize = 54;
+
   double headerOpacity = 1;
-  double headerSize = 54;
   List<User>? usersList;
 
   @override
   void initState() {
     super.initState();
+
     scrollController.addListener(() {
       final height = MediaQuery.of(context).size.height;
       const minOffset = 0;
@@ -89,12 +93,23 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
   }
 
   @override
+  void onMounted() {
+    final store = StoreProvider.of<AppState>(context);
+    final arguments = ModalRoute.of(context)!.settings.arguments as ChatDetailsArguments?;
+
+    if (arguments?.roomId == null) return;
+
+    store.dispatch(LoadUsers(
+      userIds: selectRoom(id: arguments!.roomId, state: store.state).userIds,
+    ));
+  }
+
+  @override
   void dispose() {
     super.dispose();
     scrollController.dispose();
   }
 
-  @protected
   onBlockUser({required BuildContext context, required _Props props}) async {
     final user = props.users.firstWhere(
       (user) => user!.userId != props.currentUser.userId,
@@ -114,7 +129,6 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
     );
   }
 
-  @protected
   onShowColorPicker({
     required BuildContext context,
     required int originalColor,
@@ -129,7 +143,6 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
         ),
       );
 
-  @protected
   onLeaveChat(_Props props) async {
     showDialog(
       context: context,
@@ -334,7 +347,8 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                     style: Theme.of(context).textTheme.caption,
                                   ),
                                   Visibility(
-                                    visible: props.room.topic != null && props.room.topic!.isNotEmpty,
+                                    visible:
+                                        props.room.topic != null && props.room.topic!.isNotEmpty,
                                     child: Container(
                                       padding: EdgeInsets.only(top: 12),
                                       child: Text(
@@ -435,7 +449,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   'Default',
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(color: Colors.grey),
                                 ),
                               ),
                             ),
@@ -449,7 +466,10 @@ class ChatDetailsState extends State<ChatDetailsScreen> {
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   'Default (Argon)',
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(color: Colors.grey),
                                 ),
                               ),
                             ),
@@ -561,6 +581,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [
         room,
+        users,
         messages,
         chatColorPrimary,
         loading,
@@ -569,7 +590,8 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
       loading: store.state.roomStore.loading,
       notificationSettings: store.state.settingsStore.notificationSettings,
-      notificationOptions: store.state.settingsStore.notificationSettings.notificationOptions[roomId],
+      notificationOptions:
+          store.state.settingsStore.notificationSettings.notificationOptions[roomId],
       room: selectRoom(id: roomId, state: store.state),
       users: roomUsers(store.state, roomId),
       currentUser: store.state.authStore.user,

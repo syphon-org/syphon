@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/user/model.dart';

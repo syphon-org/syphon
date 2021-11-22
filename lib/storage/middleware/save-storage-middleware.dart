@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
@@ -29,10 +27,10 @@ import 'package:syphon/store/user/storage.dart';
 ///
 /// Storage Middleware
 ///
-/// Saves store data to cold storage based
+/// Saves state data to cold storage based
 /// on which redux actions are fired.
 ///
-storageMiddleware(Database? storageOld, StorageDatabase? storage) {
+saveStorageMiddleware(Database? storageOld, StorageDatabase? storage) {
   return (
     Store<AppState> store,
     dynamic action,

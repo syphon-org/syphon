@@ -11,7 +11,8 @@ import 'package:syphon/cache/storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/storage/middleware.dart';
+import 'package:syphon/storage/middleware/load-storage-middleware.dart';
+import 'package:syphon/storage/middleware/save-storage-middleware.dart';
 import 'package:syphon/store/alerts/middleware.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/middleware.dart';
@@ -188,7 +189,8 @@ Future<Store<AppState>> initStore(
       thunkMiddleware,
       authMiddleware,
       persistor.createMiddleware(),
-      storageMiddleware(storage, coldStorage),
+      saveStorageMiddleware(storage, coldStorage),
+      loadStorageMiddleware(coldStorage),
       searchMiddleware(coldStorage),
       alertMiddleware,
     ],
