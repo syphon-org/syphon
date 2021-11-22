@@ -118,8 +118,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             mediaStore = MediaStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'SettingsStore':
-            settingsStore =
-                SettingsStore.fromJson(store as Map<String, dynamic>);
+            settingsStore = SettingsStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'UserStore':
             userStore = UserStore.fromJson(store as Map<String, dynamic>);
@@ -141,10 +140,8 @@ class CacheSerializer implements StateSerializer<AppState> {
     return AppState(
       loading: false,
       authStore: authStore ?? preloaded[StorageKeys.AUTH] ?? AuthStore(),
-      cryptoStore:
-          cryptoStore ?? preloaded[StorageKeys.CRYPTO] ?? CryptoStore(),
-      settingsStore:
-          preloaded[StorageKeys.SETTINGS] ?? settingsStore ?? SettingsStore(),
+      cryptoStore: cryptoStore ?? preloaded[StorageKeys.CRYPTO] ?? CryptoStore(),
+      settingsStore: preloaded[StorageKeys.SETTINGS] ?? settingsStore ?? SettingsStore(),
       syncStore: syncStore ?? SyncStore(),
       mediaStore: mediaStore ??
           MediaStore().copyWith(
@@ -160,16 +157,11 @@ class CacheSerializer implements StateSerializer<AppState> {
           ),
       eventStore: eventStore ??
           EventStore().copyWith(
-            messages:
-                preloaded[StorageKeys.MESSAGES] ?? <String, List<Message>>{},
-            messagesDecrypted:
-                preloaded[StorageKeys.DECRYPTED] ?? <String, List<Message>>{},
-            reactions:
-                preloaded[StorageKeys.REACTIONS] ?? <String, List<Reaction>>{},
-            redactions:
-                preloaded[StorageKeys.REDACTIONS] ?? <String, Redaction>{},
-            receipts: preloaded[StorageKeys.RECEIPTS] ??
-                <String, Map<String, ReadReceipt>>{},
+            messages: preloaded[StorageKeys.MESSAGES] ?? <String, List<Message>>{},
+            messagesDecrypted: preloaded[StorageKeys.DECRYPTED] ?? <String, List<Message>>{},
+            reactions: preloaded[StorageKeys.REACTIONS] ?? <String, List<Reaction>>{},
+            redactions: preloaded[StorageKeys.REDACTIONS] ?? <String, Redaction>{},
+            receipts: preloaded[StorageKeys.RECEIPTS] ?? <String, Map<String, ReadReceipt>>{},
           ),
     );
   }

@@ -160,6 +160,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           room: roomSynced,
           messages: messages,
           outbox: roomSynced.outbox,
+          limited: roomSynced.limited,
         ));
 
         // update room

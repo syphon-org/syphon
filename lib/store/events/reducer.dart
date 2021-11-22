@@ -33,7 +33,7 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
     case AddMessages:
       final _action = action as AddMessages;
-      if (action.messages.isEmpty) {
+      if (_action.messages.isEmpty) {
         return state;
       }
 
@@ -199,7 +199,12 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       }
 
       return state.copyWith(receipts: receiptsUpdated);
-
+    case LoadReactions:
+      return state.copyWith(reactions: action.reactionsMap);
+    case LoadReceipts:
+      return state.copyWith(receipts: action.receiptsMap);
+    case LoadRedactions:
+      return state.copyWith(redactions: action.redactionsMap);
     case ResetEvents:
       return EventStore();
     default:

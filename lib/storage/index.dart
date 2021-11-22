@@ -189,6 +189,7 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
     final userIds = <String>[];
     final messages = <String, List<Message>>{};
     final decrypted = <String, List<Message>>{};
+    final reactions = <String, List<Reaction>>{};
 
     final auth = await loadAuth(storage: storageOld);
     final crypto = await loadCrypto(storage: storageOld);
@@ -223,6 +224,7 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
       StorageKeys.MEDIA: media,
       StorageKeys.CRYPTO: crypto,
       StorageKeys.MESSAGES: messages,
+      StorageKeys.REACTIONS: reactions,
       StorageKeys.DECRYPTED: decrypted,
       StorageKeys.SETTINGS: settings,
     };
@@ -246,8 +248,8 @@ loadStorageAsync(Database? storageOld, Store<AppState> store) async {
 
     final rooms = store.state.roomStore.roomList;
 
-    final Map<String, List<Reaction>> reactions = {};
-    final Map<String, Map<String, ReadReceipt>> receipts = {};
+    final reactions = <String, List<Reaction>>{};
+    final receipts = <String, Map<String, ReadReceipt>>{};
 
     final redactions = await loadRedactions(storage: storageOld);
 

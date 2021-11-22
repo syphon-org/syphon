@@ -113,7 +113,6 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
         break;
       case AddMessages:
         final _action = action as AddMessages;
-
         saveMessages(_action.messages, storage: storage!);
         break;
       case AddMessagesDecrypted:

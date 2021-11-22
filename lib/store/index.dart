@@ -153,7 +153,7 @@ Future<Store<AppState>> initStore(
   Map<String, dynamic> preloaded = {};
 
   if (storage != null) {
-    // partially load storage to memory to rehydrate cache
+    // synchronously load mandatory cold storage to rehydrate cache
     preloaded = await loadStorage(storage, coldStorage!);
   }
 
@@ -181,7 +181,7 @@ Future<Store<AppState>> initStore(
     printError('[persistor.load] error $error');
   }
 
-  return Store<AppState>(
+  final store = Store<AppState>(
     appReducer,
     initialState: initialState ?? AppState(),
     middleware: [
@@ -193,4 +193,9 @@ Future<Store<AppState>> initStore(
       alertMiddleware,
     ],
   );
+
+  // async load additional cold storage to rehydrate cache
+  loadStorageAsync(storage, store);
+
+  return store;
 }
