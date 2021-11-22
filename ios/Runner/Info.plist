@@ -31,11 +31,9 @@
 			<string>syphon.org</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>http</string>
-				<string>https</string>
 				<string>syphon</string>
 			</array>
-		</dict>
+		</dict> 
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>

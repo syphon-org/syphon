@@ -15,7 +15,7 @@ scripts:
   uninstall: adb shell && pm uninstall org.tether.tether # (sometimes doesn't uninstall when debugging?)
 
   build-release-android: flutter build apk --release
-  build-release-ios: flutter build ipa  --release
+  build-release-ios: flutter build ipa  --release # open under xcworkspace, not xcodeproj
   build-release-macos: flutter build macos --release
 
   # mobile development commands

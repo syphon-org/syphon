@@ -1,0 +1,16 @@
+0.2.2
+
+🔮 New Features:
+- Edit Messages
+- Rename Devices
+- Delete Messages
+
+🐛 Bug Fixes
+- Cert issues on old devices
+- Reworked Syncing and Message Handling
+- Pulling messages since last open correctly
+- Notifications not displaying with local service   
+- Various issues with keyboard height for the media preview list
+
+📐 Refactoring
+- Lots!
