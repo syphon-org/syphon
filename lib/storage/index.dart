@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -16,12 +17,15 @@ import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/sembast/codec.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
@@ -178,23 +182,20 @@ deleteStorage({String? context = AppContext.DEFAULT}) async {
 /// for example, only load users that are known to be
 /// involved in stored messages/events
 ///
-/// TODO: need pagination for pretty much all of these
+/// TODO: convert auth, crypto, settings to new storage paradigm
+///
 Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase storage) async {
   try {
-    final auth = await loadAuth(storage: storageOld);
-    final crypto = await loadCrypto(storage: storageOld);
-    final settings = await loadSettings(storage: storageOld);
-    final redactions = await loadRedactions(storage: storageOld);
-
-    final rooms = await loadRooms(storage: storage);
-    // final users = await loadUsers(storage: storage);
-    final media = await loadMediaAll(storage: storage);
-
     final userIds = <String>[];
     final messages = <String, List<Message>>{};
     final decrypted = <String, List<Message>>{};
-    final reactions = <String, List<Reaction>>{};
-    final receipts = <String, Map<String, ReadReceipt>>{};
+
+    final auth = await loadAuth(storage: storageOld);
+    final crypto = await loadCrypto(storage: storageOld);
+    final settings = await loadSettings(storage: storageOld);
+
+    final rooms = await loadRooms(storage: storage);
+    final media = await loadMediaAll(storage: storage);
 
     for (final Room room in rooms.values) {
       messages[room.id] = await loadMessagesRoom(
@@ -211,7 +212,46 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
           (messages[room.id] ?? []).map((message) => message.sender ?? '').toList();
 
       userIds.addAll(currentUserIds);
+    }
 
+    final users = await loadUsers(storage: storage, ids: userIds);
+
+    return {
+      StorageKeys.AUTH: auth,
+      StorageKeys.USERS: users,
+      StorageKeys.ROOMS: rooms,
+      StorageKeys.MEDIA: media,
+      StorageKeys.CRYPTO: crypto,
+      StorageKeys.MESSAGES: messages,
+      StorageKeys.DECRYPTED: decrypted,
+      StorageKeys.SETTINGS: settings,
+    };
+  } catch (error) {
+    printError('[loadStorage]  ${error.toString()}');
+    return {};
+  }
+}
+
+//
+// Load Storage (Async)
+//
+// finishes loading cold storage objects to RAM, this can
+// be much more specific and performant
+//
+// TODO: convert reactions and redactions to new storage paradigm
+//
+loadStorageAsync(Database? storageOld, Store<AppState> store) async {
+  try {
+    if (storageOld == null) return;
+
+    final rooms = store.state.roomStore.roomList;
+
+    final Map<String, List<Reaction>> reactions = {};
+    final Map<String, Map<String, ReadReceipt>> receipts = {};
+
+    final redactions = await loadRedactions(storage: storageOld);
+
+    for (final Room room in rooms) {
       reactions.addAll(await loadReactions(
         room.messageIds,
         storage: storageOld,
@@ -223,26 +263,17 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
       );
     }
 
-    final users = await loadUsers(
-      storage: storage,
-      ids: userIds,
-    );
+    loadAsync() async {
+      await store.dispatch(LoadReactions(reactionsMap: reactions));
+      await store.dispatch(LoadReceipts(receiptsMap: receipts));
+      await store.dispatch(LoadRedactions(redactionsMap: redactions));
 
-    return {
-      StorageKeys.AUTH: auth,
-      StorageKeys.USERS: users,
-      StorageKeys.ROOMS: rooms,
-      StorageKeys.MEDIA: media,
-      StorageKeys.CRYPTO: crypto,
-      StorageKeys.MESSAGES: messages,
-      StorageKeys.DECRYPTED: decrypted,
-      StorageKeys.REACTIONS: reactions,
-      StorageKeys.REDACTIONS: redactions,
-      StorageKeys.RECEIPTS: receipts,
-      StorageKeys.SETTINGS: settings,
-    };
+      // mutate messages
+      await store.dispatch(mutateMessagesAll());
+    }
+
+    loadAsync();
   } catch (error) {
-    printError('[loadStorage]  ${error.toString()}');
-    return {};
+    printError('[loadStorageAsync]  ${error.toString()}');
   }
 }

@@ -16,10 +16,7 @@ extension UserQueries on StorageDatabase {
   }
 
   Future<List<User>> selectUsers(List<String> ids, {int offset = 0, int limit = 0}) {
-    return (select(users)..where((tbl) => tbl.userId.isIn(ids))
-        // TODO: ..limit(limit, offset: offset)
-        )
-        .get();
+    return (select(users)..where((tbl) => tbl.userId.isIn(ids))).get();
   }
 
   Future<List<User>> selectUsersAll() {

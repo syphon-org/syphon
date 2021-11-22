@@ -67,6 +67,21 @@ class SetRedactions {
   SetRedactions({this.redactions});
 }
 
+class LoadReactions {
+  final Map<String, List<Reaction>> reactionsMap;
+  LoadReactions({required this.reactionsMap});
+}
+
+class LoadReceipts {
+  final Map<String, Map<String, ReadReceipt>> receiptsMap;
+  LoadReceipts({required this.receiptsMap});
+}
+
+class LoadRedactions {
+  final Map<String, Redaction> redactionsMap;
+  LoadRedactions({required this.redactionsMap});
+}
+
 ///
 /// Save Outbox Message
 ///
