@@ -140,18 +140,15 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
-                Visibility(
-                  visible: Platform.isAndroid || Platform.isIOS, //Mobile-only
-                  child: ListTile(
-                    dense: true,
-                    onTap: () {
-                      Navigator.pushNamed(context, Routes.settingsProxy);
-                    },
-                    contentPadding: Dimensions.listPadding,
-                    title: Text(
-                      Strings.listItemSettingsProxy,
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
+                ListTile(
+                  dense: true,
+                  onTap: () {
+                    Navigator.pushNamed(context, Routes.settingsProxy);
+                  },
+                  contentPadding: Dimensions.listPadding,
+                  title: Text(
+                    Strings.listItemSettingsProxy,
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
                 ListTile(
