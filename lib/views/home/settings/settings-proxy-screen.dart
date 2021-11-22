@@ -181,7 +181,8 @@ class _Props extends Equatable {
               ),
               label: 'Port',
               inputFormatters: [
-                FilteringTextInputFormatter.singleLineFormatter
+                FilteringTextInputFormatter.singleLineFormatter,
+                FilteringTextInputFormatter.digitsOnly,
               ],
               onCancel: () {
                 Navigator.of(dialogContext).pop();
