@@ -75,6 +75,8 @@ http.Client createClient() {
   return IOClient(customHttpClient(cert: ISRG_X1));
 }
 
+/// Use package:http Client with our custom dart:io HttpClient with added
+/// LetsEncrypt trusted certificate, via a proxy
 http.Client createProxiedClient(HttpProxySettings httpProxySettings) {
   final HttpClient customClient = customHttpClient(cert: ISRG_X1);
   customClient.findProxy = (uri) {
