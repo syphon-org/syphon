@@ -177,7 +177,7 @@ class _Props extends Equatable {
               title: 'Modify Proxy Port', //TODO i18n
               content: 'The port your proxy is listening on', //TODO i18n
               editingController: TextEditingController(
-                text: store.state.settingsStore.httpProxySettings.host,
+                text: store.state.settingsStore.httpProxySettings.port,
               ),
               label: 'Port',
               inputFormatters: [
