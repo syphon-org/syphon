@@ -34,9 +34,12 @@ void main() async {
   // init redux store
   final store = await initStore(cache, storage, storageCold);
 
-  // init http proxy, if required
+  // init http client
   if (store.state.settingsStore.httpProxySettings.enabled) {
     httpClient = createProxiedClient(store.state.settingsStore.httpProxySettings);
+  }
+  else {
+    httpClient = createClient();
   }
 
   // init app
