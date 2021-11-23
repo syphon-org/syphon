@@ -134,16 +134,16 @@ class _Props extends Equatable {
         proxyEnabled: store.state.settingsStore.httpProxySettings.enabled,
         host: store.state.settingsStore.httpProxySettings.host,
         port: store.state.settingsStore.httpProxySettings.port,
-        onToggleProxy : () {
-          store.dispatch(addInfo(
+        onToggleProxy : () async {
+          await store.dispatch(addInfo(
             message: Strings.alertAppRestartEffect,
             action: 'Dismiss',
           ));
 
-          return store.dispatch(toggleProxy());
+          await store.dispatch(toggleProxy());
         },
-        onEditProxyHost: (BuildContext context) {
-          return showDialog(
+        onEditProxyHost: (BuildContext context) async {
+          showDialog(
             context: context,
             barrierDismissible: true,
             builder: (dialogContext) => DialogTextInput(
@@ -156,11 +156,11 @@ class _Props extends Equatable {
               inputFormatters: [
                 FilteringTextInputFormatter.singleLineFormatter
               ],
-              onCancel: () {
+              onCancel: () async {
                 Navigator.of(dialogContext).pop();
               },
               onConfirm: (String host) async {
-                store.dispatch(SetProxyHost(
+                await store.dispatch(SetProxyHost(
                     host: host)
                 );
 
@@ -169,8 +169,8 @@ class _Props extends Equatable {
             ),
           );
         },
-        onEditProxyPort: (BuildContext context) {
-          return showDialog(
+        onEditProxyPort: (BuildContext context) async {
+          showDialog(
             context: context,
             barrierDismissible: true,
             builder: (dialogContext) => DialogTextInput(
@@ -184,11 +184,11 @@ class _Props extends Equatable {
                 FilteringTextInputFormatter.singleLineFormatter,
                 FilteringTextInputFormatter.digitsOnly,
               ],
-              onCancel: () {
+              onCancel: () async {
                 Navigator.of(dialogContext).pop();
               },
               onConfirm: (String port) async {
-                store.dispatch(SetProxyPort(
+                await store.dispatch(SetProxyPort(
                     port: port)
                 );
 
