@@ -76,7 +76,7 @@ http.Client createClient() {
 }
 
 http.Client createProxiedClient(HttpProxySettings httpProxySettings) {
-  HttpClient customClient = customHttpClient(cert: ISRG_X1);
+  final HttpClient customClient = customHttpClient(cert: ISRG_X1);
   customClient.findProxy = (uri) {
     return 'PROXY ${httpProxySettings.host}:${httpProxySettings.port};';
   };
