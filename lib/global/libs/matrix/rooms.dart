@@ -67,6 +67,8 @@ abstract class Rooms {
     final int? timeout = params['timeout'];
     final String? filter = params['filter'];
 
+    httpClient = createClient();
+
     return sync(
       protocol: protocol,
       homeserver: homeserver,
