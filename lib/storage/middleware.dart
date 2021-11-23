@@ -149,6 +149,12 @@ storageMiddleware(Database? storageOld, StorageDatabase? storage) {
       case ToggleProxy:
         saveSettings(store.state.settingsStore, storage: storageOld);
         break;
+      case SetProxyHost:
+        saveSettings(store.state.settingsStore, storage: storageOld);
+        break;
+      case SetProxyPort:
+        saveSettings(store.state.settingsStore, storage: storageOld);
+        break;
       case SetOlmAccountBackup:
       case SetDeviceKeysOwned:
       case ToggleDeviceKeysExist:
