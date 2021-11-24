@@ -57,84 +57,84 @@ Future<Map<String, Redaction>> loadRedactions({
   return redactions;
 }
 
-///
-/// Save Reactions
-///
-/// Saves reactions to storage by the related/associated message id
-/// this allows calls to fetch reactions from cold storage to be
-/// O(1) referenced by map keys, also prevents additional key references
-/// to the specific reaction in other objects
-///
-Future<void> saveReactions(
-  List<Reaction> reactions, {
-  required Database storage,
-}) async {
-  try {
-    final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
+// ///
+// /// Save Reactions
+// ///
+// /// Saves reactions to storage by the related/associated message id
+// /// this allows calls to fetch reactions from cold storage to be
+// /// O(1) referenced by map keys, also prevents additional key references
+// /// to the specific reaction in other objects
+// ///
+// Future<void> saveReactions(
+//   List<Reaction> reactions, {
+//   required Database storage,
+// }) async {
+//   try {
+//     final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
 
-    return await storage.transaction((txn) async {
-      for (final Reaction reaction in reactions) {
-        if (reaction.relEventId != null) {
-          final record = store.record(reaction.relEventId);
-          final exists = await record.exists(storage);
+//     return await storage.transaction((txn) async {
+//       for (final Reaction reaction in reactions) {
+//         if (reaction.relEventId != null) {
+//           final record = store.record(reaction.relEventId);
+//           final exists = await record.exists(storage);
 
-          var reactionsUpdated = [reaction];
+//           var reactionsUpdated = [reaction];
 
-          if (exists) {
-            final existingRaw = await record.get(storage);
-            final existingJson = List.from(await json.decode(existingRaw!));
-            final existingList = List.from(existingJson.map(
-              (json) => Reaction.fromJson(json),
-            ));
+//           if (exists) {
+//             final existingRaw = await record.get(storage);
+//             final existingJson = List.from(await json.decode(existingRaw!));
+//             final existingList = List.from(existingJson.map(
+//               (json) => Reaction.fromJson(json),
+//             ));
 
-            final exists = existingList.any(
-              (existing) => existing.id == reaction.id,
-            );
+//             final exists = existingList.any(
+//               (existing) => existing.id == reaction.id,
+//             );
 
-            if (!exists) {
-              reactionsUpdated = [...existingList, reaction];
-            }
-          }
+//             if (!exists) {
+//               reactionsUpdated = [...existingList, reaction];
+//             }
+//           }
 
-          await record.put(txn, json.encode(reactionsUpdated));
-        }
-      }
-    });
-  } catch (error) {
-    printError('[saveReactions] $error');
-    rethrow;
-  }
-}
+//           await record.put(txn, json.encode(reactionsUpdated));
+//         }
+//       }
+//     });
+//   } catch (error) {
+//     printError('[saveReactions] $error');
+//     rethrow;
+//   }
+// }
 
-///
-/// Load Reactions
-///
-/// Loads reactions from storage by the related/associated message id
-/// this done with O(1) by reference with message ids being the key
-///
-Future<Map<String, List<Reaction>>> loadReactions(
-  List<String?> messageIds, {
-  required Database storage,
-}) async {
-  try {
-    final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
-    final reactionsMap = <String, List<Reaction>>{};
-    final reactionsRecords =
-        await store.records(messageIds).getSnapshots(storage);
+// ///
+// /// Load Reactions
+// ///
+// /// Loads reactions from storage by the related/associated message id
+// /// this done with O(1) by reference with message ids being the key
+// ///
+// Future<Map<String, List<Reaction>>> loadReactions(
+//   List<String?> messageIds, {
+//   required Database storage,
+// }) async {
+//   try {
+//     final store = StoreRef<String?, String>(StorageKeys.REACTIONS);
+//     final reactionsMap = <String, List<Reaction>>{};
+//     final reactionsRecords =
+//         await store.records(messageIds).getSnapshots(storage);
 
-    for (final RecordSnapshot<String?, String>? reactionList
-        in reactionsRecords) {
-      if (reactionList != null) {
-        final reactions = List.from(await json.decode(reactionList.value))
-            .map((json) => Reaction.fromJson(json))
-            .toList();
-        reactionsMap.putIfAbsent(reactionList.key!, () => reactions);
-      }
-    }
+//     for (final RecordSnapshot<String?, String>? reactionList
+//         in reactionsRecords) {
+//       if (reactionList != null) {
+//         final reactions = List.from(await json.decode(reactionList.value))
+//             .map((json) => Reaction.fromJson(json))
+//             .toList();
+//         reactionsMap.putIfAbsent(reactionList.key!, () => reactions);
+//       }
+//     }
 
-    return reactionsMap;
-  } catch (error) {
-    printError(error.toString());
-    return {};
-  }
-}
+//     return reactionsMap;
+//   } catch (error) {
+//     printError(error.toString());
+//     return {};
+//   }
+// }

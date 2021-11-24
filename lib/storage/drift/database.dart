@@ -16,6 +16,7 @@ import 'package:syphon/storage/drift/migrations/update.messages.5.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
+import 'package:syphon/store/events/reactions/schema.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/media/model.dart';
 import 'package:syphon/store/media/schema.dart';
@@ -109,7 +110,7 @@ LazyDatabase openDatabase(String context) {
   });
 }
 
-@DriftDatabase(tables: [Messages, Decrypted, Rooms, Users, Medias])
+@DriftDatabase(tables: [Messages, Decrypted, Rooms, Users, Medias, Reactions])
 class StorageDatabase extends _$StorageDatabase {
   // we tell the database where to store the data with this constructor
   StorageDatabase(String context) : super(openDatabase(context));

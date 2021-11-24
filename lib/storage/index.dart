@@ -23,6 +23,7 @@ import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/reactions/storage.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
@@ -242,11 +243,12 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
 //
 // TODO: convert reactions and redactions to new storage paradigm
 //
-loadStorageAsync(Database? storageOld, Store<AppState> store) async {
+loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> store) async {
   try {
     if (storageOld == null) return;
 
     final rooms = store.state.roomStore.roomList;
+    final messages = store.state.eventStore.messages;
 
     final reactions = <String, List<Reaction>>{};
     final receipts = <String, Map<String, ReadReceipt>>{};
@@ -254,9 +256,12 @@ loadStorageAsync(Database? storageOld, Store<AppState> store) async {
     final redactions = await loadRedactions(storage: storageOld);
 
     for (final Room room in rooms) {
-      reactions.addAll(await loadReactions(
-        room.messageIds,
-        storage: storageOld,
+      final messagesRoom = messages[room.id] ?? [];
+
+      reactions.addAll(await loadReactionsMapped(
+        roomId: room.id,
+        eventIds: messagesRoom.map((e) => e.id ?? '').toList(),
+        storage: storage,
       ));
 
       receipts[room.id] = await loadReceipts(

@@ -22,8 +22,8 @@ class EventStore extends Equatable {
   final Map<String, Redaction> redactions; // eventId indexed
   final Map<String, List<Message>> messages; // roomId indexed
   final Map<String, List<Reaction>> reactions; // eventId indexed
-  final Map<String, Map<String, ReadReceipt>> receipts; // eventId indexed
-  final Map<String, Map<String, Message>> outbox; // roomId and tempId subindex
+  final Map<String, Map<String, ReadReceipt>> receipts; // eventId, userId indexed
+  final Map<String, Map<String, Message>> outbox; // roomId, tempId subindex
   final Map<String, List<Message>> messagesDecrypted; // messages decrypted - in memory only
 
   const EventStore({

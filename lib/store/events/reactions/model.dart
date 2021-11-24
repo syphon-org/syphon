@@ -1,10 +1,12 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/model.dart';
 
 part 'model.g.dart';
 
 @JsonSerializable()
-class Reaction extends Event {
+class Reaction extends Event implements drift.Insertable<Reaction> {
   final String? body; // 'key' in matrix likely an emoji
   final String? relType;
   final String? relEventId;
@@ -20,7 +22,7 @@ class Reaction extends Event {
     prevBatch,
     timestamp,
     content,
-    data, //ignore
+    data,
     this.body,
     this.relType,
     this.relEventId,
@@ -87,5 +89,23 @@ class Reaction extends Event {
       relType: content['rel_type'],
       relEventId: content['event_id'],
     );
+  }
+
+  @override
+  Map<String, drift.Expression> toColumns(bool nullToAbsent) {
+    return ReactionsCompanion(
+      id: drift.Value(id!),
+      userId: drift.Value(userId),
+      roomId: drift.Value(roomId),
+      type: drift.Value(type),
+      sender: drift.Value(sender),
+      stateKey: drift.Value(stateKey),
+      batch: drift.Value(batch),
+      prevBatch: drift.Value(prevBatch),
+      timestamp: drift.Value(timestamp),
+      body: drift.Value(body),
+      relType: drift.Value(relType),
+      relEventId: drift.Value(relEventId),
+    ).toColumns(nullToAbsent);
   }
 }

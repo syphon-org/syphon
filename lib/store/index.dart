@@ -196,8 +196,10 @@ Future<Store<AppState>> initStore(
     ],
   );
 
-  // async load additional cold storage to rehydrate cache
-  loadStorageAsync(storage, store);
+  if (coldStorage != null) {
+    // async load additional cold storage to rehydrate cache
+    loadStorageAsync(storage, coldStorage, store);
+  }
 
   return store;
 }

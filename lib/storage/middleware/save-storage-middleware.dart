@@ -9,6 +9,7 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/storage.dart';
+import 'package:syphon/store/events/reactions/storage.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/events/storage.dart';
 import 'package:syphon/store/index.dart';
@@ -88,7 +89,7 @@ saveStorageMiddleware(Database? storageOld, StorageDatabase? storage) {
         break;
       case SetReactions:
         final _action = action as SetReactions;
-        saveReactions(_action.reactions ?? [], storage: storageOld);
+        saveReactions(_action.reactions ?? [], storage: storage!);
         break;
       case SetRedactions:
         final _action = action as SetRedactions;

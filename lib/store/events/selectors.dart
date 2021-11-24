@@ -39,10 +39,6 @@ List<Message> roomOutbox(AppState state, String? roomId) {
   return List.from((state.eventStore.outbox[roomId] ?? {}).values);
 }
 
-Map<String, List<Reaction>> selectReactions(AppState state) {
-  return state.eventStore.reactions;
-}
-
 // remove messages from blocked users
 List<Message> filterMessages(
   List<Message> messages,
