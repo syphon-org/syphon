@@ -135,11 +135,6 @@ class _Props extends Equatable {
         host: store.state.settingsStore.httpProxySettings.host,
         port: store.state.settingsStore.httpProxySettings.port,
         onToggleProxy : () async {
-          await store.dispatch(addInfo(
-            message: Strings.alertAppRestartEffect,
-            action: 'Dismiss',
-          ));
-
           await store.dispatch(toggleProxy());
         },
         onEditProxyHost: (BuildContext context) async {

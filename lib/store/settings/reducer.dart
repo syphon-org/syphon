@@ -1,3 +1,4 @@
+import 'package:syphon/global/https.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/http-proxy-settings/actions.dart';
@@ -114,6 +115,13 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
     case ToggleProxy:
+      if (!state.httpProxySettings.enabled) { //we're enabling it
+        httpClient = createProxiedClient(state.httpProxySettings);
+      }
+      else {
+        httpClient = createClient();
+      }
+
       return state.copyWith(
         httpProxySettings: state.httpProxySettings.copyWith(enabled: !state.httpProxySettings.enabled),
       );
