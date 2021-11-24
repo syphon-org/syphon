@@ -97,16 +97,15 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     await Future.wait(roomData.keys.map((id) async {
       try {
         final Map json = roomData[id] ?? {};
-        final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
 
-        final existing = store.state.eventStore.messages[id];
-        final existingDecrypted = store.state.eventStore.messagesDecrypted[id];
+        final roomOld = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+        final messagesOld = store.state.eventStore.messages[id];
 
         if (json.isEmpty) return;
 
         final sync = await compute(parseSync, {
           'json': json,
-          'room': roomExisting,
+          'room': roomOld,
           'currentUser': user,
           'lastSince': lastSince,
         });
@@ -132,11 +131,13 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         // handles editing newly fetched messages
         final messages = await store.dispatch(mutateMessages(
           messages: sync.messages,
-          existing: existing,
+          existing: messagesOld,
         )) as List<Message>;
 
         // update encrypted messages (updating before normal messages prevents flicker)
         if (roomSynced.encryptionEnabled) {
+          final decryptedOld = store.state.eventStore.messagesDecrypted[id];
+
           final decrypted = await store.dispatch(decryptMessages(
             roomSynced,
             messages,
@@ -145,7 +146,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           // handles editing newly fetched decrypted messages
           final decryptedMutated = await store.dispatch(mutateMessages(
             messages: decrypted,
-            existing: existingDecrypted,
+            existing: decryptedOld,
           )) as List<Message>;
 
           await store.dispatch(addMessagesDecrypted(
@@ -160,7 +161,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           room: roomSynced,
           messages: messages,
           outbox: roomSynced.outbox,
-          limited: roomSynced.limited,
         ));
 
         // update room
@@ -174,20 +174,20 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           ));
         }
 
-        // and is not already at the end of the last known batch
-        // the end would be room.prevBatch == room.lastBatch
-        // fetch previous messages since last /sync (a gap)
-        // determined by the fromSync function of room
-        final roomUpdated = store.state.roomStore.rooms[roomSynced.id];
-        if (roomUpdated != null && roomUpdated.limited) {
+        // fetch previous messages since last /sync (a messages gap)
+        // room will be marked limited to indicate this
+        if (roomSynced.limited) {
           printWarning(
-            '[fetchMessageEvents] ${roomUpdated.name} LIMITED TRUE - Fetching more messages',
+            '[fetchMessageEvents] ${roomSynced.name} LIMITED TRUE - Fetching more messages',
           );
 
           store.dispatch(fetchMessageEvents(
-            room: roomUpdated,
-            from: roomUpdated.prevBatch,
+            room: roomSynced,
+            from: roomSynced.prevBatch,
           ));
+          // a recursive sync for the messages gap has now finished
+        } else if (!roomSynced.limited && roomOld.limited) {
+          // TODO: clear all but the last 25 messages from state
         }
       } catch (error) {
         printError('[syncRoom] error $id ${error.toString()}');

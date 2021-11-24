@@ -42,13 +42,13 @@ class AddMessages {
   final String roomId;
   final List<Message> messages;
   final List<Message> outbox;
-  final bool limited;
+  final bool clear;
 
   AddMessages({
     required this.roomId,
     this.messages = const [],
     this.outbox = const [],
-    this.limited = false,
+    this.clear = false,
   });
 }
 
@@ -117,13 +117,12 @@ ThunkAction<AppState> addMessages({
   required Room room,
   List<Message> messages = const [],
   List<Message> outbox = const [],
-  bool limited = false,
 }) =>
     (Store<AppState> store) {
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        AddMessages(roomId: room.id, messages: messages, outbox: outbox, limited: limited),
+        AddMessages(roomId: room.id, messages: messages, outbox: outbox),
       );
     };
 

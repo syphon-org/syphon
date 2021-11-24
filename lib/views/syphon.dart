@@ -21,7 +21,6 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
-import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
