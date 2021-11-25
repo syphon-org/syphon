@@ -46,40 +46,45 @@ class ProxySettingsScreen extends StatelessWidget {
                               onChanged: (toggle) => props.onToggleProxy(),
                             ),
                           ),
-                          ListTile(
-                            enabled: props.proxyEnabled,
-                            dense: true,
-                            onTap: () => props.onEditProxyHost(context),
-                            contentPadding: Dimensions.listPadding,
-                            title: Text(
-                              Strings.listItemSettingsProxyHost,
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                            trailing: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                props.host,
-                                style: TextStyle(fontSize: 18.0),
+                          Visibility(
+                            visible: props.proxyEnabled,
+                            child: ListTile(
+                              dense: true,
+                              onTap: () => props.onEditProxyHost(context),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                Strings.listItemSettingsProxyHost,
+                                style: Theme.of(context).textTheme.subtitle1,
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  props.host,
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
                               ),
                             ),
                           ),
-                          ListTile(
-                            enabled: props.proxyEnabled,
-                            dense: true,
-                            onTap: () => props.onEditProxyPort(context),
-                            contentPadding: Dimensions.listPadding,
-                            title: Text(
-                              Strings.listItemSettingsProxyPort,
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                            trailing: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                props.port,
-                                style: TextStyle(fontSize: 18.0),
+                          Visibility(
+                            visible: props.proxyEnabled,
+                            child: ListTile(
+                              enabled: props.proxyEnabled,
+                              dense: true,
+                              onTap: () => props.onEditProxyPort(context),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                Strings.listItemSettingsProxyPort,
+                                style: Theme.of(context).textTheme.subtitle1,
+                              ),
+                              trailing: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  props.port,
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
                               ),
                             ),
-                          ),
+                          )
                         ],
                       ),
                     ),
