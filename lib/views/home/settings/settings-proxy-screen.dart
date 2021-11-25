@@ -68,7 +68,6 @@ class ProxySettingsScreen extends StatelessWidget {
                           Visibility(
                             visible: props.proxyEnabled,
                             child: ListTile(
-                              enabled: props.proxyEnabled,
                               dense: true,
                               onTap: () => props.onEditProxyPort(context),
                               contentPadding: Dimensions.listPadding,
