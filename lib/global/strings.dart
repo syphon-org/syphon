@@ -36,6 +36,8 @@ class Strings {
   static final titleHomeserverSearch = tr('title-view-homeserver-search');
   static final titleProxySettings = tr('title-proxy-settings');
   static final titleUseProxyServer = tr('title-proxy-use-proxy');
+  static final titleProxyHost = tr('title-proxy-host');
+  static final titleProxyPort = tr('title-proxy-port');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -175,6 +177,9 @@ class Strings {
   static final contentIntroThird = tr('content-intro-section-three', args: [Values.appName]);
   static final contentIntroFinal = tr('content-intro-section-four', args: [Values.appName]);
 
+  static final contentProxyHost = tr('content-proxy-host');
+  static final contentProxyPort = tr('content-proxy-port');
+
   // Confirmations (use confirm*)
 
   static final confirmInvite = tr('confirm-invite');
@@ -234,4 +239,8 @@ class Strings {
   static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');
   static final semanticsImageSignupUsername = tr('semantics-image-signup-username');
   static final semanticsImagePasswordReset = tr('semantics-image-password-reset');
+
+  // Labels
+  static final labelProxyHost = tr('label-proxy-host');
+  static final labelProxyPort = tr('label-proxy-port');
 }

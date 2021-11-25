@@ -142,12 +142,12 @@ class _Props extends Equatable {
             context: context,
             barrierDismissible: true,
             builder: (dialogContext) => DialogTextInput(
-              title: 'Modify Proxy Host',  //TODO i18n
-              content: 'The host for your proxy', //TODO i18n
+              title: Strings.titleProxyHost,
+              content: Strings.contentProxyHost,
               editingController: TextEditingController(
                 text: store.state.settingsStore.httpProxySettings.host,
               ),
-              label: 'Hostname', //TODO i18n
+              label: Strings.labelProxyHost,
               inputFormatters: [
                 FilteringTextInputFormatter.singleLineFormatter
               ],
@@ -169,12 +169,12 @@ class _Props extends Equatable {
             context: context,
             barrierDismissible: true,
             builder: (dialogContext) => DialogTextInput(
-              title: 'Modify Proxy Port', //TODO i18n
-              content: 'The port your proxy is listening on', //TODO i18n
+              title: Strings.titleProxyPort,
+              content: Strings.contentProxyPort,
               editingController: TextEditingController(
                 text: store.state.settingsStore.httpProxySettings.port,
               ),
-              label: 'Port',
+              label: Strings.labelProxyPort,
               inputFormatters: [
                 FilteringTextInputFormatter.singleLineFormatter,
                 FilteringTextInputFormatter.digitsOnly,

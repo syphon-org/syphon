@@ -21,6 +21,8 @@
     "title-view-homeserver-search": "Find Your Homeserver",
     "title-view-profile": "Set up Your Profile",
     "title-proxy-use-proxy": "Use a Proxy",
+    "title-proxy-host": "Modify Proxy Host",
+    "title-proxy-port": "Modify Proxy Port",
     "title-dialog-delete-keys": "Confirm Deleting Keys",
     "title-dialog-confirm-linkout": "Confirm Opening Link",
     "title-dialog-encryption": "Encrypt Chat?",
@@ -132,6 +134,8 @@
     "content-confirm-password-reset": "Click on the link sent to your email. After clicking the link, press the continue button below to change your password.",
     "content-password-requirements": "Each homeserver may have different requirements for passwords.\n\nIf you're having trouble, try creating a password including a lower-case letter, an upper-case letter, a number and a symbol, and with at least 8 characters",
     "content-sync-interval": "Syncing works by submitting a long poll request to a matrix server. The sync interval is not how frequently it will sync, but how frequently it will attempt a new long poll request.",
+    "content-proxy-host": "The host for your proxy",
+    "content-proxy-port": "The port your proxy is listening on",
     "confirm-linkout": "Are you sure you want to open the following link?\n\n{}",
     "confirm-delete-keys": "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.",
     "confirm-invite": "Are you sure you want to invite the following user to the following chat?",
@@ -169,5 +173,7 @@
     "semantics-image-empty-chat-list": "Several tiny, cute monsters peering out behind foliage.",
     "semantics-image-terms-of-service": "Hand holding a phone with a terms of service checkbox checked",
     "semantics-image-signup-username": "Person resting elbow on I.D. card",
-    "semantics-image-password-reset": "Person resting arm ontop a letter with a checkbox inside"
+    "semantics-image-password-reset": "Person resting arm ontop a letter with a checkbox inside",
+    "label-proxy-host": "Hostname",
+    "label-proxy-port": "Port"
 }
