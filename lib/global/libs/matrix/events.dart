@@ -71,8 +71,6 @@ abstract class Events {
   ///
   /// https://matrix.org/docs/spec/client_server/latest#id251
   static Future<dynamic> fetchMessageEventsThreaded(Map params) async {
-    httpClient = createClient();
-
     return fetchMessageEvents(
       protocol: params['protocol'],
       homeserver: params['homeserver'],
