@@ -18,6 +18,8 @@ class MatrixMedia {
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
 
+    httpClient = createClient();
+
     return fetchThumbnail(
       protocol: protocol,
       homeserver: homeserver,
@@ -72,6 +74,8 @@ class MatrixMedia {
     final String? accessToken = params['accessToken'];
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
+
+    httpClient = createClient();
 
     return fetchMedia(
       protocol: protocol,
