@@ -6,21 +6,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/crypto/keys/selectors.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/store/settings/devices-settings/selectors.dart';
 import 'package:syphon/store/settings/http-proxy-settings/actions.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
-import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
-import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
-import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
 class ProxySettingsScreen extends StatelessWidget {
