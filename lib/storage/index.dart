@@ -22,9 +22,11 @@ import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/reactions/storage.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
+import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/events/redaction/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/storage.dart';
@@ -272,8 +274,9 @@ loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> 
     }
 
     loadAsync() async {
-      await store.dispatch(LoadReactions(reactionsMap: reactions));
       await store.dispatch(LoadReceipts(receiptsMap: receipts));
+      await store.dispatch(LoadReactions(reactionsMap: reactions));
+      // TODO: deprecated - after redact refactor
       await store.dispatch(LoadRedactions(redactionsMap: redactions));
 
       // mutate messages

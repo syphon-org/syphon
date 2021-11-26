@@ -77,7 +77,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
           final encryptionEnabled = props.room.encryptionEnabled;
           final height = MediaQuery.of(context).size.height;
           final imageHeight = height * 0.7;
-          final sending = props.room.sending && props.room.outbox.isNotEmpty;
+          final sending = props.room.sending && props.outbox.isNotEmpty;
 
           return Scaffold(
             appBar: AppBarNormal(
@@ -179,17 +179,21 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
 
 class _Props extends Equatable {
   final Room room;
+  final Map outbox;
 
   const _Props({
     required this.room,
+    required this.outbox,
   });
 
   @override
   List<Object> get props => [
         room,
+        outbox,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
+        outbox: store.state.eventStore.outbox[roomId] ?? {},
       );
 }

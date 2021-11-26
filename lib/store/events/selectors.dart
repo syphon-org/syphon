@@ -1,7 +1,6 @@
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
@@ -55,21 +54,11 @@ List<Message> filterMessages(
 
 List<Message> reviseMessagesThreaded(Map params) {
   final List<Message> messages = params['messages'] ?? [];
-  final Map<String, Redaction> redactions = params['redactions'];
   final Map<String, List<Reaction>> reactions = params['reactions'];
 
-  return reviseMessagesFilter(messages, redactions, reactions);
-}
-
-List<Message> reviseMessagesFilter(
-  List<Message> messages,
-  Map<String, Redaction> redactions,
-  Map<String, List<Reaction>> reactions,
-) {
   final messagesMap = appendReactions(
     replaceEdited(messages),
     reactions: reactions,
-    redactions: redactions,
   );
 
   return List.from(messagesMap.values);
@@ -77,7 +66,6 @@ List<Message> reviseMessagesFilter(
 
 Map<String, Message?> appendReactions(
   Map<String, Message?> messages, {
-  Map<String, Redaction>? redactions,
   required Map<String, List<Reaction>> reactions,
 }) {
   // get a list message ids (also reaction keys) that have values in 'reactions'
@@ -89,11 +77,8 @@ Map<String, Message?> appendReactions(
     final reactionList = reactions[messageId];
     if (reactionList != null) {
       messages[messageId] = messages[messageId]!.copyWith(
-        reactions: reactionList
-            .where(
-              (reaction) => !redactions!.containsKey(reaction.id),
-            )
-            .toList(),
+        // reaction body will be null if redacted
+        reactions: reactionList.where((reaction) => reaction.body != null).toList(),
       );
     }
   }

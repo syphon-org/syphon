@@ -1,7 +1,9 @@
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
 import './actions.dart';
@@ -17,12 +19,19 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       for (final Reaction reaction in _action.reactions ?? []) {
         final reactionEventId = reaction.relEventId;
-        final exists = reactionsUpdated.containsKey(reactionEventId);
+        final hasReactions = reactionsUpdated.containsKey(reactionEventId);
 
-        if (exists) {
-          final existing = reactionsUpdated[reactionEventId]!;
-          if (existing.indexWhere((value) => value.id == reaction.id) == -1) {
-            reactionsUpdated[reactionEventId!] = [...existing, reaction];
+        if (hasReactions) {
+          final reactions = reactionsUpdated[reactionEventId]!;
+          final reactionIndex = reactions.indexWhere((value) => value.id == reaction.id);
+          if (reactionIndex == -1) {
+            reactionsUpdated[reactionEventId!] = [...reactions, reaction];
+          } else {
+            // TODO: check this is replacing existing reactions with updated values
+            reactionsUpdated[reactionEventId!] = [
+              ...reactions.where((r) => r.id != reaction.id).toList(),
+              reaction
+            ];
           }
         } else if (reactionEventId != null) {
           reactionsUpdated[reactionEventId] = [reaction];

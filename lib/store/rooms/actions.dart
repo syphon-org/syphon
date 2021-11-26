@@ -16,6 +16,8 @@ import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
+import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
@@ -128,7 +130,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         await store.dispatch(setReceipts(room: roomSynced, receipts: sync.readReceipts));
         await store.dispatch(addReactions(reactions: sync.reactions));
 
-        // redact messages through cache and cold storage
+        // redact events (reactions and messages) through cache and cold storage
         await store.dispatch(redactEvents(room: roomSynced, redactions: sync.redactions));
 
         // handles editing newly fetched messages
