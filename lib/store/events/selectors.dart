@@ -75,20 +75,6 @@ List<Message> reviseMessagesFilter(
   return List.from(messagesMap.values);
 }
 
-Map<String, Message?> filterRedactions(
-  Map<String, Message?> messages, {
-  required Map<String, Redaction> redactions,
-}) {
-  // get a list message ids (also reaction keys) that have values in 'reactions'
-  redactions.forEach((key, value) {
-    if (messages.containsKey(key)) {
-      messages[key] = messages[key]!.copyWith(body: null);
-    }
-  });
-
-  return messages;
-}
-
 Map<String, Message?> appendReactions(
   Map<String, Message?> messages, {
   Map<String, Redaction>? redactions,

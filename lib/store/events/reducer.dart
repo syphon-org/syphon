@@ -9,8 +9,8 @@ import './state.dart';
 
 EventStore eventReducer([EventStore state = const EventStore(), dynamic action]) {
   switch (action.runtimeType) {
-    case SetReactions:
-      final _action = action as SetReactions;
+    case AddReactions:
+      final _action = action as AddReactions;
       final reactionsUpdated = Map<String, List<Reaction>>.from(
         state.reactions,
       );

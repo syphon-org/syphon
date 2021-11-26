@@ -15,7 +15,7 @@ authMiddleware<State>(
   NextDispatcher next,
 ) {
   switch (action.runtimeType) {
-    case SetReactions:
+    case AddReactions:
     case SaveRedactions:
     case AddMessages:
     case UpdateRoom:

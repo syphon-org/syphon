@@ -125,8 +125,11 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         // update various message mutations and meta data
         await store.dispatch(setUsers(sync.users));
-        await store.dispatch(setReactions(reactions: sync.reactions));
         await store.dispatch(setReceipts(room: roomSynced, receipts: sync.readReceipts));
+        await store.dispatch(addReactions(reactions: sync.reactions));
+
+        // redact messages through cache and cold storage
+        await store.dispatch(redactEvents(room: roomSynced, redactions: sync.redactions));
 
         // handles editing newly fetched messages
         final messages = await store.dispatch(mutateMessages(
@@ -159,12 +162,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         await store.dispatch(addMessages(
           room: roomSynced,
           messages: messages,
-        ));
-
-        // redact messages through cache and cold storage
-        await store.dispatch(redactMessages(
-          room: roomSynced,
-          redactions: sync.redactions,
         ));
 
         // update room

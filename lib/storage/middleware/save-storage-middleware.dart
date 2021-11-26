@@ -87,8 +87,8 @@ saveStorageMiddleware(Database? storageOld, StorageDatabase? storage) {
           deleteRooms({room.id: room}, storage: storage!);
         }
         break;
-      case SetReactions:
-        final _action = action as SetReactions;
+      case AddReactions:
+        final _action = action as AddReactions;
         saveReactions(_action.reactions ?? [], storage: storage!);
         break;
       case SaveRedactions:
