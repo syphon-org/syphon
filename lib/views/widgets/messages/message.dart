@@ -345,15 +345,13 @@ class MessageWidget extends StatelessWidget {
       if (message.body!.isEmpty) {
         body = Strings.labelEncryptedMessage;
       }
-    } else {
-      if (message.body!.isEmpty) {
-        body = Strings.labelDeletedMessage;
-        fontStyle = FontStyle.italic;
-      }
     }
 
-    if (message.body == null) {
+    // TODO: confirm - 2021
+    // deleted messages returned remotely will have empty 'body' fields
+    if (message.body == null || message.body!.isEmpty) {
       body = Strings.labelDeletedMessage;
+      fontStyle = FontStyle.italic;
     }
 
     return Swipeable(
