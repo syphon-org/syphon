@@ -15,7 +15,7 @@ class Alert {
   const Alert({
     this.type = 'warning',
     this.message = '',
-    this.duration = const Duration(milliseconds: 3000),
+    this.duration = const Duration(milliseconds: 8000),
     this.error,
     this.action,
     this.onAction,
