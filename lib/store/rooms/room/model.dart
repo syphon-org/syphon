@@ -57,21 +57,13 @@ class Room implements drift.Insertable<Room> {
   final Message? draft;
   final Message? reply;
 
-  // Associated user ids
+  // Associated user ids - TODO: remove
   final List<String> userIds;
-  final List<String> messageIds;
 
-  @JsonKey(ignore: true)
-  final List<Message> outbox;
-
-  // TODO: removed until state timeline work can be done
-  @JsonKey(ignore: true)
-  final List<Event>? state;
-
-  @JsonKey(ignore: true)
+  @JsonKey(ignore: true) // TODO: remove
   final Map<String, ReadReceipt>? readReceiptsTEMP;
 
-  @JsonKey(ignore: true)
+  @JsonKey(ignore: true) // TODO: remove
   final Map<String, User> usersTEMP;
 
   @JsonKey(ignore: true)
@@ -122,9 +114,7 @@ class Room implements drift.Insertable<Room> {
     this.draft,
     this.reply,
     this.userIds = const [],
-    this.outbox = const [],
     this.usersTEMP = const {},
-    this.messageIds = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -138,7 +128,6 @@ class Room implements drift.Insertable<Room> {
     this.nextBatch,
     this.prevBatch,
     this.readReceiptsTEMP,
-    this.state,
   });
 
   Room copyWith({
@@ -167,15 +156,11 @@ class Room implements drift.Insertable<Room> {
     draft,
     reply,
     List<String>? userIds,
-    events,
-    List<String>? messageIds,
-    List<Message>? outbox,
     Map<String, User>? usersTEMP,
     Map<String, ReadReceipt>? readReceiptsTEMP,
     String? lastBatch,
     String? prevBatch,
     String? nextBatch,
-    state,
   }) =>
       Room(
         id: id ?? this.id,
@@ -203,10 +188,7 @@ class Room implements drift.Insertable<Room> {
         usersTyping: usersTyping ?? this.usersTyping,
         draft: draft ?? this.draft,
         reply: reply == Null ? null : reply ?? this.reply,
-        state: state ?? this.state,
-        outbox: outbox ?? this.outbox,
         userIds: userIds ?? this.userIds,
-        messageIds: messageIds ?? this.messageIds,
         lastBatch: lastBatch ?? this.lastBatch,
         prevBatch: prevBatch ?? this.prevBatch,
         nextBatch: nextBatch ?? this.nextBatch,
@@ -458,7 +440,6 @@ class Room implements drift.Insertable<Room> {
     try {
       bool? limited;
       int lastUpdate = this.lastUpdate;
-      final messageIds = this.messageIds;
       final limitedCurrent = this.limited;
 
       // Converting only message events
@@ -477,13 +458,10 @@ class Room implements drift.Insertable<Room> {
 
       // limited indicates need to fetch additional data for room timelines
       if (limitedCurrent) {
-        // TODO: deprecated - remove along with messageIds
         // TODO: potentially reimplement, but with batch tokens instead
-        // TODO: consider also using another "existingIds" param instead to prevent
-        // TODO: needing room to have some state value
         // Check to see if the new messages contain those existing in cache
-        if (messages.isNotEmpty && messageIds.isNotEmpty) {
-          final messageKnown = messageIds.firstWhereOrNull(
+        if (messages.isNotEmpty && existingIds.isNotEmpty) {
+          final messageKnown = existingIds.firstWhereOrNull(
             (id) => id == messages[0].id,
           );
 
@@ -512,20 +490,8 @@ class Room implements drift.Insertable<Room> {
         }
       }
 
-      // Combine current and existing messages on unique ids
-      final messagesMap = HashMap.fromIterable(
-        messages,
-        key: (message) => message.id,
-        value: (message) => message,
-      );
-
-      // save messages and unique message id updates
-      final messageIdsNew = Set<String>.from(messagesMap.keys);
-      final messageIdsAll = Set<String>.from(messageIds)..addAll(messageIdsNew);
-
       // Save values to room
       return copyWith(
-        messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
         encryptionEnabled: encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate,
@@ -630,7 +596,6 @@ class Room implements drift.Insertable<Room> {
       draft: drift.Value(draft),
       reply: drift.Value(reply),
       userIds: drift.Value(userIds),
-      messageIds: drift.Value(messageIds),
     ).toColumns(nullToAbsent);
   }
 }

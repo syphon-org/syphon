@@ -20,6 +20,7 @@ class Event {
   final String? batch;
   final String? prevBatch; // the end batch token after syncing / fetching these messages
 
+  // When the event arrived on the server
   @JsonKey(defaultValue: 0)
   final int timestamp;
 

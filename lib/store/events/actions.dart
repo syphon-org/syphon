@@ -6,17 +6,13 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/events/model.dart';
-import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/settings/models.dart';
 
 class ResetEvents {}
 
@@ -42,46 +38,14 @@ class AddMessages {
   final String roomId;
   final List<Message> messages;
   final List<Message> outbox;
-  final bool limited;
+  final bool clear;
 
   AddMessages({
     required this.roomId,
     this.messages = const [],
     this.outbox = const [],
-    this.limited = false,
+    this.clear = false,
   });
-}
-
-class SetReactions {
-  final String? roomId;
-  final List<Reaction>? reactions;
-  SetReactions({this.roomId, this.reactions});
-}
-
-class SetReceipts {
-  final String? roomId;
-  final Map<String, ReadReceipt>? receipts;
-  SetReceipts({this.roomId, this.receipts});
-}
-
-class SetRedactions {
-  final List<Redaction>? redactions;
-  SetRedactions({this.redactions});
-}
-
-class LoadReactions {
-  final Map<String, List<Reaction>> reactionsMap;
-  LoadReactions({required this.reactionsMap});
-}
-
-class LoadReceipts {
-  final Map<String, Map<String, ReadReceipt>> receiptsMap;
-  LoadReceipts({required this.receiptsMap});
-}
-
-class LoadRedactions {
-  final Map<String, Redaction> redactionsMap;
-  LoadRedactions({required this.redactionsMap});
 }
 
 ///
@@ -117,13 +81,12 @@ ThunkAction<AppState> addMessages({
   required Room room,
   List<Message> messages = const [],
   List<Message> outbox = const [],
-  bool limited = false,
 }) =>
     (Store<AppState> store) {
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        AddMessages(roomId: room.id, messages: messages, outbox: outbox, limited: limited),
+        AddMessages(roomId: room.id, messages: messages, outbox: outbox),
       );
     };
 
@@ -143,32 +106,6 @@ ThunkAction<AppState> addMessagesDecrypted({
       return store.dispatch(
         AddMessagesDecrypted(roomId: room.id, messages: messages, outbox: outbox),
       );
-    };
-
-ThunkAction<AppState> setReactions({
-  List<Reaction> reactions = const [],
-}) =>
-    (Store<AppState> store) {
-      if (reactions.isEmpty) return;
-      return store.dispatch(SetReactions(reactions: reactions));
-    };
-
-ThunkAction<AppState> setRedactions({
-  String? roomId,
-  List<Redaction>? redactions,
-}) =>
-    (Store<AppState> store) {
-      if (redactions!.isEmpty) return;
-      store.dispatch(SetRedactions(redactions: redactions));
-    };
-
-ThunkAction<AppState> setReceipts({
-  Room? room,
-  Map<String, ReadReceipt>? receipts,
-}) =>
-    (Store<AppState> store) {
-      if (receipts!.isEmpty) return;
-      return store.dispatch(SetReceipts(roomId: room!.id, receipts: receipts));
     };
 
 ///
@@ -358,83 +295,6 @@ ThunkAction<AppState> selectReply({
   };
 }
 
-///
-/// Read Message Marker
-///
-/// Send Fully Read or just Read receipts bundled into
-/// one http call
-ThunkAction<AppState> sendReadReceipts({
-  Room? room,
-  Message? message,
-  bool readAll = true,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      // Skip if typing indicators are disabled
-      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
-        return printInfo('[sendReadReceipts] read receipts disabled');
-      }
-
-      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-        printInfo('[sendReadReceipts] read receipts hidden');
-      }
-
-      final data = await MatrixApi.sendReadReceipts(
-        protocol: store.state.authStore.protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        roomId: room!.id,
-        messageId: message!.id,
-        readAll: readAll,
-        hidden: store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden,
-      );
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-
-      printInfo('[sendReadReceipts] sent ${message.id} $data');
-    } catch (error) {
-      printInfo('[sendReadReceipts] failed $error');
-    }
-  };
-}
-
-///
-/// Read Message Marker
-///
-/// Send Fully Read or just Read receipts bundled into
-/// one http call
-ThunkAction<AppState> sendTyping({
-  String? roomId,
-  bool? typing = false,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      // Skip if typing indicators are disabled
-      if (!store.state.settingsStore.typingIndicatorsEnabled) {
-        printInfo('[sendTyping] typing indicators disabled');
-        return;
-      }
-
-      final data = await MatrixApi.sendTyping(
-        protocol: store.state.authStore.protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        roomId: roomId,
-        userId: store.state.authStore.user.userId,
-        typing: typing,
-      );
-
-      if (data['errcode'] != null) {
-        throw data['error'];
-      }
-    } catch (error) {
-      printError('[sendTyping] $error');
-    }
-  };
-}
-
 /// Delete Room Event (For Outbox, Local, and Remote)
 ThunkAction<AppState> deleteMessage({required Message message, required Room room}) {
   return (Store<AppState> store) async {
@@ -474,31 +334,6 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
       final messageDeleted = message.copyWith(body: '');
 
       return store.dispatch(DeleteMessage(room: room, message: messageDeleted));
-    } catch (error) {
-      printError('[deleteMessage] $error');
-    }
-  };
-}
-
-///
-/// Redact Event
-///
-/// Only use when you're sure no temporary events
-/// can be removed first (like failed or pending sends)
-///
-ThunkAction<AppState> redactEvent({
-  Room? room,
-  Event? event,
-}) {
-  return (Store<AppState> store) async {
-    try {
-      await MatrixApi.redactEvent(
-        trxId: DateTime.now().millisecond.toString(),
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        roomId: room!.id,
-        eventId: event!.id,
-      );
     } catch (error) {
       printError('[deleteMessage] $error');
     }

@@ -9,8 +9,11 @@ import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/storage.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
+import 'package:syphon/store/events/reactions/storage.dart';
+import 'package:syphon/store/events/receipts/actions.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
-import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/model.dart';
@@ -86,13 +89,14 @@ saveStorageMiddleware(Database? storageOld, StorageDatabase? storage) {
           deleteRooms({room.id: room}, storage: storage!);
         }
         break;
-      case SetReactions:
-        final _action = action as SetReactions;
-        saveReactions(_action.reactions ?? [], storage: storageOld);
+      case AddReactions:
+        final _action = action as AddReactions;
+        saveReactions(_action.reactions ?? [], storage: storage!);
         break;
-      case SetRedactions:
-        final _action = action as SetRedactions;
-        saveRedactions(_action.redactions ?? [], storage: storageOld);
+      case SaveRedactions:
+        final _action = action as SaveRedactions;
+        saveMessagesRedacted(_action.redactions ?? [], storage: storage!);
+        saveReactionsRedacted(_action.redactions ?? [], storage: storage);
         break;
       case SetReceipts:
         final _action = action as SetReceipts;

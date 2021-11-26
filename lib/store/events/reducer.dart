@@ -1,7 +1,10 @@
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/actions.dart';
+import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
 import './actions.dart';
@@ -9,20 +12,27 @@ import './state.dart';
 
 EventStore eventReducer([EventStore state = const EventStore(), dynamic action]) {
   switch (action.runtimeType) {
-    case SetReactions:
-      final _action = action as SetReactions;
+    case AddReactions:
+      final _action = action as AddReactions;
       final reactionsUpdated = Map<String, List<Reaction>>.from(
         state.reactions,
       );
 
       for (final Reaction reaction in _action.reactions ?? []) {
         final reactionEventId = reaction.relEventId;
-        final exists = reactionsUpdated.containsKey(reactionEventId);
+        final hasReactions = reactionsUpdated.containsKey(reactionEventId);
 
-        if (exists) {
-          final existing = reactionsUpdated[reactionEventId]!;
-          if (existing.indexWhere((value) => value.id == reaction.id) == -1) {
-            reactionsUpdated[reactionEventId!] = [...existing, reaction];
+        if (hasReactions) {
+          final reactions = reactionsUpdated[reactionEventId]!;
+          final reactionIndex = reactions.indexWhere((value) => value.id == reaction.id);
+
+          if (reactionIndex == -1) {
+            reactionsUpdated[reactionEventId!] = [...reactions, reaction];
+          } else {
+            reactionsUpdated[reactionEventId!] = [
+              ...reactions.where((r) => r.id != reaction.id).toList(),
+              reaction
+            ];
           }
         } else if (reactionEventId != null) {
           reactionsUpdated[reactionEventId] = [reaction];
@@ -163,8 +173,8 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       return state.copyWith(messages: messages);
 
-    case SetRedactions:
-      final _action = action as SetRedactions;
+    case SaveRedactions:
+      final _action = action as SaveRedactions;
       if (_action.redactions == null || _action.redactions!.isEmpty) {
         return state;
       }
@@ -203,8 +213,6 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       return state.copyWith(reactions: action.reactionsMap);
     case LoadReceipts:
       return state.copyWith(receipts: action.receiptsMap);
-    case LoadRedactions:
-      return state.copyWith(redactions: action.redactionsMap);
     case ResetEvents:
       return EventStore();
     default:

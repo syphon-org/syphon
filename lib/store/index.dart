@@ -1,6 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -196,8 +194,10 @@ Future<Store<AppState>> initStore(
     ],
   );
 
-  // async load additional cold storage to rehydrate cache
-  loadStorageAsync(storage, store);
+  if (coldStorage != null) {
+    // async load additional cold storage to rehydrate cache
+    loadStorageAsync(storage, coldStorage, store);
+  }
 
   return store;
 }

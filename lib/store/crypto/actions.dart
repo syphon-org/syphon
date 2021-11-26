@@ -410,7 +410,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeyCounts) 
   return (Store<AppState> store) async {
     final currentKeyCounts = store.state.cryptoStore.oneTimeKeysCounts;
 
-    printDebug('[updateOneTimeKeyCounts] $oneTimeKeyCounts, current $currentKeyCounts');
+    printInfo('[updateOneTimeKeyCounts] $oneTimeKeyCounts, current $currentKeyCounts');
 
     // Confirm user has access token
     final accessToken = store.state.authStore.user.accessToken;
@@ -651,9 +651,7 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
-        printDebug(
-          '[claimOneTimeKeys] all key sharing sessions per device are ready',
-        );
+        printInfo('[claimOneTimeKeys] all key sharing sessions per device are ready');
         return true;
       }
 

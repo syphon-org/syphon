@@ -155,7 +155,7 @@ class ChatScreenState extends State<ChatScreen> {
         room: props.room,
       ));
     } catch (error) {
-      printDebug(error.toString());
+      printError(error.toString());
     }
   }
 
