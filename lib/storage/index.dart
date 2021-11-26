@@ -17,7 +17,6 @@ import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/sembast/codec.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
-import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -25,9 +24,8 @@ import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/reactions/storage.dart';
+import 'package:syphon/store/events/receipts/actions.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
-import 'package:syphon/store/events/redaction/actions.dart';
-import 'package:syphon/store/events/redaction/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -131,7 +129,7 @@ Future<Database?> initStorage({String? context = AppContext.DEFAULT}) async {
     Storage.instance = openedDatabase;
     return openedDatabase;
   } catch (error) {
-    printDebug('[initStorage] $error');
+    printError('[initStorage] $error');
     return null;
   }
 }
@@ -243,7 +241,7 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
 // finishes loading cold storage objects to RAM, this can
 // be much more specific and performant
 //
-// TODO: convert reactions and redactions to new storage paradigm
+// TODO: convert receipts to new storage
 //
 loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> store) async {
   try {
@@ -254,8 +252,6 @@ loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> 
 
     final reactions = <String, List<Reaction>>{};
     final receipts = <String, Map<String, ReadReceipt>>{};
-
-    final redactions = await loadRedactions(storage: storageOld);
 
     for (final Room room in rooms) {
       final currentMessages = messages[room.id] ?? [];
@@ -276,8 +272,6 @@ loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> 
     loadAsync() async {
       await store.dispatch(LoadReceipts(receiptsMap: receipts));
       await store.dispatch(LoadReactions(reactionsMap: reactions));
-      // TODO: deprecated - after redact refactor
-      await store.dispatch(LoadRedactions(redactionsMap: redactions));
 
       // mutate messages
       await store.dispatch(mutateMessagesAll());

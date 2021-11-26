@@ -114,6 +114,7 @@ class Message extends Event implements drift.Insertable<Message> {
     String? batch,
     dynamic content,
     dynamic data,
+    bool redact = false,
     bool? syncing,
     bool? pending,
     bool? failed,
@@ -136,7 +137,7 @@ class Message extends Event implements drift.Insertable<Message> {
     String? sessionId,
     String? relatedEventId,
     List<String>? editIds,
-    reactions,
+    List<Reaction>? reactions,
   }) =>
       Message(
         id: id ?? this.id,
@@ -149,7 +150,7 @@ class Message extends Event implements drift.Insertable<Message> {
         prevBatch: prevBatch ?? this.prevBatch,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
-        body: body ?? this.body,
+        body: redact ? null : body ?? this.body,
         formattedBody: formattedBody ?? this.formattedBody,
         msgtype: msgtype ?? this.msgtype,
         format: format ?? this.format,

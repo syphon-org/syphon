@@ -17,6 +17,7 @@ import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
+import 'package:syphon/store/events/receipts/actions.dart';
 import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';

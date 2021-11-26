@@ -54,6 +54,7 @@ class Reaction extends Event implements drift.Insertable<Reaction> {
     body,
     relType,
     relEventId,
+    bool redact = false,
   }) =>
       Reaction(
         id: id ?? this.id,
@@ -65,7 +66,7 @@ class Reaction extends Event implements drift.Insertable<Reaction> {
         prevBatch: prevBatch ?? this.prevBatch,
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
-        body: body ?? this.body,
+        body: redact ? null : body ?? this.body,
         relType: relType ?? this.relType,
         relEventId: relEventId ?? this.relEventId,
       );

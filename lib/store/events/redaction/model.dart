@@ -3,6 +3,12 @@ import 'package:syphon/store/events/model.dart';
 
 part 'model.g.dart';
 
+/// Redaction
+///
+/// Note: Redactions are ephemeral events
+/// meant to mutate other events
+/// These are no longer saved to any database
+/// but saved by modifying other stored events
 @JsonSerializable()
 class Redaction extends Event {
   final String? redactId; // event_id

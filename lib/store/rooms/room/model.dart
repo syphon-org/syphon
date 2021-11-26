@@ -57,13 +57,13 @@ class Room implements drift.Insertable<Room> {
   final Message? draft;
   final Message? reply;
 
-  // Associated user ids
+  // Associated user ids - TODO: remove
   final List<String> userIds;
 
-  @JsonKey(ignore: true)
+  @JsonKey(ignore: true) // TODO: remove
   final Map<String, ReadReceipt>? readReceiptsTEMP;
 
-  @JsonKey(ignore: true)
+  @JsonKey(ignore: true) // TODO: remove
   final Map<String, User> usersTEMP;
 
   @JsonKey(ignore: true)

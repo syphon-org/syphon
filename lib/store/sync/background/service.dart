@@ -94,7 +94,7 @@ Future notificationSyncTEST() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        printDebug(
+        print(
           '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
         );
         return Future.value(true);
@@ -167,7 +167,7 @@ Future notificationSyncIsolate() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        printDebug(
+        print(
           '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
         );
         return Future.value(true);

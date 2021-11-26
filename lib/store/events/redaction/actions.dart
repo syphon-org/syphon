@@ -16,20 +16,6 @@ class SaveRedactions {
   SaveRedactions({this.redactions});
 }
 
-class LoadRedactions {
-  final Map<String, Redaction> redactionsMap;
-  LoadRedactions({required this.redactionsMap});
-}
-
-ThunkAction<AppState> setRedactions({
-  String? roomId,
-  List<Redaction>? redactions,
-}) =>
-    (Store<AppState> store) {
-      if (redactions!.isEmpty) return;
-      store.dispatch(SaveRedactions(redactions: redactions));
-    };
-
 ///
 /// Send Redaction (Server Side / Remotely)
 ///
@@ -64,7 +50,12 @@ ThunkAction<AppState> redactEvents({required Room room, List<Redaction> redactio
       if (redactions.isEmpty) return;
 
       final messagesCached = store.state.eventStore.messages[room.id] ?? [];
-      final reactionsCached = store.state.eventStore.reactions[room.id] ?? [];
+      final reactionsCachedAll = store.state.eventStore.reactions; // by eventId
+
+      final messageIds = messagesCached.map((m) => m.id).toList();
+
+      final reactionsCached =
+          messageIds.map((id) => reactionsCachedAll[id]).expand((x) => x ?? []).toList();
 
       // create a map of messages for O(1) when replacing O(N)
       final messagesMap = Map<String, Message>.fromIterable(
@@ -76,8 +67,8 @@ ThunkAction<AppState> redactEvents({required Room room, List<Redaction> redactio
       // create a map of messages for O(1) when replacing O(N)
       final reactionsMap = Map<String, Reaction>.fromIterable(
         reactionsCached,
-        key: (message) => message.id,
-        value: (message) => message,
+        key: (reaction) => reaction.id,
+        value: (reaction) => reaction,
       );
 
       final messages = <Message>[];
@@ -85,16 +76,16 @@ ThunkAction<AppState> redactEvents({required Room room, List<Redaction> redactio
 
       for (final redaction in redactions) {
         if (messagesMap.containsKey(redaction.redactId)) {
-          messages.add(messagesMap[redaction.redactId]!.copyWith(body: null));
+          messages.add(messagesMap[redaction.redactId]!.copyWith(redact: true));
         }
         if (reactionsMap.containsKey(redaction.redactId)) {
-          reactions.add(reactionsMap[redaction.redactId]!.copyWith(body: null));
+          reactions.add(reactionsMap[redaction.redactId]!.copyWith(redact: true));
         }
       }
 
       // add messages back to cache having been redacted
+      await store.dispatch(addReactions(reactions: reactions));
       store.dispatch(addMessages(room: room, messages: messages));
-      store.dispatch(addReactions(reactions: reactions));
 
       // save redactions to cold storage
       store.dispatch(SaveRedactions(redactions: redactions));

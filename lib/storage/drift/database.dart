@@ -12,7 +12,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/drift/converters.dart';
 // ignore: unused_import
-import 'package:syphon/storage/drift/migrations/update.messages.5.dart';
+import 'package:syphon/storage/drift/migrations/5.update.messages.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
@@ -122,7 +122,7 @@ class StorageDatabase extends _$StorageDatabase {
   // you should bump this number whenever you change or add a table definition. Migrations
   // are covered later in this readme.
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -131,6 +131,9 @@ class StorageDatabase extends _$StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
+          if (from == 5) {
+            m.createTable(reactions);
+          }
           if (from == 4) {
             await m.addColumn(messages, messages.editIds);
             await m.addColumn(messages, messages.batch);

@@ -3,6 +3,7 @@ import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/actions.dart';
 import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
@@ -24,10 +25,10 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
         if (hasReactions) {
           final reactions = reactionsUpdated[reactionEventId]!;
           final reactionIndex = reactions.indexWhere((value) => value.id == reaction.id);
+
           if (reactionIndex == -1) {
             reactionsUpdated[reactionEventId!] = [...reactions, reaction];
           } else {
-            // TODO: check this is replacing existing reactions with updated values
             reactionsUpdated[reactionEventId!] = [
               ...reactions.where((r) => r.id != reaction.id).toList(),
               reaction
@@ -212,8 +213,6 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       return state.copyWith(reactions: action.reactionsMap);
     case LoadReceipts:
       return state.copyWith(receipts: action.receiptsMap);
-    case LoadRedactions:
-      return state.copyWith(redactions: action.redactionsMap);
     case ResetEvents:
       return EventStore();
     default:
