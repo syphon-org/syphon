@@ -7,7 +7,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/http-proxy-settings/actions.dart';
+import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
@@ -124,9 +124,9 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        proxyEnabled: store.state.settingsStore.httpProxySettings.enabled,
-        host: store.state.settingsStore.httpProxySettings.host,
-        port: store.state.settingsStore.httpProxySettings.port,
+        proxyEnabled: store.state.settingsStore.proxySettings.enabled,
+        host: store.state.settingsStore.proxySettings.host,
+        port: store.state.settingsStore.proxySettings.port,
         onToggleProxy : () async {
           await store.dispatch(toggleProxy());
         },
@@ -138,7 +138,7 @@ class _Props extends Equatable {
               title: Strings.titleProxyHost,
               content: Strings.contentProxyHost,
               editingController: TextEditingController(
-                text: store.state.settingsStore.httpProxySettings.host,
+                text: store.state.settingsStore.proxySettings.host,
               ),
               label: Strings.labelProxyHost,
               inputFormatters: [
@@ -165,7 +165,7 @@ class _Props extends Equatable {
               title: Strings.titleProxyPort,
               content: Strings.contentProxyPort,
               editingController: TextEditingController(
-                text: store.state.settingsStore.httpProxySettings.port,
+                text: store.state.settingsStore.proxySettings.port,
               ),
               label: Strings.labelProxyPort,
               inputFormatters: [

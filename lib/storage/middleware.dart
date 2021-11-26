@@ -20,7 +20,7 @@ import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/store/settings/http-proxy-settings/actions.dart';
+import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/sync/background/storage.dart';

@@ -7,7 +7,7 @@ import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 
 import './chat-settings/model.dart';
-import 'http-proxy-settings/model.dart';
+import 'proxy-settings/model.dart';
 
 part 'state.g.dart';
 
@@ -40,7 +40,7 @@ class SettingsStore extends Equatable {
   final Map<String, ChatSetting> chatSettings; // roomId
   final NotificationSettings notificationSettings;
 
-  final HttpProxySettings httpProxySettings;
+  final ProxySettings proxySettings;
 
   @JsonKey(ignore: true)
   final String? pusherToken; // NOTE: can be device token for APNS
@@ -67,7 +67,7 @@ class SettingsStore extends Equatable {
     this.alphaAgreement,
     this.pusherToken,
     this.readReceipts = ReadReceiptTypes.Off,
-    this.httpProxySettings = const HttpProxySettings(),
+    this.proxySettings = const ProxySettings(),
   });
 
   @override
@@ -89,7 +89,7 @@ class SettingsStore extends Equatable {
         alphaAgreement,
         pusherToken,
         readReceipts,
-        httpProxySettings,
+        proxySettings,
       ];
 
   SettingsStore copyWith({
@@ -113,7 +113,7 @@ class SettingsStore extends Equatable {
     String? alphaAgreement,
     String? pusherToken, // NOTE: device token for APNS
     ReadReceiptTypes? readReceipts,
-    HttpProxySettings? httpProxySettings,
+    ProxySettings? proxySettings,
   }) =>
       SettingsStore(
         language: language ?? this.language,
@@ -136,7 +136,7 @@ class SettingsStore extends Equatable {
         alphaAgreement: alphaAgreement ?? this.alphaAgreement,
         pusherToken: pusherToken ?? this.pusherToken,
         readReceipts: readReceipts ?? this.readReceipts,
-        httpProxySettings: httpProxySettings ?? this.httpProxySettings,
+        proxySettings: proxySettings ?? this.proxySettings,
       );
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);

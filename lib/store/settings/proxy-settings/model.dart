@@ -4,12 +4,12 @@ import 'package:json_annotation/json_annotation.dart';
 part 'model.g.dart';
 
 @JsonSerializable()
-class HttpProxySettings extends Equatable {
+class ProxySettings extends Equatable {
   final bool enabled; // proxy enabled
   final String host;
   final String port;
 
-  const HttpProxySettings({
+  const ProxySettings({
     this.enabled = false,
     this.host = '127.0.0.1',
     this.port = '8118',
@@ -22,12 +22,12 @@ class HttpProxySettings extends Equatable {
         port,
       ];
 
-  HttpProxySettings copyWith({
+  ProxySettings copyWith({
     enabled,
     host,
     port,
   }) =>
-      HttpProxySettings(
+      ProxySettings(
         enabled: enabled ?? this.enabled,
         host: host ?? this.host,
         port: port ?? this.port,
@@ -35,6 +35,6 @@ class HttpProxySettings extends Equatable {
 
   Map<String, dynamic> toJson() => _$HttpProxySettingsToJson(this);
 
-  factory HttpProxySettings.fromJson(Map<String, dynamic> json) =>
+  factory ProxySettings.fromJson(Map<String, dynamic> json) =>
       _$HttpProxySettingsFromJson(json);
 }
