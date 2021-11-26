@@ -283,7 +283,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
               ),
             ),
             IconButton(
-              icon: Icon(Icons.vpn_lock),
+              icon: Icon(Icons.more_vert),
               iconSize: Dimensions.iconSizeLarge,
               tooltip: Strings.listItemSettingsProxy,
               color: Theme.of(context).primaryColor,
