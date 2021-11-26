@@ -16,7 +16,7 @@ authMiddleware<State>(
 ) {
   switch (action.runtimeType) {
     case SetReactions:
-    case SetRedactions:
+    case SaveRedactions:
     case AddMessages:
     case UpdateRoom:
       if (store.state.authStore.user.accessToken == null) {

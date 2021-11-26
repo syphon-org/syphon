@@ -66,12 +66,9 @@ List<Message> reviseMessagesFilter(
   Map<String, Redaction> redactions,
   Map<String, List<Reaction>> reactions,
 ) {
-  final messagesMap = filterRedactions(
-    appendReactions(
-      replaceEdited(messages),
-      reactions: reactions,
-      redactions: redactions,
-    ),
+  final messagesMap = appendReactions(
+    replaceEdited(messages),
+    reactions: reactions,
     redactions: redactions,
   );
 
@@ -118,6 +115,7 @@ Map<String, Message?> appendReactions(
   return messages;
 }
 
+///
 /// Replace Edited
 ///
 /// Modify the original messsage and append the replacement event ID

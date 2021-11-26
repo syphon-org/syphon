@@ -25,7 +25,7 @@ import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/reactions/storage.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
-import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/events/redaction/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -256,16 +256,17 @@ loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> 
     final redactions = await loadRedactions(storage: storageOld);
 
     for (final Room room in rooms) {
-      final messagesRoom = messages[room.id] ?? [];
+      final currentMessages = messages[room.id] ?? [];
+      final currentMessagesIds = currentMessages.map((e) => e.id ?? '').toList();
 
       reactions.addAll(await loadReactionsMapped(
         roomId: room.id,
-        eventIds: messagesRoom.map((e) => e.id ?? '').toList(),
+        eventIds: currentMessagesIds,
         storage: storage,
       ));
 
       receipts[room.id] = await loadReceipts(
-        room.messageIds,
+        currentMessagesIds,
         storage: storageOld,
       );
     }

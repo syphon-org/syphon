@@ -163,8 +163,8 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       return state.copyWith(messages: messages);
 
-    case SetRedactions:
-      final _action = action as SetRedactions;
+    case SaveRedactions:
+      final _action = action as SaveRedactions;
       if (_action.redactions == null || _action.redactions!.isEmpty) {
         return state;
       }

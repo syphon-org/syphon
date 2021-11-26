@@ -5,6 +5,7 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 
 ///
 /// Message Quesies - unencrypted (Cold Storage)
@@ -23,14 +24,29 @@ extension MessageQueries on StorageDatabase {
   }
 
   ///
-  /// Select Messages (Generic)
+  /// Select Messages (Ids)
   ///
   /// Query messages that occured previous to the timestamp
   /// sent in. This doesn't factor in batches or any matrix
   /// paradigm in terms of DAG / state and just pulls messages
   /// previous in time.
   ///
-  Future<List<Message>> selectMessages(
+  Future<List<Message>> selectMessagesIds(List<String> messageIds) {
+    return (select(messages)
+          ..where((tbl) => tbl.id.isIn(messageIds))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)]))
+        .get();
+  }
+
+  ///
+  /// Select Messages (Timeline)
+  ///
+  /// Query messages that occured previous to the timestamp
+  /// sent in. This doesn't factor in batches or any matrix
+  /// paradigm in terms of DAG / state and just pulls messages
+  /// previous in time.
+  ///
+  Future<List<Message>> selectMessagesOrdered(
     String? roomId, {
     int? timestamp,
     int offset = 0,
@@ -101,6 +117,17 @@ Future<void> saveMessages(
   await storage.insertMessagesBatched(messages);
 }
 
+Future<void> saveMessagesRedacted(
+  List<Redaction> redactions, {
+  required StorageDatabase storage,
+}) async {
+  final messageIds = redactions.map((redaction) => redaction.redactId ?? '').toList();
+  final messages = await storage.selectMessagesIds(messageIds);
+
+  final messagesUpdated = messages.map((message) => message.copyWith(body: null)).toList();
+  await storage.insertMessagesBatched(messagesUpdated);
+}
+
 Future<List<Message>> loadMessages({
   required StorageDatabase storage,
   required String roomId,
@@ -123,7 +150,7 @@ Future<List<Message>> loadMessages({
       );
     }
 
-    return storage.selectMessages(
+    return storage.selectMessagesOrdered(
       roomId,
       timestamp: timestamp,
       offset: offset,

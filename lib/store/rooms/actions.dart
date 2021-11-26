@@ -94,12 +94,12 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     final synced = store.state.syncStore.synced;
     final lastSince = store.state.syncStore.lastSince;
 
-    await Future.wait(roomData.keys.map((id) async {
+    await Future.wait(roomData.keys.map((roomId) async {
       try {
-        final Map json = roomData[id] ?? {};
+        final Map json = roomData[roomId] ?? {};
 
-        final roomOld = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
-        final messagesOld = store.state.eventStore.messages[id];
+        final roomOld = rooms.containsKey(roomId) ? rooms[roomId]! : Room(id: roomId);
+        final messagesOld = store.state.eventStore.messages[roomId] ?? [];
 
         if (json.isEmpty) return;
 
@@ -108,6 +108,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           'room': roomOld,
           'currentUser': user,
           'lastSince': lastSince,
+          'existingMessages': messagesOld,
         });
 
         // overwrite room with updated one from sync
@@ -118,14 +119,13 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           '[syncRooms] ${roomSynced.name} ' +
               'full_synced: $synced ' +
               'limited: ${roomSynced.limited} ' +
-              'total messages: ${roomSynced.messageIds.length} ' +
+              'total new messages: ${sync.messages.length} ' +
               'roomPrevBatch: ${roomSynced.prevBatch}',
         );
 
         // update various message mutations and meta data
         await store.dispatch(setUsers(sync.users));
         await store.dispatch(setReactions(reactions: sync.reactions));
-        await store.dispatch(setRedactions(redactions: sync.redactions));
         await store.dispatch(setReceipts(room: roomSynced, receipts: sync.readReceipts));
 
         // handles editing newly fetched messages
@@ -136,7 +136,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         // update encrypted messages (updating before normal messages prevents flicker)
         if (roomSynced.encryptionEnabled) {
-          final decryptedOld = store.state.eventStore.messagesDecrypted[id];
+          final decryptedOld = store.state.eventStore.messagesDecrypted[roomId];
 
           final decrypted = await store.dispatch(decryptMessages(
             roomSynced,
@@ -152,7 +152,6 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           await store.dispatch(addMessagesDecrypted(
             room: roomSynced,
             messages: decryptedMutated,
-            outbox: roomSynced.outbox,
           ));
         }
 
@@ -160,7 +159,12 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         await store.dispatch(addMessages(
           room: roomSynced,
           messages: messages,
-          outbox: roomSynced.outbox,
+        ));
+
+        // redact messages through cache and cold storage
+        await store.dispatch(redactMessages(
+          room: roomSynced,
+          redactions: sync.redactions,
         ));
 
         // update room
@@ -190,10 +194,10 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           // TODO: clear all but the last 25 messages from state
         }
       } catch (error) {
-        printError('[syncRoom] error $id ${error.toString()}');
+        printError('[syncRoom] error $roomId ${error.toString()}');
 
         // prevents against recursive backfill from bombing attempts at fetching messages
-        final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+        final roomExisting = rooms.containsKey(roomId) ? rooms[roomId]! : Room(id: roomId);
         store.dispatch(SetRoom(room: roomExisting.copyWith(limited: false)));
       }
     }));

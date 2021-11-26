@@ -67,12 +67,16 @@ class SyncEvents {
 ///
 /// Not all events are needed to derive new information about the room
 ///
+/// Existing messages are used to check if a room has backfilled to a
+/// previously known position of chat / messages
 ///
 Sync parseSync(Map params) {
   final Map<String, dynamic> json = params['json'] as Map<String, dynamic>;
   final Room roomExisting = params['room'];
   final User currentUser = params['currentUser'];
   final String? lastSince = params['lastSince'];
+  final List<Message> existingMessages = params['existingMessages'];
+  final existingIds = existingMessages.map((m) => m.id ?? '').toList();
 
   final details = parseDetails(json);
   final events = parseEvents(
@@ -95,6 +99,7 @@ Sync parseSync(Map params) {
     limited: details.limited,
     lastBatch: details.lastBatch,
     prevBatch: details.prevBatch,
+    existingIds: existingIds,
   );
 
   // TODO: remove with separate parsers, solve the issue of redundant passes over this data
@@ -102,7 +107,6 @@ Sync parseSync(Map params) {
   final readReceipts = Map<String, ReadReceipt>.from(room.readReceiptsTEMP ?? {});
 
   final roomUpdated = room.copyWith(
-    outbox: [], // TODO: needs to be handled correctly
     usersTEMP: <String, User>{},
     readReceiptsTEMP: <String, ReadReceipt>{},
   );

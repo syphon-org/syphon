@@ -4,11 +4,12 @@ import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/redaction/model.dart';
 
 ///
 /// Reaction Queries - unencrypted (Cold Storage)
 ///
-/// In storage, messages are indexed by eventId
+/// In storage, reactions are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 ///
 extension ReactionQueries on StorageDatabase {
@@ -22,13 +23,26 @@ extension ReactionQueries on StorageDatabase {
   }
 
   ///
+  /// Select Reactions (Ids)
+  ///
+  /// Query every message known in a room
+  ///
+  Future<List<Reaction>> selectReactionsById(List<String> reactionIds) {
+    return (select(reactions)..where((tbl) => tbl.body.isNotNull() & tbl.id.isIn(reactionIds)))
+        .get();
+  }
+
+  ///
   /// Select Reactions (All)
   ///
   /// Query every message known in a room
   ///
   Future<List<Reaction>> selectReactionsPerEvent(String roomId, List<String>? eventIds) {
     return (select(reactions)
-          ..where((tbl) => tbl.roomId.equals(roomId) & tbl.relEventId.isIn(eventIds ?? [])))
+          ..where((tbl) =>
+              tbl.body.isNotNull() &
+              tbl.roomId.equals(roomId) &
+              tbl.relEventId.isIn(eventIds ?? [])))
         .get();
   }
 }
@@ -38,6 +52,17 @@ Future<void> saveReactions(
   required StorageDatabase storage,
 }) async {
   await storage.insertReactionsBatched(reactions);
+}
+
+Future<void> saveReactionsRedacted(
+  List<Redaction> redactions, {
+  required StorageDatabase storage,
+}) async {
+  final reactionIds = redactions.map((redaction) => redaction.redactId ?? '').toList();
+  final reactions = await storage.selectReactionsById(reactionIds);
+
+  final reactionsUpdated = reactions.map((reaction) => reaction.copyWith(body: null)).toList();
+  await storage.insertReactionsBatched(reactionsUpdated);
 }
 
 ///
@@ -58,7 +83,7 @@ Future<List<Reaction>> loadReactions({
 }
 
 ///
-/// Load Reactions
+/// Load Reactions Mapped
 ///
 ///
 Future<Map<String, List<Reaction>>> loadReactionsMapped({

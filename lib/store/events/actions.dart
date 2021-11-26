@@ -64,9 +64,9 @@ class SetReceipts {
   SetReceipts({this.roomId, this.receipts});
 }
 
-class SetRedactions {
+class SaveRedactions {
   final List<Redaction>? redactions;
-  SetRedactions({this.redactions});
+  SaveRedactions({this.redactions});
 }
 
 class LoadReactions {
@@ -127,6 +127,45 @@ ThunkAction<AppState> addMessages({
     };
 
 ///
+/// Redact Messages
+///
+/// Redact messages locally throughout all
+/// storage layers
+///
+ThunkAction<AppState> redactMessages({required Room room, List<Redaction> redactions = const []}) {
+  return (Store<AppState> store) async {
+    try {
+      if (redactions.isEmpty) return;
+
+      final messagesCached = store.state.eventStore.messages[room.id] ?? [];
+
+      // create a map of messages for O(1) when replacing O(N)
+      final messagesMap = Map<String, Message>.fromIterable(
+        messagesCached,
+        key: (message) => message.id,
+        value: (message) => message,
+      );
+
+      final redacted = <Message>[];
+
+      for (final redaction in redactions) {
+        if (messagesMap.containsKey(redaction.redactId)) {
+          redacted.add(messagesMap[redaction.redactId]!.copyWith(body: null));
+        }
+      }
+
+      // add messages back to cache having been redacted
+      store.dispatch(addMessages(room: room, messages: redacted));
+
+      // save redactions to cold storage
+      store.dispatch(SaveRedactions(redactions: redactions));
+    } catch (error) {
+      printError('[deleteMessage] $error');
+    }
+  };
+}
+
+///
 /// Add Messages Decrypted
 ///
 /// Saves in memory only version of the decrypted message
@@ -158,7 +197,7 @@ ThunkAction<AppState> setRedactions({
 }) =>
     (Store<AppState> store) {
       if (redactions!.isEmpty) return;
-      store.dispatch(SetRedactions(redactions: redactions));
+      store.dispatch(SaveRedactions(redactions: redactions));
     };
 
 ThunkAction<AppState> setReceipts({
@@ -485,10 +524,7 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
 /// Only use when you're sure no temporary events
 /// can be removed first (like failed or pending sends)
 ///
-ThunkAction<AppState> redactEvent({
-  Room? room,
-  Event? event,
-}) {
+ThunkAction<AppState> redactEvent({Room? room, Event? event}) {
   return (Store<AppState> store) async {
     try {
       await MatrixApi.redactEvent(
