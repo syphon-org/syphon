@@ -150,28 +150,7 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       return state.copyWith(outbox: outboxNew);
 
     case DeleteMessage:
-      final room = action.room;
-      final roomId = room.id;
-      final messageDeleted = (action as DeleteMessage).message;
-
-      final messages = Map<String, List<Message>>.from(
-        state.messages,
-      );
-
-      final messagesRoom = messages[roomId];
-
-      if (messagesRoom == null) {
-        return state;
-      }
-
-      messages[roomId] = messagesRoom.map((message) {
-        if (message.id == messageDeleted.id) {
-          return message.copyWith(body: Strings.labelDeletedMessage);
-        }
-        return message;
-      }).toList();
-
-      return state.copyWith(messages: messages);
+      return state;
 
     case SaveRedactions:
       final _action = action as SaveRedactions;

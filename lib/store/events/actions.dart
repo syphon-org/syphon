@@ -326,14 +326,17 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
         homeserver: store.state.authStore.user.homeserver,
       );
 
-      if (!result) {
+      final success = result != false && result['event_id'] != null;
+
+      if (!success) {
         throw 'Failed to delete message, try again soon';
       }
 
+      // TODO: confirm - 2021
       // deleted messages returned remotely will have empty 'body' fields
       final messageDeleted = message.copyWith(body: '');
 
-      return store.dispatch(DeleteMessage(room: room, message: messageDeleted));
+      return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
     } catch (error) {
       printError('[deleteMessage] $error');
     }

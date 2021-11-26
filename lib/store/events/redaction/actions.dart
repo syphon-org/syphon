@@ -33,7 +33,7 @@ ThunkAction<AppState> sendRedaction({Room? room, Event? event}) {
         eventId: event!.id,
       );
     } catch (error) {
-      printError('[deleteMessage] $error');
+      printError('[sendRedaction] $error');
     }
   };
 }
@@ -76,7 +76,7 @@ ThunkAction<AppState> redactEvents({required Room room, List<Redaction> redactio
 
       for (final redaction in redactions) {
         if (messagesMap.containsKey(redaction.redactId)) {
-          messages.add(messagesMap[redaction.redactId]!.copyWith(redact: true));
+          messages.add(messagesMap[redaction.redactId]!.copyWith(body: ''));
         }
         if (reactionsMap.containsKey(redaction.redactId)) {
           reactions.add(reactionsMap[redaction.redactId]!.copyWith(redact: true));
@@ -90,7 +90,7 @@ ThunkAction<AppState> redactEvents({required Room room, List<Redaction> redactio
       // save redactions to cold storage
       store.dispatch(SaveRedactions(redactions: redactions));
     } catch (error) {
-      printError('[deleteMessage] $error');
+      printError('[redactEvents] $error');
     }
   };
 }
