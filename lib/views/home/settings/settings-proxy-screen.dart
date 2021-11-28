@@ -127,7 +127,7 @@ class _Props extends Equatable {
         proxyEnabled: store.state.settingsStore.proxySettings.enabled,
         host: store.state.settingsStore.proxySettings.host,
         port: store.state.settingsStore.proxySettings.port,
-        onToggleProxy : () async {
+        onToggleProxy: () async {
           await store.dispatch(toggleProxy());
         },
         onEditProxyHost: (BuildContext context) async {
@@ -137,20 +137,14 @@ class _Props extends Equatable {
             builder: (dialogContext) => DialogTextInput(
               title: Strings.titleProxyHost,
               content: Strings.contentProxyHost,
-              editingController: TextEditingController(
-                text: store.state.settingsStore.proxySettings.host,
-              ),
               label: Strings.labelProxyHost,
-              inputFormatters: [
-                FilteringTextInputFormatter.singleLineFormatter
-              ],
+              initialValue: store.state.settingsStore.proxySettings.host,
+              inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
               onCancel: () async {
                 Navigator.of(dialogContext).pop();
               },
               onConfirm: (String host) async {
-                await store.dispatch(SetProxyHost(
-                    host: host)
-                );
+                await store.dispatch(SetProxyHost(host: host));
 
                 Navigator.of(dialogContext).pop();
               },
@@ -164,9 +158,7 @@ class _Props extends Equatable {
             builder: (dialogContext) => DialogTextInput(
               title: Strings.titleProxyPort,
               content: Strings.contentProxyPort,
-              editingController: TextEditingController(
-                text: store.state.settingsStore.proxySettings.port,
-              ),
+              initialValue: store.state.settingsStore.proxySettings.port,
               label: Strings.labelProxyPort,
               inputFormatters: [
                 FilteringTextInputFormatter.singleLineFormatter,
@@ -176,9 +168,7 @@ class _Props extends Equatable {
                 Navigator.of(dialogContext).pop();
               },
               onConfirm: (String port) async {
-                await store.dispatch(SetProxyPort(
-                    port: port)
-                );
+                await store.dispatch(SetProxyPort(port: port));
 
                 Navigator.of(dialogContext).pop();
               },

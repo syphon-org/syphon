@@ -33,8 +33,7 @@ class ProxySettings extends Equatable {
         port: port ?? this.port,
       );
 
-  Map<String, dynamic> toJson() => _$HttpProxySettingsToJson(this);
+  Map<String, dynamic> toJson() => _$ProxySettingsToJson(this);
 
-  factory ProxySettings.fromJson(Map<String, dynamic> json) =>
-      _$HttpProxySettingsFromJson(json);
+  factory ProxySettings.fromJson(Map<String, dynamic> json) => _$ProxySettingsFromJson(json);
 }
