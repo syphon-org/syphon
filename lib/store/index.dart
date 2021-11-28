@@ -143,17 +143,17 @@ AppState appReducer(AppState state, action) => AppState(
 ///
 Future<Store<AppState>> initStore(
   Database? cache,
-  Database? storage,
-  StorageDatabase? coldStorage, {
+  Database? storageOld,
+  StorageDatabase? storage, {
   AppState? existingState,
   bool existingUser = false,
 }) async {
   AppState? initialState;
   Map<String, dynamic> preloaded = {};
 
-  if (storage != null) {
+  if (storageOld != null) {
     // synchronously load mandatory cold storage to rehydrate cache
-    preloaded = await loadStorage(storage, coldStorage!);
+    preloaded = await loadStorage(storageOld, storage!);
   }
 
   // Configure redux persist instance
@@ -187,16 +187,16 @@ Future<Store<AppState>> initStore(
       thunkMiddleware,
       authMiddleware,
       persistor.createMiddleware(),
-      saveStorageMiddleware(storage, coldStorage),
-      loadStorageMiddleware(coldStorage),
-      searchMiddleware(coldStorage),
+      saveStorageMiddleware(storage),
+      loadStorageMiddleware(storage),
+      searchMiddleware(storage),
       alertMiddleware,
     ],
   );
 
-  if (coldStorage != null) {
+  if (storage != null) {
     // async load additional cold storage to rehydrate cache
-    loadStorageAsync(storage, coldStorage, store);
+    loadStorageAsync(storage, store);
   }
 
   return store;

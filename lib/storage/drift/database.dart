@@ -14,6 +14,8 @@ import 'package:syphon/storage/drift/converters.dart';
 // ignore: unused_import
 import 'package:syphon/storage/drift/migrations/5.update.messages.dart';
 import 'package:syphon/storage/index.dart';
+import 'package:syphon/store/auth/schema.dart';
+import 'package:syphon/store/crypto/schema.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -25,6 +27,7 @@ import 'package:syphon/store/media/model.dart';
 import 'package:syphon/store/media/schema.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/schema.dart';
+import 'package:syphon/store/settings/schema.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/schema.dart';
 
@@ -113,7 +116,18 @@ LazyDatabase openDatabase(String context) {
   });
 }
 
-@DriftDatabase(tables: [Messages, Decrypted, Rooms, Users, Medias, Reactions, Receipts])
+@DriftDatabase(tables: [
+  Messages,
+  Decrypted,
+  Rooms,
+  Users,
+  Medias,
+  Reactions,
+  Receipts,
+  Auths,
+  Cryptos,
+  Settings,
+])
 class StorageDatabase extends _$StorageDatabase {
   // we tell the database where to store the data with this constructor
   StorageDatabase(String context) : super(openDatabase(context));
@@ -133,7 +147,11 @@ class StorageDatabase extends _$StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
+
           if (from == 5) {
+            m.createTable(auths);
+            m.createTable(cryptos);
+            m.createTable(settings);
             m.createTable(receipts);
             m.createTable(reactions);
           }

@@ -161,8 +161,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // Stop saving to existing context databases
     await closeCache(cache);
-    await closeStorage(storage);
-    await closeColdStorage(storageCold);
+    await closeStorageOLD(storage);
+    await closeStorage(storageCold);
 
     // final context switches
     final contextOld = await loadCurrentContext();
@@ -179,8 +179,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
 
     final cacheNew = await initCache(context: contextNew);
-    final storageNew = await initStorage(context: contextNew);
-    final storageColdNew = await initColdStorage(context: contextNew);
+    final storageNew = await initStorageOLD(context: contextNew);
+    final storageColdNew = await initStorage(context: contextNew);
 
     final storeExisting = AppState(
       authStore: store.state.authStore.copyWith(user: user),
@@ -249,8 +249,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       printInfo('[onDeleteContext] DELETING CONTEXT DATA ${context.current}');
     }
     await deleteCache(context: context.current);
+    await deleteStorageOLD(context: context.current);
     await deleteStorage(context: context.current);
-    await deleteColdStorage(context: context.current);
   }
 
   // Reset contexts if the current user has no accessToken (unrecoverable state)

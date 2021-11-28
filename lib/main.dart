@@ -22,10 +22,10 @@ void main() async {
   final cache = await initCache(context: context.current);
 
   // init cold storage - old
-  final storage = await initStorage(context: context.current);
+  final storage = await initStorageOLD(context: context.current);
 
   // init cold storage
-  final storageCold = await initColdStorage(context: context.current);
+  final storageCold = await initStorage(context: context.current);
 
   // init redux store
   final store = await initStore(cache, storage, storageCold);
