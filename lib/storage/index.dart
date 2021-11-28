@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
@@ -17,7 +18,6 @@ import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/sembast/codec.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
@@ -25,8 +25,10 @@ import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/reactions/storage.dart';
 import 'package:syphon/store/events/receipts/actions.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
@@ -197,7 +199,6 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
     final settings = await loadSettings(storage: storageOld);
 
     final rooms = await loadRooms(storage: storage);
-    final media = await loadMediaAll(storage: storage);
 
     for (final Room room in rooms.values) {
       messages[room.id] = await loadMessagesRoom(
@@ -217,6 +218,12 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
     }
 
     final users = await loadUsers(storage: storage, ids: userIds);
+
+    final media = await loadMediaRelative(
+      storage: storage,
+      users: users.values.toList(),
+      rooms: rooms.values.toList(),
+    );
 
     return {
       StorageKeys.AUTH: auth,
@@ -249,9 +256,11 @@ loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> 
 
     final rooms = store.state.roomStore.roomList;
     final messages = store.state.eventStore.messages;
+    final decrypted = store.state.eventStore.messagesDecrypted;
 
+    final medias = <String, Uint8List>{};
     final reactions = <String, List<Reaction>>{};
-    final receipts = <String, Map<String, ReadReceipt>>{};
+    final receipts = <String, Map<String, Receipt>>{};
 
     for (final Room room in rooms) {
       final currentMessages = messages[room.id] ?? [];
@@ -267,11 +276,20 @@ loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> 
         currentMessagesIds,
         storage: storageOld,
       );
+
+      medias.addAll(await loadMediaRelative(
+        storage: storage,
+        messages:
+            messages.values.expand((e) => e).toList() + decrypted.values.expand((e) => e).toList(),
+      ));
     }
 
     loadAsync() async {
-      await store.dispatch(LoadReceipts(receiptsMap: receipts));
-      await store.dispatch(LoadReactions(reactionsMap: reactions));
+      await Future.wait([
+        store.dispatch(LoadMedia(mediaMap: medias)),
+        store.dispatch(LoadReceipts(receiptsMap: receipts)),
+        store.dispatch(LoadReactions(reactionsMap: reactions)),
+      ] as Iterable<Future<dynamic>>);
 
       // mutate messages
       await store.dispatch(mutateMessagesAll());

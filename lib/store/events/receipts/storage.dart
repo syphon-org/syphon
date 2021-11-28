@@ -4,14 +4,14 @@ import 'dart:convert';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 
 ///
 /// Save Receipts
 ///
 ///
 Future<void> saveReceipts(
-  Map<String, ReadReceipt>? receipts, {
+  Map<String, Receipt>? receipts, {
   Database? storage,
   required bool ready,
 }) async {
@@ -33,19 +33,19 @@ Future<void> saveReceipts(
 ///
 /// Iterates through
 ///
-Future<Map<String, ReadReceipt>> loadReceipts(
+Future<Map<String, Receipt>> loadReceipts(
   List<String?> messageIds, {
   required Database storage,
 }) async {
   try {
     final store = StoreRef<String?, String>(StorageKeys.RECEIPTS);
 
-    final receiptsMap = <String, ReadReceipt>{};
+    final receiptsMap = <String, Receipt>{};
     final records = await store.records(messageIds).getSnapshots(storage);
 
     for (final RecordSnapshot<String?, String>? record in records) {
       if (record != null) {
-        final receipt = ReadReceipt.fromJson(await json.decode(record.value));
+        final receipt = Receipt.fromJson(await json.decode(record.value));
         receiptsMap.putIfAbsent(record.key!, () => receipt);
       }
     }

@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
@@ -7,7 +5,6 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/storage/drift/database.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -59,9 +56,6 @@ class Room implements drift.Insertable<Room> {
 
   // Associated user ids - TODO: remove
   final List<String> userIds;
-
-  @JsonKey(ignore: true) // TODO: remove
-  final Map<String, ReadReceipt>? readReceiptsTEMP;
 
   @JsonKey(ignore: true) // TODO: remove
   final Map<String, User> usersTEMP;
@@ -127,7 +121,6 @@ class Room implements drift.Insertable<Room> {
     this.lastBatch,
     this.nextBatch,
     this.prevBatch,
-    this.readReceiptsTEMP,
   });
 
   Room copyWith({
@@ -151,13 +144,12 @@ class Room implements drift.Insertable<Room> {
     int? totalJoinedUsers,
     guestEnabled,
     encryptionEnabled,
-    userTyping,
-    usersTyping,
+    bool? userTyping,
+    List<String>? usersTyping,
     draft,
     reply,
     List<String>? userIds,
     Map<String, User>? usersTEMP,
-    Map<String, ReadReceipt>? readReceiptsTEMP,
     String? lastBatch,
     String? prevBatch,
     String? nextBatch,
@@ -193,7 +185,6 @@ class Room implements drift.Insertable<Room> {
         prevBatch: prevBatch ?? this.prevBatch,
         nextBatch: nextBatch ?? this.nextBatch,
         usersTEMP: usersTEMP ?? this.usersTEMP,
-        readReceiptsTEMP: readReceiptsTEMP ?? this.readReceiptsTEMP,
       );
 
   Map<String, dynamic> toJson() => _$RoomToJson(this);
@@ -240,10 +231,6 @@ class Room implements drift.Insertable<Room> {
           prevBatch: prevBatch,
           messages: events.messages,
           existingIds: existingIds,
-        )
-        .fromEphemeralEvents(
-          currentUser: currentUser,
-          events: events.ephemeral,
         );
   }
 
@@ -507,63 +494,6 @@ class Room implements drift.Insertable<Room> {
       printError('[fromMessageEvents] $error');
       return this;
     }
-  }
-
-  /// Appends ephemeral events (mostly read receipts) to a
-  /// hashmap of eventIds linking them to users and timestamps
-  Room fromEphemeralEvents({
-    required List<Event> events,
-    User? currentUser,
-  }) {
-    bool userTyping = false;
-    List<String> usersTyping = this.usersTyping;
-    final readReceipts = Map<String, ReadReceipt>.from(readReceiptsTEMP ?? {});
-
-    try {
-      for (final event in events) {
-        switch (event.type) {
-          case 'm.typing':
-            final List<dynamic> usersTypingList = event.content['user_ids'];
-            usersTyping = List<String>.from(usersTypingList);
-            usersTyping.removeWhere(
-              (user) => currentUser!.userId == user,
-            );
-            userTyping = usersTyping.isNotEmpty;
-            break;
-          case 'm.receipt':
-            final Map<String, dynamic> receiptEventIds = event.content;
-
-            // TODO: figure out how to pull what messages have been read from read recepts
-            // // Set a new timestamp for the latest read message if it exceeds the current
-            // latestRead = latestRead < newReadStatuses.latestRead
-            //     ? newReadStatuses.latestRead
-            //     : latestRead;
-
-            // Filter through every eventId to find receipts
-            receiptEventIds.forEach((key, receipt) {
-              // convert every m.read object to a map of userIds + timestamps for read
-              final readReceiptsNew = ReadReceipt.fromReceipt(receipt);
-
-              // update the eventId if that event already has reads
-              if (!readReceipts.containsKey(key)) {
-                readReceipts[key] = readReceiptsNew;
-              } else {
-                // otherwise, add the usersRead to the existing reads
-                readReceipts[key]!.userReads!.addAll(readReceiptsNew.userReads!);
-              }
-            });
-            break;
-          default:
-            break;
-        }
-      }
-    } catch (error) {}
-
-    return copyWith(
-      userTyping: userTyping,
-      usersTyping: usersTyping,
-      readReceiptsTEMP: readReceipts,
-    );
   }
 
   // allows converting to message companion type for saving through drift

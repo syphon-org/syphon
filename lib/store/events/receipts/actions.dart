@@ -2,26 +2,26 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/models.dart';
 
 class SetReceipts {
   final String? roomId;
-  final Map<String, ReadReceipt>? receipts;
+  final Map<String, Receipt>? receipts;
   SetReceipts({this.roomId, this.receipts});
 }
 
 class LoadReceipts {
-  final Map<String, Map<String, ReadReceipt>> receiptsMap;
+  final Map<String, Map<String, Receipt>> receiptsMap;
   LoadReceipts({required this.receiptsMap});
 }
 
 ThunkAction<AppState> setReceipts({
   Room? room,
-  Map<String, ReadReceipt>? receipts,
+  Map<String, Receipt>? receipts,
 }) =>
     (Store<AppState> store) {
       if (receipts!.isEmpty) return;

@@ -18,6 +18,8 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/reactions/schema.dart';
+import 'package:syphon/store/events/receipts/model.dart';
+import 'package:syphon/store/events/receipts/schema.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/media/model.dart';
 import 'package:syphon/store/media/schema.dart';
@@ -111,7 +113,7 @@ LazyDatabase openDatabase(String context) {
   });
 }
 
-@DriftDatabase(tables: [Messages, Decrypted, Rooms, Users, Medias, Reactions])
+@DriftDatabase(tables: [Messages, Decrypted, Rooms, Users, Medias, Reactions, Receipts])
 class StorageDatabase extends _$StorageDatabase {
   // we tell the database where to store the data with this constructor
   StorageDatabase(String context) : super(openDatabase(context));
@@ -132,6 +134,7 @@ class StorageDatabase extends _$StorageDatabase {
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
           if (from == 5) {
+            m.createTable(receipts);
             m.createTable(reactions);
           }
           if (from == 4) {

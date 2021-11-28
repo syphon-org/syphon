@@ -8,6 +8,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/media/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/user/model.dart';
 
 ///
 /// Message Quesies - unencrypted (Cold Storage)
@@ -95,17 +96,22 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 /// Load All Media (Cold Storage)
 ///
 /// load all media found within media storage
-Future<Map<String, Uint8List>?> loadMediaRelative({
+Future<Map<String, Uint8List>> loadMediaRelative({
   required StorageDatabase storage,
-  List<Message>? messages,
-  List<Room>? rooms,
+  List<User> users = const [],
+  List<Room> rooms = const [],
+  List<Message> messages = const [],
 }) async {
+  final media = <String, Uint8List>{};
+
   try {
-    final Map<String, Uint8List> media = {};
+    final idsUserAvatar = users.map((u) => u.avatarUri).toList();
+    final idsRoomAvatar = rooms.map((r) => r.avatarUri).toList();
+    final idsMediaMessages = messages.map((m) => m.url).toList();
 
-    final mediaIds = <String>[];
+    final idsAll = idsMediaMessages + idsRoomAvatar + idsUserAvatar;
 
-    final images = await storage.selectMedias(mediaIds);
+    final images = await storage.selectMedias(idsAll);
 
     printInfo('[media] loaded ${images.length.toString()}');
 
@@ -114,10 +120,9 @@ Future<Map<String, Uint8List>?> loadMediaRelative({
         media[image.mxcUri!] = image.data!;
       }
     }
-
-    return media;
   } catch (error) {
     printError(error.toString(), title: 'loadMediaRelative');
-    return null;
   }
+
+  return media;
 }

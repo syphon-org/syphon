@@ -28,8 +28,7 @@ class Medias extends Table {
   TextColumn get mxcUri => text().customConstraint('UNIQUE')();
   BlobColumn get data => blob().nullable()();
   TextColumn get type => text().nullable()();
-  TextColumn get info =>
-      text().map(const EncryptInfoToJsonConverter()).nullable()();
+  TextColumn get info => text().map(const EncryptInfoToJsonConverter()).nullable()();
 
   @override
   Set<Column> get primaryKey => {mxcUri};

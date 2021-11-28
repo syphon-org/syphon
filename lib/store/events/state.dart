@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
 import 'model.dart';
@@ -22,7 +22,7 @@ class EventStore extends Equatable {
   final Map<String, Redaction> redactions; // eventId indexed
   final Map<String, List<Message>> messages; // roomId indexed
   final Map<String, List<Reaction>> reactions; // eventId indexed
-  final Map<String, Map<String, ReadReceipt>> receipts; // eventId, userId indexed
+  final Map<String, Map<String, Receipt>> receipts; // eventId, userId indexed
   final Map<String, Map<String, Message>> outbox; // roomId, tempId subindex
   final Map<String, List<Message>> messagesDecrypted; // messages decrypted - in memory only
 
@@ -53,7 +53,7 @@ class EventStore extends Equatable {
     Map<String, List<Message>>? messagesDecrypted,
     Map<String, Redaction>? redactions,
     Map<String, List<Reaction>>? reactions,
-    Map<String, Map<String, ReadReceipt>>? receipts,
+    Map<String, Map<String, Receipt>>? receipts,
     Map<String, Map<String, Message>>? outbox,
   }) =>
       EventStore(

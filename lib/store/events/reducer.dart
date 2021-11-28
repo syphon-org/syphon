@@ -1,9 +1,8 @@
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/actions.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
@@ -176,10 +175,10 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       }
 
       final roomId = action.roomId;
-      final receiptsUpdated = Map<String, Map<String, ReadReceipt>>.from(
+      final receiptsUpdated = Map<String, Map<String, Receipt>>.from(
         state.receipts,
       );
-      final receiptsNew = Map<String, ReadReceipt>.from(
+      final receiptsNew = Map<String, Receipt>.from(
         action.receipts,
       );
 
