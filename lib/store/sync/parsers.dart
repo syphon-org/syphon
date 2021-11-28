@@ -49,6 +49,7 @@ class SyncEvents {
 class SyncDetails {
   final bool? invite;
   final bool? limited;
+  final int? totalMembers;
   final String? currBatch; // current batch, if known from fetchMessages
   final String? lastBatch;
   final String? prevBatch;
@@ -59,6 +60,7 @@ class SyncDetails {
     this.currBatch,
     this.lastBatch,
     this.prevBatch,
+    this.totalMembers,
   });
 }
 
@@ -91,6 +93,7 @@ Sync parseSync(Map params) {
   final existingIds = existingMessages.map((m) => m.id ?? '').toList();
 
   final details = parseDetails(json);
+
   final events = parseEvents(
     json,
     roomId: roomExisting.id,
@@ -125,6 +128,7 @@ Sync parseSync(Map params) {
   final roomUpdated = room.copyWith(
     userTyping: ephemerals.userTyping,
     usersTyping: ephemerals.usersTyping,
+    totalJoinedUsers: details.totalMembers,
     usersTEMP: <String, User>{},
   );
 
@@ -148,6 +152,7 @@ Sync parseSync(Map params) {
 SyncDetails parseDetails(Map<String, dynamic> json) {
   bool invite;
   bool? limited;
+  int? totalMembers;
   String? currBatch;
   String? lastBatch;
   String? prevBatch;
@@ -161,12 +166,17 @@ SyncDetails parseDetails(Map<String, dynamic> json) {
     prevBatch = json['timeline']['prev_batch'];
   }
 
+  if (json['summary'] != null) {
+    totalMembers = json['summary']['m.joined_member_count'];
+  }
+
   return SyncDetails(
     invite: invite,
     limited: limited,
     currBatch: currBatch,
     lastBatch: lastBatch,
     prevBatch: prevBatch,
+    totalMembers: totalMembers,
   );
 }
 

@@ -20,7 +20,6 @@ import 'package:syphon/store/settings/notification-settings/options/types.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/store/user/storage.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -290,7 +289,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                                           textAlign: TextAlign.start,
                                         ),
                                         Text(
-                                          ' (${props.room.userIds.length})',
+                                          ' (${props.room.userIds.length > props.usersTotal ? props.room.userIds.length : props.usersTotal})',
                                           textAlign: TextAlign.start,
                                         ),
                                       ],
@@ -548,6 +547,7 @@ class _Props extends Equatable {
   final Room room;
   final bool loading;
   final User currentUser;
+  final int usersTotal;
   final List<User?> users;
   final Color chatColorPrimary;
   final List<Message> messages;
@@ -566,6 +566,7 @@ class _Props extends Equatable {
     required this.users,
     required this.loading,
     required this.messages,
+    required this.usersTotal,
     required this.currentUser,
     required this.onBlockUser,
     required this.onLeaveChat,
@@ -594,6 +595,9 @@ class _Props extends Equatable {
           store.state.settingsStore.notificationSettings.notificationOptions[roomId],
       room: selectRoom(id: roomId, state: store.state),
       users: roomUsers(store.state, roomId),
+      usersTotal: selectRoom(id: roomId, state: store.state).totalJoinedUsers > 0
+          ? selectRoom(id: roomId, state: store.state).totalJoinedUsers
+          : roomUsers(store.state, roomId).length,
       currentUser: store.state.authStore.user,
       messages: roomMessages(store.state, roomId),
       onToggleRoomNotifications: () async {
