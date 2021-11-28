@@ -102,7 +102,7 @@ saveStorageMiddleware(Database? storageOld, StorageDatabase? storage) {
         final _action = action as SetReceipts;
         final isSynced = store.state.syncStore.synced;
         // TODO: the initial sync loads way too many read receipts
-        saveReceipts(_action.receipts ?? {}, storage: storageOld, ready: isSynced);
+        saveReceipts(_action.receipts ?? {}, storage: storage!, ready: isSynced);
         break;
       case SetRoom:
         final _action = action as SetRoom;

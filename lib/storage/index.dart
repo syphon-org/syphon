@@ -250,10 +250,8 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
 //
 // TODO: convert receipts to new storage
 //
-loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> store) async {
+loadStorageAsync(StorageDatabase storage, Store<AppState> store) async {
   try {
-    if (storageOld == null) return;
-
     final rooms = store.state.roomStore.roomList;
     final messages = store.state.eventStore.messages;
     final decrypted = store.state.eventStore.messagesDecrypted;
@@ -274,13 +272,13 @@ loadStorageAsync(Database? storageOld, StorageDatabase storage, Store<AppState> 
 
       receipts[room.id] = await loadReceipts(
         currentMessagesIds,
-        storage: storageOld,
+        storage: storage,
       );
 
       medias.addAll(await loadMediaRelative(
-        storage: storage,
         messages:
             messages.values.expand((e) => e).toList() + decrypted.values.expand((e) => e).toList(),
+        storage: storage,
       ));
     }
 
