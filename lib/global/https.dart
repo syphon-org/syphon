@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
+import 'package:syphon/store/settings/proxy-settings/model.dart';
 
 /// This is LetsEncrypt's self-signed trusted root certificate authority
 /// certificate, issued under common name: ISRG Root X1 (Internet Security
@@ -72,6 +73,17 @@ HttpClient customHttpClient({String? cert}) {
 /// LetsEncrypt trusted certificate
 http.Client createClient() {
   return IOClient(customHttpClient(cert: ISRG_X1));
+}
+
+/// Use package:http Client with our custom dart:io HttpClient with added
+/// LetsEncrypt trusted certificate, via a proxy
+http.Client createProxiedClient(ProxySettings proxySettings) {
+  final HttpClient customClient = customHttpClient(cert: ISRG_X1);
+  customClient.findProxy = (uri) {
+    return 'PROXY ${proxySettings.host}:${proxySettings.port};';
+  };
+
+  return IOClient(customClient);
 }
 
 // WARN: global var for httpClient requests

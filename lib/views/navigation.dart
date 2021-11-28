@@ -34,6 +34,8 @@ import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/intro/signup/signup-screen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
+import 'home/settings/settings-proxy-screen.dart';
+
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -106,6 +108,7 @@ class Routes {
   static const settingsBlocked = '/home/settings/blocked';
   static const settingsPassword = '/home/settings/password';
   static const settingsAdvanced = '/home/settings/advanced';
+  static const settingsProxy = '/home/settings/proxy';
   static const settingsNotifications = '/home/settings/notifications';
   static const settingsLanguages = '/settings/languages';
 
@@ -142,6 +145,7 @@ class NavigationProvider {
         Routes.settingsNotifications: (BuildContext context) => const NotificationSettingsScreen(),
         Routes.settingsLanguages: (BuildContext context) => const LanguageSettingsScreen(),
         Routes.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),
+        Routes.settingsProxy: (BuildContext context) => const ProxySettingsScreen(),
         Routes.settingsStorage: (BuildContext context) => const StorageSettingsScreen(),
         Routes.settingsPassword: (BuildContext context) => const PasswordUpdateScreen(),
         Routes.licenses: (BuildContext context) =>
