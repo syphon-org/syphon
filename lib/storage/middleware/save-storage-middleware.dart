@@ -20,8 +20,8 @@ import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
@@ -144,16 +144,10 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetMainFabLocation:
       case SetMainFabType:
       case ToggleAutoDownload:
-        saveSettings(store.state.settingsStore, storage: storage);
-        break;
       case ToggleProxy:
-        saveSettings(store.state.settingsStore, storage: storageOld);
-        break;
       case SetProxyHost:
-        saveSettings(store.state.settingsStore, storage: storageOld);
-        break;
       case SetProxyPort:
-        saveSettings(store.state.settingsStore, storage: storageOld);
+        saveSettings(store.state.settingsStore, storage: storage);
         break;
       case SetOlmAccountBackup:
       case SetDeviceKeysOwned:
