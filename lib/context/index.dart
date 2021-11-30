@@ -14,17 +14,24 @@ import 'package:syphon/global/print.dart';
 ///
 /// allows multiaccount feature to be domain logic independent
 ///
-
 String generateContextId() {
   final shaHash = sha256.convert(utf8.encode(getRandomString(10)));
-  return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
+  return base64
+      .encode(shaHash.bytes)
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^\w]'), '')
+      .substring(0, 10);
 }
 
 // Switch to generating UserID independent context IDs that can still be managed globally
 // ignore: non_constant_identifier_names
 String generateContextId_DEPRECATED({required String id}) {
   final shaHash = sha256.convert(utf8.encode(id));
-  return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
+  return base64
+      .encode(shaHash.bytes)
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^\w]'), '')
+      .substring(0, 10);
 }
 
 // TODO: convert to setCurrentContext after 0.1.14 release
@@ -47,7 +54,8 @@ Future<AppContext> loadCurrentContext() async {
 
     try {
       SecureStorage().write(key: AppContext.ALL_CONTEXT_KEY, value: json.encode([]));
-      SecureStorage().write(key: AppContext.CURRENT_CONTEXT_KEY, value: json.encode(AppContext.DEFAULT));
+      SecureStorage()
+          .write(key: AppContext.CURRENT_CONTEXT_KEY, value: json.encode(AppContext.DEFAULT));
     } catch (error) {
       printError('[loadCurrentContext] ERROR SAVING DEFAULTS ${error.toString()}');
     }
