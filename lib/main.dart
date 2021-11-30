@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:syphon/cache/index.dart';
@@ -7,6 +9,8 @@ import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/prelock.dart';
 import 'package:syphon/views/syphon.dart';
+
+import 'global/https.dart';
 
 // ignore: avoid_void_async
 void main() async {
@@ -29,6 +33,14 @@ void main() async {
 
   // init redux store
   final store = await initStore(cache, storage, storageCold);
+
+  // init http client
+  if (store.state.settingsStore.proxySettings.enabled) {
+    httpClient = createProxiedClient(store.state.settingsStore.proxySettings);
+  }
+  else {
+    httpClient = createClient();
+  }
 
   // init app
   runApp(

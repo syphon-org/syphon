@@ -160,5 +160,9 @@
     "confirm-leave-chat-multi": "Êtes-vous sûr·e de vouloir quitter les {} discussions sélectionnées ?",
     "confirm-leave-chat-multi-nonpublic": "Certaines de ces discussions ne sont pas publiques. Vous ne pourrez plus les rejoindre sans invitation.",
     "alert-hidden-read-receipts": "Les accusés de réception cachés doivent être pris en charge par votre serveur domestique, sinon cela aura le même effet que d'activer les accusés de réception",
-    "label-download-image": "Charger l'image"
+    "label-download-image": "Charger l'image",
+    "content-dialog-device-rename": "Entrez un nouveau nom public pour cet appareil.",
+    "title-device-rename": "Renommer un appareil",
+    "confirm-linkout": "Voulez-vous vraiment ouvrir le lien suivant ?\n\n{}",
+    "title-dialog-confirm-linkout": "Confirmer l'ouverture du lien"
 }

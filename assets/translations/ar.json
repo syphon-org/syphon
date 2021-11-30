@@ -160,5 +160,9 @@
     "button-text-mark-all-read": "ضع علامة بأنه تمت القراءة",
     "button-text-invite": "دعوة الأصدقاء",
     "alert-hidden-read-receipts": "يجب دعم إيصالات القراءة المخفية من قبل الخادم المنزلي الخاص بك ، أو سيكون لهذا نفس تأثير تبديل إيصالات القراءة \"تشغيل\"",
-    "label-download-image": "تحميل الصورة"
+    "label-download-image": "تحميل الصورة",
+    "content-dialog-device-rename": "أدخل اسم العرض العام الجديد لهذا الجهاز.",
+    "title-device-rename": "أعد تسمية الجهاز",
+    "title-dialog-confirm-linkout": "تأكيد فتح الرابط",
+    "confirm-linkout": "هل أنت متأكد أنك تريد فتح الرابط التالي؟\n\n{}"
 }

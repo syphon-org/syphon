@@ -74,7 +74,7 @@
     "title-user-verification": "Verificação do utilizador",
     "title-dialog-terms-alpha": "Confirmar os Termos de Serviço do Alpha Aberto",
     "title-dialog-terms": "Confirmar os Termos de Serviço",
-    "title-dialog-captcha": "Completa o captcha",
+    "title-dialog-captcha": "Completar o captcha",
     "title-dialog-encryption": "Encriptar a conversa?",
     "title-dialog-delete-keys": "Confirmar a eliminação das chaves",
     "title-view-profile": "Configurar o seu perfil",
@@ -160,5 +160,9 @@
     "confirm-block-user": "Se bloquear {}, não poderá ver as mensagens dessa pessoa e sairá imediatamente desta conversa.",
     "label-back": "Voltar",
     "alert-hidden-read-receipts": "Os recibos de leitura ocultos devem ser suportados pelo seu servidor doméstico, ou isso terá o mesmo efeito que alternar os recibos de leitura para 'Ativado'",
-    "label-download-image": "Carregar imagem"
+    "label-download-image": "Carregar imagem",
+    "content-dialog-device-rename": "Introduza o novo nome público para este dispositivo.",
+    "confirm-linkout": "Tem a certeza que quer abrir a seguinte hiperligação?\n\n{}",
+    "title-device-rename": "Alternar nome do dispositivo",
+    "title-dialog-confirm-linkout": "Confirmar abertura de hiperligação"
 }

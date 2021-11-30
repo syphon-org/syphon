@@ -13,6 +13,7 @@ class DialogTextInput extends StatefulWidget {
     this.title = '',
     this.content = '',
     this.label = '',
+    this.initialValue = '',
     this.loading = false,
     this.valid = false,
     this.keyboardType = TextInputType.text,
@@ -26,6 +27,8 @@ class DialogTextInput extends StatefulWidget {
   final String title;
   final String content;
   final String label;
+  final String initialValue;
+
   final bool loading;
   final bool valid;
   final TextInputType keyboardType;
@@ -47,6 +50,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
   @override
   void initState() {
     super.initState();
+    editingControllerDefault.text = widget.initialValue;
 
     editingControllerDefault.addListener(() {
       setState(() {
