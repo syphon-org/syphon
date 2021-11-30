@@ -110,6 +110,7 @@ Sync parseSync(Map params) {
   final room = roomExisting.fromEvents(
     events: events,
     lastSince: lastSince,
+    invite: details.invite,
     currentUser: currentUser,
     limited: details.limited,
     lastBatch: details.lastBatch,
@@ -150,14 +151,16 @@ Sync parseSync(Map params) {
 /// and batch information
 ///
 SyncDetails parseDetails(Map<String, dynamic> json) {
-  bool invite;
+  bool? invite;
   bool? limited;
   int? totalMembers;
   String? currBatch;
   String? lastBatch;
   String? prevBatch;
 
-  invite = json['invite_state'] != null;
+  if (json['invite_state'] != null) {
+    invite = true;
+  }
 
   if (json['timeline'] != null) {
     limited = json['timeline']['limited'];

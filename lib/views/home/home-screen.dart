@@ -12,7 +12,6 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -297,6 +296,7 @@ class HomeState extends State<HomeScreen> {
     final assetColor = computeContrastColorText(
       Theme.of(context).appBarTheme.backgroundColor,
     );
+
     return AppBar(
       automaticallyImplyLeading: false,
       titleSpacing: 16.00,

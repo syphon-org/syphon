@@ -36,6 +36,7 @@ class MessageWidget extends StatelessWidget {
     this.fontSize = 14.0,
     this.timeFormat = '12hr',
     this.color,
+    this.luminance = 0.0,
     this.onSendEdit,
     this.onLongPress,
     this.onPressAvatar,
@@ -53,10 +54,12 @@ class MessageWidget extends StatelessWidget {
   final int lastRead;
   final double fontSize;
   final String timeFormat;
+
+  final Color? color;
+  final double? luminance;
   final String? avatarUri;
   final String? selectedMessageId;
   final String? displayName;
-  final Color? color;
 
   final Message message;
   final ThemeType themeType;
@@ -79,8 +82,8 @@ class MessageWidget extends StatelessWidget {
         ),
     );
 
-    final reactionKeys = reactionsMap.keys.toList();
-    final reactionCounts = reactionsMap.values.toList();
+    final reactionKeys = reactionsMap.keys;
+    final reactionCounts = reactionsMap.values;
 
     return ListView.builder(
       shrinkWrap: true,
@@ -89,8 +92,8 @@ class MessageWidget extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.antiAlias,
       itemBuilder: (BuildContext context, int index) {
-        final reactionKey = reactionKeys[index];
-        final reactionCount = reactionCounts[index];
+        final reactionKey = reactionKeys.elementAt(index);
+        final reactionCount = reactionCounts.elementAt(index);
         return GestureDetector(
           onTap: () {
             if (onToggleReaction != null) {
@@ -229,6 +232,7 @@ class MessageWidget extends StatelessWidget {
 
     var textColor = Colors.white;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
+    var luminance = this.luminance;
 
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
@@ -302,11 +306,15 @@ class MessageWidget extends StatelessWidget {
     if (isUserSent) {
       if (themeType == ThemeType.Dark) {
         bubbleColor = Color(Colours.greyDark);
+        luminance = 0.2;
       } else if (themeType != ThemeType.Light) {
         bubbleColor = Color(Colours.greyDarkest);
+        luminance = bubbleColor.computeLuminance();
+        luminance = 0.2;
       } else {
         textColor = const Color(Colours.blackFull);
         bubbleColor = const Color(Colours.greyLightest);
+        luminance = 0.85;
       }
 
       indicatorColor = isRead ? textColor : bubbleColor;
@@ -316,7 +324,7 @@ class MessageWidget extends StatelessWidget {
       alignmentReaction = MainAxisAlignment.start;
       alignmentMessageText = CrossAxisAlignment.end;
     } else {
-      textColor = bubbleColor.computeLuminance() > 0.6 ? Colors.black : Colors.white;
+      textColor = (luminance ?? 0.0) > 0.6 ? Colors.black : Colors.white;
     }
 
     if (selectedMessageId != null && !selected) {
@@ -337,7 +345,7 @@ class MessageWidget extends StatelessWidget {
 
     // efficent way to check if Matrix message is a reply
     if (body.length > 1 && body[0] == '>') {
-      final isLight = bubbleColor.computeLuminance() > 0.5;
+      final isLight = (luminance ?? 0.0) > 0.5;
       replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
     }
 
@@ -588,9 +596,7 @@ class MessageWidget extends StatelessWidget {
                                           visible: showStatus,
                                           child: Container(
                                             // timestamp and error message
-                                            margin: EdgeInsets.only(
-                                              right: 4,
-                                            ),
+                                            margin: EdgeInsets.only(right: 4),
                                             child: Text(
                                               status,
                                               style: TextStyle(

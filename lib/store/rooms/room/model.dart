@@ -74,16 +74,16 @@ class Room implements drift.Insertable<Room> {
 
   @JsonKey(ignore: true)
   String get type {
+    if (invite) {
+      return 'invite';
+    }
+
     if (joinRule == 'public' || worldReadable) {
       return 'public';
     }
 
     if (direct) {
       return 'direct';
-    }
-
-    if (invite) {
-      return 'invite';
     }
 
     return 'group';
@@ -436,7 +436,7 @@ class Room implements drift.Insertable<Room> {
 
       // See if the newest message has a greater timestamp
       final latestMessage = messages.firstWhereOrNull(
-        (msg) => lastUpdate < msg.timestamp,
+        (msg) => msg.timestamp > lastUpdate,
       );
 
       if (latestMessage != null) {
