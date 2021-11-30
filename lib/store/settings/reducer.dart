@@ -130,6 +130,14 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       httpClient = createClient(proxySettings: _state.proxySettings);
 
       return _state;
+    case SetProxyPort:
+      final _state =  state.copyWith(
+        proxySettings: state.proxySettings.copyWith(port: action.port),
+      );
+
+      httpClient = createClient(proxySettings: _state.proxySettings);
+
+      return _state;
     case SetReadReceipts:
       final _action = action as SetReadReceipts;
       return state.copyWith(
