@@ -213,7 +213,8 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         'fullState': isFullSync,
         'since': forceFull ? null : since ?? lastSince,
         'filter': null,
-        'timeout': store.state.settingsStore.syncPollTimeout
+        'timeout': store.state.settingsStore.syncPollTimeout,
+        'proxySettings': store.state.settingsStore.proxySettings,
       });
 
       if (data['errcode'] != null) {

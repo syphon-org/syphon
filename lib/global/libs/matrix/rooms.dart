@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/proxy-settings/model.dart';
 
 abstract class Rooms {
   /// Sync (main functionality)
@@ -66,8 +67,9 @@ abstract class Rooms {
     final bool? fullState = params['fullState'];
     final int? timeout = params['timeout'];
     final String? filter = params['filter'];
+    final ProxySettings? proxySettings = params['proxySettings'];
 
-    httpClient = createClient();
+    httpClient = createClient(proxySettings: proxySettings);
 
     return sync(
       protocol: protocol,
