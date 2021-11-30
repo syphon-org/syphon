@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -16,6 +14,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
+import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -187,7 +186,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                       themeType: props.themeType,
                       color: props.chatColorPrimary ?? color,
                       luminance: luminance,
-                      timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
+                      timeFormat: props.timeFormat,
                       onSendEdit: widget.onSendEdit,
                       onSwipe: props.onSelectReply,
                       onPressAvatar: () => widget.onViewUserDetails!(
@@ -216,12 +215,12 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
 
 class _Props extends Equatable {
   final Room room;
-  final ThemeType themeType;
   final User currentUser;
+  final ThemeType themeType;
+  final TimeFormat timeFormat;
   final Map<String, User> users;
   final List<Message> messages;
   final List<Message> messagesRaw;
-  final bool? timeFormat24Enabled;
   final Color? chatColorPrimary;
 
   final Function onToggleReaction;
@@ -234,7 +233,7 @@ class _Props extends Equatable {
     required this.messages,
     required this.messagesRaw,
     required this.currentUser,
-    required this.timeFormat24Enabled,
+    required this.timeFormat,
     required this.chatColorPrimary,
     required this.onToggleReaction,
     required this.onSelectReply,
@@ -248,7 +247,8 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
-        timeFormat24Enabled: store.state.settingsStore.timeFormat24Enabled,
+        timeFormat:
+            store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
         themeType: store.state.settingsStore.themeSettings.themeType,
         currentUser: store.state.authStore.user,
         chatColorPrimary: selectBubbleColor(store, roomId),

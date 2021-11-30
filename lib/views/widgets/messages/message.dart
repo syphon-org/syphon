@@ -11,6 +11,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
@@ -34,7 +35,7 @@ class MessageWidget extends StatelessWidget {
     this.displayName,
     this.themeType = ThemeType.Light,
     this.fontSize = 14.0,
-    this.timeFormat = '12hr',
+    this.timeFormat = TimeFormat.hr12,
     this.color,
     this.luminance = 0.0,
     this.onSendEdit,
@@ -53,7 +54,7 @@ class MessageWidget extends StatelessWidget {
 
   final int lastRead;
   final double fontSize;
-  final String timeFormat;
+  final TimeFormat timeFormat;
 
   final Color? color;
   final double? luminance;
@@ -248,7 +249,7 @@ class MessageWidget extends StatelessWidget {
     var fontStyle;
     var opacity = 1.0;
     var zIndex = 1.0;
-    var status = timeFormat == 'full'
+    var status = timeFormat == TimeFormat.full
         ? formatTimestampFull(
             lastUpdateMillis: message.timestamp,
             timeFormat: timeFormat,
