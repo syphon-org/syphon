@@ -115,12 +115,7 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
     case ToggleProxy:
-      if (!state.proxySettings.enabled) { //we're enabling it
-        httpClient = createProxiedClient(state.proxySettings);
-      }
-      else {
-        httpClient = createClient();
-      }
+      httpClient = createClient(proxySettings: state.proxySettings);
 
       return state.copyWith(
         proxySettings: state.proxySettings.copyWith(enabled: !state.proxySettings.enabled),
