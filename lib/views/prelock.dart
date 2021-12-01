@@ -13,6 +13,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/views/intro/lock-screen.dart';
 import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/syphon.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 
 ///
 /// Prelock
@@ -45,7 +46,7 @@ class Prelock extends StatefulWidget {
   _PrelockState createState() => _PrelockState();
 }
 
-class _PrelockState extends State<Prelock> with WidgetsBindingObserver {
+class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycle<Prelock> {
   Key key = UniqueKey();
   Key storekey = UniqueKey();
 
@@ -59,11 +60,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver {
   Database? cache;
   Database? storageOld;
   StorageDatabase? storage;
-  Store<AppState> store = Store<AppState>(
-    appReducer,
-    initialState: AppState(),
-    middleware: [],
-  );
+  Store<AppState>? store;
 
   @override
   void initState() {
@@ -93,6 +90,15 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+
+    backgroundLockLatencyTimer?.cancel();
+
+    super.dispose();
+  }
+
   showLockScreen() {
     locked = true;
 
@@ -108,11 +114,33 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver {
   }
 
   toggleLocked() async {
-    await onLoadStores();
+    locked = !locked;
 
-    setState(() {
-      locked = false;
-    });
+    if (!locked) {
+      await onLoadStores();
+
+      setState(() {
+        locked = false;
+      });
+
+      _navigatorKey.currentState?.pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => buildSyphon(),
+          transitionDuration: Duration(seconds: 0),
+        ),
+      );
+    } else {
+      setState(() {
+        locked = true;
+      });
+
+      setState(() {
+        store = null;
+        cache = null;
+        storage = null;
+        storageOld = null;
+      });
+    }
   }
 
   onLoadStores() async {
@@ -131,8 +159,8 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver {
     final storePreload = await initStore(cache, storageOld, storagePreload);
 
     // init http client
-    if (store.state.settingsStore.proxySettings.enabled) {
-      httpClient = createProxiedClient(store.state.settingsStore.proxySettings);
+    if (storePreload.state.settingsStore.proxySettings.enabled) {
+      httpClient = createProxiedClient(storePreload.state.settingsStore.proxySettings);
     } else {
       httpClient = createClient();
     }
@@ -151,7 +179,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver {
 
   buildSyphon() {
     return Syphon(
-      store,
+      store!,
       cache,
       storageOld,
       storage,

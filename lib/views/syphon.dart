@@ -72,7 +72,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
-    super.initState();
 
     // init all on state change listeners
     onInitListeners();
@@ -83,6 +82,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     if (!authed) {
       defaultHome = IntroScreen();
     }
+
+    super.initState();
   }
 
   onInitListeners() async {

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/types.dart';
@@ -45,7 +44,7 @@ class _LockScreenState extends State<LockScreen> with Lifecycle<LockScreen> {
           ));
         },
         onUnlocked: () async {
-          Prelock.togglePermitted(context);
+          Prelock.toggleLocked(context);
         });
   }
 
