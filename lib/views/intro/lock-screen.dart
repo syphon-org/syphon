@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/types.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/prelock.dart';
@@ -38,6 +40,12 @@ class _LockScreenState extends State<LockScreen> with Lifecycle<LockScreen> {
         onMaxRetries: onMaxRetries,
         maxRetries: maxRetries,
         onVerify: (String answer) async {
+          // TODO: remove just for testing
+          if (DEBUG_MODE) {
+            printDebug('ANSWER ${answer == '1908'}');
+            return answer == '1010';
+          }
+
           return Future.value(verifyPinHash(
             passcode: answer,
             hash: widget.appContext.pinHash,

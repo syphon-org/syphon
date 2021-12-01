@@ -77,7 +77,7 @@ class LockController {
 
     if (!_isConfirmed) {
       final verified = await _onVerifyInput(inputText);
-      verifyController.add(verified);
+      return verifyController.add(verified);
     }
 
     if (inputText == correctString) {

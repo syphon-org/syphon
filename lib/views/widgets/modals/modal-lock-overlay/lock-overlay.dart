@@ -159,17 +159,18 @@ class _LockOverlayState extends State<LockOverlay> {
       });
     });
 
-    lockController.verifyInput.listen((success) {
+    lockController.verifyInput.listen((success) async {
+      if (success) {
+        unlocked();
+      }
+
       // Wait for the animation on failure.
       Future.delayed(const Duration(milliseconds: 300), () {
         lockController.clear();
       });
+
       if (!success) {
         error();
-      }
-
-      if (!widget.confirmMode) {
-        unlocked();
       }
 
       if (widget.onConfirmed != null) {

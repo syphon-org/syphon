@@ -141,7 +141,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
       _navigatorKey.currentState?.pushReplacement(
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) => buildSyphon(),
-          transitionDuration: Duration(seconds: 0),
+          transitionDuration: Duration(seconds: 200),
         ),
       );
     } else {
