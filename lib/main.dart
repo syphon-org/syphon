@@ -22,35 +22,9 @@ void main() async {
   // pull current context / nullable
   final context = await loadCurrentContext();
 
-  // init hot cache
-  final cache = await initCache(context: context.current);
-
-  // init cold storage - old
-  final storage = await initStorageOLD(context: context.current);
-
-  // init cold storage
-  final storageCold = await initStorage(context: context.current);
-
-  // init redux store
-  final store = await initStore(cache, storage, storageCold);
-
-  // init http client
-  if (store.state.settingsStore.proxySettings.enabled) {
-    httpClient = createProxiedClient(store.state.settingsStore.proxySettings);
-  }
-  else {
-    httpClient = createClient();
-  }
-
   // init app
-  runApp(
-    Prelock(
-      child: Syphon(
-        store,
-        cache,
-        storage,
-        storageCold,
-      ),
-    ),
-  );
+  runApp(Prelock(
+    appContext: context,
+    enabled: context.pinHash.isNotEmpty,
+  ));
 }

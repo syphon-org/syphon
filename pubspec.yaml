@@ -104,6 +104,7 @@ dependencies:
   emoji_picker_flutter: ^1.0.3
   flutter_speed_dial: ^4.2.0
   fab_circular_menu: ^1.0.2
+  flutter_screen_lock: ^4.0.0
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ### data
