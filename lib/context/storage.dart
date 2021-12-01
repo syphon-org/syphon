@@ -17,6 +17,12 @@ resetAppContext() async {
   }
 }
 
+saveAppContexts(List<AppContext>? all) async {
+  if (all == null) return;
+
+  SecureStorage().write(key: ALL_APP_CONTEXT_KEY, value: json.encode(all));
+}
+
 saveAppContextCurrent(AppContext? current) async {
   if (current == null) return;
 
@@ -40,7 +46,7 @@ saveAppContext(AppContext? current) async {
     allContexts.insert(0, current);
   }
 
-  return SecureStorage().write(key: ALL_APP_CONTEXT_KEY, value: json.encode(allContexts));
+  return saveAppContexts(allContexts);
 }
 
 loadCurrentAppContext() async {
@@ -86,5 +92,5 @@ deleteAppContext(AppContext? current) async {
     saveAppContextCurrent(allContexts.first);
   }
 
-  return SecureStorage().write(key: ALL_APP_CONTEXT_KEY, value: json.encode(allContexts));
+  return saveAppContexts(allContexts);
 }

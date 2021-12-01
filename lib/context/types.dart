@@ -21,8 +21,8 @@ class AppContext {
   final String pinHash;
 
   AppContext({
-    this.current = DEFAULT,
-    this.pinHash = DEFAULT,
+    this.current = Values.EMPTY,
+    this.pinHash = Values.EMPTY,
   });
 
   Map<String, dynamic> toJson() => _$AppContextToJson(this);

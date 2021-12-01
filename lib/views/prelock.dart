@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -74,6 +75,20 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
   }
 
   @override
+  onMounted() async {
+    if (!locked) {
+      await _onLoadStores();
+
+      _navigatorKey.currentState?.pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => buildSyphon(),
+          transitionDuration: Duration(seconds: 200),
+        ),
+      );
+    }
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!enabled) {
       return;
@@ -117,7 +132,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     locked = !locked;
 
     if (!locked) {
-      await onLoadStores();
+      await _onLoadStores();
 
       setState(() {
         locked = false;
@@ -143,7 +158,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     }
   }
 
-  onLoadStores() async {
+  _onLoadStores() async {
     final appContext = widget.appContext;
 
     // init hot caches
@@ -186,16 +201,25 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     );
   }
 
+  buildHome() {
+    if (widget.enabled) {
+      return buildLockScreen();
+    }
+
+    return LoadingScreen(lite: Platform.isAndroid);
+  }
+
   @override
   Widget build(BuildContext context) => KeyedSubtree(
         key: key,
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: widget.enabled ? buildLockScreen() : buildSyphon(),
+          home: buildHome(),
           navigatorKey: _navigatorKey,
           routes: {
+            '/loading-screen': (context) => LoadingScreen(lite: Platform.isAndroid),
             '/lock-screen': (context) => buildLockScreen(),
-            '/unlocked': (context) => locked ? LoadingScreen() : buildSyphon()
+            '/unlocked': (context) => buildSyphon(),
           },
         ),
       );
