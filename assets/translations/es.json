@@ -1,5 +1,5 @@
 {
-    "alert-message-failed": "El mensaje no se ha podido enviar",
+    "alert-message-failed": "Fallo en el envío del mensaje",
     "alert-feature-in-progress": "🛠 Esta función estará disponible próximamente",
     "button-login-sso": "single sign on",
     "label-search-homeservers": "Buscar servidores bases…",
@@ -107,5 +107,18 @@
     "button-text-support": "Ayuda",
     "list-item-settings-notification": "Notificaciones",
     "list-item-settings-privacy": "Privacidad",
-    "list-item-settings-sms": "SMS y MMS"
+    "list-item-settings-sms": "SMS y MMS",
+    "alert-homeserver-invalid": "Este servidor no ha superado la comprobación de \"conocido\". Asegúrese de que el servidor está configurado correctamente.",
+    "content-intro-section-two": "Matrix te permite enviar mensajes a otros",
+    "content-intro-section-two-part-two": "\nen privado y con control ",
+    "prompt-homeserver-select": "Seleccione su nombre de usuario y su servidor doméstico",
+    "content-thanks": "Gracias por probar {}!\n\n",
+    "alert-invite-user-unknown": "Este usuario no parece existir dentro de matrix, pero puedes intentar invitarlo de todos modos.\n\nAsegúrese de que tiene el nombre correcto antes de intentarlo.",
+    "alert-hidden-read-receipts": "Los recibos de lectura ocultos deben ser compatibles con su servidor doméstico, o esto tendrá el mismo efecto que activar los recibos de lectura.",
+    "prompt-confirm-deactivate": "Introduzca su contraseña a continuación para confirmar la desactivación",
+    "content-password-recommendation": "Intenta pensar en 3 o más palabras al azar\npalabras que recuerdes fácilmente",
+    "content-intro-section-one": "{} funciona utilizando una red encriptada  \ny red descentralizada \nllamado ",
+    "content-intro-section-two-part-three": "donde se almacenan los\nmensajes se almacenan",
+    "content-intro-section-three": "Tanto Matrix como {} se desarrollan\nabiertamente por organizaciones y personas,\nno por corporaciones",
+    "placeholder-topic": "No hay descripción del tema"
 }
