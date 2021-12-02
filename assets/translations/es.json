@@ -23,7 +23,7 @@
     "header-intro": "Privacidad y libertad\nsin complicaciones.",
     "header-signup-username": "Crear un nombre de usuario",
     "title-verification": "Verificación",
-    "title-view-delete-devices": "Confirmar la retirada del dispositivo",
+    "title-view-delete-devices": "Confirmar el retiro del dispositivo",
     "title-view-search-groups": "Explorar grupos",
     "title-view-search-users": "Buscar usuarios",
     "title-view-invite-users": "Invitar usuarios",
@@ -85,7 +85,7 @@
     "button-delete-keys": "teclas de borrado",
     "button-block-user": "bloquear usuario",
     "button-delete-chat": "borrar el chat",
-    "button-archive-chat": "chat de archivo",
+    "button-archive-chat": "archivar conversación",
     "button-select-all": "seleccionar todo",
     "button-room-details": "detalles de la sala",
     "button-send-verification": "enviar correo de verificación",
@@ -96,6 +96,11 @@
     "button-text-signup-action": "Crear uno",
     "button-text-load-captcha": "Cargar Captcha",
     "button-text-create-group": "Nuevo Grupo",
-    "button-text-mark-all-read": "Marcar todo lo leído",
-    "button-text-invite": "Invitar a los amigos"
+    "button-text-mark-all-read": "Marcar todo como leído",
+    "button-text-invite": "Invitar amigos",
+    "list-item-settings-logout": "Salir",
+    "list-item-settings-proxy": "Configuración de proxy",
+    "list-item-settings-proxy-port": "Puerto",
+    "alert-restart-app-effect": "Deberá reiniciar la aplicación para que el cambio tenga efecto",
+    "list-item-settings-proxy-host": "Servidor"
 }
