@@ -102,5 +102,10 @@
     "list-item-settings-proxy": "Configuración de proxy",
     "list-item-settings-proxy-port": "Puerto",
     "alert-restart-app-effect": "Deberá reiniciar la aplicación para que el cambio tenga efecto",
-    "list-item-settings-proxy-host": "Servidor"
+    "list-item-settings-proxy-host": "Servidor",
+    "button-text-settings": "Configuración",
+    "button-text-support": "Ayuda",
+    "list-item-settings-notification": "Notificaciones",
+    "list-item-settings-privacy": "Privacidad",
+    "list-item-settings-sms": "SMS y MMS"
 }
