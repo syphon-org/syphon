@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
@@ -127,7 +126,7 @@ abstract class Events {
       body.addAll(unencryptedData);
     }
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -163,7 +162,7 @@ abstract class Events {
       ...Values.defaultHeaders,
     };
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(content),
@@ -214,7 +213,7 @@ abstract class Events {
       body['formatted_body'] = message['formatted_body'];
     }
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(message),
@@ -253,7 +252,7 @@ abstract class Events {
       'm.relates_to': {'rel_type': 'm.annotation', 'event_id': messageId, 'key': reaction}
     };
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -285,7 +284,7 @@ abstract class Events {
 
     final Map body = {};
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -325,7 +324,7 @@ abstract class Events {
       'messages': content,
     };
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -355,7 +354,7 @@ abstract class Events {
       'timeout': 5000,
     };
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -419,7 +418,7 @@ abstract class Events {
 
     final Map body = {};
 
-    final response = await http.put(Uri.parse(url), headers:  headers, body: json.encode(body));
+    final response = await httpClient.put(Uri.parse(url), headers:  headers, body: json.encode(body));
 
     return await json.decode(
       response.body,
