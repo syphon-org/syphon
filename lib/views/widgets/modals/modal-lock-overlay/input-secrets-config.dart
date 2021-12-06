@@ -29,7 +29,7 @@ class InputSecretsConfig {
 class InputSecretConfig {
   const InputSecretConfig({
     this.width = 16,
-    this.height = 16,
+    this.height = 20,
     this.borderSize = 1.0,
     this.borderColor = Colors.white,
     this.enabledColor = Colors.white,

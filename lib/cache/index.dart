@@ -39,15 +39,18 @@ class Cache {
 ///
 /// Init Hot Cache
 ///
-Future<Database?> initCache({String? context = AppContext.DEFAULT}) async {
+Future<Database?> initCache({AppContext context = const AppContext()}) async {
   try {
+    final contextId = context.id;
     var cacheKeyId = Cache.keyLocation;
     var cacheLocation = Cache.databaseLocation;
 
-    if (context!.isNotEmpty) {
-      cacheKeyId = '$context-${Cache.keyLocation}';
-      cacheLocation = '$context-${Cache.databaseLocation}';
+    if (contextId.isNotEmpty) {
+      cacheKeyId = '$contextId-${Cache.keyLocation}';
+      cacheLocation = '$contextId-${Cache.databaseLocation}';
     }
+
+    cacheLocation = DEBUG_MODE ? 'debug-$cacheLocation' : cacheLocation;
 
     var cacheFactory;
 
@@ -87,15 +90,17 @@ Future<Database?> initCache({String? context = AppContext.DEFAULT}) async {
   }
 }
 
-deleteCache({String? context = AppContext.DEFAULT}) async {
+deleteCache({AppContext context = const AppContext()}) async {
   try {
     late var cacheFactory;
+    final contextId = context.id;
+
     var cacheKeyId = Cache.keyLocation;
     var cacheLocation = Cache.databaseLocation;
 
-    if (context!.isNotEmpty) {
-      cacheKeyId = '$context-${Cache.keyLocation}';
-      cacheLocation = '$context-${Cache.databaseLocation}';
+    if (contextId.isNotEmpty) {
+      cacheKeyId = '$contextId-${Cache.keyLocation}';
+      cacheLocation = '$contextId-${Cache.databaseLocation}';
     }
 
     if (Platform.isAndroid || Platform.isIOS) {

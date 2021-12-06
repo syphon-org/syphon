@@ -5,18 +5,22 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:device_info/device_info.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/context/auth.dart';
+import 'package:syphon/context/storage.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/libs/matrix/utils.dart';
+import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
@@ -181,7 +185,6 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
         }
 
         _sub = uriLinkStream.listen((Uri? uri) {
-          printInfo('SSO URI CAUGHT $uri');
           final token = uri!.queryParameters['loginToken'];
           store.dispatch(loginUserSSO(token: token));
         }, onError: (err) {
@@ -1280,6 +1283,37 @@ ThunkAction<AppState> setPassword({
     store.dispatch(SetPasswordValid(
       valid: (currentPassword == currentConfirm || ignoreConfirm) && password.length > 8,
     ));
+  };
+}
+
+ThunkAction<AppState> setScreenLock({required String pin, String existing = ''}) {
+  return (Store<AppState> store) async {
+    try {
+      final currentContext = await loadContextCurrent();
+      final storageKeyId = '${currentContext.id}-${Storage.keyLocation}';
+      final storageKey = await loadKey(storageKeyId);
+
+      saveContext(AppContext(
+        id: currentContext.id,
+        pinHash: await generatePinHash(passcode: pin),
+        secretKeyEncrypted: await convertSecretKey(currentContext, pin, storageKey),
+      ));
+
+      await deleteKey(storageKeyId);
+
+      await store.dispatch(addConfirmation(
+        message: 'Screen lock pin was set successfully for this account.',
+      ));
+
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        origin: 'setScreenLock',
+        message: error.toString(),
+        error: error,
+      ));
+      return false;
+    }
   };
 }
 

@@ -7,7 +7,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
-import 'package:syphon/context/index.dart';
+import 'package:syphon/context/auth.dart';
+import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/formatters.dart';
@@ -43,6 +44,10 @@ class Syphon extends StatefulWidget {
     this.storageCold,
   );
 
+  static AppContext getAppContext(BuildContext buildContext) {
+    return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ?? AppContext();
+  }
+
   @override
   SyphonState createState() => SyphonState(
         store,
@@ -57,6 +62,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   Database? cache;
   Database? storage;
   StorageDatabase? storageCold;
+  AppContext? appContext;
 
   final globalScaffold = GlobalKey<ScaffoldMessengerState>();
 
@@ -91,12 +97,15 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     await onDispatchListeners();
     await onStartListeners();
 
-    // ** context handling **
-    final currentContext = (await loadCurrentContext()).current;
+    // context handling
+    final currentContext = await loadContextCurrent();
+    appContext = currentContext;
+
+    // auth handling
     final currentUser = store.state.authStore.user;
 
     // Reset contexts if the current user has no accessToken (unrecoverable state)
-    if (currentUser.accessToken == null && currentContext != AppContext.DEFAULT) {
+    if (currentUser.accessToken == null && currentContext.id != AppContext.DEFAULT) {
       return onResetContext();
     }
 
@@ -166,22 +175,26 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     await closeStorage(storageCold);
 
     // final context switches
-    final contextOld = await loadCurrentContext();
-    String? contextNew;
+    final contextOld = await loadContextCurrent();
+    AppContext? contextNew;
 
     // save new user context
     if (user != null) {
-      contextNew = generateContextId_DEPRECATED(id: user.userId!);
+      contextNew = AppContext(id: generateContextId_DEPRECATED(id: user.userId!));
       await saveContext(contextNew);
     } else {
       // revert to another user context or default
-      await deleteContext(contextOld.current);
-      contextNew = (await loadCurrentContext()).current;
+      await deleteContext(contextOld);
+      contextNew = await loadContextNext();
     }
 
+    // Context cannot be null after above is run
     final cacheNew = await initCache(context: contextNew);
     final storageNew = await initStorageOLD(context: contextNew);
     final storageColdNew = await initStorage(context: contextNew);
+
+    // allow referencing current app context throughout the app
+    appContext = contextNew;
 
     final storeExisting = AppState(
       authStore: store.state.authStore.copyWith(user: user),
@@ -226,7 +239,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final authObserverNew = storeNew.state.authStore.authObserver;
 
     // revert to another authed user if available and logging out
-    if (user == null && userNew.accessToken != null && contextNew.isNotEmpty) {
+    if (user == null && userNew.accessToken != null && contextNew.id.isNotEmpty) {
       authObserverNew?.add(userNew);
     } else {
       authObserverNew?.add(user);
@@ -234,45 +247,39 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // wipe unauthenticated storage
     if (user != null) {
-      onDeleteContext(AppContext(current: AppContext.DEFAULT));
+      onDeleteContextStorage(AppContext(id: AppContext.DEFAULT));
     } else {
       // delete cache data if removing context / account (context is not default)
-      onDeleteContext(contextOld);
+      onDeleteContextStorage(contextOld);
     }
 
     storeNew.dispatch(SetGlobalLoading(loading: false));
   }
 
-  onDeleteContext(AppContext context) async {
-    if (context.current.isEmpty) {
+  onDeleteContextStorage(AppContext context) async {
+    if (context.id.isEmpty) {
       printInfo('[onContextChanged] DELETING DEFAULT CONTEXT');
     } else {
-      printInfo('[onDeleteContext] DELETING CONTEXT DATA ${context.current}');
+      printInfo('[onDeleteContext] DELETING CONTEXT DATA ${context.id}');
     }
-    await deleteCache(context: context.current);
-    await deleteStorageOLD(context: context.current);
-    await deleteStorage(context: context.current);
+
+    await deleteCache(context: context);
+    await deleteStorage(context: context);
+    await deleteStorageOLD(context: context);
+    await deleteContext(context);
   }
 
   // Reset contexts if the current user has no accessToken (unrecoverable state)
   onResetContext() async {
     printError('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
-    final allContexts = await loadContexts();
 
-    await Future.forEach(
-      allContexts,
-      (AppContext context) async {
-        await onDeleteContext(context);
-      },
-    );
+    resetContextsAll();
 
-    store.state.authStore.contextObserver?.add(
-      null,
-    );
+    store.state.authStore.contextObserver?.add(null);
   }
 
   onAuthStateChanged(User? user) async {
-    final allContexts = await loadContexts();
+    final allContexts = await loadContextsAll();
     final defaultScreen = defaultHome.runtimeType;
     final currentRoute = NavigationService.currentRoute();
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:syphon/context/index.dart';
+import 'package:syphon/context/storage.dart';
 import 'package:syphon/global/platform.dart';
 import 'package:syphon/views/prelock.dart';
 
@@ -11,8 +11,11 @@ void main() async {
   // init platform specific code
   await initPlatformDependencies();
 
+  // TODO: remove after
+  await migrateContexts_MIGRATION();
+
   // pull current context / nullable
-  final context = await loadCurrentContext();
+  final context = await loadContextCurrent();
 
   // init app
   runApp(Prelock(

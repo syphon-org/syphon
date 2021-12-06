@@ -34,11 +34,11 @@ class KeyPad extends StatelessWidget {
     return StreamBuilder<String>(
       stream: lockController.currentInput,
       builder: (context, snapshot) {
-        if (snapshot.hasData == false || snapshot.data!.isEmpty) {
+        if ((snapshot.hasData == false || snapshot.data!.isEmpty) && canCancel) {
           return CustomizableButton(
             onPressed: onLeftButtonTap == null ? () => false : () => onLeftButtonTap!(),
             child: const Icon(
-              Icons.fingerprint,
+              Icons.cancel,
               size: Dimensions.iconSizeLarge,
             ),
           );

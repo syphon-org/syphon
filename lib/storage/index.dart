@@ -39,7 +39,7 @@ class Storage {
   // cache key identifiers
   static const keyLocation = '${Values.appLabel}@storageKey';
 
-  // storage identifiers
+  // storage identifiers  // TODO: convert after total drift conversion
   static const sqliteLocation = '${Values.appLabel}-cold-storage.db';
 
   // cold storage references
@@ -52,8 +52,8 @@ class Storage {
   static const databaseLocation = '${Values.appLabel}-main-storage.db';
 }
 
-Future initStorage({String context = AppContext.DEFAULT}) async {
-  final StorageDatabase database = await Future.value(StorageDatabase(context)); // never null ^
+Future initStorage({AppContext context = const AppContext(), String pin = ''}) async {
+  final StorageDatabase database = await Future.value(StorageDatabase(context, pin: pin));
   Storage.database = database;
   return database;
 }
@@ -64,12 +64,13 @@ Future closeStorage(StorageDatabase? storage) async {
   }
 }
 
-Future deleteStorage({String? context = AppContext.DEFAULT}) async {
+Future deleteStorage({AppContext context = const AppContext()}) async {
   try {
+    final contextId = context.id;
     var storageLocation = Storage.sqliteLocation;
 
-    if (context!.isNotEmpty) {
-      storageLocation = '$context-$storageLocation';
+    if (contextId.isNotEmpty) {
+      storageLocation = '$contextId-$storageLocation';
     }
 
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
@@ -91,7 +92,7 @@ Future deleteStorage({String? context = AppContext.DEFAULT}) async {
 /// for example, only load users that are known to be
 /// involved in stored messages/events
 ///
-Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase storage) async {
+Future<Map<String, dynamic>> loadStorage(Database? storageOld, StorageDatabase storage) async {
   try {
     final userIds = <String>[];
     final messages = <String, List<Message>>{};
@@ -102,10 +103,16 @@ Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase st
     final crypto = await loadCrypto(storage: storage);
     final settings = await loadSettings(storage: storage);
 
+    var authOld;
+    var cryptoOld;
+    var settingsOld;
+
     // TODO: deprecate / remove after 0.2.3
-    final authOld = await loadAuthOld(storage: storageOld);
-    final cryptoOld = await loadCryptoOld(storage: storageOld);
-    final settingsOld = await loadSettingsOld(storage: storageOld);
+    if (storageOld != null) {
+      authOld = await loadAuthOld(storage: storageOld);
+      cryptoOld = await loadCryptoOld(storage: storageOld);
+      settingsOld = await loadSettingsOld(storage: storageOld);
+    }
 
     final rooms = await loadRooms(storage: storage);
 
@@ -206,14 +213,15 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) async {
 
 ///
 /// TODO: deprecated - remove after 0.2.3
-Future<Database?> initStorageOLD({String? context = AppContext.DEFAULT}) async {
+Future<Database?> initStorageOLD({AppContext context = const AppContext()}) async {
   try {
+    final contextId = context.id;
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.databaseLocation;
 
-    if (context!.isNotEmpty) {
-      storageKeyId = '$context-$storageKeyId';
-      storageLocation = '$context-$storageLocation';
+    if (contextId.isNotEmpty) {
+      storageKeyId = '$contextId-$storageKeyId';
+      storageLocation = '$contextId-$storageLocation';
     }
 
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
@@ -244,7 +252,7 @@ Future<Database?> initStorageOLD({String? context = AppContext.DEFAULT}) async {
       );
     }
 
-    printInfo('[initStorage] $storageLocation $storageKey');
+    printInfo('[initStorageOLD] $storageLocation $storageKey');
 
     final codec = getEncryptSembastCodec(password: storageKey);
 
@@ -257,7 +265,7 @@ Future<Database?> initStorageOLD({String? context = AppContext.DEFAULT}) async {
     Storage.instance = openedDatabase;
     return openedDatabase;
   } catch (error) {
-    printError('[initStorage] $error');
+    printError('[initStorageOLD] $error');
     return null;
   }
 }
@@ -272,14 +280,15 @@ closeStorageOLD(Database? database) async {
 
 ///
 /// TODO: deprecated - remove after 0.2.3
-deleteStorageOLD({String? context = AppContext.DEFAULT}) async {
+deleteStorageOLD({AppContext context = const AppContext()}) async {
   try {
+    final contextId = context.id;
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.databaseLocation;
 
-    if (context!.isNotEmpty) {
-      storageKeyId = '$context-$storageKeyId';
-      storageLocation = '$context-$storageLocation';
+    if (contextId.isNotEmpty) {
+      storageKeyId = '$contextId-$storageKeyId';
+      storageLocation = '$contextId-$storageLocation';
     }
 
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;

@@ -8,6 +8,7 @@ import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/https.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/index.dart';
@@ -77,7 +78,9 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
   @override
   onMounted() async {
     if (!locked) {
-      await _onLoadStores();
+      await _onLoadStorage();
+
+      printDebug('[onMounted] LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushReplacement(
         PageRouteBuilder(
@@ -129,10 +132,10 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
   }
 
   toggleLocked() async {
-    locked = !locked;
+    final lockedNew = !locked;
 
-    if (!locked) {
-      await _onLoadStores();
+    if (!lockedNew) {
+      await _onLoadStorage();
 
       setState(() {
         locked = false;
@@ -158,20 +161,20 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     }
   }
 
-  _onLoadStores() async {
+  _onLoadStorage() async {
     final appContext = widget.appContext;
 
     // init hot caches
-    final cachePreload = await initCache(context: appContext.current);
+    final cachePreload = await initCache(context: appContext);
 
     // init cold storage
-    final storagePreload = await initStorage(context: appContext.current);
+    final storagePreload = await initStorage(context: appContext);
 
-    // init cold storage - old
-    final storageOldPreload = await initStorageOLD(context: appContext.current);
+    // init cold storage - old TODO: deprecated - remove after 0.2.3
+    final storageOldPreload = await initStorageOLD(context: appContext);
 
     // init redux store
-    final storePreload = await initStore(cache, storageOld, storagePreload);
+    final storePreload = await initStore(cachePreload, storageOld, storagePreload);
 
     // init http client
     if (storePreload.state.settingsStore.proxySettings.enabled) {

@@ -132,6 +132,18 @@ class _LockOverlayState extends State<LockOverlay> {
   }
 
   Widget buildHeadingText() {
+    if (widget.confirmMode) {
+      return StreamBuilder<bool>(
+        stream: lockController.confirmed,
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data!) {
+            return widget.confirmTitle;
+          }
+          return widget.title;
+        },
+      );
+    }
+
     return widget.title;
   }
 
@@ -203,11 +215,14 @@ class _LockOverlayState extends State<LockOverlay> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     buildHeadingText(),
-                    InputSecrets(
-                      length: currentInput.length,
-                      config: widget.inputSecretsConfig,
-                      inputStream: lockController.currentInput,
-                      verifyStream: lockController.verifyInput,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 28),
+                      child: InputSecrets(
+                        length: currentInput.length,
+                        config: widget.inputSecretsConfig,
+                        inputStream: lockController.currentInput,
+                        verifyStream: lockController.verifyInput,
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 48),

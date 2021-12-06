@@ -7,6 +7,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlcipher_library_windows/sqlcipher_library_windows.dart';
 import 'package:sqlite3/open.dart';
+import 'package:syphon/context/auth.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
@@ -68,24 +70,25 @@ void _openOnLinux() {
   }
 }
 
-LazyDatabase openDatabase(String context) {
+LazyDatabase openDatabase(AppContext context, {String pin = ''}) {
   return LazyDatabase(() async {
     var storageKeyId = Storage.keyLocation;
-    var storageLocation = Storage.sqliteLocation; // TODO: convert after total drift conversion
+    var storageLocation = Storage.sqliteLocation;
 
-    // prepend with context
-    storageKeyId = '$context-$storageKeyId';
-    storageLocation = '$context-$storageLocation';
+    final contextId = context.id;
+
+    // prepend with context - always even if empty
+    if (contextId.isNotEmpty) {
+      storageKeyId = '$contextId-$storageKeyId';
+      storageLocation = '$contextId-$storageLocation';
+    }
 
     // prepend with debug mode
     storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
 
     // get application support directory for all platforms
-
-    var filePath;
-
     final dbFolder = await getApplicationSupportDirectory();
-    filePath = File(path.join(dbFolder.path, storageLocation));
+    final filePath = File(path.join(dbFolder.path, storageLocation));
 
     if (Platform.isWindows) {
       openSQLCipherOnWindows();
@@ -104,7 +107,14 @@ LazyDatabase openDatabase(String context) {
     }
 
     // Configure cache encryption/decryption instance
-    final storageKey = await loadKey(storageKeyId);
+    var storageKey = await loadKey(storageKeyId);
+
+    printInfo('[initStorage] $storageLocation $storageKey');
+
+    if (context.secretKeyEncrypted.isNotEmpty && pin.isNotEmpty) {
+      printInfo('[pre-unlockSecretKey] $storageKeyId $storageKey');
+      storageKey = await unlockSecretKey(context, pin);
+    }
 
     return NativeDatabase(
       filePath,
@@ -130,7 +140,7 @@ LazyDatabase openDatabase(String context) {
 ])
 class StorageDatabase extends _$StorageDatabase {
   // we tell the database where to store the data with this constructor
-  StorageDatabase(String context) : super(openDatabase(context));
+  StorageDatabase(AppContext context, {String pin = ''}) : super(openDatabase(context, pin: pin));
 
   // this is the new constructor
   StorageDatabase.connect(DatabaseConnection connection) : super.connect(connection);
@@ -147,13 +157,12 @@ class StorageDatabase extends _$StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
-
           if (from == 5) {
-            m.createTable(auths);
-            m.createTable(cryptos);
-            m.createTable(settings);
-            m.createTable(receipts);
-            m.createTable(reactions);
+            await m.createTable(auths);
+            await m.createTable(cryptos);
+            await m.createTable(settings);
+            await m.createTable(receipts);
+            await m.createTable(reactions);
           }
           if (from == 4) {
             await m.addColumn(messages, messages.editIds);

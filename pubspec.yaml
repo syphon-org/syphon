@@ -61,6 +61,7 @@ dependencies:
   olm: ^2.0.0
   crypto: ^3.0.1
   encrypt: ^5.0.0
+  cryptography: ^2.0.5
   canonical_json: 1.1.0
 
   ### cache/storage

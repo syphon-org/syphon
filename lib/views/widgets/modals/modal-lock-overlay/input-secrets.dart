@@ -79,16 +79,16 @@ class _InputSecretsState extends State<InputSecrets> with SingleTickerProviderSt
     _animation = _animationController
         .drive(CurveTween(curve: Curves.elasticIn))
         .drive(Tween<Offset>(begin: Offset.zero, end: const Offset(0.05, 0)))
-          ..addListener(() {
-            setState(() {});
-          })
-          ..addStatusListener(
-            (status) {
-              if (status == AnimationStatus.completed) {
-                _animationController.reverse();
-              }
-            },
-          );
+      ..addListener(() {
+        setState(() {});
+      })
+      ..addStatusListener(
+        (status) {
+          if (status == AnimationStatus.completed) {
+            _animationController.reverse();
+          }
+        },
+      );
   }
 
   @override
@@ -117,20 +117,26 @@ class _InputSecretsState extends State<InputSecrets> with SingleTickerProviderSt
             child: Wrap(
               spacing: _computeSpacing(context),
               children: widget.length < 1
-                  ? [Container(height: widget.config.secretConfig.height)]
+                  ? [Container(height: widget.config.secretConfig.height + 4.0)]
                   : List.generate(
                       widget.length,
                       (index) {
                         if (!snapshot.hasData) {
-                          return InputSecret(
-                            config: widget.config.secretConfig,
-                            enabled: false,
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 4),
+                            child: InputSecret(
+                              config: widget.config.secretConfig,
+                              enabled: false,
+                            ),
                           );
                         }
 
-                        return InputSecret(
-                          config: widget.config.secretConfig,
-                          enabled: index < snapshot.data!.length,
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 4),
+                          child: InputSecret(
+                            config: widget.config.secretConfig,
+                            enabled: index < snapshot.data!.length,
+                          ),
                         );
                       },
                       growable: false,

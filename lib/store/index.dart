@@ -151,9 +151,9 @@ Future<Store<AppState>> initStore(
   AppState? initialState;
   Map<String, dynamic> preloaded = {};
 
-  if (storageOld != null) {
+  if (storage != null) {
     // synchronously load mandatory cold storage to rehydrate cache
-    preloaded = await loadStorage(storageOld, storage!);
+    preloaded = await loadStorage(storageOld, storage);
   }
 
   // Configure redux persist instance

@@ -34,11 +34,6 @@ class LockController {
     if (_currentInputs.length >= _maxLength) {
       return;
     }
-
-    if (_isConfirmed && _firstInput.isEmpty) {
-      setConfirmed();
-      clear();
-    }
   }
 
   /// Remove the trailing characters and stream it.
@@ -78,12 +73,18 @@ class LockController {
     if (!_isConfirmed) {
       final verified = await _onVerifyInput(inputText);
       return verifyController.add(verified);
-    }
-
-    if (inputText == correctString) {
-      verifyController.add(true);
     } else {
-      verifyController.add(false);
+      if (_firstInput.isEmpty) {
+        setConfirmed();
+        clear();
+        return;
+      }
+
+      if (inputText == _firstInput) {
+        verifyController.add(true);
+      } else {
+        verifyController.add(false);
+      }
     }
   }
 

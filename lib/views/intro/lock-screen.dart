@@ -40,11 +40,11 @@ class _LockScreenState extends State<LockScreen> with Lifecycle<LockScreen> {
         onMaxRetries: onMaxRetries,
         maxRetries: maxRetries,
         onVerify: (String answer) async {
-          // TODO: remove just for testing
-          if (DEBUG_MODE) {
-            printDebug('ANSWER ${answer == '1908'}');
-            return answer == '1010';
-          }
+          // // TODO: remove just for testing
+          // if (DEBUG_MODE) {
+          //   printDebug('ANSWER ${answer == '1908'}');
+          //   return answer == '1010';
+          // }
 
           return Future.value(verifyPinHash(
             passcode: answer,
