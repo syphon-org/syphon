@@ -100,9 +100,11 @@ class AppBarAvatar extends StatelessWidget {
                     height: 16,
                     width: 16,
                     padding: EdgeInsets.all(2),
-                    color: selectIconBackground(themeType),
                     child: CircularProgressIndicator(
                       strokeWidth: Dimensions.strokeWidthThin,
+                      color: computeContrastColorText(
+                        Theme.of(context).appBarTheme.backgroundColor,
+                      ),
                     ),
                   ),
                 ),

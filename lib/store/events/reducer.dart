@@ -1,7 +1,9 @@
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/actions.dart';
+import 'package:syphon/store/events/receipts/model.dart';
+import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 
 import './actions.dart';
@@ -9,20 +11,27 @@ import './state.dart';
 
 EventStore eventReducer([EventStore state = const EventStore(), dynamic action]) {
   switch (action.runtimeType) {
-    case SetReactions:
-      final _action = action as SetReactions;
+    case AddReactions:
+      final _action = action as AddReactions;
       final reactionsUpdated = Map<String, List<Reaction>>.from(
         state.reactions,
       );
 
       for (final Reaction reaction in _action.reactions ?? []) {
         final reactionEventId = reaction.relEventId;
-        final exists = reactionsUpdated.containsKey(reactionEventId);
+        final hasReactions = reactionsUpdated.containsKey(reactionEventId);
 
-        if (exists) {
-          final existing = reactionsUpdated[reactionEventId]!;
-          if (existing.indexWhere((value) => value.id == reaction.id) == -1) {
-            reactionsUpdated[reactionEventId!] = [...existing, reaction];
+        if (hasReactions) {
+          final reactions = reactionsUpdated[reactionEventId]!;
+          final reactionIndex = reactions.indexWhere((value) => value.id == reaction.id);
+
+          if (reactionIndex == -1) {
+            reactionsUpdated[reactionEventId!] = [...reactions, reaction];
+          } else {
+            reactionsUpdated[reactionEventId!] = [
+              ...reactions.where((r) => r.id != reaction.id).toList(),
+              reaction
+            ];
           }
         } else if (reactionEventId != null) {
           reactionsUpdated[reactionEventId] = [reaction];
@@ -33,7 +42,7 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
     case AddMessages:
       final _action = action as AddMessages;
-      if (action.messages.isEmpty) {
+      if (_action.messages.isEmpty) {
         return state;
       }
 
@@ -140,31 +149,10 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       return state.copyWith(outbox: outboxNew);
 
     case DeleteMessage:
-      final room = action.room;
-      final roomId = room.id;
-      final messageDeleted = (action as DeleteMessage).message;
+      return state;
 
-      final messages = Map<String, List<Message>>.from(
-        state.messages,
-      );
-
-      final messagesRoom = messages[roomId];
-
-      if (messagesRoom == null) {
-        return state;
-      }
-
-      messages[roomId] = messagesRoom.map((message) {
-        if (message.id == messageDeleted.id) {
-          return message.copyWith(body: Strings.labelDeletedMessage);
-        }
-        return message;
-      }).toList();
-
-      return state.copyWith(messages: messages);
-
-    case SetRedactions:
-      final _action = action as SetRedactions;
+    case SaveRedactions:
+      final _action = action as SaveRedactions;
       if (_action.redactions == null || _action.redactions!.isEmpty) {
         return state;
       }
@@ -187,10 +175,10 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       }
 
       final roomId = action.roomId;
-      final receiptsUpdated = Map<String, Map<String, ReadReceipt>>.from(
+      final receiptsUpdated = Map<String, Map<String, Receipt>>.from(
         state.receipts,
       );
-      final receiptsNew = Map<String, ReadReceipt>.from(
+      final receiptsNew = Map<String, Receipt>.from(
         action.receipts,
       );
 
@@ -199,7 +187,10 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       }
 
       return state.copyWith(receipts: receiptsUpdated);
-
+    case LoadReactions:
+      return state.copyWith(reactions: action.reactionsMap);
+    case LoadReceipts:
+      return state.copyWith(receipts: action.receiptsMap);
     case ResetEvents:
       return EventStore();
     default:

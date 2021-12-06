@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import 'package:mime/mime.dart';
 import 'package:redux/redux.dart';
@@ -17,6 +16,11 @@ import 'package:syphon/store/media/converters.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/media/model.dart';
 import 'package:syphon/store/media/storage.dart';
+
+class LoadMedia {
+  final Map<String, Uint8List> mediaMap;
+  LoadMedia({required this.mediaMap});
+}
 
 class UpdateMediaChecks {
   final String? mxcUri;

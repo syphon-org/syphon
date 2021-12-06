@@ -31,11 +31,9 @@ import 'package:syphon/store/user/model.dart';
 ThunkAction<AppState> mutateMessages({List<Message>? messages, List<Message>? existing}) {
   return (Store<AppState> store) async {
     final reactions = store.state.eventStore.reactions;
-    final redactions = store.state.eventStore.redactions;
 
     final revisedMessages = await compute(reviseMessagesThreaded, {
       'reactions': reactions,
-      'redactions': redactions,
       'messages': (messages ?? []) + (existing ?? []),
     });
 
@@ -76,13 +74,11 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
     final messages = store.state.eventStore.messages[room.id];
     final decrypted = store.state.eventStore.messagesDecrypted[room.id];
     final reactions = store.state.eventStore.reactions;
-    final redactions = store.state.eventStore.redactions;
 
     final mutations = [
       compute(reviseMessagesThreaded, {
         'messages': messages,
         'reactions': reactions,
-        'redactions': redactions,
       })
     ];
 
@@ -90,7 +86,6 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
       mutations.add(compute(reviseMessagesThreaded, {
         'messages': decrypted,
         'reactions': reactions,
-        'redactions': redactions,
       }));
     }
 
@@ -341,7 +336,7 @@ Future<bool> isMessageDeletable({required Message message, User? user, Room? roo
 
     return false;
   } catch (error) {
-    debugPrint('[deleteMessage] $error');
+    debugPrint('[isMessageDeletable] $error');
     return false;
   }
 }

@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -15,9 +14,11 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
+import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/messages/typing-indicator.dart';
 
@@ -51,8 +52,26 @@ class MessageList extends StatefulWidget {
   MessageListState createState() => MessageListState();
 }
 
-class MessageListState extends State<MessageList> {
+class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
   final TextEditingController controller = TextEditingController();
+
+  final Map<String, Color> colorMap = {};
+  final Map<String, double> luminanceMap = {};
+
+  @override
+  void onMounted() {
+    final store = StoreProvider.of<AppState>(context);
+
+    final messages = roomMessages(store.state, widget.roomId);
+
+    setState(() {
+      for (final message in messages) {
+        final userColor = Colours.hashedColor(message.sender);
+        colorMap[message.sender ?? ''] = userColor;
+        luminanceMap[message.sender ?? ''] = userColor.computeLuminance();
+      }
+    });
+  }
 
   @protected
   onInputReaction({Message? message, _Props? props}) async {
@@ -76,7 +95,7 @@ class MessageListState extends State<MessageList> {
         child: EmojiPicker(
             config: Config(
               columns: 9,
-              emojiSizeMax: Platform.isIOS ? 24 : 32,
+              emojiSizeMax: 24,
               indicatorColor: Theme.of(context).colorScheme.secondary,
               bgColor: Theme.of(context).scaffoldBackgroundColor,
               categoryIcons: CategoryIcons(
@@ -149,6 +168,8 @@ class MessageListState extends State<MessageList> {
                     final user = props.users[message.sender];
                     final avatarUri = user?.avatarUri;
                     final displayName = user?.displayName;
+                    final color = colorMap[message.sender];
+                    final luminance = luminanceMap[message.sender];
 
                     return MessageWidget(
                       key: Key(message.id ?? ''),
@@ -163,8 +184,9 @@ class MessageListState extends State<MessageList> {
                       avatarUri: avatarUri,
                       displayName: displayName,
                       themeType: props.themeType,
-                      color: props.chatColorPrimary,
-                      timeFormat: props.timeFormat24Enabled! ? '24hr' : '12hr',
+                      color: props.chatColorPrimary ?? color,
+                      luminance: luminance,
+                      timeFormat: props.timeFormat,
                       onSendEdit: widget.onSendEdit,
                       onSwipe: props.onSelectReply,
                       onPressAvatar: () => widget.onViewUserDetails!(
@@ -193,11 +215,12 @@ class MessageListState extends State<MessageList> {
 
 class _Props extends Equatable {
   final Room room;
-  final ThemeType themeType;
   final User currentUser;
+  final ThemeType themeType;
+  final TimeFormat timeFormat;
   final Map<String, User> users;
   final List<Message> messages;
-  final bool? timeFormat24Enabled;
+  final List<Message> messagesRaw;
   final Color? chatColorPrimary;
 
   final Function onToggleReaction;
@@ -208,8 +231,9 @@ class _Props extends Equatable {
     required this.themeType,
     required this.users,
     required this.messages,
+    required this.messagesRaw,
     required this.currentUser,
-    required this.timeFormat24Enabled,
+    required this.timeFormat,
     required this.chatColorPrimary,
     required this.onToggleReaction,
     required this.onSelectReply,
@@ -219,16 +243,18 @@ class _Props extends Equatable {
   List<Object> get props => [
         room,
         users,
-        messages,
+        messagesRaw,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
-        timeFormat24Enabled: store.state.settingsStore.timeFormat24Enabled,
+        timeFormat:
+            store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
         themeType: store.state.settingsStore.themeSettings.themeType,
         currentUser: store.state.authStore.user,
         chatColorPrimary: selectBubbleColor(store, roomId),
         room: selectRoom(id: roomId, state: store.state),
         users: messageUsers(roomId: roomId, state: store.state),
+        messagesRaw: roomMessages(store.state, roomId),
         messages: latestMessages(
           filterMessages(
             combineOutbox(

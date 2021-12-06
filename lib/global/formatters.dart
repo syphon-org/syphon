@@ -1,13 +1,13 @@
 import 'package:intl/intl.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/settings/models.dart';
 
 // @again_guy:matrix.org -> again_ereio
 String formatSender(String sender) {
   return sender.replaceAll('@', '').split(':')[0];
 }
 
-String formatUserId(String displayName,
-    {String homeserver = Values.homeserverDefault}) {
+String formatUserId(String displayName, {String homeserver = Values.homeserverDefault}) {
   return '@$displayName:$homeserver';
 }
 
@@ -24,9 +24,7 @@ String formatLocale(String? language) {
 // a -> A
 String formatInitials(String? word) {
   final wordUppercase = (word ?? '').toUpperCase();
-  return wordUppercase.length > 1
-      ? wordUppercase.substring(0, 2)
-      : wordUppercase;
+  return wordUppercase.length > 1 ? wordUppercase.substring(0, 2) : wordUppercase;
 }
 
 String formatInitialsLong(String? fullword) {
@@ -54,8 +52,7 @@ String formatInitialsLong(String? fullword) {
     return initials.toUpperCase();
   }
 
-  final initials =
-      word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);
+  final initials = word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);
 
   return initials.toUpperCase();
 }
@@ -63,12 +60,12 @@ String formatInitialsLong(String? fullword) {
 String formatTimestampFull({
   int lastUpdateMillis = 0,
   bool showTime = false,
-  String? timeFormat,
+  TimeFormat timeFormat = TimeFormat.hr12,
 }) {
   if (lastUpdateMillis == 0) return '';
 
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
-  final hourFormat = timeFormat == '24hr' ? 'H:mm' : 'h:mm';
+  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm';
 
   return DateFormat(
     showTime ? 'MMM d $hourFormat a' : 'MMM d yyyy',
@@ -79,13 +76,13 @@ String formatTimestampFull({
 String formatTimestamp({
   int lastUpdateMillis = 0,
   bool showTime = false,
-  String timeFormat = '24hr',
+  TimeFormat timeFormat = TimeFormat.hr12,
 }) {
   if (lastUpdateMillis == 0) return '';
 
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
   final sinceLastUpdate = DateTime.now().difference(timestamp);
-  final hourFormat = timeFormat == '24hr' ? 'H:mm' : 'h:mm';
+  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm';
 
   if (sinceLastUpdate.inDays > 365) {
     return DateFormat(
@@ -114,11 +111,9 @@ String formatTimestamp({
 }
 
 formatUsernameHint({required String homeserver, String? username}) {
-  final usernameFormatted =
-      username != null && username.isNotEmpty ? username : 'username';
-  final alias = homeserver.isNotEmpty
-      ? '@$usernameFormatted:$homeserver'
-      : '@$usernameFormatted:matrix.org';
+  final usernameFormatted = username != null && username.isNotEmpty ? username : 'username';
+  final alias =
+      homeserver.isNotEmpty ? '@$usernameFormatted:$homeserver' : '@$usernameFormatted:matrix.org';
 
   return alias.replaceFirst('@', '', 1);
 }

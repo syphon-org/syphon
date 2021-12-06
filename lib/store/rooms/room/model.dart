@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
@@ -7,7 +5,6 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/storage/drift/database.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -57,21 +54,10 @@ class Room implements drift.Insertable<Room> {
   final Message? draft;
   final Message? reply;
 
-  // Associated user ids
+  // Associated user ids - TODO: remove
   final List<String> userIds;
-  final List<String> messageIds;
 
-  @JsonKey(ignore: true)
-  final List<Message> outbox;
-
-  // TODO: removed until state timeline work can be done
-  @JsonKey(ignore: true)
-  final List<Event>? state;
-
-  @JsonKey(ignore: true)
-  final Map<String, ReadReceipt>? readReceiptsTEMP;
-
-  @JsonKey(ignore: true)
+  @JsonKey(ignore: true) // TODO: remove
   final Map<String, User> usersTEMP;
 
   @JsonKey(ignore: true)
@@ -88,16 +74,16 @@ class Room implements drift.Insertable<Room> {
 
   @JsonKey(ignore: true)
   String get type {
+    if (invite) {
+      return 'invite';
+    }
+
     if (joinRule == 'public' || worldReadable) {
       return 'public';
     }
 
     if (direct) {
       return 'direct';
-    }
-
-    if (invite) {
-      return 'invite';
     }
 
     return 'group';
@@ -122,9 +108,7 @@ class Room implements drift.Insertable<Room> {
     this.draft,
     this.reply,
     this.userIds = const [],
-    this.outbox = const [],
     this.usersTEMP = const {},
-    this.messageIds = const [],
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -137,8 +121,6 @@ class Room implements drift.Insertable<Room> {
     this.lastBatch,
     this.nextBatch,
     this.prevBatch,
-    this.readReceiptsTEMP,
-    this.state,
   });
 
   Room copyWith({
@@ -162,20 +144,15 @@ class Room implements drift.Insertable<Room> {
     int? totalJoinedUsers,
     guestEnabled,
     encryptionEnabled,
-    userTyping,
-    usersTyping,
+    bool? userTyping,
+    List<String>? usersTyping,
     draft,
     reply,
     List<String>? userIds,
-    events,
-    List<String>? messageIds,
-    List<Message>? outbox,
     Map<String, User>? usersTEMP,
-    Map<String, ReadReceipt>? readReceiptsTEMP,
     String? lastBatch,
     String? prevBatch,
     String? nextBatch,
-    state,
   }) =>
       Room(
         id: id ?? this.id,
@@ -203,15 +180,11 @@ class Room implements drift.Insertable<Room> {
         usersTyping: usersTyping ?? this.usersTyping,
         draft: draft ?? this.draft,
         reply: reply == Null ? null : reply ?? this.reply,
-        state: state ?? this.state,
-        outbox: outbox ?? this.outbox,
         userIds: userIds ?? this.userIds,
-        messageIds: messageIds ?? this.messageIds,
         lastBatch: lastBatch ?? this.lastBatch,
         prevBatch: prevBatch ?? this.prevBatch,
         nextBatch: nextBatch ?? this.nextBatch,
         usersTEMP: usersTEMP ?? this.usersTEMP,
-        readReceiptsTEMP: readReceiptsTEMP ?? this.readReceiptsTEMP,
       );
 
   Map<String, dynamic> toJson() => _$RoomToJson(this);
@@ -258,10 +231,6 @@ class Room implements drift.Insertable<Room> {
           prevBatch: prevBatch,
           messages: events.messages,
           existingIds: existingIds,
-        )
-        .fromEphemeralEvents(
-          currentUser: currentUser,
-          events: events.ephemeral,
         );
   }
 
@@ -458,7 +427,6 @@ class Room implements drift.Insertable<Room> {
     try {
       bool? limited;
       int lastUpdate = this.lastUpdate;
-      final messageIds = this.messageIds;
       final limitedCurrent = this.limited;
 
       // Converting only message events
@@ -468,7 +436,7 @@ class Room implements drift.Insertable<Room> {
 
       // See if the newest message has a greater timestamp
       final latestMessage = messages.firstWhereOrNull(
-        (msg) => lastUpdate < msg.timestamp,
+        (msg) => msg.timestamp > lastUpdate,
       );
 
       if (latestMessage != null) {
@@ -477,13 +445,10 @@ class Room implements drift.Insertable<Room> {
 
       // limited indicates need to fetch additional data for room timelines
       if (limitedCurrent) {
-        // TODO: deprecated - remove along with messageIds
         // TODO: potentially reimplement, but with batch tokens instead
-        // TODO: consider also using another "existingIds" param instead to prevent
-        // TODO: needing room to have some state value
         // Check to see if the new messages contain those existing in cache
-        if (messages.isNotEmpty && messageIds.isNotEmpty) {
-          final messageKnown = messageIds.firstWhereOrNull(
+        if (messages.isNotEmpty && existingIds.isNotEmpty) {
+          final messageKnown = existingIds.firstWhereOrNull(
             (id) => id == messages[0].id,
           );
 
@@ -512,20 +477,8 @@ class Room implements drift.Insertable<Room> {
         }
       }
 
-      // Combine current and existing messages on unique ids
-      final messagesMap = HashMap.fromIterable(
-        messages,
-        key: (message) => message.id,
-        value: (message) => message,
-      );
-
-      // save messages and unique message id updates
-      final messageIdsNew = Set<String>.from(messagesMap.keys);
-      final messageIdsAll = Set<String>.from(messageIds)..addAll(messageIdsNew);
-
       // Save values to room
       return copyWith(
-        messageIds: messageIdsAll.toList(),
         limited: limited ?? this.limited,
         encryptionEnabled: encryptionEnabled || hasEncrypted != null,
         lastUpdate: lastUpdate,
@@ -541,63 +494,6 @@ class Room implements drift.Insertable<Room> {
       printError('[fromMessageEvents] $error');
       return this;
     }
-  }
-
-  /// Appends ephemeral events (mostly read receipts) to a
-  /// hashmap of eventIds linking them to users and timestamps
-  Room fromEphemeralEvents({
-    required List<Event> events,
-    User? currentUser,
-  }) {
-    bool userTyping = false;
-    List<String> usersTyping = this.usersTyping;
-    final readReceipts = Map<String, ReadReceipt>.from(readReceiptsTEMP ?? {});
-
-    try {
-      for (final event in events) {
-        switch (event.type) {
-          case 'm.typing':
-            final List<dynamic> usersTypingList = event.content['user_ids'];
-            usersTyping = List<String>.from(usersTypingList);
-            usersTyping.removeWhere(
-              (user) => currentUser!.userId == user,
-            );
-            userTyping = usersTyping.isNotEmpty;
-            break;
-          case 'm.receipt':
-            final Map<String, dynamic> receiptEventIds = event.content;
-
-            // TODO: figure out how to pull what messages have been read from read recepts
-            // // Set a new timestamp for the latest read message if it exceeds the current
-            // latestRead = latestRead < newReadStatuses.latestRead
-            //     ? newReadStatuses.latestRead
-            //     : latestRead;
-
-            // Filter through every eventId to find receipts
-            receiptEventIds.forEach((key, receipt) {
-              // convert every m.read object to a map of userIds + timestamps for read
-              final readReceiptsNew = ReadReceipt.fromReceipt(receipt);
-
-              // update the eventId if that event already has reads
-              if (!readReceipts.containsKey(key)) {
-                readReceipts[key] = readReceiptsNew;
-              } else {
-                // otherwise, add the usersRead to the existing reads
-                readReceipts[key]!.userReads!.addAll(readReceiptsNew.userReads!);
-              }
-            });
-            break;
-          default:
-            break;
-        }
-      }
-    } catch (error) {}
-
-    return copyWith(
-      userTyping: userTyping,
-      usersTyping: usersTyping,
-      readReceiptsTEMP: readReceipts,
-    );
   }
 
   // allows converting to message companion type for saving through drift
@@ -630,7 +526,6 @@ class Room implements drift.Insertable<Room> {
       draft: drift.Value(draft),
       reply: drift.Value(reply),
       userIds: drift.Value(userIds),
-      messageIds: drift.Value(messageIds),
     ).toColumns(nullToAbsent);
   }
 }

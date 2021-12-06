@@ -62,10 +62,6 @@ class Rooms extends Table {
   // Associated user ids
   TextColumn get userIds =>
       text().map(const ListToTextConverter()).withDefault(const Constant('[]'))();
-  TextColumn get messageIds =>
-      text().map(const ListToTextConverter()).withDefault(const Constant('[]'))();
-  TextColumn get reactionIds =>
-      text().map(const ListToTextConverter()).withDefault(const Constant('[]'))();
 
   @override
   Set<Column> get primaryKey => {id};

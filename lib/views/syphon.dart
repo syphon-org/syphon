@@ -21,7 +21,6 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
-import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
@@ -77,10 +76,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // init all on state change listeners
     onInitListeners();
-
-    // mutate messages
-    // TODO: deprecate this
-    store.dispatch(mutateMessagesAll());
 
     final currentUser = store.state.authStore.user;
     final authed = currentUser.accessToken != null;
@@ -166,8 +161,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // Stop saving to existing context databases
     await closeCache(cache);
-    await closeStorage(storage);
-    await closeColdStorage(storageCold);
+    await closeStorageOLD(storage);
+    await closeStorage(storageCold);
 
     // final context switches
     final contextOld = await loadCurrentContext();
@@ -184,8 +179,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
 
     final cacheNew = await initCache(context: contextNew);
-    final storageNew = await initStorage(context: contextNew);
-    final storageColdNew = await initColdStorage(context: contextNew);
+    final storageNew = await initStorageOLD(context: contextNew);
+    final storageColdNew = await initStorage(context: contextNew);
 
     final storeExisting = AppState(
       authStore: store.state.authStore.copyWith(user: user),
@@ -254,8 +249,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       printInfo('[onDeleteContext] DELETING CONTEXT DATA ${context.current}');
     }
     await deleteCache(context: context.current);
+    await deleteStorageOLD(context: context.current);
     await deleteStorage(context: context.current);
-    await deleteColdStorage(context: context.current);
   }
 
   // Reset contexts if the current user has no accessToken (unrecoverable state)

@@ -56,7 +56,7 @@ class ListUserBubbles extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
-              final user = users[index]!;
+              final user = users[index] ?? User();
 
               return Align(
                 child: GestureDetector(

@@ -1,5 +1,7 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
+import 'package:syphon/store/events/redaction/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 
@@ -15,9 +17,9 @@ authMiddleware<State>(
   NextDispatcher next,
 ) {
   switch (action.runtimeType) {
-    case SetReactions:
-    case SetRedactions:
     case AddMessages:
+    case AddReactions:
+    case SaveRedactions:
     case UpdateRoom:
       if (store.state.authStore.user.accessToken == null) {
         return;

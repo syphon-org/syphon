@@ -1,6 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -11,7 +9,8 @@ import 'package:syphon/cache/storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/index.dart';
-import 'package:syphon/storage/middleware.dart';
+import 'package:syphon/storage/middleware/load-storage-middleware.dart';
+import 'package:syphon/storage/middleware/save-storage-middleware.dart';
 import 'package:syphon/store/alerts/middleware.dart';
 import 'package:syphon/store/alerts/model.dart';
 import 'package:syphon/store/auth/middleware.dart';
@@ -144,17 +143,17 @@ AppState appReducer(AppState state, action) => AppState(
 ///
 Future<Store<AppState>> initStore(
   Database? cache,
-  Database? storage,
-  StorageDatabase? coldStorage, {
+  Database? storageOld,
+  StorageDatabase? storage, {
   AppState? existingState,
   bool existingUser = false,
 }) async {
   AppState? initialState;
   Map<String, dynamic> preloaded = {};
 
-  if (storage != null) {
-    // partially load storage to memory to rehydrate cache
-    preloaded = await loadStorage(storage, coldStorage!);
+  if (storageOld != null) {
+    // synchronously load mandatory cold storage to rehydrate cache
+    preloaded = await loadStorage(storageOld, storage!);
   }
 
   // Configure redux persist instance
@@ -181,16 +180,24 @@ Future<Store<AppState>> initStore(
     printError('[persistor.load] error $error');
   }
 
-  return Store<AppState>(
+  final store = Store<AppState>(
     appReducer,
     initialState: initialState ?? AppState(),
     middleware: [
       thunkMiddleware,
       authMiddleware,
       persistor.createMiddleware(),
-      storageMiddleware(storage, coldStorage),
-      searchMiddleware(coldStorage),
+      saveStorageMiddleware(storage),
+      loadStorageMiddleware(storage),
+      searchMiddleware(storage),
       alertMiddleware,
     ],
   );
+
+  if (storage != null) {
+    // async load additional cold storage to rehydrate cache
+    loadStorageAsync(storage, store);
+  }
+
+  return store;
 }

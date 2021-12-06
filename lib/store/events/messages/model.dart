@@ -136,7 +136,7 @@ class Message extends Event implements drift.Insertable<Message> {
     String? sessionId,
     String? relatedEventId,
     List<String>? editIds,
-    reactions,
+    List<Reaction>? reactions,
   }) =>
       Message(
         id: id ?? this.id,

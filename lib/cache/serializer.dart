@@ -10,9 +10,9 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/auth/state.dart';
 import 'package:syphon/store/crypto/state.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/events/state.dart';
 import 'package:syphon/store/index.dart';
@@ -118,8 +118,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             mediaStore = MediaStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'SettingsStore':
-            settingsStore =
-                SettingsStore.fromJson(store as Map<String, dynamic>);
+            settingsStore = SettingsStore.fromJson(store as Map<String, dynamic>);
             break;
           case 'UserStore':
             userStore = UserStore.fromJson(store as Map<String, dynamic>);
@@ -141,35 +140,19 @@ class CacheSerializer implements StateSerializer<AppState> {
     return AppState(
       loading: false,
       authStore: authStore ?? preloaded[StorageKeys.AUTH] ?? AuthStore(),
-      cryptoStore:
-          cryptoStore ?? preloaded[StorageKeys.CRYPTO] ?? CryptoStore(),
-      settingsStore:
-          preloaded[StorageKeys.SETTINGS] ?? settingsStore ?? SettingsStore(),
+      cryptoStore: cryptoStore ?? preloaded[StorageKeys.CRYPTO] ?? CryptoStore(),
+      settingsStore: preloaded[StorageKeys.SETTINGS] ?? settingsStore ?? SettingsStore(),
       syncStore: syncStore ?? SyncStore(),
-      mediaStore: mediaStore ??
-          MediaStore().copyWith(
-            mediaCache: preloaded[StorageKeys.MEDIA],
-          ),
-      roomStore: roomStore ??
-          RoomStore().copyWith(
-            rooms: preloaded[StorageKeys.ROOMS] ?? {},
-          ),
-      userStore: userStore ??
-          UserStore().copyWith(
-            users: preloaded[StorageKeys.USERS] ?? {},
-          ),
+      mediaStore: mediaStore ?? MediaStore().copyWith(mediaCache: preloaded[StorageKeys.MEDIA]),
+      roomStore: roomStore ?? RoomStore().copyWith(rooms: preloaded[StorageKeys.ROOMS] ?? {}),
+      userStore: userStore ?? UserStore().copyWith(users: preloaded[StorageKeys.USERS] ?? {}),
       eventStore: eventStore ??
           EventStore().copyWith(
-            messages:
-                preloaded[StorageKeys.MESSAGES] ?? <String, List<Message>>{},
-            messagesDecrypted:
-                preloaded[StorageKeys.DECRYPTED] ?? <String, List<Message>>{},
-            reactions:
-                preloaded[StorageKeys.REACTIONS] ?? <String, List<Reaction>>{},
-            redactions:
-                preloaded[StorageKeys.REDACTIONS] ?? <String, Redaction>{},
-            receipts: preloaded[StorageKeys.RECEIPTS] ??
-                <String, Map<String, ReadReceipt>>{},
+            messages: preloaded[StorageKeys.MESSAGES] ?? <String, List<Message>>{},
+            messagesDecrypted: preloaded[StorageKeys.DECRYPTED] ?? <String, List<Message>>{},
+            reactions: preloaded[StorageKeys.REACTIONS] ?? <String, List<Reaction>>{},
+            redactions: preloaded[StorageKeys.REDACTIONS] ?? <String, Redaction>{},
+            receipts: preloaded[StorageKeys.RECEIPTS] ?? <String, Map<String, Receipt>>{},
           ),
     );
   }

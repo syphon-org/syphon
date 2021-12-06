@@ -5,9 +5,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
@@ -28,8 +29,8 @@ class MessageDetailsScreen extends StatelessWidget {
 
   @protected
   Widget buildUserReadList(_Props props, double width) {
-    final ReadReceipt readReceipts = props.readReceipts[props.message!.id!] ?? ReadReceipt();
-    final Map<String, int> userReads = readReceipts.userReads ?? {};
+    final Receipt readReceipts = props.readReceipts[props.message!.id!] ?? Receipt();
+    final Map<String, int> userReads = readReceipts.userReads;
 
     final List<User?> users = userReads.keys.map((userId) => props.users[userId]).toList();
 
@@ -94,7 +95,7 @@ class MessageDetailsScreen extends StatelessWidget {
                       isUserSent: isUserSent,
                       messageOnly: true,
                       themeType: props.themeType,
-                      timeFormat: 'full',
+                      timeFormat: TimeFormat.full,
                     ),
                   ),
                 ),
@@ -198,17 +199,19 @@ class MessageDetailsScreen extends StatelessWidget {
 class _Props extends Equatable {
   final String? userId;
   final String? roomId;
-  final ThemeType themeType;
   final Message? message;
+  final ThemeType themeType;
+  final TimeFormat timeFormat;
   final Map<String, User> users;
-  final Map<String, ReadReceipt> readReceipts;
+  final Map<String, Receipt> readReceipts;
 
   const _Props({
     required this.users,
-    required this.themeType,
     required this.roomId,
     required this.userId,
     required this.message,
+    required this.themeType,
+    required this.timeFormat,
     required this.readReceipts,
   });
 
@@ -220,9 +223,11 @@ class _Props extends Equatable {
         roomId: args.roomId,
         message: args.message,
         users: store.state.userStore.users,
-        readReceipts: store.state.eventStore.receipts[args.roomId!] ?? <String, ReadReceipt>{},
+        readReceipts: store.state.eventStore.receipts[args.roomId!] ?? <String, Receipt>{},
         userId: store.state.authStore.user.userId,
         themeType: store.state.settingsStore.themeSettings.themeType,
+        timeFormat:
+            store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
       );
 
   @override

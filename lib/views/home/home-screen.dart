@@ -12,7 +12,6 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -297,6 +296,7 @@ class HomeState extends State<HomeScreen> {
     final assetColor = computeContrastColorText(
       Theme.of(context).appBarTheme.backgroundColor,
     );
+
     return AppBar(
       automaticallyImplyLeading: false,
       titleSpacing: 16.00,
@@ -759,7 +759,6 @@ class _Props extends Equatable {
   final Map<String, List<Message>> messages;
   final Map<String, List<Message>> decrypted;
 
-  final Function onDebug;
   final Function onLeaveChat;
   final Function onDeleteChat;
   final Function onArchiveChat;
@@ -782,7 +781,6 @@ class _Props extends Equatable {
     required this.fabType,
     required this.fabLocation,
     required this.roomTypeBadgesEnabled,
-    required this.onDebug,
     required this.onLeaveChat,
     required this.onDeleteChat,
     required this.onSelectHelp,
@@ -854,9 +852,6 @@ class _Props extends Equatable {
               throw 'Could not launch ${Values.openHelpUrl}';
             }
           } catch (error) {}
-        },
-        onDebug: () async {
-          printDebug('[onDebug] trigged debug function @ home');
         },
       );
 }

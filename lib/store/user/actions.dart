@@ -1,10 +1,10 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/store/user/model.dart';
 
 class SetLoading {
@@ -30,6 +30,11 @@ class SetUsersBlocked {
 class SetUserInvites {
   final List<User>? users;
   SetUserInvites({this.users});
+}
+
+class LoadUsers {
+  final List<String>? userIds;
+  LoadUsers({this.userIds});
 }
 
 class ClearUserInvites {}

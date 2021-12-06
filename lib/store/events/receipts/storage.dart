@@ -1,31 +1,49 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:sembast/sembast.dart';
+import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/constants.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/store/events/receipts/model.dart';
+
+///
+/// Reaction Queries - unencrypted (Cold Storage)
+///
+/// In storage, reactions are indexed by eventId
+/// In redux, they're indexed by RoomID and placed in a list
+///
+extension ReceiptQueries on StorageDatabase {
+  Future<void> insertReceiptsBatched(List<Receipt> receipts) {
+    return batch(
+      (batch) => batch.insertAllOnConflictUpdate(
+        this.receipts,
+        receipts,
+      ),
+    );
+  }
+
+  ///
+  /// Select Receipts (Ids)
+  ///
+  /// Query every message known in a room
+  ///
+  Future<List<Receipt>> selectReceipts(List<String> eventIds) {
+    return (select(receipts)..where((tbl) => tbl.eventId.isIn(eventIds))).get();
+  }
+}
 
 ///
 /// Save Receipts
 ///
 ///
 Future<void> saveReceipts(
-  Map<String, ReadReceipt>? receipts, {
-  Database? storage,
+  Map<String, Receipt> receipts, {
+  required StorageDatabase storage,
   required bool ready,
 }) async {
-  final store = StoreRef<String, String>(StorageKeys.RECEIPTS);
-
   // TODO: the initial sync loads way too many read receipts
   if (!ready) return;
 
-  return storage!.transaction((txn) async {
-    for (final key in receipts!.keys) {
-      final record = store.record(key);
-      await record.put(txn, json.encode(receipts[key]));
-    }
-  });
+  return storage.insertReceiptsBatched(receipts.values.toList());
 }
 
 ///
@@ -33,25 +51,20 @@ Future<void> saveReceipts(
 ///
 /// Iterates through
 ///
-Future<Map<String, ReadReceipt>> loadReceipts(
-  List<String?> messageIds, {
-  required Database storage,
+Future<Map<String, Receipt>> loadReceipts(
+  List<String> eventIds, {
+  required StorageDatabase storage,
 }) async {
   try {
-    final store = StoreRef<String?, String>(StorageKeys.RECEIPTS);
+    final receipts = await storage.selectReceipts(eventIds);
 
-    final receiptsMap = <String, ReadReceipt>{};
-    final records = await store.records(messageIds).getSnapshots(storage);
-
-    for (RecordSnapshot<String?, String>? record in records) {
-      if (record != null) {
-        final receipt = ReadReceipt.fromJson(await json.decode(record.value));
-        receiptsMap.putIfAbsent(record.key!, () => receipt);
-      }
-    }
-    return receiptsMap;
+    return Map.fromIterable(
+      receipts,
+      key: (receipt) => receipt.eventId,
+      value: (receipt) => receipt,
+    );
   } catch (error) {
-    printError(error.toString());
+    printError(error.toString(), title: 'loadReactions');
     return {};
   }
 }

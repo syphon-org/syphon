@@ -155,7 +155,7 @@ class ChatScreenState extends State<ChatScreen> {
         room: props.room,
       ));
     } catch (error) {
-      printDebug(error.toString());
+      printError(error.toString());
     }
   }
 
@@ -776,7 +776,8 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         currentUser: store.state.authStore.currentUser,
         room: selectRoom(id: roomId, state: store.state),
-        showAvatars: roomUsers(store.state, roomId).length > 2,
+        showAvatars: selectRoom(id: roomId, state: store.state).totalJoinedUsers > 2 ||
+            roomUsers(store.state, roomId).length > 2,
         themeType: store.state.settingsStore.themeSettings.themeType,
         userId: store.state.authStore.user.userId,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,

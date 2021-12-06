@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -16,12 +18,17 @@ import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/sembast/codec.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
-import 'package:syphon/store/events/ephemeral/m.read/model.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/storage.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/reactions/model.dart';
+import 'package:syphon/store/events/reactions/storage.dart';
+import 'package:syphon/store/events/receipts/actions.dart';
+import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/receipts/storage.dart';
-import 'package:syphon/store/events/storage.dart';
+import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/storage.dart';
@@ -33,29 +40,31 @@ class Storage {
   static const keyLocation = '${Values.appLabel}@storageKey';
 
   // storage identifiers
-  static const databaseLocation = '${Values.appLabel}-main-storage.db';
-
-  // storage identifiers
   static const sqliteLocation = '${Values.appLabel}-cold-storage.db';
 
   // cold storage references
-  static Database? instance;
   static StorageDatabase? database;
+
+  /// TODO: deprecated - remove after 0.2.3
+  static Database? instance;
+
+  /// TODO: deprecated - remove after 0.2.3
+  static const databaseLocation = '${Values.appLabel}-main-storage.db';
 }
 
-Future<StorageDatabase> initColdStorage({String? context = AppContext.DEFAULT}) async {
-  final StorageDatabase database = await Future.value(StorageDatabase(context!)); // never null ^
+Future initStorage({String context = AppContext.DEFAULT}) async {
+  final StorageDatabase database = await Future.value(StorageDatabase(context)); // never null ^
   Storage.database = database;
   return database;
 }
 
-Future closeColdStorage(StorageDatabase? storage) async {
+Future closeStorage(StorageDatabase? storage) async {
   if (storage != null) {
     storage.close();
   }
 }
 
-Future deleteColdStorage({String? context = AppContext.DEFAULT}) async {
+Future deleteStorage({String? context = AppContext.DEFAULT}) async {
   try {
     var storageLocation = Storage.sqliteLocation;
 
@@ -73,7 +82,131 @@ Future deleteColdStorage({String? context = AppContext.DEFAULT}) async {
   }
 }
 
-Future<Database?> initStorage({String? context = AppContext.DEFAULT}) async {
+///
+/// Load Storage
+///
+/// bulk loads cold storage objects to RAM, this can
+/// be much more specific and performant
+///
+/// for example, only load users that are known to be
+/// involved in stored messages/events
+///
+Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase storage) async {
+  try {
+    final userIds = <String>[];
+    final messages = <String, List<Message>>{};
+    final decrypted = <String, List<Message>>{};
+    final reactions = <String, List<Reaction>>{};
+
+    final auth = await loadAuth(storage: storage);
+    final crypto = await loadCrypto(storage: storage);
+    final settings = await loadSettings(storage: storage);
+
+    // TODO: deprecate / remove after 0.2.3
+    final authOld = await loadAuthOld(storage: storageOld);
+    final cryptoOld = await loadCryptoOld(storage: storageOld);
+    final settingsOld = await loadSettingsOld(storage: storageOld);
+
+    final rooms = await loadRooms(storage: storage);
+
+    for (final Room room in rooms.values) {
+      messages[room.id] = await loadMessagesRoom(
+        room.id,
+        storage: storage,
+      );
+
+      decrypted[room.id] = await loadDecryptedRoom(
+        room.id,
+        storage: storage,
+      );
+
+      final currentUserIds =
+          (messages[room.id] ?? []).map((message) => message.sender ?? '').toList();
+
+      userIds.addAll(currentUserIds);
+    }
+
+    final users = await loadUsers(storage: storage, ids: userIds);
+
+    final media = await loadMediaRelative(
+      storage: storage,
+      users: users.values.toList(),
+      rooms: rooms.values.toList(),
+    );
+
+    return {
+      StorageKeys.AUTH: auth ?? authOld,
+      StorageKeys.CRYPTO: crypto ?? cryptoOld,
+      StorageKeys.SETTINGS: settings ?? settingsOld,
+      StorageKeys.USERS: users,
+      StorageKeys.ROOMS: rooms,
+      StorageKeys.MEDIA: media,
+      StorageKeys.MESSAGES: messages,
+      StorageKeys.REACTIONS: reactions,
+      StorageKeys.DECRYPTED: decrypted,
+    };
+  } catch (error) {
+    printError('[loadStorage]  ${error.toString()}');
+    return {};
+  }
+}
+
+//
+// Load Storage (Async)
+//
+// finishes loading cold storage objects to RAM, this can
+// be much more specific and performant
+//
+loadStorageAsync(StorageDatabase storage, Store<AppState> store) async {
+  try {
+    final rooms = store.state.roomStore.roomList;
+    final messages = store.state.eventStore.messages;
+    final decrypted = store.state.eventStore.messagesDecrypted;
+
+    final medias = <String, Uint8List>{};
+    final reactions = <String, List<Reaction>>{};
+    final receipts = <String, Map<String, Receipt>>{};
+
+    for (final Room room in rooms) {
+      final currentMessages = messages[room.id] ?? [];
+      final currentMessagesIds = currentMessages.map((e) => e.id ?? '').toList();
+
+      reactions.addAll(await loadReactionsMapped(
+        roomId: room.id,
+        eventIds: currentMessagesIds,
+        storage: storage,
+      ));
+
+      receipts[room.id] = await loadReceipts(
+        currentMessagesIds,
+        storage: storage,
+      );
+
+      medias.addAll(await loadMediaRelative(
+        messages:
+            messages.values.expand((e) => e).toList() + decrypted.values.expand((e) => e).toList(),
+        storage: storage,
+      ));
+    }
+
+    loadAsync() async {
+      store.dispatch(LoadMedia(mediaMap: medias));
+      store.dispatch(LoadReceipts(receiptsMap: receipts));
+      await store.dispatch(LoadReactions(reactionsMap: reactions));
+
+      // mutate messages
+      await store.dispatch(mutateMessagesAll());
+    }
+
+    loadAsync();
+  } catch (error) {
+    printError('[loadStorageAsync]  ${error.toString()}');
+  }
+}
+
+///
+/// TODO: deprecated - remove after 0.2.3
+Future<Database?> initStorageOLD({String? context = AppContext.DEFAULT}) async {
   try {
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.databaseLocation;
@@ -124,19 +257,22 @@ Future<Database?> initStorage({String? context = AppContext.DEFAULT}) async {
     Storage.instance = openedDatabase;
     return openedDatabase;
   } catch (error) {
-    printDebug('[initStorage] $error');
+    printError('[initStorage] $error');
     return null;
   }
 }
 
-// Closes and saves storage
-closeStorage(Database? database) async {
+///
+/// TODO: deprecated - remove after 0.2.3
+closeStorageOLD(Database? database) async {
   if (database != null) {
     database.close();
   }
 }
 
-deleteStorage({String? context = AppContext.DEFAULT}) async {
+///
+/// TODO: deprecated - remove after 0.2.3
+deleteStorageOLD({String? context = AppContext.DEFAULT}) async {
   try {
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.databaseLocation;
@@ -166,83 +302,5 @@ deleteStorage({String? context = AppContext.DEFAULT}) async {
     await deleteKey(storageKeyId);
   } catch (error) {
     printError('[deleteStorage] ${error.toString()}');
-  }
-}
-
-///
-/// Load Storage
-///
-/// bulk loads cold storage objects to RAM, this can
-/// be much more specific and performant
-///
-/// for example, only load users that are known to be
-/// involved in stored messages/events
-///
-/// TODO: need pagination for pretty much all of these
-Future<Map<String, dynamic>> loadStorage(Database storageOld, StorageDatabase storage) async {
-  try {
-    final auth = await loadAuth(storage: storageOld);
-    final crypto = await loadCrypto(storage: storageOld);
-    final settings = await loadSettings(storage: storageOld);
-    final redactions = await loadRedactions(storage: storageOld);
-
-    final rooms = await loadRooms(storage: storage);
-    // final users = await loadUsers(storage: storage);
-    final media = await loadMediaAll(storage: storage);
-
-    final userIds = <String>[];
-    final messages = <String, List<Message>>{};
-    final decrypted = <String, List<Message>>{};
-    final reactions = <String, List<Reaction>>{};
-    final receipts = <String, Map<String, ReadReceipt>>{};
-
-    for (final Room room in rooms.values) {
-      messages[room.id] = await loadMessagesRoom(
-        room.id,
-        storage: storage,
-      );
-
-      decrypted[room.id] = await loadDecryptedRoom(
-        room.id,
-        storage: storage,
-      );
-
-      final currentUserIds =
-          (messages[room.id] ?? []).map((message) => message.sender ?? '').toList();
-
-      userIds.addAll(currentUserIds);
-
-      reactions.addAll(await loadReactions(
-        room.messageIds,
-        storage: storageOld,
-      ));
-
-      receipts[room.id] = await loadReceipts(
-        room.messageIds,
-        storage: storageOld,
-      );
-    }
-
-    final users = await loadUsers(
-      storage: storage,
-      ids: userIds,
-    );
-
-    return {
-      StorageKeys.AUTH: auth,
-      StorageKeys.USERS: users,
-      StorageKeys.ROOMS: rooms,
-      StorageKeys.MEDIA: media,
-      StorageKeys.CRYPTO: crypto,
-      StorageKeys.MESSAGES: messages,
-      StorageKeys.DECRYPTED: decrypted,
-      StorageKeys.REACTIONS: reactions,
-      StorageKeys.REDACTIONS: redactions,
-      StorageKeys.RECEIPTS: receipts,
-      StorageKeys.SETTINGS: settings,
-    };
-  } catch (error) {
-    printError('[loadStorage]  ${error.toString()}');
-    return {};
   }
 }
