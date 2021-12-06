@@ -164,5 +164,16 @@
     "content-dialog-device-rename": "Introduza o novo nome público para este dispositivo.",
     "confirm-linkout": "Tem a certeza que quer abrir a seguinte hiperligação?\n\n{}",
     "title-device-rename": "Alternar nome do dispositivo",
-    "title-dialog-confirm-linkout": "Confirmar abertura de hiperligação"
+    "title-dialog-confirm-linkout": "Confirmar abertura de hiperligação",
+    "title-proxy-use-proxy": "Usar um proxy",
+    "list-item-settings-proxy": "Configurações do proxy",
+    "list-item-settings-proxy-host": "Host",
+    "subtitle-proxy-use-proxy": "Isto forçará todo o tráfego que sai do Syphon a usar um proxy",
+    "list-item-settings-proxy-port": "Porta",
+    "content-proxy-host": "O host do proxy",
+    "label-proxy-port": "Porta",
+    "content-proxy-port": "A porta em que o proxy está a \"escutar\"",
+    "label-proxy-host": "Hostname",
+    "title-proxy-host": "Alterar o host do proxy",
+    "title-proxy-port": "Alterar a porta do proxy"
 }
