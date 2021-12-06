@@ -115,16 +115,29 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
     case ToggleProxy:
-      if (!state.proxySettings.enabled) { //we're enabling it
-        httpClient = createProxiedClient(state.proxySettings);
-      }
-      else {
-        httpClient = createClient();
-      }
-
-      return state.copyWith(
+      final _state =  state.copyWith(
         proxySettings: state.proxySettings.copyWith(enabled: !state.proxySettings.enabled),
       );
+
+      httpClient = createClient(proxySettings: _state.proxySettings);
+
+      return _state;
+    case SetProxyHost:
+      final _state =  state.copyWith(
+        proxySettings: state.proxySettings.copyWith(host: action.host),
+      );
+
+      httpClient = createClient(proxySettings: _state.proxySettings);
+
+      return _state;
+    case SetProxyPort:
+      final _state =  state.copyWith(
+        proxySettings: state.proxySettings.copyWith(port: action.port),
+      );
+
+      httpClient = createClient(proxySettings: _state.proxySettings);
+
+      return _state;
     case SetReadReceipts:
       final _action = action as SetReadReceipts;
       return state.copyWith(

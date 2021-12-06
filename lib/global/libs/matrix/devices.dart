@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 
@@ -47,7 +46,7 @@ abstract class Devices {
       'display_name': displayName,
     };
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -125,7 +124,7 @@ abstract class Devices {
       'display_name': displayName,
     };
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),

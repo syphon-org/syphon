@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/proxy-settings/model.dart';
 
 abstract class Rooms {
   /// Sync (main functionality)
@@ -43,7 +43,7 @@ abstract class Rooms {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final response = await http
+    final response = await httpClient
         .get(
           Uri.parse(url),
           headers: headers,
@@ -66,8 +66,9 @@ abstract class Rooms {
     final bool? fullState = params['fullState'];
     final int? timeout = params['timeout'];
     final String? filter = params['filter'];
+    final ProxySettings? proxySettings = params['proxySettings'];
 
-    httpClient = createClient();
+    httpClient = createClient(proxySettings: proxySettings);
 
     return sync(
       protocol: protocol,
@@ -346,7 +347,7 @@ abstract class Rooms {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final reponse = await http.delete(
+    final reponse = await httpClient.delete(
       Uri.parse(url),
       headers: headers,
     );
@@ -470,7 +471,7 @@ abstract class Rooms {
       ...Values.defaultHeaders,
     };
 
-    final response = await http.get(
+    final response = await httpClient.get(
       Uri.parse(url),
       headers: headers,
     );

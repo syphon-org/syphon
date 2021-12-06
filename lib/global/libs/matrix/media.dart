@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/settings/proxy-settings/model.dart';
 
 /// Media queries for matrix
 ///
@@ -17,8 +18,9 @@ class MatrixMedia {
     final String? accessToken = params['accessToken'];
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
+    final ProxySettings? proxySettings = params['proxySettings'];
 
-    httpClient = createClient();
+    httpClient = createClient(proxySettings: proxySettings);
 
     return fetchThumbnail(
       protocol: protocol,
@@ -74,8 +76,9 @@ class MatrixMedia {
     final String? accessToken = params['accessToken'];
     final String? serverName = params['serverName'];
     final String mediaUri = params['mediaUri'];
+    final ProxySettings? proxySettings = params['proxySettings'];
 
-    httpClient = createClient();
+    httpClient = createClient(proxySettings: proxySettings);
 
     return fetchMedia(
       protocol: protocol,

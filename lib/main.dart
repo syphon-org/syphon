@@ -35,12 +35,7 @@ void main() async {
   final store = await initStore(cache, storage, storageCold);
 
   // init http client
-  if (store.state.settingsStore.proxySettings.enabled) {
-    httpClient = createProxiedClient(store.state.settingsStore.proxySettings);
-  }
-  else {
-    httpClient = createClient();
-  }
+  httpClient = createClient(proxySettings: store.state.settingsStore.proxySettings);
 
   // init app
   runApp(
