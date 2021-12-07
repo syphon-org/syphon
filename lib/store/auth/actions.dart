@@ -1306,8 +1306,8 @@ ThunkAction<AppState> setScreenLock({required String pin, String existing = ''})
       }
 
       await saveContext(contextConverted);
-
-      await deleteKey(storageKeyId);
+      
+      await clearKey(storageKeyId);
 
       await store.dispatch(addConfirmation(
         message: 'Screen lock pin was set successfully for this account.',

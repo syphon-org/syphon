@@ -1,6 +1,6 @@
 import 'package:encrypt/encrypt.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/libs/storage/secure-storage.dart';
+import 'package:syphon/global/print.dart';
 
 String generateKey() {
   return Key.fromSecureRandom(32).base64;
@@ -9,6 +9,15 @@ String generateKey() {
 Future<bool> checkKey(String keyId) async {
   try {
     return await SecureStorage.check(key: keyId);
+  } catch (error) {
+    printError('[checkKey] $error');
+    return false;
+  }
+}
+
+Future<bool> clearKey(String keyId) async {
+  try {
+    return await SecureStorage().write(key: keyId, value: '');
   } catch (error) {
     printError('[checkKey] $error');
     return false;
