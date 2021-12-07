@@ -170,6 +170,7 @@ ThunkAction<AppState> fetchMedia({
           'homeserver': store.state.authStore.currentUser.homeserver,
           'mediaUri': mxcUri,
           'size': size,
+          'proxySettings': store.state.settingsStore.proxySettings,
         });
       } else {
         data = await compute(MatrixApi.fetchMediaThreaded, {
@@ -177,6 +178,7 @@ ThunkAction<AppState> fetchMedia({
           'accessToken': store.state.authStore.user.accessToken,
           'homeserver': store.state.authStore.currentUser.homeserver,
           'mediaUri': mxcUri,
+          'proxySettings': store.state.settingsStore.proxySettings,
         });
       }
 

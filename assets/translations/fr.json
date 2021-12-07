@@ -164,5 +164,16 @@
     "content-dialog-device-rename": "Entrez un nouveau nom public pour cet appareil.",
     "title-device-rename": "Renommer un appareil",
     "confirm-linkout": "Voulez-vous vraiment ouvrir le lien suivant ?\n\n{}",
-    "title-dialog-confirm-linkout": "Confirmer l'ouverture du lien"
+    "title-dialog-confirm-linkout": "Confirmer l'ouverture du lien",
+    "title-proxy-host": "Modifier l'hôte du proxy",
+    "subtitle-proxy-use-proxy": "Cela va forcer tout le trafic sortant de Syphon a passer par un proxy",
+    "list-item-settings-proxy-host": "Hôte",
+    "content-proxy-host": "L'hôte de votre proxy",
+    "content-proxy-port": "Le port d'écoute de votre proxy",
+    "label-proxy-port": "Port",
+    "title-proxy-use-proxy": "Utiliser un proxy",
+    "title-proxy-port": "Modifier le port du proxy",
+    "list-item-settings-proxy": "Paramètres du proxy",
+    "list-item-settings-proxy-port": "Port",
+    "label-proxy-host": "Nom d'hôte"
 }

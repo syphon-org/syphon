@@ -160,5 +160,20 @@
     "button-text-invite": "Zaproś Znajomych",
     "button-text-settings": "Ustawienia",
     "alert-hidden-read-receipts": "Ukryte potwierdzenia odczytu muszą być wspierane przez twój serwer, inaczej wbranie tej opcji będzie miało ten sam efekt co wybranie opcji 'Włączone'",
-    "label-download-image": "Załaduj Obraz"
+    "label-download-image": "Załaduj Obraz",
+    "title-proxy-host": "Zmień Serwer Proxy",
+    "list-item-settings-proxy-port": "Port",
+    "title-proxy-use-proxy": "Użyj Serwera Proxy",
+    "list-item-settings-proxy": "Ustawienia Serwera Proxy",
+    "list-item-settings-proxy-host": "Adres Serwera",
+    "content-dialog-device-rename": "Wprowadź nową nazwę urządzenia.",
+    "title-proxy-port": "Zmień Port Proxy",
+    "title-dialog-confirm-linkout": "Potwierdź Otwarcie Linku",
+    "title-device-rename": "Zmień nazwę urządzenia",
+    "subtitle-proxy-use-proxy": "To wymusi przesyłanie wszystkich danych aplikacji przez serwer proxy",
+    "content-proxy-host": "Serwer proxy",
+    "content-proxy-port": "Port gdzie serwer proxy oczekuje na połączenia",
+    "confirm-linkout": "Czy na pewno chcesz otworzyć następujący link?\n\n{}",
+    "label-proxy-host": "Nazwa serwera",
+    "label-proxy-port": "Port"
 }

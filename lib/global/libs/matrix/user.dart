@@ -61,7 +61,7 @@ abstract class Users {
       'Authorization': 'Bearer $accessToken',
     };
 
-    final saveResponse = await http.put(
+    final saveResponse = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(accountData),
@@ -97,7 +97,7 @@ abstract class Users {
       'ignored_users': blockUserList,
     };
 
-    final saveResponse = await http.put(
+    final saveResponse = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -194,7 +194,7 @@ abstract class Users {
       'displayname': displayName,
     };
 
-    final response = await http.put(
+    final response = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
@@ -227,7 +227,7 @@ abstract class Users {
       'avatar_url': avatarUri, // mxc:// resource
     };
 
-    final saveResponse = await http.put(
+    final saveResponse = await httpClient.put(
       Uri.parse(url),
       headers: headers,
       body: json.encode(body),
