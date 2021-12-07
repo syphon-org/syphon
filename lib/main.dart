@@ -11,7 +11,7 @@ void main() async {
   // init platform specific code
   await initPlatformDependencies();
 
-  // TODO: remove after
+  // TODO: remove after 0.2.3
   await migrateContexts_MIGRATION();
 
   // pull current context / nullable
@@ -20,6 +20,6 @@ void main() async {
   // init app
   runApp(Prelock(
     appContext: context,
-    enabled: context.pinHash.isNotEmpty,
+    enabled: context.id.isNotEmpty && context.pinHash.isNotEmpty,
   ));
 }

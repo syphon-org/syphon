@@ -11,10 +11,22 @@ import 'package:syphon/storage/index.dart';
 const ALL_APP_CONTEXT_KEY = '${Values.appLabel}@app-context-all';
 const CURRENT_APP_CONTEXT_KEY = '${Values.appLabel}@app-context-current';
 
+Future<AppContext> findContext(String contextId) async {
+  final all = await loadContextsAll();
+
+  return all.firstWhere((e) => e.id == contextId, orElse: () => AppContext());
+}
+
 Future saveContextCurrent(AppContext? current) async {
   if (current == null) return;
 
   SecureStorage().write(key: CURRENT_APP_CONTEXT_KEY, value: json.encode(current));
+}
+
+Future saveContextsAll(List<AppContext>? all) async {
+  if (all == null) return;
+
+  await SecureStorage().write(key: ALL_APP_CONTEXT_KEY, value: json.encode(all));
 }
 
 Future saveContext(AppContext? current) async {
@@ -22,9 +34,6 @@ Future saveContext(AppContext? current) async {
 
   final allContexts = await loadContextsAll();
   final position = allContexts.indexWhere((c) => c.id == current.id);
-
-  // TODO: handle setting current context external to saveContext
-  saveContextCurrent(current);
 
   // both saves new or effectively updates existing
   if (position == -1) {
@@ -34,13 +43,10 @@ Future saveContext(AppContext? current) async {
     allContexts.insert(0, current);
   }
 
+  // TODO: handle setting current context external to saveContext
+  await saveContextCurrent(current);
+
   return saveContextsAll(allContexts);
-}
-
-Future saveContextsAll(List<AppContext>? all) async {
-  if (all == null) return;
-
-  SecureStorage().write(key: ALL_APP_CONTEXT_KEY, value: json.encode(all));
 }
 
 Future<AppContext> loadContextCurrent() async {
@@ -53,7 +59,11 @@ Future<AppContext> loadContextCurrent() async {
     printError('[loadCurrentContext] ERROR LOADING CURRENT CONTEXT ${error.toString()}');
 
     try {
-      return loadContextNext();
+      final fallback = await loadContextNext();
+
+      saveContextCurrent(fallback);
+
+      return fallback;
     } catch (error) {
       printError('[loadNextContext] ERROR LOADING NEXT CONTEXT - RESETTING CONTEXT');
       resetContextsAll();
@@ -91,7 +101,7 @@ Future deleteContext(AppContext? current) async {
 
   final allContexts = await loadContextsAll();
 
-  allContexts.remove(current);
+  final updatedContexts = allContexts.where((e) => e.id != current.id).toList();
 
   if (allContexts.isNotEmpty) {
     saveContextCurrent(allContexts.first);
@@ -99,7 +109,7 @@ Future deleteContext(AppContext? current) async {
     saveContextCurrent(AppContext());
   }
 
-  return saveContextsAll(allContexts);
+  return saveContextsAll(updatedContexts);
 }
 
 resetContextsAll() async {

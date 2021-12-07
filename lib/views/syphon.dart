@@ -30,6 +30,7 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/home-screen.dart';
 import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/prelock.dart';
 
 class Syphon extends StatefulWidget {
   final Database? cache;
@@ -180,8 +181,18 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // save new user context
     if (user != null) {
-      contextNew = AppContext(id: generateContextId_DEPRECATED(id: user.userId!));
+      final contextId = generateContextId_DEPRECATED(id: user.userId!);
+      contextNew = await findContext(contextId);
+
+      if (contextNew.id.isEmpty) {
+        contextNew = AppContext(id: contextId);
+      }
+
       await saveContext(contextNew);
+
+      if (contextNew.pinHash.isNotEmpty) {
+        return Prelock.restart(context);
+      }
     } else {
       // revert to another user context or default
       await deleteContext(contextOld);

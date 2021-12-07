@@ -19,8 +19,6 @@ class AppContext {
 
   final String id;
   final String pinHash;
-
-  @JsonKey(defaultValue: Values.EMPTY)
   final String secretKeyEncrypted;
 
   const AppContext({

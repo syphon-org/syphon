@@ -5,6 +5,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Store Context
@@ -64,18 +65,20 @@ Key convertPasscodeToKey(String passcode) {
   return Key.fromBase64(passcode.padRight(32, passcode[0]));
 }
 
-// TODO: this should be improved
 Future<String> unlockSecretKey(AppContext context, String passcode) async {
   final iv = IV.fromBase64(context.id.substring(0, 8));
   final encrypter = Encrypter(AES(convertPasscodeToKey(passcode), mode: AESMode.sic));
 
+  printInfo('[unlockSecretKey] $passcode, ${context.secretKeyEncrypted}, ${context.id}');
+
   return encrypter.decrypt(Encrypted.fromBase64(context.secretKeyEncrypted), iv: iv);
 }
 
-// TODO: this should be improved
 Future<String> convertSecretKey(AppContext context, String passcode, String plaintextKey) async {
   final iv = IV.fromBase64(context.id.substring(0, 8));
   final encrypter = Encrypter(AES(convertPasscodeToKey(passcode), mode: AESMode.sic));
+
+  printInfo('[convertSecretKey] $passcode, $plaintextKey, ${context.id}');
 
   return encrypter.encrypt(plaintextKey, iv: iv).base64;
 }

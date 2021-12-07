@@ -1293,11 +1293,19 @@ ThunkAction<AppState> setScreenLock({required String pin, String existing = ''})
       final storageKeyId = '${currentContext.id}-${Storage.keyLocation}';
       final storageKey = await loadKey(storageKeyId);
 
-      saveContext(AppContext(
+      final contextConverted = AppContext(
         id: currentContext.id,
         pinHash: await generatePinHash(passcode: pin),
         secretKeyEncrypted: await convertSecretKey(currentContext, pin, storageKey),
-      ));
+      );
+
+      final unlockedKey = await unlockSecretKey(contextConverted, pin);
+
+      if (unlockedKey != storageKey) {
+        throw Exception('Keys did not match after decryption');
+      }
+
+      await saveContext(contextConverted);
 
       await deleteKey(storageKeyId);
 

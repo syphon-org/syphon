@@ -109,10 +109,10 @@ LazyDatabase openDatabase(AppContext context, {String pin = ''}) {
     // Configure cache encryption/decryption instance
     var storageKey = await loadKey(storageKeyId);
 
-    printInfo('[initStorage] $storageLocation $storageKey');
+    final isLockedContext =
+        context.id.isNotEmpty && context.secretKeyEncrypted.isNotEmpty && pin.isNotEmpty;
 
-    if (context.secretKeyEncrypted.isNotEmpty && pin.isNotEmpty) {
-      printInfo('[pre-unlockSecretKey] $storageKeyId $storageKey');
+    if (isLockedContext) {
       storageKey = await unlockSecretKey(context, pin);
     }
 
