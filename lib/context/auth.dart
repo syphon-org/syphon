@@ -71,6 +71,7 @@ Future<String> unlockSecretKey(AppContext context, String passcode) async {
 
   printInfo('[unlockSecretKey] $passcode, ${context.secretKeyEncrypted}, ${context.id}');
 
+  // ignore: await_only_futures
   return encrypter.decrypt(Encrypted.fromBase64(context.secretKeyEncrypted), iv: iv);
 }
 
@@ -80,5 +81,6 @@ Future<String> convertSecretKey(AppContext context, String passcode, String plai
 
   printInfo('[convertSecretKey] $passcode, $plaintextKey, ${context.id}');
 
-  return encrypter.encrypt(plaintextKey, iv: iv).base64;
+  // ignore: await_only_futures
+  return await encrypter.encrypt(plaintextKey, iv: iv).base64;
 }

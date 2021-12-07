@@ -1306,7 +1306,8 @@ ThunkAction<AppState> setScreenLock({required String pin, String existing = ''})
       }
 
       await saveContext(contextConverted);
-      
+
+      // Clears the key but doesn't invalidate the key ID
       await clearKey(storageKeyId);
 
       await store.dispatch(addConfirmation(

@@ -112,6 +112,7 @@ LazyDatabase openDatabase(AppContext context, {String pin = ''}) {
     final isLockedContext =
         context.id.isNotEmpty && context.secretKeyEncrypted.isNotEmpty && pin.isNotEmpty;
 
+    // TODO: why is this completely different if I dont print here
     if (isLockedContext) {
       storageKey = await unlockSecretKey(context, pin);
     }

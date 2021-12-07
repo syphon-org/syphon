@@ -177,11 +177,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     final storePreload = await initStore(cachePreload, storageOld, storagePreload);
 
     // init http client
-    if (storePreload.state.settingsStore.proxySettings.enabled) {
-      httpClient = createProxiedClient(storePreload.state.settingsStore.proxySettings);
-    } else {
-      httpClient = createClient();
-    }
+    httpClient = createClient(proxySettings: storePreload.state.settingsStore.proxySettings);
 
     setState(() {
       store = storePreload;

@@ -15,12 +15,12 @@ Future<bool> checkKey(String keyId) async {
   }
 }
 
-Future<bool> clearKey(String keyId) async {
+Future<void> clearKey(String keyId) async {
   try {
     return await SecureStorage().write(key: keyId, value: '');
   } catch (error) {
     printError('[checkKey] $error');
-    return false;
+    return;
   }
 }
 
