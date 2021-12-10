@@ -70,7 +70,7 @@ void _openOnLinux() {
   }
 }
 
-LazyDatabase openDatabase(AppContext context, {String pin = ''}) {
+LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   return LazyDatabase(() async {
     var storageKeyId = Storage.keyLocation;
     var storageLocation = Storage.sqliteLocation;

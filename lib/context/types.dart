@@ -13,7 +13,7 @@ part 'types.g.dart';
 ///
 @JsonSerializable()
 class AppContext {
-  static const DEFAULT = Values.EMPTY;
+  static const DEFAULT = Values.empty;
   static const ALL_CONTEXT_KEY = '${Values.appLabel}@context-all';
   static const CURRENT_CONTEXT_KEY = '${Values.appLabel}@context-current';
 
@@ -22,9 +22,9 @@ class AppContext {
   final String secretKeyEncrypted;
 
   const AppContext({
-    this.id = Values.EMPTY,
-    this.pinHash = Values.EMPTY,
-    this.secretKeyEncrypted = Values.EMPTY,
+    this.id = Values.empty,
+    this.pinHash = Values.empty,
+    this.secretKeyEncrypted = Values.empty,
   });
 
   Map<String, dynamic> toJson() => _$AppContextToJson(this);

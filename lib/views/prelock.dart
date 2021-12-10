@@ -9,6 +9,7 @@ import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/drift/database.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/index.dart';
@@ -40,8 +41,8 @@ class Prelock extends StatefulWidget {
     context.findAncestorStateOfType<_PrelockState>()!.restart();
   }
 
-  static Future? toggleLocked(BuildContext context) {
-    return context.findAncestorStateOfType<_PrelockState>()!.toggleLocked();
+  static Future? toggleLocked(BuildContext context, String pin) {
+    return context.findAncestorStateOfType<_PrelockState>()!.toggleLocked(pin: pin);
   }
 
   @override
@@ -131,11 +132,11 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     });
   }
 
-  toggleLocked() async {
+  toggleLocked({required String pin}) async {
     final lockedNew = !locked;
 
     if (!lockedNew) {
-      await _onLoadStorage();
+      await _onLoadStorage(pin: pin);
 
       setState(() {
         locked = false;
@@ -161,14 +162,14 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     }
   }
 
-  _onLoadStorage() async {
+  _onLoadStorage({String pin = Values.empty}) async {
     final appContext = widget.appContext;
 
     // init hot caches
     final cachePreload = await initCache(context: appContext);
 
     // init cold storage
-    final storagePreload = await initStorage(context: appContext);
+    final storagePreload = await initStorage(context: appContext, pin: pin);
 
     // init cold storage - old TODO: deprecated - remove after 0.2.3
     final storageOldPreload = await initStorageOLD(context: appContext);

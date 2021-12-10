@@ -44,7 +44,7 @@ Future<T>? showLockOverlay<T>({
   int digits = 9,
   int maxRetries = 0,
   LockController? lockController,
-  void Function()? onUnlocked,
+  void Function(String pin)? onUnlocked,
   void Function(int retries)? onError,
   void Function(int retries)? onMaxRetries,
   void Function()? onOpened,

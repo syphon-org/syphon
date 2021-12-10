@@ -1,6 +1,6 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.3+2004
+version: 0.2.4+2005
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -124,11 +124,6 @@ dev_dependencies:
 
 # TODO: remove when similar functionality is merged
 dependency_overrides:
-  # sqlparser: # TODO: for moor_generator Uint8List error output
-  #   git:
-  #     url: https://github.com/simolus3/moor.git
-  #     ref: cc7d98d110204acb72d415312a78ed7821382d69
-  #     path: sqlparser
   swipeable: # TODO: null saftey version
     git:
       url: https://github.com/ereio/swipeable.git

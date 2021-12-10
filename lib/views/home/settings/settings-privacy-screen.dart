@@ -5,7 +5,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -18,7 +17,6 @@ import 'package:syphon/store/settings/devices-settings/selectors.dart';
 import 'package:syphon/store/settings/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
-import 'package:syphon/views/prelock.dart';
 import 'package:syphon/views/syphon.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
@@ -458,7 +456,7 @@ class _Props extends Equatable {
         screenLockEnabled: selectScreenLockEnabled(context),
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
         readReceipts: selectReadReceiptsString(store.state.settingsStore.readReceipts),
-        sessionId: store.state.authStore.user.deviceId ?? Values.EMPTY,
+        sessionId: store.state.authStore.user.deviceId ?? Values.empty,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),
         onSetScreenLock: (String matchedPin) => store.dispatch(setScreenLock(pin: matchedPin)),

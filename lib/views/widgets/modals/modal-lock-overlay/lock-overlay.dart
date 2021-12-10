@@ -66,7 +66,7 @@ class LockOverlay extends StatefulWidget {
   /// Called if the value matches the correctString.
   ///
   /// To close the screen, call `Navigator.pop(context)`.
-  final void Function()? onUnlocked;
+  final void Function(String pin)? onUnlocked;
 
   /// Called when the first and second inputs match during confirmation.
   ///
@@ -110,9 +110,9 @@ class _LockOverlayState extends State<LockOverlay> {
   int retries = 1;
   String currentInput = '';
 
-  void unlocked() {
+  void unlocked(String pin) {
     if (widget.onUnlocked != null) {
-      widget.onUnlocked!();
+      widget.onUnlocked!(pin);
       return;
     }
 
@@ -173,7 +173,7 @@ class _LockOverlayState extends State<LockOverlay> {
 
     lockController.verifyInput.listen((success) async {
       if (success) {
-        unlocked();
+        unlocked(currentInput);
       }
 
       // Wait for the animation on failure.

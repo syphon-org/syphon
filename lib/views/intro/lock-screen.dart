@@ -32,6 +32,8 @@ class LockScreen extends StatefulWidget {
 class _LockScreenState extends State<LockScreen> with Lifecycle<LockScreen> {
   int maxRetries = 3;
 
+  String pinVerified = '';
+
   @override
   void onMounted() {
     showLockOverlay(
@@ -40,19 +42,13 @@ class _LockScreenState extends State<LockScreen> with Lifecycle<LockScreen> {
         onMaxRetries: onMaxRetries,
         maxRetries: maxRetries,
         onVerify: (String answer) async {
-          // // TODO: remove just for testing
-          // if (DEBUG_MODE) {
-          //   printDebug('ANSWER ${answer == '1908'}');
-          //   return answer == '1010';
-          // }
-
           return Future.value(verifyPinHash(
             passcode: answer,
             hash: widget.appContext.pinHash,
           ));
         },
-        onUnlocked: () async {
-          Prelock.toggleLocked(context);
+        onUnlocked: (String pin) {
+          Prelock.toggleLocked(context, pin);
         });
   }
 
