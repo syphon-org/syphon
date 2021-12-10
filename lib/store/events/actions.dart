@@ -13,6 +13,7 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/sync/actions.dart';
 
 class ResetEvents {}
 
@@ -81,13 +82,17 @@ ThunkAction<AppState> addMessages({
   required Room room,
   List<Message> messages = const [],
   List<Message> outbox = const [],
+  bool clear = false,
 }) =>
     (Store<AppState> store) {
       if (messages.isEmpty && outbox.isEmpty) return;
 
-      return store.dispatch(
-        AddMessages(roomId: room.id, messages: messages, outbox: outbox),
-      );
+      return store.dispatch(AddMessages(
+        roomId: room.id,
+        messages: messages,
+        outbox: outbox,
+        clear: clear,
+      ));
     };
 
 ///
@@ -152,12 +157,14 @@ ThunkAction<AppState> loadMessagesCached({
   };
 }
 
+///
 /// Fetch Message Events
 ///
 /// https://matrix.org/docs/spec/client_server/latest#syncing
 /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-rooms-roomid-messages
 ///
-/// Pulls next message events remote from homeserver
+/// Pulls next message events remote from homeserver or storage
+///
 ThunkAction<AppState> fetchMessageEvents({
   Room? room,
   String? to,
@@ -171,11 +178,12 @@ ThunkAction<AppState> fetchMessageEvents({
         loadMessagesCached(room: room, batch: from, limit: limit, timestamp: timestamp),
       ) as List<Message>;
 
-      final oldest = cached.isEmpty;
-
-      if (!oldest) {
+      // known cached messages for this batch will be loaded
+      if (cached.isNotEmpty) {
         return;
       }
+
+      final oldest = cached.isEmpty;
 
       // mark syncing (to show loading indicators) since it needs to pull remotely
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));

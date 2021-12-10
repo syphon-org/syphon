@@ -89,8 +89,7 @@ Sync parseSync(Map params) {
   final Room roomExisting = params['room'];
   final User currentUser = params['currentUser'];
   final String? lastSince = params['lastSince'];
-  final List<Message> existingMessages = params['existingMessages'];
-  final existingIds = existingMessages.map((m) => m.id ?? '').toList();
+  final List<String> existingIds = params['existingMessages'];
 
   final details = parseDetails(json);
 

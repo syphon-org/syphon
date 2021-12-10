@@ -12,8 +12,19 @@ import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
+import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/messages/actions.dart';
+import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/actions.dart';
+import 'package:syphon/store/events/receipts/actions.dart';
+import 'package:syphon/store/events/redaction/actions.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/sync/parsers.dart';
+import 'package:syphon/store/user/actions.dart';
 
 class SetBackoff {
   final int? backoff;
@@ -277,6 +288,148 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       if (store.state.syncStore.backgrounded) {
         store.dispatch(setBackgrounded(false));
       }
+    }
+  };
+}
+
+///
+/// Sync State Data
+///
+/// Helper action that will determine how to update a room
+/// from data formatted like a sync request
+///
+ThunkAction<AppState> syncRooms(Map roomData) {
+  return (Store<AppState> store) async {
+    // init new store containers
+    final rooms = store.state.roomStore.rooms;
+    final user = store.state.authStore.user;
+    final synced = store.state.syncStore.synced;
+    final lastSince = store.state.syncStore.lastSince;
+
+    await Future.wait(roomData.keys.map((roomId) async {
+      try {
+        final Map json = roomData[roomId] ?? {};
+
+        if (json.isEmpty) return;
+
+        final roomOld = rooms.containsKey(roomId) ? rooms[roomId]! : Room(id: roomId);
+        final messagesOld = store.state.eventStore.messages[roomId] ?? [];
+
+        final sync = await compute(parseSync, {
+          'json': json,
+          'room': roomOld,
+          'currentUser': user,
+          'lastSince': lastSince,
+          'existingMessages': messagesOld.map((m) => m.id ?? '').toList(),
+        });
+
+        // overwrite room with updated one from sync
+        final roomSynced = sync.room;
+
+        printInfo(
+          // ignore: prefer_interpolation_to_compose_strings
+          '[syncRooms] ${roomSynced.name} ' +
+              'full_synced: $synced ' +
+              'limited: ${roomSynced.limited} ' +
+              'total new messages: ${sync.messages.length} ' +
+              'roomPrevBatch: ${roomSynced.prevBatch}',
+        );
+
+        // update various message mutations and meta data
+        await store.dispatch(setUsers(sync.users));
+        await store.dispatch(setReceipts(room: roomSynced, receipts: sync.readReceipts));
+        await store.dispatch(addReactions(reactions: sync.reactions));
+
+        // redact events (reactions and messages) through cache and cold storage
+        await store.dispatch(redactEvents(room: roomSynced, redactions: sync.redactions));
+
+        // handles editing newly fetched messages
+        final messages = await store.dispatch(mutateMessages(
+          messages: sync.messages,
+          existing: messagesOld,
+        )) as List<Message>;
+
+        // update encrypted messages (updating before normal messages prevents flicker)
+        if (roomSynced.encryptionEnabled) {
+          final decryptedOld = store.state.eventStore.messagesDecrypted[roomId];
+
+          final decrypted = await store.dispatch(decryptMessages(
+            roomSynced,
+            messages,
+          )) as List<Message>;
+
+          // handles editing newly fetched decrypted messages
+          final decryptedMutated = await store.dispatch(mutateMessages(
+            messages: decrypted,
+            existing: decryptedOld,
+          )) as List<Message>;
+
+          await store.dispatch(addMessagesDecrypted(
+            room: roomSynced,
+            messages: decryptedMutated,
+          ));
+        }
+
+        // save normal or encrypted messages
+        await store.dispatch(addMessages(
+          room: roomSynced,
+          messages: messages,
+        ));
+
+        // update room
+        store.dispatch(SetRoom(room: roomSynced));
+
+        // fetch avatar if a uri was found
+        if (roomSynced.avatarUri != null) {
+          store.dispatch(fetchMedia(
+            mxcUri: roomSynced.avatarUri,
+            thumbnail: true,
+          ));
+        }
+
+        // fetch previous messages since last /sync (a messages gap)
+        // room will be marked limited to indicate this
+        if (roomSynced.limited) {
+          printWarning(
+            '[syncRooms] ${roomSynced.name} LIMITED TRUE - Fetching more messages',
+          );
+
+          store.dispatch(fetchMessageEvents(
+            room: roomSynced,
+            from: roomSynced.prevBatch,
+          ));
+
+          // a recursive sync for the messages gap has now finished
+        } else if (!roomSynced.limited && roomOld.limited) {
+          final messagesSorted = latestMessages(messagesOld);
+
+          // wipe all but the latest 25 messages from the cache
+          await store.dispatch(addMessages(
+            room: roomSynced,
+            messages:
+                messagesSorted.sublist(0, messagesSorted.length > 25 ? 25 : messagesSorted.length),
+            clear: true,
+          ));
+        }
+      } catch (error) {
+        printError('[syncRoom] error $roomId ${error.toString()}');
+
+        // prevents against recursive backfill from bombing attempts at fetching messages
+        final roomExisting = rooms.containsKey(roomId) ? rooms[roomId]! : Room(id: roomId);
+        store.dispatch(SetRoom(room: roomExisting.copyWith(limited: false)));
+      }
+    }));
+  };
+}
+
+// TODO: a non-recursive backfill of "limited" room timelines
+ThunkAction<AppState> syncBackfill(
+  String? roomId, {
+  List<String> previousIds = const [],
+}) {
+  return (Store<AppState> store) async {
+    if (previousIds.isEmpty) {
+      return;
     }
   };
 }
