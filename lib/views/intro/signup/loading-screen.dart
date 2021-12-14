@@ -5,6 +5,8 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
+const ICON_SIZE = 108.0;
+
 class LoadingScreen extends StatelessWidget {
   final bool dark;
 
@@ -33,8 +35,8 @@ class LoadingScreen extends StatelessWidget {
                 TouchableOpacity(
                   child: SvgPicture.asset(
                     Assets.appIcon,
-                    width: width * 0.35,
-                    height: width * 0.35,
+                    width: ICON_SIZE,
+                    height: ICON_SIZE,
                   ),
                 ),
               ],
@@ -66,8 +68,8 @@ class LoadingScreen extends StatelessWidget {
                 TouchableOpacity(
                   child: SvgPicture.asset(
                     Assets.appIcon,
-                    width: width * 0.35,
-                    height: width * 0.35,
+                    width: ICON_SIZE,
+                    height: ICON_SIZE,
                     color: Colors.white,
                   ),
                 ),
