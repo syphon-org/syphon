@@ -121,7 +121,6 @@ resetContextsAll() async {
       (AppContext context) async {
         await deleteCache(context: context);
         await deleteStorage(context: context);
-        await deleteStorageOLD(context: context);
       },
     );
 

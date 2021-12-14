@@ -12,10 +12,10 @@ import 'package:syphon/context/types.dart';
 import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/storage/drift/converters.dart';
-// ignore: unused_import
-import 'package:syphon/storage/drift/migrations/5.update.messages.dart';
+import 'package:syphon/storage/converters.dart';
 import 'package:syphon/storage/index.dart';
+// ignore: unused_import
+import 'package:syphon/storage/migrations/5.update.messages.dart';
 import 'package:syphon/store/auth/schema.dart';
 import 'package:syphon/store/crypto/schema.dart';
 import 'package:syphon/store/events/messages/model.dart';

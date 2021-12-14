@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:drift/drift.dart' as drift;
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/media/encryption.dart';
 
 enum MediaType {

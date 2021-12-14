@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,6 +63,6 @@ class _LockScreenState extends State<LockScreen> with Lifecycle<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingScreen();
+    return LoadingScreen(dark: Platform.isAndroid);
   }
 }

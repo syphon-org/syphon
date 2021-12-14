@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syphon/global/assets.dart';
@@ -7,14 +6,14 @@ import 'package:syphon/views/behaviors.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 class LoadingScreen extends StatelessWidget {
-  final bool lite;
+  final bool dark;
 
   const LoadingScreen({
     Key? key,
-    this.lite = false,
+    this.dark = false,
   }) : super(key: key);
 
-  buildLoadingDefault(BuildContext context) {
+  buildLoadingLight(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -46,7 +45,7 @@ class LoadingScreen extends StatelessWidget {
     );
   }
 
-  buildLoadingInverted(BuildContext context) {
+  buildLoadingDark(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
@@ -66,9 +65,10 @@ class LoadingScreen extends StatelessWidget {
               children: <Widget>[
                 TouchableOpacity(
                   child: SvgPicture.asset(
-                    Assets.appIconLite,
+                    Assets.appIcon,
                     width: width * 0.35,
                     height: width * 0.35,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -80,11 +80,11 @@ class LoadingScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => lite
-      ? buildLoadingInverted(
+  Widget build(BuildContext context) => dark
+      ? buildLoadingDark(
           context,
         )
-      : buildLoadingDefault(
+      : buildLoadingLight(
           context,
         );
 }

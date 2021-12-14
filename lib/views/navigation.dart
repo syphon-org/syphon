@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
@@ -51,6 +53,13 @@ class NavigationService {
 
   static Future navigateTo(String routeName) {
     return navigatorKey.currentState!.pushNamed(routeName);
+  }
+
+  static Future<bool> goBack() {
+    if (navigatorKey.currentState!.canPop()) {
+      navigatorKey.currentState!.pop();
+    }
+    return Future.value(false);
   }
 
   static Future clearTo(String routeName, BuildContext context) {

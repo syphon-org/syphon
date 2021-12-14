@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,7 +15,6 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/receipts/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -216,7 +214,7 @@ class ChatInputState extends State<ChatInput> {
   }
 
   onAddPhoto() async {
-    final pickerResult = await ImagePicker().pickImage(
+    final pickerResult = await ImagePicker().getImage(
       source: ImageSource.gallery,
       maxWidth: Dimensions.avatarSizeMax,
       maxHeight: Dimensions.avatarSizeMax,

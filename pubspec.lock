@@ -22,13 +22,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.8.0"
-  android_alarm_manager:
+  android_alarm_manager_plus:
     dependency: "direct main"
     description:
-      name: android_alarm_manager
+      name: android_alarm_manager_plus
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.3"
   archive:
     dependency: transitive
     description:
@@ -441,7 +441,7 @@ packages:
       name: flutter_local_notifications
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "9.0.0"
+    version: "9.1.4"
   flutter_local_notifications_linux:
     dependency: transitive
     description:
@@ -1058,7 +1058,7 @@ packages:
       name: sqlparser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.18.0"
+    version: "0.18.1"
   stack_trace:
     dependency: transitive
     description:

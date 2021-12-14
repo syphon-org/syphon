@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:syphon/storage/drift/converters.dart';
+import 'package:syphon/storage/converters.dart';
 import 'package:syphon/store/events/messages/model.dart';
 
 ///

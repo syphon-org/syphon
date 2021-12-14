@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart' as localization;
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
@@ -16,7 +15,7 @@ import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/alerts/model.dart';
@@ -34,15 +33,13 @@ import 'package:syphon/views/prelock.dart';
 
 class Syphon extends StatefulWidget {
   final Database? cache;
-  final Database? storage;
-  final StorageDatabase? storageCold;
   final Store<AppState> store;
+  final StorageDatabase? storage;
 
   const Syphon(
-    this.store,
     this.cache,
+    this.store,
     this.storage,
-    this.storageCold,
   );
 
   static AppContext getAppContext(BuildContext buildContext) {
@@ -50,34 +47,28 @@ class Syphon extends StatefulWidget {
   }
 
   @override
-  SyphonState createState() => SyphonState(
-        store,
-        cache,
-        storage,
-        storageCold,
-      );
+  SyphonState createState() => SyphonState();
 }
 
 class SyphonState extends State<Syphon> with WidgetsBindingObserver {
-  Store<AppState> store;
+  late Store<AppState> store;
+
   Database? cache;
-  Database? storage;
-  StorageDatabase? storageCold;
+  StorageDatabase? storage;
   AppContext? appContext;
 
   final globalScaffold = GlobalKey<ScaffoldMessengerState>();
 
   Widget defaultHome = HomeScreen();
 
-  SyphonState(
-    this.store,
-    this.cache,
-    this.storage,
-    this.storageCold,
-  );
+  SyphonState();
 
   @override
   void initState() {
+    cache = widget.cache;
+    store = widget.store;
+    storage = widget.storage;
+
     WidgetsBinding.instance?.addObserver(this);
 
     // init all on state change listeners
@@ -172,8 +163,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // Stop saving to existing context databases
     await closeCache(cache);
-    await closeStorageOLD(storage);
-    await closeStorage(storageCold);
+    await closeStorage(storage);
 
     // final context switches
     final contextOld = await loadContextCurrent();
@@ -201,8 +191,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // Context cannot be null after above is run
     final cacheNew = await initCache(context: contextNew);
-    final storageNew = await initStorageOLD(context: contextNew);
-    final storageColdNew = await initStorage(context: contextNew);
+    final storageNew = await initStorage(context: contextNew);
 
     // allow referencing current app context throughout the app
     appContext = contextNew;
@@ -230,7 +219,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final storeNew = await initStore(
       cacheNew,
       storageNew,
-      storageColdNew,
       existingUser: existingUser,
       existingState: storeExisting,
     );
@@ -239,7 +227,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       cache = cacheNew;
       store = storeNew;
       storage = storageNew;
-      storageCold = storageColdNew;
     });
 
     // reinitialize and start new store listeners
@@ -276,7 +263,6 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     await deleteCache(context: context);
     await deleteStorage(context: context);
-    await deleteStorageOLD(context: context);
     await deleteContext(context);
   }
 

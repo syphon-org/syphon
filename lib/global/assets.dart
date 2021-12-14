@@ -2,7 +2,6 @@ class Assets {
   // App Icons
   static const appIcon = 'assets/icons/current/app_icon_cyan.svg';
   static const appIconPng = 'assets/icons/current/app_icon_cyan.png';
-  static const appIconLite = 'assets/icons/current/app_icon_white.svg';
 
   // Generic Icons (Originally, Poorly titled "Being" illustrations)
   static const iconPersonAddBeing = 'assets/icons/global/being-person-add.svg';
