@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
@@ -74,7 +73,27 @@ void _openOnLinux() {
   }
 }
 
-Future<DatabaseInfo> initDatabase(AppContext context,
+void initDatabase() {
+  if (Platform.isWindows) {
+    openSQLCipherOnWindows();
+  }
+
+  if (Platform.isIOS || Platform.isMacOS) {
+    _openOnIOS();
+  }
+
+  if (Platform.isLinux) {
+    _openOnLinux();
+  }
+
+  if (Platform.isAndroid) {
+    _openOnAndroid();
+  }
+
+  return;
+}
+
+Future<DatabaseInfo> findDatabase(AppContext context,
     {String pin = Values.empty, SendPort? port}) async {
   var storageKeyId = Storage.keyLocation;
   var storageLocation = Storage.sqliteLocation;
@@ -93,22 +112,6 @@ Future<DatabaseInfo> initDatabase(AppContext context,
   // get application support directory for all platforms
   final dbFolder = await getApplicationSupportDirectory();
   final filePath = File(path.join(dbFolder.path, storageLocation));
-
-  if (Platform.isWindows) {
-    openSQLCipherOnWindows();
-  }
-
-  if (Platform.isIOS || Platform.isMacOS) {
-    _openOnIOS();
-  }
-
-  if (Platform.isLinux) {
-    _openOnLinux();
-  }
-
-  if (Platform.isAndroid) {
-    _openOnAndroid();
-  }
 
   // Configure cache encryption/decryption instance
   var storageKey = await loadKey(storageKeyId);
@@ -130,6 +133,8 @@ Future<DatabaseInfo> initDatabase(AppContext context,
 // This needs to be a top-level method because it's run on a background isolate
 // When using a Flutter plugin like `path_provider` to determine the path,
 void _openDatabaseBackground(DatabaseInfo info) {
+  initDatabase();
+
   final driftIsolate = DriftIsolate.inCurrent(
     () => DatabaseConnection.fromExecutor(NativeDatabase(
       File(info.path),
@@ -151,7 +156,7 @@ void _openDatabaseBackground(DatabaseInfo info) {
 Future<DriftIsolate> openDatabaseIsolate(AppContext context, {String pin = Values.empty}) async {
   final receivePort = ReceivePort();
 
-  final info = await initDatabase(context, pin: pin, port: receivePort.sendPort);
+  final info = await findDatabase(context, pin: pin, port: receivePort.sendPort);
 
   await Isolate.spawn(
     _openDatabaseBackground,
@@ -178,7 +183,9 @@ StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.em
 
 LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   return LazyDatabase(() async {
-    final info = await initDatabase(context, pin: pin);
+    initDatabase();
+
+    final info = await findDatabase(context, pin: pin);
 
     return NativeDatabase(
       File(info.path),
