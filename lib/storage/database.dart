@@ -70,6 +70,10 @@ void _openOnLinux() {
   }
 }
 
+///
+/// TODO: convert to running entirely in isolates
+/// https://drift.simonbinder.eu/docs/advanced-features/isolates/
+///
 LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   return LazyDatabase(() async {
     var storageKeyId = Storage.keyLocation;
