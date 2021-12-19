@@ -153,7 +153,7 @@ void _openDatabaseBackground(DatabaseInfo info) {
   info.port!.send(driftIsolate);
 }
 
-Future<DriftIsolate> openDatabaseIsolate(AppContext context, {String pin = Values.empty}) async {
+Future<DriftIsolate> spawnDatabaseIsolate(AppContext context, {String pin = Values.empty}) async {
   final receivePort = ReceivePort();
 
   final info = await findDatabase(context, pin: pin, port: receivePort.sendPort);
@@ -173,7 +173,7 @@ Future<DriftIsolate> openDatabaseIsolate(AppContext context, {String pin = Value
 ///
 StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.empty}) {
   final connection = DatabaseConnection.delayed(() async {
-    final isolate = await openDatabaseIsolate(context, pin: pin);
+    final isolate = await spawnDatabaseIsolate(context, pin: pin);
     // ignore: unnecessary_await_in_return
     return await isolate.connect();
   }());
