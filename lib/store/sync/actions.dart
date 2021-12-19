@@ -18,7 +18,6 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/receipts/actions.dart';
 import 'package:syphon/store/events/redaction/actions.dart';
-import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
@@ -106,17 +105,20 @@ ThunkAction<AppState> startSyncObserver() {
       }
 
       var backoff = store.state.syncStore.backoff;
-      final lastAttemptMillis = store.state.syncStore.lastAttempt;
-      final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
-        lastAttemptMillis!,
-      );
 
-      if (backoff > 5 && ConnectionService.isConnected()) {
-        ConnectionService.checked = true;
-        backoff = 0;
+      if (backoff != 0) {
+        if (backoff > 5 && ConnectionService.isConnected()) {
+          ConnectionService.checked = true;
+          backoff = 0;
+        }
       }
 
       if (backoff != 0) {
+        final lastAttemptMillis = store.state.syncStore.lastAttempt;
+        final lastAttempt = DateTime.fromMillisecondsSinceEpoch(
+          lastAttemptMillis!,
+        );
+
         final backoffs = fibonacci(backoff);
         final backoffFactor = backoffs[backoffs.length - 1];
         final backoffLimit = DateTime.now().difference(lastAttempt).compareTo(
@@ -166,7 +168,6 @@ ThunkAction<AppState> stopSyncObserver() {
 /// for multiple rooms all at once in order to show the user just some room names
 /// and timestamps. Lazy loading isn't always supported, so it's not a solid solution
 ///
-/// TODO: potentially re-enable the fetch rooms function if lazy_load fails
 ThunkAction<AppState> initialSync() {
   return (Store<AppState> store) async {
     // Start initial sync in background
@@ -178,9 +179,6 @@ ThunkAction<AppState> initialSync() {
     // Fetch All Room Ids - continue showing a sync
     if (lastSince != null) {
       await store.dispatch(fetchDirectRooms());
-      // TODO: remove comment if sync does not return
-      // TODO: room information as it previously would not in some cases
-      // await store.dispatch(fetchRooms());
     }
 
     await store.dispatch(SetSyncing(syncing: false));
@@ -306,8 +304,9 @@ ThunkAction<AppState> syncRooms(Map roomData) {
     final synced = store.state.syncStore.synced;
     final lastSince = store.state.syncStore.lastSince;
 
-    await Future.wait(roomData.keys.map((roomId) async {
+    await Future.forEach(roomData.keys, (id) async {
       try {
+        final String roomId = id?.toString() ?? '';
         final Map json = roomData[roomId] ?? {};
 
         if (json.isEmpty) return;
@@ -365,15 +364,16 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           )) as List<Message>;
 
           await store.dispatch(addMessagesDecrypted(
-            room: roomSynced,
+            roomId: roomSynced.id,
             messages: decryptedMutated,
           ));
         }
 
         // save normal or encrypted messages
         await store.dispatch(addMessages(
-          room: roomSynced,
+          roomId: roomSynced.id,
           messages: messages,
+          clear: sync.override ?? false, // !sync.limited
         ));
 
         // update room
@@ -397,28 +397,31 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           store.dispatch(fetchMessageEvents(
             room: roomSynced,
             from: roomSynced.prevBatch,
-          ));
-
-          // a recursive sync for the messages gap has now finished
-        } else if (!roomSynced.limited && roomOld.limited) {
-          final messagesSorted = latestMessages(messagesOld);
-
-          // wipe all but the latest 25 messages from the cache
-          await store.dispatch(addMessages(
-            room: roomSynced,
-            messages:
-                messagesSorted.sublist(0, messagesSorted.length > 25 ? 25 : messagesSorted.length),
-            clear: true,
+            limited: false, // prevents recursive backfill
           ));
         }
+        // TODO: this should happen immediately and backfill should happen in background
+        // a recursive sync for the messages gap has now finished
+        //  else if (!roomSynced.limited && roomOld.limited) {
+        //   final messagesSorted = latestMessages(messagesOld);
+
+        //   // wipe all but the latest 25 messages from the cache
+        //   await store.dispatch(addMessages(
+        //     room: roomSynced,
+        //     messages:
+        //         messagesSorted.sublist(0, messagesSorted.length > 25 ? 25 : messagesSorted.length),
+        //     clear: true,
+        //   ));
+        // }
       } catch (error) {
+        final String roomId = id?.toString() ?? '';
         printError('[syncRoom] error $roomId ${error.toString()}');
 
         // prevents against recursive backfill from bombing attempts at fetching messages
         final roomExisting = rooms.containsKey(roomId) ? rooms[roomId]! : Room(id: roomId);
         store.dispatch(SetRoom(room: roomExisting.copyWith(limited: false)));
       }
-    }));
+    });
   };
 }
 

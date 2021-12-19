@@ -16,6 +16,7 @@ class Sync {
   final List<Redaction> redactions;
   final Map<String, User> users;
   final Map<String, Receipt> readReceipts;
+  final bool? override; // TODO: remove - stops loading limited timeline
 
   const Sync({
     required this.room,
@@ -25,6 +26,7 @@ class Sync {
     this.messages = const [],
     this.readReceipts = const {},
     this.users = const {},
+    this.override,
   });
 }
 
@@ -140,6 +142,8 @@ Sync parseSync(Map params) {
     reactions: events.reactions,
     redactions: events.redactions,
     readReceipts: ephemerals.readReceipts,
+    // TODO: clear messages if limited was explicitly false from parsed json
+    override: details.limited != null && !details.limited!,
   );
 }
 

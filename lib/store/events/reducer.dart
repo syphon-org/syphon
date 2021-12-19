@@ -48,16 +48,15 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       final roomId = _action.roomId;
 
-      final messages = Map<String, List<Message>>.from(
-        state.messages,
-      );
-
       // convert to map to merge old and new messages based on ids
-      final messagesOld = Map<String, Message>.fromIterable(
-        messages[roomId] ?? [],
-        key: (msg) => msg.id,
-        value: (msg) => msg,
-      );
+      // ignore previous messages and only save the newest to local state if "clear"ing
+      final messagesOld = _action.clear
+          ? <String, Message>{}
+          : Map<String, Message>.fromIterable(
+              state.messages[roomId] ?? [],
+              key: (msg) => msg.id,
+              value: (msg) => msg,
+            );
 
       final messagesNew = Map<String, Message>.fromIterable(
         action.messages,
@@ -67,6 +66,11 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       // prioritize new message data though over the old (invalidates using Map overwrite)
       final messagesAll = messagesOld..addAll(messagesNew);
+
+      // NOTE: technically messages is mutateable here
+      final messages = state.messages;
+
+      // update values in the mutateable map for only the room involved
       messages[roomId] = messagesAll.values.toList();
 
       // remove locally saved outbox messages if they've now been received from a server

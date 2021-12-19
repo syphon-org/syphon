@@ -184,7 +184,7 @@ class ChatScreenState extends State<ChatScreen> {
     );
 
     await store.dispatch(addMessagesDecrypted(
-      room: props.room,
+      roomId: props.room.id,
       messages: messagesDecrypted,
     ));
   }

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -44,27 +43,6 @@ ThunkAction<AppState> mutateMessages({List<Message>? messages, List<Message>? ex
 ///
 /// Mutate Messages All
 ///
-/// Add/mutate to accomodate all messages avaiable with
-/// the required, necessary mutations by matrix after the
-/// message has been sent (such as reactions, redactions, and edits)
-///
-ThunkAction<AppState> mutateMessagesAll() {
-  return (Store<AppState> store) async {
-    final rooms = store.state.roomStore.roomList;
-
-    await Future.wait(rooms.map((room) async {
-      try {
-        await store.dispatch(mutateMessagesRoom(room: room));
-      } catch (error) {
-        printError('[mutateMessagesAll] error ${room.id} ${error.toString()}');
-      }
-    }));
-  };
-}
-
-///
-/// Mutate Messages All
-///
 /// Run through all room messages to accomodate the required,
 /// necessary mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
@@ -89,18 +67,51 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
       }));
     }
 
+    // TODO: remove after loadAsync works
+    // printJson({'loadAync': 'COMPUTE MUTATION STARTED ${room.id}'});
+
     final messagesLists = await Future.wait(mutations);
 
+    // TODO: remove after loadAsync works
+    // printJson({'loadAync': 'COMPUTE MUTATION COMPLETED ${room.id}'});
+
     await store.dispatch(addMessages(
-      room: Room(id: room.id),
+      roomId: room.id,
       messages: messagesLists[0],
     ));
 
     if (room.encryptionEnabled) {
       await store.dispatch(addMessagesDecrypted(
-        room: Room(id: room.id),
+        roomId: room.id,
         messages: messagesLists[1],
       ));
+    }
+
+    // TODO: remove after loadAsync works
+    // printJson({'loadAync': 'MUTATE ROOM COMPLETED ${room.id}'});
+  };
+}
+
+///
+/// Mutate Messages All
+///
+/// Add/mutate to accomodate all messages avaiable with
+/// the required, necessary mutations by matrix after the
+/// message has been sent (such as reactions, redactions, and edits)
+///
+ThunkAction<AppState> mutateMessagesAll() {
+  return (Store<AppState> store) async {
+    final rooms = store.state.roomStore.roomList;
+
+    for (final room in rooms) {
+      try {
+        store.dispatch(mutateMessagesRoom(room: room));
+
+        // TODO: remove after loadAsync works
+        // printJson({'loadAync': 'MUTATE ROOM STARTED ${room.id}'});
+      } catch (error) {
+        printError('[mutateMessagesAll] error ${room.id} ${error.toString()}');
+      }
     }
   };
 }
