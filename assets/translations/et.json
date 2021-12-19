@@ -1,1 +1,25 @@
-{}
+{
+    "header-intro": "Privaatsus ja vabadus\nilma probleemideta.",
+    "title-view-invite-users": "Kutsu kasutajaid",
+    "header-signup-username": "Loo kasutajanimi",
+    "title-verification": "Verifitseerimine",
+    "title-view-delete-devices": "Kinnita seadme eemaldamine",
+    "title-view-search-groups": "Tutvu jututubadega",
+    "title-view-search-users": "Otsi kasutajaid",
+    "title-view-create-group-public": "Loo avalik jututuba",
+    "title-view-devices": "Seadmed",
+    "title-view-settings": "Seadistused",
+    "title-view-theming": "Välimus",
+    "title-view-invite": "Kutsu",
+    "title-view-settings-chat": "Vestlused",
+    "title-view-privacy": "Privaatsus",
+    "title-view-profile": "Seadista oma profiili",
+    "title-proxy-use-proxy": "Kasuta puhverserverit",
+    "title-proxy-host": "Muuda puhverserveri aadressi",
+    "title-proxy-port": "Muuda puhverserveri porti",
+    "title-dialog-delete-keys": "Kinnita krüptovõtmete kustutamine",
+    "title-dialog-confirm-linkout": "Kinnita lingi avamine",
+    "title-dialog-captcha": "Täida robotilõksu andmed",
+    "title-dialog-terms": "Tutvu kasutustingimustega",
+    "title-dialog-encryption": "Kas krüptime vestluse?"
+}
