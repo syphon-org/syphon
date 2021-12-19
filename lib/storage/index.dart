@@ -41,7 +41,7 @@ class Storage {
 }
 
 Future initStorage({AppContext context = const AppContext(), String pin = ''}) async {
-  final StorageDatabase database = await Future.value(StorageDatabase(context, pin: pin));
+  final database = openDatabaseThreaded(context, pin: pin);
   Storage.database = database;
   return database;
 }

@@ -130,7 +130,8 @@ class PrivacySettingsScreen extends StatelessWidget {
         return Future.value(true);
       },
       onConfirmed: (String matchedText) async {
-        props.onSetScreenLock(matchedText);
+        await props.onSetScreenLock(matchedText);
+        Syphon.reloadCurrentContext(context);
       },
     );
   }
@@ -458,7 +459,8 @@ class _Props extends Equatable {
         sessionId: store.state.authStore.user.deviceId ?? Values.empty,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),
-        onSetScreenLock: (String matchedPin) => store.dispatch(setScreenLock(pin: matchedPin)),
+        onSetScreenLock: (String matchedPin) async =>
+            await store.dispatch(setScreenLock(pin: matchedPin)),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(

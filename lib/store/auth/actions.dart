@@ -1292,6 +1292,7 @@ ThunkAction<AppState> setScreenLock({required String pin, String existing = ''})
       final currentContext = await loadContextCurrent();
       final storageKeyId = '${currentContext.id}-${Storage.keyLocation}';
       final storageKey = await loadKey(storageKeyId);
+      printJson({'storageKeyId': storageKeyId});
 
       final contextConverted = AppContext(
         id: currentContext.id,

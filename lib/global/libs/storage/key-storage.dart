@@ -35,7 +35,7 @@ Future<String> loadKey(String keyId) async {
   }
 
   // generate a new one on failure
-  if (key == null) {
+  if (key == null || key.isEmpty) {
     printInfo('[loadKey] generating new key for $keyId');
     key = generateKey();
     await SecureStorage().write(key: keyId, value: key);
