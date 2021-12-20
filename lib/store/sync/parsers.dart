@@ -51,6 +51,7 @@ class SyncEvents {
 class SyncDetails {
   final bool? invite;
   final bool? limited;
+  final bool? override;
   final int? totalMembers;
   final String? currBatch; // current batch, if known from fetchMessages
   final String? lastBatch;
@@ -59,6 +60,7 @@ class SyncDetails {
   const SyncDetails({
     this.invite,
     this.limited,
+    this.override,
     this.currBatch,
     this.lastBatch,
     this.prevBatch,
@@ -143,7 +145,7 @@ Sync parseSync(Map params) {
     redactions: events.redactions,
     readReceipts: ephemerals.readReceipts,
     // TODO: clear messages if limited was explicitly false from parsed json
-    override: details.limited != null && !details.limited!,
+    override: details.override,
   );
 }
 
@@ -156,6 +158,7 @@ Sync parseSync(Map params) {
 SyncDetails parseDetails(Map<String, dynamic> json) {
   bool? invite;
   bool? limited;
+  bool? override;
   int? totalMembers;
   String? currBatch;
   String? lastBatch;
@@ -166,6 +169,7 @@ SyncDetails parseDetails(Map<String, dynamic> json) {
   }
 
   if (json['timeline'] != null) {
+    override = json['timeline']['override'];
     limited = json['timeline']['limited'];
     lastBatch = json['timeline']['last_batch'];
     currBatch = json['timeline']['curr_batch'];
@@ -179,6 +183,7 @@ SyncDetails parseDetails(Map<String, dynamic> json) {
   return SyncDetails(
     invite: invite,
     limited: limited,
+    override: override,
     currBatch: currBatch,
     lastBatch: lastBatch,
     prevBatch: prevBatch,

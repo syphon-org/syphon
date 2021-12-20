@@ -38,6 +38,7 @@ import 'package:syphon/store/settings/notification-settings/remote/actions.dart'
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
+import 'package:syphon/views/syphon.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 

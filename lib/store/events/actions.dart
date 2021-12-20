@@ -23,6 +23,10 @@ class SetEvents {
   SetEvents({this.roomId, this.events});
 }
 
+class SetMessages {}
+
+class SetMessagesDecrypted {}
+
 class AddMessagesDecrypted {
   final String roomId;
   final List<Message> messages;
@@ -179,7 +183,7 @@ ThunkAction<AppState> fetchMessageEvents({
   String? from,
   int timestamp = 0,
   int loadLimit = DEFAULT_LOAD_LIMIT,
-  bool? limited,
+  bool? override,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -226,7 +230,8 @@ ThunkAction<AppState> fetchMessageEvents({
             'curr_batch': start,
             'last_batch': oldest ? end ?? from : null,
             'prev_batch': end,
-            'limited': limited ?? (end == start || end == null ? false : null),
+            'limited': end == start || end == null ? false : null,
+            'override': override,
           }
         },
       }));

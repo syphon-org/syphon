@@ -463,13 +463,9 @@ class _Props extends Equatable {
             await store.dispatch(setScreenLock(pin: matchedPin)),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
-        onToggleTypingIndicators: () => store.dispatch(
-          toggleTypingIndicators(),
-        ),
+        onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
-        onImportDeviceKey: () => store.dispatch(
-          importDeviceKeysOwned(),
-        ),
+        onImportDeviceKey: () => store.dispatch(importDeviceKeysOwned()),
         onDeactivateAccount: (BuildContext context) async {
           // Attempt to deactivate account
           await store.dispatch(deactivateAccount());

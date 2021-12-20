@@ -67,8 +67,8 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
       // prioritize new message data though over the old (invalidates using Map overwrite)
       final messagesAll = messagesOld..addAll(messagesNew);
 
-      // NOTE: technically messages is mutateable here
-      final messages = state.messages;
+      // TODO: check if "messages" can be mutateable here
+      final messages = Map<String, List<Message>>.from(state.messages);
 
       // update values in the mutateable map for only the room involved
       messages[roomId] = messagesAll.values.toList();

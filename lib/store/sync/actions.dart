@@ -373,7 +373,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         await store.dispatch(addMessages(
           roomId: roomSynced.id,
           messages: messages,
-          clear: sync.override ?? false, // !sync.limited
+          clear: sync.override ?? false,
         ));
 
         // update room
@@ -397,7 +397,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           store.dispatch(fetchMessageEvents(
             room: roomSynced,
             from: roomSynced.prevBatch,
-            limited: false, // prevents recursive backfill
+            override: true,
           ));
         }
         // TODO: this should happen immediately and backfill should happen in background
