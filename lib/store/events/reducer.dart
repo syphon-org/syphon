@@ -45,14 +45,66 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
     case SetMessages:
       final _action = action as SetMessages;
 
-      return state.copyWith(messages: _action.all);
+      final messagesAll = _action.all;
+      final existingAll = state.messages;
+
+      final combinedAll = Map<String, List<Message>>.from(existingAll);
+
+      messagesAll.forEach((roomId, messages) {
+        // convert to map to merge old and new messages based on ids
+        // ignore previous messages and only save the newest to local state if "clear"ing
+        final messagesOld = Map<String, Message>.fromIterable(
+          state.messages[roomId] ?? [],
+          key: (msg) => msg.id,
+          value: (msg) => msg,
+        );
+
+        final messagesNew = Map<String, Message>.fromIterable(
+          messages,
+          key: (msg) => msg.id,
+          value: (msg) => msg,
+        );
+
+        // prioritize new message data though over the old (invalidates using Map overwrite)
+        final combinedNew = messagesOld..addAll(messagesNew);
+
+        combinedAll[roomId] = combinedNew.values.toList();
+      });
+
+      return state.copyWith(messages: combinedAll);
 
     // set the decrypted map to exactly what's passed in
     // helps with message revisions after lazy loads
     case SetMessagesDecrypted:
       final _action = action as SetMessagesDecrypted;
 
-      return state.copyWith(messagesDecrypted: _action.all);
+      final messagesAll = _action.all;
+      final existingAll = state.messagesDecrypted;
+
+      final combinedAll = Map<String, List<Message>>.from(existingAll);
+
+      messagesAll.forEach((roomId, messages) {
+        // convert to map to merge old and new messages based on ids
+        // ignore previous messages and only save the newest to local state if "clear"ing
+        final messagesOld = Map<String, Message>.fromIterable(
+          state.messages[roomId] ?? [],
+          key: (msg) => msg.id,
+          value: (msg) => msg,
+        );
+
+        final messagesNew = Map<String, Message>.fromIterable(
+          messages,
+          key: (msg) => msg.id,
+          value: (msg) => msg,
+        );
+
+        // prioritize new message data though over the old (invalidates using Map overwrite)
+        final combinedNew = messagesOld..addAll(messagesNew);
+
+        combinedAll[roomId] = combinedNew.values.toList();
+      });
+
+      return state.copyWith(messagesDecrypted: combinedAll);
     case AddMessages:
       final _action = action as AddMessages;
       if (_action.messages.isEmpty) {
