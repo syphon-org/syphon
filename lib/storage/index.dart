@@ -158,6 +158,7 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
     loadAsync() async {
       for (final Room room in rooms) {
         final currentMessages = messages[room.id] ?? [];
+        final currentDecrypted = decrypted[room.id] ?? [];
         final currentMessagesIds = currentMessages.map((e) => e.id ?? '').toList();
 
         reactions.addAll(await loadReactionsMapped(
@@ -172,8 +173,7 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
         );
 
         medias.addAll(await loadMediaRelative(
-          messages: messages.values.expand((e) => e).toList() +
-              decrypted.values.expand((e) => e).toList(),
+          messages: currentMessages + currentDecrypted,
           storage: storage,
         ));
       }

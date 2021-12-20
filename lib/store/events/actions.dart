@@ -27,11 +27,13 @@ class AddMessagesDecrypted {
   final String roomId;
   final List<Message> messages;
   final List<Message> outbox;
+  final bool clear;
 
   AddMessagesDecrypted({
     required this.roomId,
     this.messages = const [],
     this.outbox = const [],
+    this.clear = false,
   });
 }
 
@@ -104,12 +106,18 @@ ThunkAction<AppState> addMessagesDecrypted({
   required String roomId,
   required List<Message> messages,
   List<Message> outbox = const [],
+  bool clear = false,
 }) =>
     (Store<AppState> store) {
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        AddMessagesDecrypted(roomId: roomId, messages: messages, outbox: outbox),
+        AddMessagesDecrypted(
+          roomId: roomId,
+          messages: messages,
+          outbox: outbox,
+          clear: clear,
+        ),
       );
     };
 

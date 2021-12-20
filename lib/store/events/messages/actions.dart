@@ -78,12 +78,14 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
     await store.dispatch(addMessages(
       roomId: room.id,
       messages: messagesLists[0],
+      clear: true,
     ));
 
     if (room.encryptionEnabled) {
       await store.dispatch(addMessagesDecrypted(
         roomId: room.id,
         messages: messagesLists[1],
+        clear: true,
       ));
     }
 
