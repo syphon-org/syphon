@@ -226,7 +226,7 @@ ThunkAction<AppState> startAuthObserver() {
 
     onAuthStateChanged(User? user) async {
       if (user != null && user.accessToken != null) {
-        if (user.displayName?.isEmpty ?? false) {
+        if (user.displayName?.isEmpty ?? true) {
           store.dispatch(fetchAuthUserProfile());
         }
 
