@@ -11,6 +11,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/models.dart';
@@ -442,9 +443,11 @@ class MessageWidget extends StatelessWidget {
                           children: [
                             Container(
                               constraints: BoxConstraints(
-                                // TODO: issue shrinking the message based on width
+                                // NOTE: issue shrinking the message based on width
                                 maxWidth:
                                     !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
+                                // NOTE: prevents exposing the reply icon
+                                minWidth: 72,
                               ),
                               padding: EdgeInsets.only(
                                 // make an image span the message width
