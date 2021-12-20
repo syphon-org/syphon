@@ -13,6 +13,11 @@ String selectEventBody(Message message) {
         return Strings.labelEncryptedMessage;
       }
       break;
+    case EventTypes.message:
+      if (isBodyEmpty) {
+        return Strings.labelDeletedMessage;
+      }
+      break;
   }
 
   // default encrypted message conditions

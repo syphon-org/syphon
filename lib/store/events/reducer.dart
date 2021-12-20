@@ -40,6 +40,19 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       return state.copyWith(reactions: reactionsUpdated);
 
+    // set the messages map to exactly what's passed in
+    // helps with message revisions after lazy loads
+    case SetMessages:
+      final _action = action as SetMessages;
+
+      return state.copyWith(messages: _action.all);
+
+    // set the decrypted map to exactly what's passed in
+    // helps with message revisions after lazy loads
+    case SetMessagesDecrypted:
+      final _action = action as SetMessagesDecrypted;
+
+      return state.copyWith(messagesDecrypted: _action.all);
     case AddMessages:
       final _action = action as AddMessages;
       if (_action.messages.isEmpty) {

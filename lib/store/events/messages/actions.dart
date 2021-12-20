@@ -13,6 +13,7 @@ import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/formatters.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/encryption.dart';
@@ -27,9 +28,31 @@ import 'package:syphon/store/user/model.dart';
 /// mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessages({List<Message>? messages, List<Message>? existing}) {
+Future<List<Message>> reviseMessages({
+  List<Message>? messages,
+  List<Message>? existing,
+  Map<String, List<Reaction>>? reactions,
+}) async {
+  return compute(reviseMessagesThreaded, {
+    'reactions': reactions,
+    'messages': (messages ?? []) + (existing ?? []),
+  });
+}
+
+///
+/// Mutate Messages
+///
+/// Add/mutate to accomodate all the required, necessary
+/// mutations by matrix after the message has been sent
+/// such as reactions, redactions, and edits
+///
+ThunkAction<AppState> mutateMessages({
+  List<Message>? messages,
+  List<Message>? existing,
+  Map<String, List<Reaction>>? reactionsMap,
+}) {
   return (Store<AppState> store) async {
-    final reactions = store.state.eventStore.reactions;
+    final reactions = reactionsMap ?? store.state.eventStore.reactions;
 
     final revisedMessages = await compute(reviseMessagesThreaded, {
       'reactions': reactions,
@@ -103,16 +126,44 @@ ThunkAction<AppState> mutateMessagesAll() {
   return (Store<AppState> store) async {
     final rooms = store.state.roomStore.roomList;
 
-    for (final room in rooms) {
-      try {
-        store.dispatch(mutateMessagesRoom(room: room));
+    final messages = store.state.eventStore.messages;
+    final decrypted = store.state.eventStore.messagesDecrypted;
+    final reactions = store.state.eventStore.reactions;
 
-        // TODO: remove after loadAsync works
-        // printJson({'loadAync': 'MUTATE ROOM STARTED ${room.id}'});
+    final messagesUpdated = <String, List<Message>>{};
+    final decryptedUpdated = <String, List<Message>>{};
+
+    await Future.forEach(rooms, (Room room) async {
+      try {
+        final messagesRoom = messages[room.id];
+        final messagesDecryptedRoom = decrypted[room.id];
+
+        final messagesRoomUpdated = reviseMessages(
+          messages: messagesRoom,
+          reactions: reactions,
+        );
+
+        final decryptedRoomUpdated = !room.encryptionEnabled
+            ? Future.value(<Message>[])
+            : reviseMessages(
+                messages: messagesDecryptedRoom,
+                reactions: reactions,
+              );
+
+        final allUpdated = await Future.wait([
+          messagesRoomUpdated,
+          decryptedRoomUpdated,
+        ]);
+
+        messagesUpdated.addAll({room.id: allUpdated[0]});
+        decryptedUpdated.addAll({room.id: allUpdated[1]});
       } catch (error) {
         printError('[mutateMessagesAll] error ${room.id} ${error.toString()}');
       }
-    }
+    });
+
+    store.dispatch(SetMessages(all: messagesUpdated));
+    store.dispatch(SetMessagesDecrypted(all: decryptedUpdated));
   };
 }
 

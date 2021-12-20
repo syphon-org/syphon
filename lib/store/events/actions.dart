@@ -23,9 +23,21 @@ class SetEvents {
   SetEvents({this.roomId, this.events});
 }
 
-class SetMessages {}
+class SetMessages {
+  final Map<String, List<Message>> all;
 
-class SetMessagesDecrypted {}
+  SetMessages({
+    required this.all,
+  });
+}
+
+class SetMessagesDecrypted {
+  final Map<String, List<Message>> all;
+
+  SetMessagesDecrypted({
+    required this.all,
+  });
+}
 
 class AddMessagesDecrypted {
   final String roomId;
