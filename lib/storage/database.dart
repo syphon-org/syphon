@@ -119,6 +119,7 @@ Future<DatabaseInfo> findDatabase(AppContext context,
   final isLockedContext =
       context.id.isNotEmpty && context.secretKeyEncrypted.isNotEmpty && pin.isNotEmpty;
 
+  // TODO: move into the isolate?
   if (isLockedContext) {
     storageKey = await unlockSecretKey(context, pin);
   }
