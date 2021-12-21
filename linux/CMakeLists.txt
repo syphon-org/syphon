@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
 set(BINARY_NAME "syphon")
-set(APPLICATION_ID "org.tether.tether")
+set(APPLICATION_ID "org.syphon.Syphon")
 
 cmake_policy(SET CMP0063 NEW)
 
