@@ -38,6 +38,7 @@ class TextFieldSecure extends StatelessWidget {
     this.onTap,
     this.textInputAction,
     this.autofillHints,
+    this.mouseCursor = MaterialStateMouseCursor.textable,
   }) : super(key: key);
 
   final bool valid;
@@ -65,6 +66,8 @@ class TextFieldSecure extends StatelessWidget {
   final Function? onEditingComplete;
   final Function? onTap;
   final Iterable<String>? autofillHints;
+
+  final MaterialStateMouseCursor? mouseCursor;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -106,6 +109,7 @@ class TextFieldSecure extends StatelessWidget {
           obscureText: obscureText,
           cursorColor: Theme.of(context).primaryColor,
           keyboardAppearance: Theme.of(context).brightness,
+          mouseCursor: mouseCursor,
           decoration: InputDecoration(
             labelText: label,
             hintText: hint,
