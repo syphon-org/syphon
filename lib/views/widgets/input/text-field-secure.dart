@@ -35,6 +35,7 @@ class TextFieldSecure extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.onEditingComplete,
+    this.onTap,
     this.textInputAction,
     this.autofillHints,
   }) : super(key: key);
@@ -62,6 +63,7 @@ class TextFieldSecure extends StatelessWidget {
   final Function? onChanged;
   final Function? onSubmitted;
   final Function? onEditingComplete;
+  final Function? onTap;
   final Iterable<String>? autofillHints;
 
   @override
@@ -81,6 +83,7 @@ class TextFieldSecure extends StatelessWidget {
           onSubmitted: onSubmitted as void Function(String)?,
           textInputAction: textInputAction,
           onEditingComplete: onEditingComplete as void Function()?,
+          onTap: onTap as void Function()?,
           autocorrect: autocorrect,
           enableSuggestions: enabledSuggestions,
           autofillHints: disabled ? null : autofillHints,
