@@ -282,11 +282,6 @@ class ChatInputState extends State<ChatInput> {
             sendButtonColor = Theme.of(context).primaryColor;
           }
 
-          // if the button is disabled, make it more transparent to indicate that
-          if (widget.sending || !isSendable) {
-            sendButtonColor = Color(Colours.greyDisabled);
-          }
-
           var sendButton = Semantics(
             button: true,
             enabled: true,
@@ -526,7 +521,10 @@ class ChatInputState extends State<ChatInput> {
                   Container(
                     width: Dimensions.buttonSendSize,
                     padding: EdgeInsets.symmetric(vertical: 4),
-                    child: sendButton,
+                    child: Visibility(
+                      visible: isSendable,
+                      child: sendButton,
+                    )
                   ),
                 ],
               ),
