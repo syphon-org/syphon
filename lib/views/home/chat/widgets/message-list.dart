@@ -176,6 +176,10 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                     final nextMessage =
                         index + 1 < props.messages.length ? props.messages[index + 1] : null;
 
+                    // was sent at least 2 minutes after the previous message
+                    final isNewContext =
+                        (message.timestamp - (lastMessage?.timestamp ?? 0)) > 120000;
+
                     final isLastSender =
                         lastMessage != null && lastMessage.sender == message.sender;
                     final isNextSender =
@@ -198,6 +202,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                       isUserSent: isUserSent,
                       isLastSender: isLastSender,
                       isNextSender: isNextSender,
+                      isNewContext: isNewContext,
                       messageOnly: !isUserSent && !widget.showAvatars,
                       lastRead: props.room.lastRead,
                       selectedMessageId: selectedMessageId,
