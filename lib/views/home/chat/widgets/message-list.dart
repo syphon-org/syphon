@@ -178,7 +178,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
 
                     // was sent at least 2 minutes after the previous message
                     final isNewContext =
-                        (message.timestamp - (lastMessage?.timestamp ?? 0)) > 120000;
+                        ((lastMessage?.timestamp ?? 0) - message.timestamp) > 120000;
 
                     final isLastSender =
                         lastMessage != null && lastMessage.sender == message.sender;
