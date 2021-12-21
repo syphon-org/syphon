@@ -29,6 +29,7 @@ class TextFieldSecure extends StatelessWidget {
     this.disableSpacing = false,
     this.autocorrect = false,
     this.enabledSuggestions = false,
+    this.enableInteractiveSelection = true,
     this.textAlign = TextAlign.left,
     this.formatters = const [],
     this.onChanged,
@@ -45,6 +46,7 @@ class TextFieldSecure extends StatelessWidget {
   final bool disableSpacing;
   final bool autocorrect;
   final bool enabledSuggestions;
+  final bool enableInteractiveSelection;
 
   final int maxLines;
   final Widget? suffix; // include actions
@@ -83,6 +85,7 @@ class TextFieldSecure extends StatelessWidget {
           enableSuggestions: enabledSuggestions,
           autofillHints: disabled ? null : autofillHints,
           selectionHeightStyle: BoxHeightStyle.max,
+          enableInteractiveSelection: enableInteractiveSelection,
           inputFormatters: !disableSpacing
               ? [
                   FilteringTextInputFormatter.deny(RegExp(r'\t')),
