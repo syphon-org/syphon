@@ -90,11 +90,6 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
     final auth = await loadAuth(storage: storage);
     final crypto = await loadCrypto(storage: storage);
     final settings = await loadSettings(storage: storage);
-
-    var authOld;
-    var cryptoOld;
-    var settingsOld;
-
     final rooms = await loadRooms(storage: storage);
 
     for (final Room room in rooms.values) {
@@ -123,11 +118,11 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
     );
 
     return {
-      StorageKeys.AUTH: auth ?? authOld,
-      StorageKeys.CRYPTO: crypto ?? cryptoOld,
-      StorageKeys.SETTINGS: settings ?? settingsOld,
-      StorageKeys.USERS: users,
+      StorageKeys.AUTH: auth,
+      StorageKeys.CRYPTO: crypto,
+      StorageKeys.SETTINGS: settings,
       StorageKeys.ROOMS: rooms,
+      StorageKeys.USERS: users,
       StorageKeys.MEDIA: media,
       StorageKeys.MESSAGES: messages,
       StorageKeys.REACTIONS: reactions,
@@ -194,6 +189,6 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
 
     loadAsync();
   } catch (error) {
-    printError('[loadStorageAsync]  ${error.toString()}');
+    printError('[loadStorageAsync] ${error.toString()}');
   }
 }
