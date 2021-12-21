@@ -298,25 +298,25 @@ ThunkAction<AppState> stopAuthObserver() {
 ///
 /// Used in matrix to distinguish devices
 /// for encryption and verification
-ThunkAction<AppState> generateDeviceId({String? salt}) {
+ThunkAction<AppState> generateDeviceId({String salt = ''}) {
   return (Store<AppState> store) async {
     final defaultId = Random.secure().nextInt(1 << 31).toString();
 
     try {
-      final deviceInfoPlugin = DeviceInfoPlugin();
+      final deviceId = Random.secure().nextInt(1 << 31).toString();
 
-      var deviceId;
+      // TODO: enable device persistant sessions to better
+      // TODO: keep track of device identity anonymously
+      // final deviceInfoPlugin = DeviceInfoPlugin();
 
       // Find a unique value for the type of device
-      if (Platform.isAndroid) {
-        final info = await deviceInfoPlugin.androidInfo;
-        deviceId = info.androidId;
-      } else if (Platform.isIOS) {
-        final info = await deviceInfoPlugin.iosInfo;
-        deviceId = info.identifierForVendor;
-      } else {
-        deviceId = Random.secure().nextInt(1 << 31).toString();
-      }
+      // if (Platform.isAndroid) {
+      //   final info = await deviceInfoPlugin.androidInfo;
+      //   deviceId = info.androidId;
+      // } else if (Platform.isIOS) {
+      //   final info = await deviceInfoPlugin.iosInfo;
+      //   deviceId = info.identifierForVendor;
+      // }
 
       // hash it
       final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
