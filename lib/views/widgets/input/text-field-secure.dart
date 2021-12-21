@@ -24,6 +24,7 @@ class TextFieldSecure extends StatelessWidget {
     this.maxLines = 1,
     this.valid = true,
     this.disabled = false,
+    this.readOnly = false,
     this.obscureText = false,
     this.disableSpacing = false,
     this.autocorrect = false,
@@ -39,6 +40,7 @@ class TextFieldSecure extends StatelessWidget {
 
   final bool valid;
   final bool disabled;
+  final bool readOnly;
   final bool obscureText;
   final bool disableSpacing;
   final bool autocorrect;
@@ -69,6 +71,7 @@ class TextFieldSecure extends StatelessWidget {
         ),
         child: TextField(
           enabled: !disabled,
+          readOnly: readOnly,
           maxLines: maxLines,
           focusNode: focusNode,
           controller: controller,
