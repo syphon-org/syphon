@@ -81,9 +81,7 @@ Future<Database?> initCache({AppContext context = const AppContext()}) async {
     printInfo('[initCache] $cacheLocation $cacheKey');
 
     Cache.cacheKey = cacheKey;
-    return await cacheFactory.openDatabase(
-      cacheLocation,
-    );
+    return await cacheFactory.openDatabase(cacheLocation);
   } catch (error) {
     printError('[initCache] $error');
     return null;

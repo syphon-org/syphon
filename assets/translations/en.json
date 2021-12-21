@@ -55,6 +55,8 @@
     "label-users-known": "Known Users",
     "label-chat-default": "New Chat",
     "label-messages-empty": "no messages found",
+    "label-call-invite": "User invited you to a voice call",
+    "label-call-hangup": "User ended a voice call",
     "label-groups-empty": "no groups found",
     "label-message-encrypted": "Encrypted Message",
     "label-message-matrix": "Matrix message",

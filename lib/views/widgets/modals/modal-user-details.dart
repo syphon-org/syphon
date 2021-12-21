@@ -31,8 +31,7 @@ class ModalUserDetails extends StatelessWidget {
   final String? userId;
   final bool? nested; // pop context twice when double nested in a view
 
-  onNavigateToProfile(
-      {required BuildContext context, required _Props props}) async {
+  onNavigateToProfile({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
       Routes.userDetails,
@@ -42,8 +41,7 @@ class ModalUserDetails extends StatelessWidget {
     );
   }
 
-  onNavigateToInvite(
-      {required BuildContext context, required _Props props}) async {
+  onNavigateToInvite({required BuildContext context, required _Props props}) async {
     Navigator.pushNamed(
       context,
       Routes.searchChats,
@@ -58,17 +56,17 @@ class ModalUserDetails extends StatelessWidget {
     return await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => DialogStartChat(
+      builder: (BuildContext dialogContext) => DialogStartChat(
         user: user,
         title: 'Chat with ${user.displayName}',
         content: Strings.confirmStartChat,
         onStartChat: () async {
           final newRoomId = await props.onCreateChatDirect(user: user);
 
-          Navigator.pop(context);
+          Navigator.pop(dialogContext);
 
           if (nested!) {
-            Navigator.pop(context);
+            Navigator.pop(dialogContext);
           }
 
           if (newRoomId != null) {
@@ -145,10 +143,9 @@ class ModalUserDetails extends StatelessWidget {
                             props.user.displayName ?? '',
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style:
-                                Theme.of(context).textTheme.subtitle1!.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                            style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
                           ),
                         )
                       ],
@@ -279,9 +276,7 @@ class _Props extends Equatable {
         blocked,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store,
-          {User? user, String? userId}) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store, {User? user, String? userId}) => _Props(
         user: () {
           final users = store.state.userStore.users;
           final loading = store.state.userStore.loading;

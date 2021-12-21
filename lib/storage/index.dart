@@ -41,7 +41,7 @@ class Storage {
 }
 
 Future initStorage({AppContext context = const AppContext(), String pin = ''}) async {
-  final StorageDatabase database = await Future.value(StorageDatabase(context, pin: pin));
+  final database = openDatabaseThreaded(context, pin: pin);
   Storage.database = database;
   return database;
 }
@@ -90,11 +90,6 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
     final auth = await loadAuth(storage: storage);
     final crypto = await loadCrypto(storage: storage);
     final settings = await loadSettings(storage: storage);
-
-    var authOld;
-    var cryptoOld;
-    var settingsOld;
-
     final rooms = await loadRooms(storage: storage);
 
     for (final Room room in rooms.values) {
@@ -123,11 +118,11 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
     );
 
     return {
-      StorageKeys.AUTH: auth ?? authOld,
-      StorageKeys.CRYPTO: crypto ?? cryptoOld,
-      StorageKeys.SETTINGS: settings ?? settingsOld,
-      StorageKeys.USERS: users,
+      StorageKeys.AUTH: auth,
+      StorageKeys.CRYPTO: crypto,
+      StorageKeys.SETTINGS: settings,
       StorageKeys.ROOMS: rooms,
+      StorageKeys.USERS: users,
       StorageKeys.MEDIA: media,
       StorageKeys.MESSAGES: messages,
       StorageKeys.REACTIONS: reactions,
@@ -145,7 +140,7 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
 // finishes loading cold storage objects to RAM, this can
 // be much more specific and performant
 //
-loadStorageAsync(StorageDatabase storage, Store<AppState> store) async {
+loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
   try {
     final rooms = store.state.roomStore.roomList;
     final messages = store.state.eventStore.messages;
@@ -155,39 +150,45 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) async {
     final reactions = <String, List<Reaction>>{};
     final receipts = <String, Map<String, Receipt>>{};
 
-    for (final Room room in rooms) {
-      final currentMessages = messages[room.id] ?? [];
-      final currentMessagesIds = currentMessages.map((e) => e.id ?? '').toList();
-
-      reactions.addAll(await loadReactionsMapped(
-        roomId: room.id,
-        eventIds: currentMessagesIds,
-        storage: storage,
-      ));
-
-      receipts[room.id] = await loadReceipts(
-        currentMessagesIds,
-        storage: storage,
-      );
-
-      medias.addAll(await loadMediaRelative(
-        messages:
-            messages.values.expand((e) => e).toList() + decrypted.values.expand((e) => e).toList(),
-        storage: storage,
-      ));
-    }
-
     loadAsync() async {
+      for (final Room room in rooms) {
+        final currentMessages = messages[room.id] ?? [];
+        final currentDecrypted = decrypted[room.id] ?? [];
+        final currentMessagesIds = currentMessages.map((e) => e.id ?? '').toList();
+
+        reactions.addAll(await loadReactionsMapped(
+          roomId: room.id,
+          eventIds: currentMessagesIds,
+          storage: storage,
+        ));
+
+        receipts[room.id] = await loadReceipts(
+          currentMessagesIds,
+          storage: storage,
+        );
+
+        medias.addAll(await loadMediaRelative(
+          messages: currentMessages + currentDecrypted,
+          storage: storage,
+        ));
+      }
+
+      // TODO: remove after loadAsync works
+      // printJson({'loadAync': 'SQL LOAD COMPLETED'});
+
       store.dispatch(LoadMedia(mediaMap: medias));
       store.dispatch(LoadReceipts(receiptsMap: receipts));
-      await store.dispatch(LoadReactions(reactionsMap: reactions));
+      store.dispatch(LoadReactions(reactionsMap: reactions));
+
+      // TODO: remove after loadAsync works
+      // printJson({'loadAync': 'STATE LOAD COMPLETED'});
 
       // mutate messages
-      await store.dispatch(mutateMessagesAll());
+      store.dispatch(mutateMessagesAll());
     }
 
     loadAsync();
   } catch (error) {
-    printError('[loadStorageAsync]  ${error.toString()}');
+    printError('[loadStorageAsync] ${error.toString()}');
   }
 }

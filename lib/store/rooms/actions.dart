@@ -118,7 +118,7 @@ ThunkAction<AppState> fetchRoom(
             'homeserver': store.state.authStore.user.homeserver,
             'accessToken': store.state.authStore.user.accessToken,
             'roomId': roomId,
-            'limit': LOAD_LIMIT,
+            'limit': DEFAULT_LOAD_LIMIT,
           },
         );
 

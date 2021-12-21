@@ -25,7 +25,7 @@ scripts:
   list-android: emulator -list-avds
   boot-android: emulator -avd #<device_id>
   inspect-android: adb shell && run-as org.tether.tether # cache inspection
-  log-all: adb logcat ActivityManager:I flutter:I *:S
+  log-android: adb logcat ActivityManager:I flutter:I *:S
 
   # configuration and troubleshooting
   init-repo: git submodule update --init --recursive

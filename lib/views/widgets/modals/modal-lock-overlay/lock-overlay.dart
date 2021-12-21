@@ -172,22 +172,22 @@ class _LockOverlayState extends State<LockOverlay> {
     });
 
     lockController.verifyInput.listen((success) async {
-      if (success) {
-        unlocked(currentInput);
-      }
-
-      // Wait for the animation on failure.
-      Future.delayed(const Duration(milliseconds: 300), () {
-        lockController.clear();
-      });
-
       if (!success) {
         error();
+
+        // Wait for the animation on failure.
+        return Future.delayed(const Duration(milliseconds: 300), () {
+          lockController.clear();
+        });
       }
 
       if (widget.onConfirmed != null) {
-        widget.onConfirmed!(lockController.confirmedInput);
+        widget.onConfirmed!(
+          lockController.confirmedInput.isEmpty ? currentInput : lockController.confirmedInput,
+        );
       }
+
+      return unlocked(currentInput);
     });
   }
 

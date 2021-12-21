@@ -4,9 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path/path.dart' as path;
@@ -186,7 +184,7 @@ class ChatScreenState extends State<ChatScreen> {
     );
 
     await store.dispatch(addMessagesDecrypted(
-      room: props.room,
+      roomId: props.room.id,
       messages: messagesDecrypted,
     ));
   }

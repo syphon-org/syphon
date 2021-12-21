@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -809,7 +808,7 @@ class _Props extends Equatable {
         themeType: store.state.settingsStore.themeSettings.themeType,
         rooms: availableRooms(sortPrioritizedRooms(filterSearches(
           filterBlockedRooms(
-            store.state.roomStore.rooms.values.toList(),
+            store.state.roomStore.roomList,
             store.state.userStore.blocked,
           ),
           store.state.searchStore.searchMessages,

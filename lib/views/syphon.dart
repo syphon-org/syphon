@@ -46,6 +46,10 @@ class Syphon extends StatefulWidget {
     return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ?? AppContext();
   }
 
+  static Future reloadCurrentContext(BuildContext buildContext) {
+    return buildContext.findAncestorStateOfType<SyphonState>()!.reloadCurrentContext();
+  }
+
   @override
   SyphonState createState() => SyphonState();
 }
@@ -82,6 +86,12 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
 
     super.initState();
+  }
+
+  reloadCurrentContext() async {
+    // context handling
+    final currentContext = await loadContextCurrent();
+    appContext = currentContext;
   }
 
   onInitListeners() async {

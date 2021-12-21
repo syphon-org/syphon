@@ -1,7 +1,9 @@
 import 'dart:ffi';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:drift/drift.dart';
+import 'package:drift/isolate.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -16,6 +18,7 @@ import 'package:syphon/storage/converters.dart';
 import 'package:syphon/storage/index.dart';
 // ignore: unused_import
 import 'package:syphon/storage/migrations/5.update.messages.dart';
+import 'package:syphon/storage/models.dart';
 import 'package:syphon/store/auth/schema.dart';
 import 'package:syphon/store/crypto/schema.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -70,58 +73,125 @@ void _openOnLinux() {
   }
 }
 
-LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
-  return LazyDatabase(() async {
-    var storageKeyId = Storage.keyLocation;
-    var storageLocation = Storage.sqliteLocation;
+void initDatabase() {
+  if (Platform.isWindows) {
+    openSQLCipherOnWindows();
+  }
 
-    final contextId = context.id;
+  if (Platform.isIOS || Platform.isMacOS) {
+    _openOnIOS();
+  }
 
-    // prepend with context - always even if empty
-    if (contextId.isNotEmpty) {
-      storageKeyId = '$contextId-$storageKeyId';
-      storageLocation = '$contextId-$storageLocation';
-    }
+  if (Platform.isLinux) {
+    _openOnLinux();
+  }
 
-    // prepend with debug mode
-    storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
+  if (Platform.isAndroid) {
+    _openOnAndroid();
+  }
 
-    // get application support directory for all platforms
-    final dbFolder = await getApplicationSupportDirectory();
-    final filePath = File(path.join(dbFolder.path, storageLocation));
+  return;
+}
 
-    if (Platform.isWindows) {
-      openSQLCipherOnWindows();
-    }
+Future<DatabaseInfo> findDatabase(AppContext context,
+    {String pin = Values.empty, SendPort? port}) async {
+  var storageKeyId = Storage.keyLocation;
+  var storageLocation = Storage.sqliteLocation;
 
-    if (Platform.isIOS || Platform.isMacOS) {
-      _openOnIOS();
-    }
+  final contextId = context.id;
 
-    if (Platform.isLinux) {
-      _openOnLinux();
-    }
+  // prepend with context - always even if empty
+  if (contextId.isNotEmpty) {
+    storageKeyId = '$contextId-$storageKeyId';
+    storageLocation = '$contextId-$storageLocation';
+  }
 
-    if (Platform.isAndroid) {
-      _openOnAndroid();
-    }
+  // prepend with debug mode
+  storageLocation = DEBUG_MODE ? 'debug-$storageLocation' : storageLocation;
 
-    // Configure cache encryption/decryption instance
-    var storageKey = await loadKey(storageKeyId);
+  // get application support directory for all platforms
+  final dbFolder = await getApplicationSupportDirectory();
+  final filePath = File(path.join(dbFolder.path, storageLocation));
 
-    final isLockedContext =
-        context.id.isNotEmpty && context.secretKeyEncrypted.isNotEmpty && pin.isNotEmpty;
+  // Configure cache encryption/decryption instance
+  var storageKey = await loadKey(storageKeyId);
 
-    // TODO: why is this completely different if I dont print here
-    if (isLockedContext) {
-      storageKey = await unlockSecretKey(context, pin);
-    }
+  final isLockedContext =
+      context.id.isNotEmpty && context.secretKeyEncrypted.isNotEmpty && pin.isNotEmpty;
 
-    return NativeDatabase(
-      filePath,
+  if (isLockedContext) {
+    storageKey = await unlockSecretKey(context, pin);
+  }
+
+  return DatabaseInfo(
+    key: storageKey,
+    path: filePath.path,
+    port: port,
+  );
+}
+
+// This needs to be a top-level method because it's run on a background isolate
+// When using a Flutter plugin like `path_provider` to determine the path,
+void _openDatabaseBackground(DatabaseInfo info) {
+  initDatabase();
+
+  final driftIsolate = DriftIsolate.inCurrent(
+    () => DatabaseConnection.fromExecutor(NativeDatabase(
+      File(info.path),
       logStatements: false, // DEBUG_MODE,
       setup: (rawDb) {
-        rawDb.execute("PRAGMA key = '$storageKey';");
+        rawDb.execute("PRAGMA key = '${info.key}';");
+      },
+    )),
+  );
+
+  if (info.port == null) {
+    return;
+  }
+
+  // inform the starting isolate about this, so that it can call .connect()
+  info.port!.send(driftIsolate);
+}
+
+Future<DriftIsolate> spawnDatabaseIsolate(AppContext context, {String pin = Values.empty}) async {
+  final receivePort = ReceivePort();
+
+  final info = await findDatabase(context, pin: pin, port: receivePort.sendPort);
+
+  await Isolate.spawn(
+    _openDatabaseBackground,
+    info,
+  );
+
+  // _startBackground will send the DriftIsolate to this ReceivePort
+  return await receivePort.first as DriftIsolate;
+}
+
+///
+/// TODO: needs to work with multiaccounts
+/// https://drift.simonbinder.eu/docs/advanced-features/isolates/
+///
+StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.empty}) {
+  final connection = DatabaseConnection.delayed(() async {
+    final isolate = await spawnDatabaseIsolate(context, pin: pin);
+    // ignore: unnecessary_await_in_return
+    return await isolate.connect();
+  }());
+
+  return StorageDatabase.connect(connection);
+}
+
+LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
+  return LazyDatabase(() async {
+    initDatabase();
+
+    final info = await findDatabase(context, pin: pin);
+
+    return NativeDatabase(
+      File(info.path),
+      logStatements: false, // DEBUG_MODE,
+      setup: (rawDb) {
+        rawDb.execute("PRAGMA key = '${info.key}';");
       },
     );
   });

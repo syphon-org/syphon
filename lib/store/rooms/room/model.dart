@@ -222,8 +222,8 @@ class Room implements drift.Insertable<Room> {
         .fromStateEvents(
           invite: invite,
           limited: limited,
-          currentUser: currentUser,
           events: events.state,
+          currentUser: currentUser,
         )
         .fromMessageEvents(
           lastBatch: lastBatch,

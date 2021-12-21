@@ -1,6 +1,6 @@
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
@@ -57,14 +57,12 @@ String formatPreview({required Room room, Message? message}) {
   }
 
   // message was deleted
-  if (message.type != EventTypes.encrypted &&
-      (message.body == null || message.body!.isEmpty)) {
+  if (message.type != EventTypes.encrypted && (message.body == null || message.body!.isEmpty)) {
     return 'This message was deleted';
   }
 
   // message hasn't been decrypted
-  if (message.type == EventTypes.encrypted &&
-      (message.body == null || message.body!.isEmpty)) {
+  if (message.type == EventTypes.encrypted && (message.body == null || message.body!.isEmpty)) {
     return Strings.labelEncryptedMessage;
   }
 

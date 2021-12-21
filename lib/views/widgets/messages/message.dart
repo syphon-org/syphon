@@ -8,8 +8,11 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/messages/selectors.dart';
+import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
@@ -342,25 +345,16 @@ class MessageWidget extends StatelessWidget {
       status += ' (Edited)';
     }
 
-    String body = message.body ?? '';
+    final String body = selectEventBody(message);
 
+    // Indicates special event text instead of the message body
+    if (message.body != body) {
+      fontStyle = FontStyle.italic;
+    }
     // efficent way to check if Matrix message is a reply
     if (body.length > 1 && body[0] == '>') {
       final isLight = (luminance ?? 0.0) > 0.5;
       replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
-    }
-
-    if (message.type == EventTypes.encrypted) {
-      if (message.body!.isEmpty) {
-        body = Strings.labelEncryptedMessage;
-      }
-    }
-
-    // TODO: confirm - 2021
-    // deleted messages returned remotely will have empty 'body' fields
-    if (message.body == null || message.body!.isEmpty) {
-      body = Strings.labelDeletedMessage;
-      fontStyle = FontStyle.italic;
     }
 
     return Swipeable(
@@ -449,9 +443,11 @@ class MessageWidget extends StatelessWidget {
                           children: [
                             Container(
                               constraints: BoxConstraints(
-                                // TODO: issue shrinking the message based on width
+                                // NOTE: issue shrinking the message based on width
                                 maxWidth:
                                     !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
+                                // NOTE: prevents exposing the reply icon
+                                minWidth: 72,
                               ),
                               padding: EdgeInsets.only(
                                 // make an image span the message width

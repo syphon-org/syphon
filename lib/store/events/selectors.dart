@@ -38,20 +38,6 @@ List<Message> roomOutbox(AppState state, String? roomId) {
   return List.from((state.eventStore.outbox[roomId] ?? {}).values);
 }
 
-// remove messages from blocked users
-List<Message> filterMessages(
-  List<Message> messages,
-  AppState state,
-) {
-  final blocked = state.userStore.blocked;
-
-  // TODO: remove the replacement filter here, should be managed by the mutators
-  return messages
-    ..removeWhere(
-      (message) => blocked.contains(message.sender) || message.replacement,
-    );
-}
-
 List<Message> reviseMessagesThreaded(Map params) {
   final List<Message> messages = params['messages'] ?? [];
   final Map<String, List<Reaction>> reactions = params['reactions'];

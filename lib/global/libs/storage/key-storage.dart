@@ -15,6 +15,15 @@ Future<bool> checkKey(String keyId) async {
   }
 }
 
+Future<void> overrideKey(String keyId, {String value = ''}) async {
+  try {
+    return await SecureStorage().write(key: keyId, value: value);
+  } catch (error) {
+    printError('[checkKey] $error');
+    return;
+  }
+}
+
 Future<void> clearKey(String keyId) async {
   try {
     return await SecureStorage().write(key: keyId, value: '');
@@ -35,7 +44,7 @@ Future<String> loadKey(String keyId) async {
   }
 
   // generate a new one on failure
-  if (key == null) {
+  if (key == null || key.isEmpty) {
     printInfo('[loadKey] generating new key for $keyId');
     key = generateKey();
     await SecureStorage().write(key: keyId, value: key);

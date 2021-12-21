@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/input-secrets-config.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 class InputSecret extends StatelessWidget {
   const InputSecret({
@@ -38,6 +41,17 @@ class InputSecret extends StatelessWidget {
   }
 }
 
+class SineCurve extends Curve {
+  const SineCurve({this.count = 3});
+  final double count;
+
+  // 2. override transformInternal() method
+  @override
+  double transformInternal(double t) {
+    return sin(count * 2 * pi * t);
+  }
+}
+
 class InputSecrets extends StatefulWidget {
   const InputSecrets({
     Key? key,
@@ -57,28 +71,17 @@ class InputSecrets extends StatefulWidget {
 }
 
 class _InputSecretsState extends State<InputSecrets> with SingleTickerProviderStateMixin {
-  late Animation<Offset> _animation;
+  bool? enabled;
   late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
 
-    widget.verifyStream.listen((valid) {
-      if (!valid) {
-        // shake animation when invalid
-        _animationController.forward();
-      }
-    });
-
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 80),
-    );
-
-    _animation = _animationController
-        .drive(CurveTween(curve: Curves.elasticIn))
-        .drive(Tween<Offset>(begin: Offset.zero, end: const Offset(0.05, 0)))
+      duration: const Duration(milliseconds: 400),
+    )
       ..addListener(() {
         setState(() {});
       })
@@ -89,12 +92,32 @@ class _InputSecretsState extends State<InputSecrets> with SingleTickerProviderSt
           }
         },
       );
+
+    Tween<double>(
+      begin: 50.0,
+      end: 120.0,
+    ).animate(_animationController);
+
+    widget.verifyStream.listen((valid) {
+      if (!valid) {
+        // shake animation when invalid
+        _animationController.forward();
+      } else {
+        enabled = false;
+      }
+    });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  Vector3 _shake() {
+    final double progress = _animationController.value;
+    final double offset = sin(progress * pi * 10.0);
+    return Vector3(offset * 10, 0.0, 0.0);
   }
 
   double _computeSpacing(BuildContext context) {
@@ -107,8 +130,8 @@ class _InputSecretsState extends State<InputSecrets> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return SlideTransition(
-      position: _animation,
+    return Transform(
+      transform: Matrix4.translation(_shake()),
       child: StreamBuilder<String>(
         stream: widget.inputStream,
         builder: (context, snapshot) {
@@ -135,7 +158,7 @@ class _InputSecretsState extends State<InputSecrets> with SingleTickerProviderSt
                           padding: EdgeInsets.only(bottom: 4),
                           child: InputSecret(
                             config: widget.config.secretConfig,
-                            enabled: index < snapshot.data!.length,
+                            enabled: enabled ?? index < snapshot.data!.length,
                           ),
                         );
                       },

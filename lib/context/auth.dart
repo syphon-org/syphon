@@ -38,7 +38,7 @@ String generateContextId_DEPRECATED({required String id}) {
 Future<String> generatePinHash({required String passcode, String salt = 'TODO:'}) async {
   final pbkdf2 = Pbkdf2(
     macAlgorithm: Hmac.sha256(),
-    iterations: 45000,
+    iterations: 25000,
     bits: 128,
   );
 

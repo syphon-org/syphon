@@ -35,8 +35,8 @@ class LoadingScreen extends StatelessWidget {
                 TouchableOpacity(
                   child: SvgPicture.asset(
                     Assets.appIcon,
-                    width: ICON_SIZE,
-                    height: ICON_SIZE,
+                    width: width * 0.35,
+                    height: width * 0.35,
                   ),
                 ),
               ],
@@ -68,8 +68,8 @@ class LoadingScreen extends StatelessWidget {
                 TouchableOpacity(
                   child: SvgPicture.asset(
                     Assets.appIcon,
-                    width: ICON_SIZE,
-                    height: ICON_SIZE,
+                    width: width * 0.35,
+                    height: width * 0.35,
                     color: Colors.white,
                   ),
                 ),
