@@ -38,7 +38,6 @@ import 'package:syphon/store/settings/notification-settings/remote/actions.dart'
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/views/syphon.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -1292,7 +1291,46 @@ ThunkAction<AppState> setPassword({
   };
 }
 
-ThunkAction<AppState> setScreenLock({required String pin, String existing = ''}) {
+ThunkAction<AppState> removeScreenLock({required String pin}) {
+  return (Store<AppState> store) async {
+    try {
+      final currentContext = await loadContextCurrent();
+      final storageKeyId = '${currentContext.id}-${Storage.keyLocation}';
+      final pinHash = await generatePinHash(passcode: pin);
+
+      if (pinHash != currentContext.pinHash) {
+        throw Exception('Pin entered was not correct');
+      }
+
+      final unlockedKey = await unlockSecretKey(currentContext, pin);
+
+      await overrideKey(storageKeyId, value: unlockedKey);
+
+      await saveContext(AppContext(
+        id: currentContext.id,
+        pinHash: '',
+        secretKeyEncrypted: '',
+      ));
+
+      await store.dispatch(addConfirmation(
+        message: 'Screen lock was removed successfully for this account.',
+      ));
+
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        origin: 'removeScreenLock',
+        message: DEBUG_MODE
+            ? error.toString()
+            : 'Failure to remove screen lock. Try again or contact support.',
+        error: error,
+      ));
+      return false;
+    }
+  };
+}
+
+ThunkAction<AppState> setScreenLock({required String pin}) {
   return (Store<AppState> store) async {
     try {
       final currentContext = await loadContextCurrent();

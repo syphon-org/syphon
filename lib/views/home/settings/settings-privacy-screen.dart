@@ -4,6 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -116,7 +117,46 @@ class PrivacySettingsScreen extends StatelessWidget {
     required _Props props,
     required BuildContext context,
   }) {
-    showLockOverlay(
+    if (props.screenLockEnabled) {
+      return showDialog(
+        context: context,
+        builder: (dialogContext) => DialogConfirm(
+          title: 'Remove Screen Lock',
+          content:
+              'Are you sure you want to remove the screen lock? This will also remove the pin protection of the cache',
+          loading: props.loading,
+          confirmText: 'Remove',
+          confirmStyle: TextStyle(color: Colors.red),
+          onDismiss: () => Navigator.pop(dialogContext),
+          onConfirm: () async {
+            Navigator.of(dialogContext).pop();
+
+            showLockOverlay(
+              context: context,
+              canCancel: true,
+              maxRetries: 0,
+              onMaxRetries: (stuff) {
+                Navigator.of(context).pop();
+              },
+              onLeftButtonTap: () {
+                Navigator.of(context).pop();
+                return Future.value();
+              },
+              title: Text('Enter your current screen lock pin'),
+              onVerify: (String answer) async {
+                return Future.value(true);
+              },
+              onConfirmed: (String matchedText) async {
+                await props.onRemoveScreenLock(matchedText);
+                Syphon.reloadCurrentContext(context);
+              },
+            );
+          },
+        ),
+      );
+    }
+
+    return showLockOverlay(
       context: context,
       canCancel: true,
       confirmMode: true,
@@ -422,6 +462,7 @@ class _Props extends Equatable {
   final Function onDeactivateAccount;
   final Function onResetConfirmAuth;
   final Function onSetScreenLock;
+  final Function onRemoveScreenLock;
 
   const _Props({
     required this.loading,
@@ -438,6 +479,7 @@ class _Props extends Equatable {
     required this.onDeactivateAccount,
     required this.onResetConfirmAuth,
     required this.onSetScreenLock,
+    required this.onRemoveScreenLock,
   });
 
   @override
@@ -461,6 +503,8 @@ class _Props extends Equatable {
         sessionKey: selectCurrentUserSessionKey(store),
         onSetScreenLock: (String matchedPin) async =>
             await store.dispatch(setScreenLock(pin: matchedPin)),
+        onRemoveScreenLock: (String matchedPin) async =>
+            await store.dispatch(removeScreenLock(pin: matchedPin)),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),

@@ -186,7 +186,9 @@ class _LockOverlayState extends State<LockOverlay> {
       }
 
       if (widget.onConfirmed != null) {
-        widget.onConfirmed!(lockController.confirmedInput);
+        widget.onConfirmed!(
+          lockController.confirmedInput.isEmpty ? currentInput : lockController.confirmedInput,
+        );
       }
     });
   }

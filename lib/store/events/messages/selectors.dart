@@ -51,7 +51,10 @@ List<Message> filterMessages(
 
   // TODO: remove the replacement filter here, should be managed by the mutators
   return messages
-    ..removeWhere((message) => blocked.contains(message.sender) || message.replacement
-        // || message.typeDecrypted == EventTypes.callCandidates,
-        );
+    ..removeWhere(
+      (message) =>
+          blocked.contains(message.sender) ||
+          message.replacement ||
+          message.typeDecrypted == EventTypes.callCandidates,
+    );
 }

@@ -15,6 +15,15 @@ Future<bool> checkKey(String keyId) async {
   }
 }
 
+Future<void> overrideKey(String keyId, {String value = ''}) async {
+  try {
+    return await SecureStorage().write(key: keyId, value: value);
+  } catch (error) {
+    printError('[checkKey] $error');
+    return;
+  }
+}
+
 Future<void> clearKey(String keyId) async {
   try {
     return await SecureStorage().write(key: keyId, value: '');
