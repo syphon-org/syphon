@@ -145,10 +145,6 @@ ThunkAction<AppState> addMessagesDecrypted({
 ///
 /// Make sure these have been exhausted before calling fetchMessageEvents
 ///
-/// TODO: will need to handle loading all encrypted messages under new
-/// sessions in order to decrypt correctly, at least up until the previous
-/// session was created
-///
 ThunkAction<AppState> loadMessagesCached({
   Room? room,
   String? batch,
@@ -162,7 +158,7 @@ ThunkAction<AppState> loadMessagesCached({
       final messagesStored = await loadMessages(
         storage: Storage.database!,
         roomId: room.id,
-        limit: !room.encryptionEnabled ? limit : 0,
+        limit: limit,
         timestamp: timestamp,
         batch: batch,
       );

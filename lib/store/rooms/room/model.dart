@@ -484,7 +484,7 @@ class Room implements drift.Insertable<Room> {
         lastUpdate: lastUpdate,
         // oldest hash in the timeline
         lastBatch: lastBatch ?? this.lastBatch ?? prevBatch,
-        // TODO: fetchMessages maks this temporarily misassigned
+        // TODO: fetchMessages makes this temporarily misassigned
         // most recent prev_batch from the last /sync
         prevBatch: prevBatch ?? this.prevBatch,
         // next hash in the timeline
