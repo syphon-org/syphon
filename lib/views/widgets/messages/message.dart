@@ -20,6 +20,10 @@ import 'package:syphon/views/widgets/input/text-field-edit.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+const MESSAGE_MARGIN_VERTICAL_LARGE = 6.0;
+const MESSAGE_MARGIN_VERTICAL_NORMAL = 4.0;
+const MESSAGE_MARGIN_VERTICAL_SMALL = 1.0;
+
 class MessageWidget extends StatelessWidget {
   const MessageWidget({
     Key? key,
@@ -245,7 +249,7 @@ class MessageWidget extends StatelessWidget {
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
     var alignmentMessageText = CrossAxisAlignment.start;
-    var bubbleSpacing = EdgeInsets.symmetric(vertical: 4);
+    var bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_NORMAL);
     var showInfoRow = true;
     var showStatus = true;
 
@@ -269,12 +273,15 @@ class MessageWidget extends StatelessWidget {
       if (isLastSender) {
         if (isNextSender) {
           // Message in the middle of a sender messages block
-          bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+          bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderMiddleUser;
           showInfoRow = isNewContext;
         } else {
           // Message at the beginning of a user sender messages block
-          bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
+          bubbleMargin = EdgeInsets.only(
+            top: MESSAGE_MARGIN_VERTICAL_LARGE,
+            bottom: MESSAGE_MARGIN_VERTICAL_SMALL,
+          );
           bubbleBorder = Styles.bubbleBorderTopUser;
           showInfoRow = isNewContext;
         }
@@ -282,7 +289,10 @@ class MessageWidget extends StatelessWidget {
 
       if (!isLastSender && isNextSender) {
         // End of a sender messages block
-        bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
+        bubbleMargin = EdgeInsets.only(
+          top: MESSAGE_MARGIN_VERTICAL_SMALL,
+          bottom: MESSAGE_MARGIN_VERTICAL_LARGE,
+        );
         bubbleBorder = Styles.bubbleBorderBottomUser;
       }
       // External User Sent Styling
@@ -290,13 +300,13 @@ class MessageWidget extends StatelessWidget {
       if (isLastSender) {
         if (isNextSender) {
           // Message in the middle of a sender messages block
-          bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+          bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderMiddleSender;
           showSender = false;
           showInfoRow = isNewContext;
         } else {
           // Message at the beginning of a sender messages block
-          bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
+          bubbleMargin = EdgeInsets.only(top: 8, bottom: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderTopSender;
           showInfoRow = isNewContext;
         }
@@ -304,7 +314,10 @@ class MessageWidget extends StatelessWidget {
 
       if (!isLastSender && isNextSender) {
         // End of a sender messages block
-        bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
+        bubbleMargin = EdgeInsets.only(
+          top: MESSAGE_MARGIN_VERTICAL_SMALL,
+          bottom: MESSAGE_MARGIN_VERTICAL_LARGE,
+        );
         bubbleBorder = Styles.bubbleBorderBottomSender;
       }
     }
@@ -405,10 +418,8 @@ class MessageWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  margin: bubbleSpacing, // spacing between different user bubbles
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                  ),
+                  margin: bubbleMargin, // spacing between different user bubbles
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Flex(
                     direction: Axis.horizontal,
                     mainAxisAlignment: alignmentMessage,

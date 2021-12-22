@@ -37,12 +37,10 @@ class Prelock extends StatefulWidget {
     this.backgroundLockLatency = const Duration(seconds: 0),
   });
 
-  static restart(BuildContext context) {
-    context.findAncestorStateOfType<_PrelockState>()!.restart();
-  }
-
-  static Future? toggleLocked(BuildContext context, String pin) {
-    return context.findAncestorStateOfType<_PrelockState>()!.toggleLocked(pin: pin);
+  static Future? toggleLocked(BuildContext context, String pin, {bool? override}) {
+    return context
+        .findAncestorStateOfType<_PrelockState>()!
+        .toggleLocked(pin: pin, override: override);
   }
 
   @override
@@ -125,14 +123,8 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     return _navigatorKey.currentState!.pushNamed('/lock-screen');
   }
 
-  restart() {
-    setState(() {
-      key = UniqueKey();
-    });
-  }
-
-  toggleLocked({required String pin}) async {
-    final lockedNew = !locked;
+  toggleLocked({required String pin, bool? override}) async {
+    final lockedNew = override ?? !locked;
 
     if (!lockedNew) {
       await _onLoadStorage(pin: pin);
@@ -157,6 +149,8 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
         cache = null;
         storage = null;
       });
+
+      showLockScreen();
     }
   }
 

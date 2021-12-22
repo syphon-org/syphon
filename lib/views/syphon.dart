@@ -191,7 +191,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       await saveContext(contextNew);
 
       if (contextNew.pinHash.isNotEmpty) {
-        return Prelock.restart(context);
+        return Prelock.toggleLocked(context, '', override: true);
       }
     } else {
       // revert to another user context or default
