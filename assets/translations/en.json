@@ -82,7 +82,7 @@
     "button-delete-chat": "delete chat",
     "button-archive-chat": "archive chat",
     "button-select-all": "select all",
-    "button-room-details": "room details",
+    "button-chat-details": "chat details",
     "button-send-verification": "send verification email",
     "button-confirm-verification": "confirm verification",
     "button-deactivate": "deactivate",

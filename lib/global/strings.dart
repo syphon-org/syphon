@@ -118,7 +118,7 @@ class Strings {
   static final buttonDeleteChat = tr('button-delete-chat');
   static final buttonArchiveChat = tr('button-archive-chat');
   static final buttonSelectAll = tr('button-select-all');
-  static final buttonRoomDetails = tr('button-room-details');
+  static final buttonRoomDetails = tr('button-chat-details');
   static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
 
   // Buttons (Text)

@@ -139,7 +139,7 @@
     "button-leave-chat": "Quitter la discussion",
     "label-close": "Fermer",
     "button-text-invite": "Inviter des amis",
-    "button-room-details": "Informations sur le salon",
+    "button-chat-details": "Informations sur le salon",
     "confirm-delete-chat-single": "Êtes-vous sûr·e de vouloir supprimer la discussion « {} » ? Les messages de cette discussion seront perdus à jamais.",
     "label-back": "Retour",
     "button-select-all": "Tout sélectionner",

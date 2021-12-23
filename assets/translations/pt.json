@@ -139,7 +139,7 @@
     "content-captcha-warning": "Alguns servidores Matrix exigem uma confirmação de captcha fornecida pelo Google por meio do reCAPTCHA.\n\nSe preferir não completar este captcha, pode ser necessário voltar para a seleção do servidor e escolher um servidor diferente para a criação da conta.",
     "button-select-all": "selecionar tudo",
     "button-text-create-group": "Novo grupo",
-    "button-room-details": "detalhes da sala",
+    "button-chat-details": "detalhes da sala",
     "button-text-mark-all-read": "Marcar tudo como lido",
     "button-text-settings": "Configurações",
     "label-close": "fechar",
