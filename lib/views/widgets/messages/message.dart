@@ -251,7 +251,7 @@ class MessageWidget extends StatelessWidget {
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
     var alignmentMessageText = CrossAxisAlignment.start;
-    var bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_NORMAL);
+    var bubbleMargin = const EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_NORMAL);
     var showInfoRow = true;
     var showStatus = true;
 
@@ -370,8 +370,9 @@ class MessageWidget extends StatelessWidget {
     if (message.body != body) {
       fontStyle = FontStyle.italic;
     }
+
     // efficent way to check if Matrix message is a reply
-    if (body.length > 1 && body[0] == '>') {
+    if (body.isNotEmpty && body[0] == '>') {
       final isLight = (luminance ?? 0.0) > 0.5;
       replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
     }
