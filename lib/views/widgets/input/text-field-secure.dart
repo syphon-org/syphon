@@ -3,8 +3,13 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
+
+const DEFAULT_BORDER_WIDTH = 1.2;
 
 ///
 /// Secured Text Field Input
@@ -60,6 +65,46 @@ class TextFieldSecure extends StatelessWidget {
   final Function? onEditingComplete;
   final Iterable<String>? autofillHints;
 
+  buildBorderColorFocused(BuildContext context) {
+    if (disabled) {
+      return BorderSide(
+        color: Theme.of(context).disabledColor,
+      );
+    }
+
+    if (!valid) {
+      return BorderSide(
+        color: Theme.of(context).errorColor,
+        width: DEFAULT_BORDER_WIDTH,
+      );
+    }
+
+    return BorderSide(
+      color: Theme.of(context).primaryColor,
+      width: DEFAULT_BORDER_WIDTH,
+    );
+  }
+
+  buildBorderColor(BuildContext context) {
+    if (disabled) {
+      return BorderSide(
+        color: Theme.of(context).disabledColor,
+      );
+    }
+
+    if (!valid) {
+      return BorderSide(
+        color: Theme.of(context).errorColor.withOpacity(0.75),
+        width: DEFAULT_BORDER_WIDTH,
+      );
+    }
+
+    return BorderSide(
+      color: Theme.of(context).dividerColor,
+      width: DEFAULT_BORDER_WIDTH,
+    );
+  }
+
   @override
   Widget build(BuildContext context) => Container(
         height: Dimensions.inputHeight,
@@ -102,12 +147,14 @@ class TextFieldSecure extends StatelessWidget {
             hintText: hint,
             suffixIcon: suffix,
             contentPadding: Dimensions.inputPadding,
-            border: OutlineInputBorder(
-              borderSide: !valid
-                  ? BorderSide()
-                  : BorderSide(
-                      color: Theme.of(context).primaryColor,
-                    ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: buildBorderColorFocused(context),
+              borderRadius: BorderRadius.circular(
+                Dimensions.inputBorderRadius,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: buildBorderColor(context),
               borderRadius: BorderRadius.circular(
                 Dimensions.inputBorderRadius,
               ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';
+import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/print.dart';
@@ -17,6 +18,13 @@ import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/syphon.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
+
+class PrelockRoutes {
+  static const root = '/';
+  static const locked = '/locked';
+  static const unlocked = '/unlocked';
+  static const loading = '/loading-screen';
+}
 
 ///
 /// Prelock
@@ -37,6 +45,10 @@ class Prelock extends StatefulWidget {
     this.backgroundLockLatency = const Duration(seconds: 0),
   });
 
+  static restart(BuildContext context) {
+    context.findAncestorStateOfType<_PrelockState>()!.restart();
+  }
+
   static Future? toggleLocked(BuildContext context, String pin, {bool? override}) {
     return context
         .findAncestorStateOfType<_PrelockState>()!
@@ -48,11 +60,9 @@ class Prelock extends StatefulWidget {
 }
 
 class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycle<Prelock> {
-  Key key = UniqueKey();
-  Key storekey = UniqueKey();
-
   static final GlobalKey<NavigatorState> _navigatorKey = GlobalKey();
 
+  Key key = UniqueKey();
   bool locked = false;
   bool enabled = false;
   bool _didUnlockForAppLaunch = false;
@@ -61,6 +71,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
   Database? cache;
   StorageDatabase? storage;
   Store<AppState>? store;
+  AppContext? appContext;
 
   @override
   void initState() {
@@ -115,53 +126,14 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     super.dispose();
   }
 
-  showLockScreen() {
-    locked = true;
-
-    if (_navigatorKey.currentState == null) return;
-
-    return _navigatorKey.currentState!.pushNamed('/lock-screen');
-  }
-
-  toggleLocked({required String pin, bool? override}) async {
-    final lockedNew = override ?? !locked;
-
-    if (!lockedNew) {
-      await _onLoadStorage(pin: pin);
-
-      setState(() {
-        locked = false;
-      });
-
-      _navigatorKey.currentState?.pushAndRemoveUntil(
-          PageRouteBuilder(
-            pageBuilder: (context, animation1, animation2) => buildSyphon(),
-            transitionDuration: Duration(seconds: 200),
-          ),
-          ModalRoute.withName('/'));
-    } else {
-      setState(() {
-        locked = true;
-      });
-
-      setState(() {
-        store = null;
-        cache = null;
-        storage = null;
-      });
-
-      showLockScreen();
-    }
-  }
-
   _onLoadStorage({String pin = Values.empty}) async {
-    final appContext = widget.appContext;
+    final context = appContext ?? widget.appContext;
 
     // init hot caches
-    final cachePreload = await initCache(context: appContext);
+    final cachePreload = await initCache(context: context);
 
     // init cold storage
-    final storagePreload = await initStorage(context: appContext, pin: pin);
+    final storagePreload = await initStorage(context: context, pin: pin);
 
     // init redux store
     final storePreload = await initStore(cachePreload, storagePreload);
@@ -176,8 +148,97 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     });
   }
 
+  showLockScreen() async {
+    locked = true;
+
+    if (_navigatorKey.currentState == null) return;
+
+    _navigatorKey.currentState?.pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) => buildLockScreen(),
+        transitionDuration: Duration(seconds: 200),
+      ),
+    );
+  }
+
+  restart() async {
+    final appContextNew = await loadContextCurrent();
+
+    final isLocked = appContextNew.id.isNotEmpty && appContextNew.pinHash.isNotEmpty;
+
+    await _navigatorKey.currentState?.pushAndRemoveUntil(
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) => buildLoadingScreen(),
+        transitionDuration: Duration(seconds: 200),
+      ),
+      ModalRoute.withName(PrelockRoutes.root),
+    );
+
+    setState(() {
+      key = UniqueKey();
+      locked = isLocked;
+      enabled = isLocked;
+      appContext = appContextNew;
+      _didUnlockForAppLaunch = !enabled;
+    });
+
+    if (isLocked) {
+      await showLockScreen();
+    } else {
+      await _onLoadStorage();
+
+      printDebug('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+
+      _navigatorKey.currentState?.pushAndRemoveUntil(
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => buildSyphon(),
+          transitionDuration: Duration(seconds: 200),
+        ),
+        ModalRoute.withName(PrelockRoutes.root),
+      );
+    }
+  }
+
+  toggleLocked({required String pin, bool? override}) async {
+    final lockedNew = override ?? !locked;
+
+    if (!lockedNew) {
+      await _onLoadStorage(pin: pin);
+
+      setState(() {
+        locked = false;
+      });
+
+      _navigatorKey.currentState?.pushAndRemoveUntil(
+        PageRouteBuilder(
+          pageBuilder: (context, animation1, animation2) => buildSyphon(),
+          transitionDuration: Duration(seconds: 200),
+        ),
+        ModalRoute.withName(PrelockRoutes.root),
+      );
+    } else {
+      final appContextCurrent = await loadContextCurrent();
+      setState(() {
+        locked = true;
+        appContext = appContextCurrent;
+      });
+
+      await showLockScreen();
+
+      setState(() {
+        store = null;
+        cache = null;
+        storage = null;
+      });
+    }
+  }
+
+  buildLoadingScreen() => LoadingScreen(
+        dark: Platform.isAndroid,
+      );
+
   buildLockScreen() => LockScreen(
-        appContext: widget.appContext,
+        appContext: appContext ?? widget.appContext,
       );
 
   buildSyphon() => WillPopScope(
@@ -190,7 +251,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
       );
 
   buildHome() {
-    if (widget.enabled) {
+    if (enabled) {
       return buildLockScreen();
     }
 
@@ -205,9 +266,9 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
           home: buildHome(),
           navigatorKey: _navigatorKey,
           routes: {
-            '/unlocked': (context) => buildSyphon(),
-            '/lock-screen': (context) => buildLockScreen(),
-            '/loading-screen': (context) => LoadingScreen(dark: Platform.isAndroid),
+            PrelockRoutes.unlocked: (context) => buildSyphon(),
+            PrelockRoutes.locked: (context) => buildLockScreen(),
+            PrelockRoutes.loading: (context) => buildLoadingScreen(),
           },
         ),
       );

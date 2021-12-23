@@ -366,7 +366,11 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
       // deleted messages returned remotely will have empty 'body' fields
       final messageDeleted = message.copyWith(body: '');
 
-      return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
+      if (room.encryptionEnabled) {
+        return store.dispatch(AddMessagesDecrypted(roomId: room.id, messages: [messageDeleted]));
+      } else {
+        return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
+      }
     } catch (error) {
       printError('[deleteMessage] $error');
     }

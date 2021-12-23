@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/settings/models.dart';
@@ -11,10 +12,10 @@ String formatUserId(String displayName, {String homeserver = Values.homeserverDe
   return '@$displayName:$homeserver';
 }
 
-// TODO: remoove after switching to Locale / LanguageCode as source of truth
-String formatLocale(String? language) {
-  if (language!.length > 3) {
-    return SupportedLanguages.defaultLang;
+String findLocale(String language, {required BuildContext context}) {
+  // TODO: remove length > 2 - accounting for pre 0.2 users
+  if (language.isEmpty || language.length > 2) {
+    return Localizations.localeOf(context).languageCode;
   }
 
   return language;

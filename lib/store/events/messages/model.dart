@@ -226,13 +226,13 @@ class Message extends Event implements drift.Insertable<Message> {
       if (relatesTo != null && relatesTo['rel_type'] == 'm.replace') {
         replacement = true;
         relatedEventId = relatesTo['event_id'];
+      }
 
-        final newContent = content['m.new_content'];
+      final newContent = content['m.new_content'];
 
-        if (newContent != null) {
-          body = content['m.new_content']['body'];
-          msgtype = content['m.new_content']['msgtype'];
-        }
+      if (newContent != null) {
+        body = content['m.new_content']['body'];
+        msgtype = content['m.new_content']['msgtype'];
       }
 
       var info;

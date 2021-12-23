@@ -70,6 +70,7 @@ class ChatScreenState extends State<ChatScreen> {
   String? mediumType = MediumType.plaintext;
 
   final inputFieldNode = FocusNode();
+  final inputController = TextEditingController();
   final editorController = TextEditingController();
   final messagesController = ScrollController();
   final listViewController = ScrollController();
@@ -117,7 +118,7 @@ class ChatScreenState extends State<ChatScreen> {
     }
 
     if (draft != null && draft.type == MatrixMessageTypes.text) {
-      editorController.value = TextEditingValue(
+      inputController.value = TextEditingValue(
         text: draft.body!,
         selection: TextSelection.fromPosition(
           TextPosition(offset: draft.body!.length),
@@ -148,13 +149,17 @@ class ChatScreenState extends State<ChatScreen> {
   onCheatCode(_Props props) async {
     final store = StoreProvider.of<AppState>(context);
 
-    try {
-      await store.dispatch(mutateMessagesRoom(
-        room: props.room,
-      ));
-    } catch (error) {
-      printError(error.toString());
-    }
+    setState(() {
+      sending = false;
+    });
+
+    // try {
+    //   await store.dispatch(mutateMessagesRoom(
+    //     room: props.room,
+    //   ));
+    // } catch (error) {
+    //   printError(error.toString());
+    // }
   }
 
   onAttemptDecryption(_Props props) async {
@@ -218,8 +223,12 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  onSendEdit(_Props props,
-      {String? text, String? type = MatrixMessageTypes.text, Message? related}) async {
+  onSendEdit(
+    _Props props, {
+    String? text,
+    String? type = MatrixMessageTypes.text,
+    Message? related,
+  }) async {
     setState(() {
       sending = true;
     });
@@ -231,14 +240,16 @@ class ChatScreenState extends State<ChatScreen> {
       edit: true,
     );
 
-    onToggleEdit();
+    inputController.clear();
 
-    editorController.clear();
-    if (props.dismissKeyboardEnabled) {
-      FocusScope.of(context).unfocus();
-    }
+    // TODO: consider keeping this enabled?
+    // if (props.dismissKeyboardEnabled) {
+    FocusScope.of(context).unfocus();
+    // }
+
     setState(() {
       sending = false;
+      editing = false;
     });
   }
 
@@ -248,18 +259,18 @@ class ChatScreenState extends State<ChatScreen> {
     });
 
     props.onSendMessage(
-      body: editorController.text,
+      body: inputController.text,
       type: MatrixMessageTypes.text,
     );
 
-    onToggleEdit();
-
-    editorController.clear();
+    inputController.clear();
     if (props.dismissKeyboardEnabled) {
       FocusScope.of(context).unfocus();
     }
+
     setState(() {
       sending = false;
+      editing = false;
     });
   }
 
@@ -339,7 +350,7 @@ class ChatScreenState extends State<ChatScreen> {
       ));
     }
 
-    editorController.clear();
+    inputController.clear();
 
     if (props.dismissKeyboardEnabled) {
       FocusScope.of(context).unfocus();
@@ -566,6 +577,7 @@ class ChatScreenState extends State<ChatScreen> {
           final isScrolling = messagesController.hasClients && messagesController.offset != 0;
 
           var inputContainerColor = Colors.white;
+          var backgroundColor = Theme.of(context).scaffoldBackgroundColor;
 
           if (Theme.of(context).brightness == Brightness.dark) {
             inputContainerColor = Theme.of(context).scaffoldBackgroundColor;
@@ -579,9 +591,9 @@ class ChatScreenState extends State<ChatScreen> {
               onCheatCode(props);
             },
             onBack: () {
-              if (editorController.text.isNotEmpty) {
+              if (inputController.text.isNotEmpty) {
                 props.onSaveDraftMessage(
-                  body: editorController.text,
+                  body: inputController.text,
                   type: MatrixMessageTypes.text,
                 );
               } else if (props.room.draft != null) {
@@ -593,10 +605,17 @@ class ChatScreenState extends State<ChatScreen> {
           );
 
           if (selectedMessage != null) {
+            final isUserSent = props.currentUser.userId == (selectedMessage?.sender ?? '');
+            final backgroundColorDark = HSLColor.fromColor(backgroundColor);
+
+            backgroundColor =
+                backgroundColorDark.withLightness(backgroundColorDark.lightness - 0.2).toColor();
+
             appBar = AppBarMessageOptions(
               user: props.currentUser,
               room: props.room,
               message: selectedMessage,
+              isUserSent: isUserSent,
               onEdit: () => onToggleEdit(),
               onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
@@ -608,9 +627,7 @@ class ChatScreenState extends State<ChatScreen> {
 
           return Scaffold(
             appBar: appBar as PreferredSizeWidget?,
-            backgroundColor: selectedMessage != null
-                ? Theme.of(context).scaffoldBackgroundColor.withAlpha(200)
-                : Theme.of(context).scaffoldBackgroundColor,
+            backgroundColor: backgroundColor,
             body: Align(
               alignment: Alignment.topRight,
               child: Column(
@@ -627,6 +644,7 @@ class ChatScreenState extends State<ChatScreen> {
                         children: [
                           MessageList(
                             editing: editing,
+                            editorController: editorController,
                             roomId: props.room.id,
                             showAvatars: props.showAvatars,
                             selectedMessage: selectedMessage,
@@ -685,16 +703,24 @@ class ChatScreenState extends State<ChatScreen> {
                       ),
                       child: ChatInput(
                         roomId: props.room.id,
+                        sending: sending,
+                        editing: editing,
+                        editorController: editorController,
                         mediumType: mediumType,
                         focusNode: inputFieldNode,
                         enterSend: props.enterSendEnabled,
-                        controller: editorController,
+                        controller: inputController,
                         quotable: props.room.reply,
-                        sending: sending,
                         inset: keyboardInset,
                         onCancelReply: () => props.onSelectReply(null),
                         onChangeMethod: () => onShowMediumMenu(context, props),
-                        onSubmitMessage: () => onSendMessage(props),
+                        onSubmitMessage: !editing
+                            ? () => onSendMessage(props)
+                            : () => onSendEdit(
+                                  props,
+                                  text: editorController.text,
+                                  related: selectedMessage,
+                                ),
                         onAddMedia: ({required File file, required MessageType type}) =>
                             onAddMedia(file, type, props),
                       ),
@@ -825,6 +851,8 @@ class _Props extends Equatable {
             return store.dispatch(sendMessageEncrypted(
               roomId: room.id,
               message: message,
+              related: related,
+              edit: edit,
             ));
           }
 

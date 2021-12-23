@@ -28,6 +28,7 @@ class MessageWidget extends StatelessWidget {
   const MessageWidget({
     Key? key,
     required this.message,
+    this.editorController,
     this.isUserSent = false,
     this.messageOnly = false,
     this.isNewContext = false,
@@ -70,6 +71,7 @@ class MessageWidget extends StatelessWidget {
 
   final Message message;
   final ThemeType themeType;
+  final TextEditingController? editorController;
 
   final Function? onSwipe;
   final Function? onSendEdit;
@@ -215,9 +217,11 @@ class MessageWidget extends StatelessWidget {
         onConfirm: () async {
           Navigator.of(dialogContext).pop();
 
-          if (await canLaunch(url)) {
+          // TODO: confirm it can launch a URL with new Android 11 privacy settings
+          // if (await canLaunch(url)) {
+          try {
             return launch(url, forceSafariVC: false);
-          } else {
+          } catch (error) {
             throw 'Could not launch $url';
           }
         },
@@ -249,7 +253,7 @@ class MessageWidget extends StatelessWidget {
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
     var alignmentMessageText = CrossAxisAlignment.start;
-    var bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_NORMAL);
+    var bubbleMargin = const EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_NORMAL);
     var showInfoRow = true;
     var showStatus = true;
 
@@ -368,8 +372,9 @@ class MessageWidget extends StatelessWidget {
     if (message.body != body) {
       fontStyle = FontStyle.italic;
     }
+
     // efficent way to check if Matrix message is a reply
-    if (body.length > 1 && body[0] == '>') {
+    if (body.isNotEmpty && body[0] == '>') {
       final isLight = (luminance ?? 0.0) > 0.5;
       replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
     }
@@ -470,6 +475,7 @@ class MessageWidget extends StatelessWidget {
                                 // make an image span the message width
                                 right: removePadding ? 0 : 12,
                                 top: isMedia && !showSender ? 0 : 8,
+                                // remove bottom padding if info row is hidden
                                 bottom: isMedia
                                     ? 12
                                     : !showInfoRow
@@ -572,15 +578,20 @@ class MessageWidget extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      secondChild: Padding(
-                                        padding: EdgeInsets.only(left: 12, right: 12),
-                                        child: IntrinsicWidth(
-                                          child: TextFieldInline(
-                                            body: body,
-                                            onEdit: (text) => onSendEdit!(text, message),
-                                          ),
-                                        ),
-                                      ),
+                                      // HACK: to prevent other instantiations overwriting editorController
+                                      secondChild: !selected
+                                          ? Container()
+                                          : Padding(
+                                              padding: EdgeInsets.only(left: 12, right: 12),
+                                              child: IntrinsicWidth(
+                                                child: TextFieldInline(
+                                                  body: body,
+                                                  autofocus: isEditing,
+                                                  controller: editorController,
+                                                  onEdit: (text) => onSendEdit!(text, message),
+                                                ),
+                                              ),
+                                            ),
                                     ),
                                   ),
                                   Visibility(

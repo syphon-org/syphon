@@ -62,7 +62,7 @@ class FabCircleExpanding extends StatelessWidget {
             children: [
               FloatingActionButton(
                 heroTag: 'fab1',
-                tooltip: 'Create Public Room',
+                tooltip: 'Create Public Group',
                 backgroundColor: props.primaryColor,
                 onPressed: () => onNavigateToCreateGroupPublic(context),
                 child: SvgPicture.asset(
@@ -119,8 +119,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        primaryColor:
-            selectPrimaryColor(store.state.settingsStore.themeSettings),
+        primaryColor: selectPrimaryColor(store.state.settingsStore.themeSettings),
       );
 }
 
@@ -142,8 +141,7 @@ class FabBarContainer extends StatefulWidget {
   FabBarContainerState createState() => FabBarContainerState();
 }
 
-class FabBarContainerState extends State<FabBarContainer>
-    with SingleTickerProviderStateMixin {
+class FabBarContainerState extends State<FabBarContainer> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _expandAnimation;
   bool _open = false;
@@ -235,9 +233,7 @@ class FabBarContainerState extends State<FabBarContainer>
     final children = <Widget>[];
     final count = widget.children.length;
     final step = 90.0 / (count - 1);
-    for (var i = 0, angleInDegrees = 0.0;
-        i < count;
-        i++, angleInDegrees += step) {
+    for (var i = 0, angleInDegrees = 0.0; i < count; i++, angleInDegrees += step) {
       children.add(
         _ExpandingActionButton(
           directionInDegrees: angleInDegrees,

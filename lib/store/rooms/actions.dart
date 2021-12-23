@@ -405,16 +405,14 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
     try {
       final room = store.state.roomStore.rooms[roomId!];
       if (room == null) {
-        throw 'Room not found';
+        throw 'Chat not found';
       }
 
       // mark read locally only
-      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
-        await store.dispatch(UpdateRoom(
-          id: roomId,
-          lastRead: DateTime.now().millisecondsSinceEpoch,
-        ));
-      }
+      await store.dispatch(UpdateRoom(
+        id: roomId,
+        lastRead: DateTime.now().millisecondsSinceEpoch,
+      ));
 
       // send read receipt remotely to mark locally on /sync
       if (store.state.settingsStore.readReceipts != ReadReceiptTypes.Off) {
@@ -431,7 +429,7 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
     } catch (error) {
       store.dispatch(addAlert(
-        message: 'Failed to mark room as read',
+        message: 'Failed to mark chat as read',
         error: error,
         origin: 'markRoomRead',
       ));

@@ -21,6 +21,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/containers/media-card.dart';
 import 'package:syphon/views/widgets/lists/list-local-images.dart';
 
@@ -34,12 +35,14 @@ _empty({
 class ChatInput extends StatefulWidget {
   final String roomId;
   final bool sending;
+  final bool editing;
   final bool enterSend;
   final double inset;
   final Message? quotable;
   final String? mediumType;
   final FocusNode focusNode;
   final TextEditingController controller;
+  final TextEditingController? editorController;
 
   final Function? onSubmitMessage;
   final Function? onChangeMethod;
@@ -55,10 +58,12 @@ class ChatInput extends StatefulWidget {
     required this.roomId,
     required this.focusNode,
     required this.controller,
+    this.editorController,
     this.mediumType,
     this.quotable,
     this.inset = 0,
     this.sending = false,
+    this.editing = false,
     this.enterSend = false,
     this.onUpdateMessage,
     this.onChangeMethod,
@@ -251,13 +256,16 @@ class ChatInputState extends State<ChatInput> {
           // dynamic dimensions
           final double messageInputWidth = width - 72;
           final bool replying = widget.quotable != null && widget.quotable!.sender != null;
+          final bool loading = widget.sending;
           final double maxInputHeight = replying ? height * 0.45 : height * 0.65;
           final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight : height * 0.38;
 
           final imageHeight =
               keyboardHeight > 0 ? maxMediaHeight * 0.65 : imageWidth; // 2 images in view
 
-          final isSendable = sendable && !widget.sending;
+          final isSendable = (sendable && !widget.sending) ||
+              // account for if editing
+              widget.editing && (widget.editorController?.text.isNotEmpty ?? false);
 
           Color sendButtonColor = const Color(Colours.blueBubbly);
 
@@ -272,7 +280,7 @@ class ChatInputState extends State<ChatInput> {
           }
 
           // if the button is disabled, make it more transparent to indicate that
-          if (!isSendable) {
+          if (widget.sending || !isSendable) {
             sendButtonColor = Color(Colours.greyDisabled);
           }
 
@@ -306,7 +314,31 @@ class ChatInputState extends State<ChatInput> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(48),
                 onLongPress: widget.onChangeMethod as void Function()?,
-                onTap: !isSendable ? null : onSubmit,
+                onTap: loading || !isSendable ? null : onSubmit,
+                child: CircleAvatar(
+                  backgroundColor: sendButtonColor,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 2, top: 3),
+                    child: SvgPicture.asset(
+                      Assets.iconSendLockSolidBeing,
+                      color: Colors.white,
+                      semanticsLabel: Strings.labelSendEncrypted,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          if (loading) {
+            sendButton = Semantics(
+              button: true,
+              enabled: true,
+              label: Strings.labelSendEncrypted,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(48),
+                onLongPress: widget.onChangeMethod as void Function()?,
+                onTap: widget.sending || !isSendable ? null : onSubmit,
                 child: CircleAvatar(
                   backgroundColor: sendButtonColor,
                   child: Container(
@@ -409,59 +441,83 @@ class ChatInputState extends State<ChatInput> {
                       maxHeight: maxInputHeight,
                       maxWidth: messageInputWidth,
                     ),
-                    child: TextField(
-                      maxLines: null,
-                      autocorrect: props.autocorrectEnabled,
-                      enableSuggestions: props.suggestionsEnabled,
-                      textCapitalization: props.textCapitalization,
-                      keyboardType: TextInputType.multiline,
-                      textInputAction:
-                          widget.enterSend ? TextInputAction.send : TextInputAction.newline,
-                      cursorColor: props.inputCursorColor,
-                      focusNode: widget.focusNode,
-                      controller: widget.controller,
-                      onChanged: (text) => onUpdate(text, props: props),
-                      onSubmitted: !isSendable ? null : (text) => onSubmit(),
-                      style: TextStyle(
-                        height: 1.5,
-                        color: props.inputTextColor,
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        hintText: hintText,
-                        suffixIcon: IconButton(
-                          color: Theme.of(context).iconTheme.color,
-                          onPressed: () => onToggleMediaOptions(),
-                          icon: Icon(
-                            Icons.add,
-                            size: Dimensions.iconSizeLarge,
+                    child: Stack(
+                      children: [
+                        Visibility(
+                          visible: widget.editing,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              ButtonText(
+                                text: 'Save Message Edit',
+                                size: 18.0,
+                                disabled: widget.sending || !isSendable,
+                                onPressed: () => onSubmit(),
+                              ),
+                            ],
                           ),
                         ),
-                        fillColor: props.inputColorBackground,
-                        contentPadding: Dimensions.inputContentPadding,
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.secondary,
-                              width: 1,
+                        Visibility(
+                          visible: !widget.editing,
+                          child: TextField(
+                            maxLines: null,
+                            autocorrect: props.autocorrectEnabled,
+                            enableSuggestions: props.suggestionsEnabled,
+                            textCapitalization: props.textCapitalization,
+                            keyboardType: TextInputType.multiline,
+                            textInputAction:
+                                widget.enterSend ? TextInputAction.send : TextInputAction.newline,
+                            cursorColor: props.inputCursorColor,
+                            focusNode: widget.focusNode,
+                            controller: widget.controller,
+                            onChanged: (text) => onUpdate(text, props: props),
+                            onSubmitted: !isSendable ? null : (text) => onSubmit(),
+                            style: TextStyle(
+                              height: 1.5,
+                              color: props.inputTextColor,
                             ),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                              topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                              bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                              bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
-                            )),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.secondary,
-                              width: 1,
+                            decoration: InputDecoration(
+                              filled: true,
+                              hintText: hintText,
+                              suffixIcon: IconButton(
+                                color: Theme.of(context).iconTheme.color,
+                                onPressed: () => onToggleMediaOptions(),
+                                icon: Icon(
+                                  Icons.add,
+                                  size: Dimensions.iconSizeLarge,
+                                ),
+                              ),
+                              fillColor: props.inputColorBackground,
+                              contentPadding: Dimensions.inputContentPadding,
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).colorScheme.secondary,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                    topRight:
+                                        Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                    bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                    bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                  )),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).colorScheme.secondary,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                    topRight:
+                                        Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                    bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                    bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                  )),
                             ),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                              topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                              bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                              bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
-                            )),
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(

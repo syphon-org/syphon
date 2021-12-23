@@ -58,8 +58,10 @@ class NavigationService {
   static Future<bool> goBack() {
     if (navigatorKey.currentState!.canPop()) {
       navigatorKey.currentState!.pop();
+      return Future.value(false);
+    } else {
+      return Future.value(true);
     }
-    return Future.value(false);
   }
 
   static Future clearTo(String routeName, BuildContext context) {

@@ -100,7 +100,7 @@ steps:
       - go get code.gitea.io/tea
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
-      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-android" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
+      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
 ---
 kind: pipeline
 type: docker
@@ -140,7 +140,7 @@ steps:
       - go get code.gitea.io/tea
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
-      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.nightly.linux.x64.tar.gz
+      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-linux" --asset ./syphon.nightly.linux.x64.tar.gz
 ---
 kind: pipeline
 type: docker

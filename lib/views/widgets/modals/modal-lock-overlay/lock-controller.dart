@@ -9,11 +9,14 @@ class LockController {
 
   final List<String> _currentInputs = [];
 
+  late StreamController<bool> loadingController;
   late StreamController<bool> verifyController;
   late StreamController<String> inputController;
   late StreamController<bool> confirmedController;
 
   /// Get latest input text stream.
+  Stream<bool> get loading => loadingController.stream;
+
   Stream<String> get currentInput => inputController.stream;
 
   /// Get verify result stream.
@@ -67,11 +70,17 @@ class LockController {
 
   /// Verify that the input is correct.
   Future verify() async {
+    loadingController.add(true);
+
     final inputText = _currentInputs.join();
-    final String correctString = _firstInput;
 
     if (!_isConfirmed) {
       final verified = await _onVerifyInput(inputText);
+
+      if (!verified) {
+        loadingController.add(false);
+      }
+
       return verifyController.add(verified);
     } else {
       if (_firstInput.isEmpty) {
@@ -85,6 +94,8 @@ class LockController {
       } else {
         verifyController.add(false);
       }
+
+      loadingController.add(false);
     }
   }
 
@@ -94,6 +105,7 @@ class LockController {
     bool isConfirmed = false,
     required Future<bool> Function(String input) onVerifyInput,
   }) {
+    loadingController = StreamController.broadcast();
     inputController = StreamController.broadcast();
     verifyController = StreamController.broadcast();
     confirmedController = StreamController.broadcast();

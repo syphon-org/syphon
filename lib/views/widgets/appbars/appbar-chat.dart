@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
@@ -441,7 +440,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         currentUser: store.state.authStore.user,
-        roomUsers: (store.state.roomStore.rooms[roomId!]!.userIds)
+        roomUsers: (store.state.roomStore.rooms[roomId]?.userIds ?? [])
             .map((id) => store.state.userStore.users[id])
             .toList(),
         onBlockUser: (String userId) async {
@@ -450,12 +449,12 @@ class _Props extends Equatable {
         },
         onMuteNotifications: (Duration duration) {
           store.dispatch(muteChatNotifications(
-            roomId: roomId,
+            roomId: roomId!,
             timestamp: DateTime.now().add(duration).millisecondsSinceEpoch,
           ));
         },
         onToggleNotifications: () {
-          store.dispatch(toggleChatNotifications(roomId: roomId, enabled: false));
+          store.dispatch(toggleChatNotifications(roomId: roomId!, enabled: false));
         },
       );
 }
