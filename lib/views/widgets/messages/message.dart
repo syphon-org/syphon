@@ -7,6 +7,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/selectors.dart';
@@ -28,6 +29,7 @@ class MessageWidget extends StatelessWidget {
   const MessageWidget({
     Key? key,
     required this.message,
+    this.editorController,
     this.isUserSent = false,
     this.messageOnly = false,
     this.isNewContext = false,
@@ -70,6 +72,7 @@ class MessageWidget extends StatelessWidget {
 
   final Message message;
   final ThemeType themeType;
+  final TextEditingController? editorController;
 
   final Function? onSwipe;
   final Function? onSendEdit;
@@ -575,15 +578,19 @@ class MessageWidget extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      secondChild: Padding(
-                                        padding: EdgeInsets.only(left: 12, right: 12),
-                                        child: IntrinsicWidth(
-                                          child: TextFieldInline(
-                                            body: body,
-                                            onEdit: (text) => onSendEdit!(text, message),
-                                          ),
-                                        ),
-                                      ),
+                                      // HACK: to prevent other instantiations overwriting editorController
+                                      secondChild: !selected
+                                          ? Container()
+                                          : Padding(
+                                              padding: EdgeInsets.only(left: 12, right: 12),
+                                              child: IntrinsicWidth(
+                                                child: TextFieldInline(
+                                                  body: body,
+                                                  controller: editorController,
+                                                  onEdit: (text) => onSendEdit!(text, message),
+                                                ),
+                                              ),
+                                            ),
                                     ),
                                   ),
                                   Visibility(

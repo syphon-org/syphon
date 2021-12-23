@@ -28,6 +28,8 @@ class MessageList extends StatefulWidget {
   final bool editing;
   final bool showAvatars;
   final Message? selectedMessage;
+  final TextEditingController editorController;
+
   final ScrollController scrollController;
 
   final Function? onSendEdit;
@@ -39,6 +41,7 @@ class MessageList extends StatefulWidget {
     Key? key,
     required this.roomId,
     required this.scrollController,
+    required this.editorController,
     this.showAvatars = true,
     this.editing = false,
     this.selectedMessage,
@@ -198,6 +201,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                     return MessageWidget(
                       key: Key(message.id ?? ''),
                       message: message,
+                      editorController: widget.editorController,
                       isEditing: widget.editing,
                       isUserSent: isUserSent,
                       isLastSender: isLastSender,

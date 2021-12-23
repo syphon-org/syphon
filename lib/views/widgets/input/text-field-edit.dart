@@ -1,9 +1,7 @@
-import 'dart:ui';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 
 ///
 /// Secured Text Field Input
@@ -13,26 +11,35 @@ import 'package:syphon/global/dimensions.dart';
 /// text content
 ///
 class TextFieldInline extends StatefulWidget {
+  final String? body;
+  final TextEditingController? controller;
+
+  final Function? onEdit;
+
   const TextFieldInline({
     Key? key,
     this.body,
     this.onEdit,
+    this.controller,
   }) : super(key: key);
 
-  final String? body;
-
-  final Function? onEdit;
   @override
   State<TextFieldInline> createState() => _TextFieldInlineState();
 }
 
-class _TextFieldInlineState extends State<TextFieldInline> {
-  late TextEditingController controller;
+class _TextFieldInlineState extends State<TextFieldInline> with Lifecycle<TextFieldInline> {
+  late TextEditingController _controller;
 
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController(text: widget.body?.trim());
+
+    _controller = widget.controller ?? TextEditingController(text: widget.body?.trim());
+  }
+
+  @override
+  void onMounted() {
+    _controller.text = widget.body?.trim() ?? 'BUG';
   }
 
   @override
@@ -41,11 +48,11 @@ class _TextFieldInlineState extends State<TextFieldInline> {
           maxLines: null,
           autocorrect: false,
           enableSuggestions: false,
-          controller: controller,
+          controller: _controller,
           textInputAction: TextInputAction.send,
           onEditingComplete: () {
             if (widget.onEdit != null) {
-              widget.onEdit!(controller.value.text.toString());
+              widget.onEdit!(_controller.value.text.toString());
             }
           },
           decoration: InputDecoration(
