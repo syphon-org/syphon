@@ -256,6 +256,7 @@ class ChatInputState extends State<ChatInput> {
           // dynamic dimensions
           final double messageInputWidth = width - 72;
           final bool replying = widget.quotable != null && widget.quotable!.sender != null;
+          final bool loading = widget.sending;
           final double maxInputHeight = replying ? height * 0.45 : height * 0.65;
           final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight : height * 0.38;
 
@@ -279,7 +280,7 @@ class ChatInputState extends State<ChatInput> {
           }
 
           // if the button is disabled, make it more transparent to indicate that
-          if (!isSendable) {
+          if (widget.sending || !isSendable) {
             sendButtonColor = Color(Colours.greyDisabled);
           }
 
@@ -313,7 +314,31 @@ class ChatInputState extends State<ChatInput> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(48),
                 onLongPress: widget.onChangeMethod as void Function()?,
-                onTap: !isSendable ? null : onSubmit,
+                onTap: loading || !isSendable ? null : onSubmit,
+                child: CircleAvatar(
+                  backgroundColor: sendButtonColor,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 2, top: 3),
+                    child: SvgPicture.asset(
+                      Assets.iconSendLockSolidBeing,
+                      color: Colors.white,
+                      semanticsLabel: Strings.labelSendEncrypted,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          if (loading) {
+            sendButton = Semantics(
+              button: true,
+              enabled: true,
+              label: Strings.labelSendEncrypted,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(48),
+                onLongPress: widget.onChangeMethod as void Function()?,
+                onTap: widget.sending || !isSendable ? null : onSubmit,
                 child: CircleAvatar(
                   backgroundColor: sendButtonColor,
                   child: Container(
@@ -427,7 +452,6 @@ class ChatInputState extends State<ChatInput> {
                               ButtonText(
                                 text: 'Save Message Edit',
                                 size: 18.0,
-                                loading: widget.sending,
                                 disabled: widget.sending || !isSendable,
                                 onPressed: () => onSubmit(),
                               ),

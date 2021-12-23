@@ -147,12 +147,13 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
         builder: (context, props) {
+          final lockScrolling = widget.selectedMessage != null && !widget.editing;
           return GestureDetector(
             onTap: () => widget.onToggleSelectedMessage!(null),
             child: ListView(
               reverse: true,
               padding: EdgeInsets.only(bottom: 16),
-              physics: widget.selectedMessage != null ? const NeverScrollableScrollPhysics() : null,
+              physics: lockScrolling ? const NeverScrollableScrollPhysics() : null,
               controller: widget.scrollController,
               children: [
                 TypingIndicator(
@@ -167,7 +168,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                   shrinkWrap: true,
                   // TODO: add padding based on widget height to allow
                   // TODO: user to always pull down to load regardless of list size
-                  padding: EdgeInsets.only(bottom: 0),
+                  padding: EdgeInsets.only(bottom: 0, top: props.messages.length < 10 ? 200 : 0),
                   addRepaintBoundaries: true,
                   addAutomaticKeepAlives: true,
                   itemCount: props.messages.length,

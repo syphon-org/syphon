@@ -7,7 +7,6 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/selectors.dart';
@@ -476,6 +475,7 @@ class MessageWidget extends StatelessWidget {
                                 // make an image span the message width
                                 right: removePadding ? 0 : 12,
                                 top: isMedia && !showSender ? 0 : 8,
+                                // remove bottom padding if info row is hidden
                                 bottom: isMedia
                                     ? 12
                                     : !showInfoRow
@@ -586,6 +586,7 @@ class MessageWidget extends StatelessWidget {
                                               child: IntrinsicWidth(
                                                 child: TextFieldInline(
                                                   body: body,
+                                                  autofocus: isEditing,
                                                   controller: editorController,
                                                   onEdit: (text) => onSendEdit!(text, message),
                                                 ),

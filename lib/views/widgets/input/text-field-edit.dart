@@ -12,6 +12,7 @@ import 'package:syphon/views/widgets/lifecycle.dart';
 ///
 class TextFieldInline extends StatefulWidget {
   final String? body;
+  final bool autofocus;
   final TextEditingController? controller;
 
   final Function? onEdit;
@@ -20,6 +21,7 @@ class TextFieldInline extends StatefulWidget {
     Key? key,
     this.body,
     this.onEdit,
+    this.autofocus = false,
     this.controller,
   }) : super(key: key);
 
@@ -48,6 +50,7 @@ class _TextFieldInlineState extends State<TextFieldInline> with Lifecycle<TextFi
           maxLines: null,
           autocorrect: false,
           enableSuggestions: false,
+          autofocus: widget.autofocus,
           controller: _controller,
           textInputAction: TextInputAction.send,
           onEditingComplete: () {

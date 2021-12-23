@@ -234,20 +234,18 @@ ThunkAction<AppState> sendMessage({
         throw data['error'];
       }
 
-      if (edit) {
-        return true;
-      }
-
       // Update sent message with event id but needs
       // to be syncing to remove from outbox
-      store.dispatch(SaveOutboxMessage(
-        tempId: tempId,
-        pendingMessage: pending.copyWith(
-          id: data['event_id'],
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          syncing: true,
-        ),
-      ));
+      if (!edit) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending.copyWith(
+            id: data['event_id'],
+            timestamp: DateTime.now().millisecondsSinceEpoch,
+            syncing: true,
+          ),
+        ));
+      }
 
       return true;
     } catch (error) {
@@ -273,8 +271,10 @@ ThunkAction<AppState> sendMessage({
 ThunkAction<AppState> sendMessageEncrypted({
   required String roomId,
   required Message message, // temp - contains all unencrypted info being sent
+  Message? related,
   File? file,
   EncryptInfo? info,
+  bool edit = false,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -290,32 +290,47 @@ ThunkAction<AppState> sendMessageEncrypted({
       // Save unsent message to outbox
       final tempId = Random.secure().nextInt(1 << 32).toString();
       final reply = room.reply;
+      final hasReply = reply != null && reply.body != null;
+      final hasReplacement = related != null && related.id != null;
 
       // pending outbox message
       Message pending = await formatMessageContent(
         tempId: tempId,
         userId: userId,
         message: message,
+        related: related,
         room: room,
         file: file,
         info: info,
+        edit: edit,
       );
 
+      // spec requires some data is unencrypted
       final unencryptedData = {};
 
-      if (reply != null && reply.body != null) {
+      if (hasReply) {
         unencryptedData['m.relates_to'] = {
-          'm.in_reply_to': {'event_id': reply.id}
+          'm.in_reply_to': {'event_id': reply!.id}
         };
 
         pending = formatMessageReply(room, pending, reply);
       }
 
-      store.dispatch(SaveOutboxMessage(
-        tempId: tempId,
-        pendingMessage: pending,
-      ));
+      if (hasReplacement) {
+        unencryptedData['m.relates_to'] = {
+          'event_id': related!.id,
+          'rel_type': RelationTypes.replace,
+        };
+      }
 
+      if (!edit) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending,
+        ));
+      }
+
+      printJson({'content': pending.content});
       // Encrypt the message event
       final encryptedEvent = await store.dispatch(
         encryptMessageContent(
@@ -352,14 +367,16 @@ ThunkAction<AppState> sendMessageEncrypted({
         throw data['error'];
       }
 
-      store.dispatch(SaveOutboxMessage(
-        tempId: tempId,
-        pendingMessage: pending.copyWith(
-          id: data['event_id'],
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          syncing: true,
-        ),
-      ));
+      if (!edit) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending.copyWith(
+            id: data['event_id'],
+            timestamp: DateTime.now().millisecondsSinceEpoch,
+            syncing: true,
+          ),
+        ));
+      }
 
       return true;
     } catch (error) {

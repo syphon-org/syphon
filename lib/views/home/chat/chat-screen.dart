@@ -240,14 +240,16 @@ class ChatScreenState extends State<ChatScreen> {
       edit: true,
     );
 
-    onToggleEdit();
-
     inputController.clear();
-    if (props.dismissKeyboardEnabled) {
-      FocusScope.of(context).unfocus();
-    }
+
+    // TODO: consider keeping this enabled?
+    // if (props.dismissKeyboardEnabled) {
+    FocusScope.of(context).unfocus();
+    // }
+
     setState(() {
       sending = false;
+      editing = false;
     });
   }
 
@@ -261,14 +263,14 @@ class ChatScreenState extends State<ChatScreen> {
       type: MatrixMessageTypes.text,
     );
 
-    onToggleEdit();
-
     inputController.clear();
     if (props.dismissKeyboardEnabled) {
       FocusScope.of(context).unfocus();
     }
+
     setState(() {
       sending = false;
+      editing = false;
     });
   }
 
@@ -849,6 +851,8 @@ class _Props extends Equatable {
             return store.dispatch(sendMessageEncrypted(
               roomId: room.id,
               message: message,
+              related: related,
+              edit: edit,
             ));
           }
 
