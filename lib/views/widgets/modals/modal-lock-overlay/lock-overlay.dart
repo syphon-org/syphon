@@ -108,6 +108,7 @@ class _LockOverlayState extends State<LockOverlay> {
   late LockController lockController;
 
   int retries = 1;
+  bool unlocking = false;
   String currentInput = '';
 
   void unlocked(String pin) {
@@ -186,6 +187,10 @@ class _LockOverlayState extends State<LockOverlay> {
           lockController.confirmedInput.isEmpty ? currentInput : lockController.confirmedInput,
         );
       }
+
+      if (unlocking) return;
+
+      unlocking = true;
 
       return unlocked(currentInput);
     });

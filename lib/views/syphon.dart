@@ -42,6 +42,10 @@ class Syphon extends StatefulWidget {
     this.storage,
   );
 
+  static Future setAppContext(BuildContext buildContext, AppContext appContext) {
+    return buildContext.findAncestorStateOfType<SyphonState>()!.onContextSet(appContext);
+  }
+
   static AppContext getAppContext(BuildContext buildContext) {
     return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ?? AppContext();
   }
@@ -133,11 +137,11 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     // init auth listener
     store.state.authStore.onAuthStateChanged.listen(onAuthStateChanged);
 
-    // init alerts listener
-    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
-
     // set auth state listener
     store.state.authStore.onContextChanged.listen(onContextChanged);
+
+    // init alerts listener
+    store.state.alertsStore.onAlertsChanged.listen(onAlertsChanged);
   }
 
   @override
@@ -160,6 +164,11 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         store.dispatch(setBackgrounded(true));
         break;
     }
+  }
+
+  onContextSet(AppContext appContext) async {
+    await saveContextCurrent(appContext);
+    await Prelock.restart(context);
   }
 
   onContextChanged(User? user) async {

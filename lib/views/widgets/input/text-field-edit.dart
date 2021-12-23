@@ -41,7 +41,7 @@ class _TextFieldInlineState extends State<TextFieldInline> with Lifecycle<TextFi
 
   @override
   void onMounted() {
-    _controller.text = widget.body?.trim() ?? 'BUG';
+    _controller.text = widget.body?.trim() ?? '';
   }
 
   @override

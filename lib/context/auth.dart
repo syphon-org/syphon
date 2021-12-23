@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart' as crypt;
 import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:flutter/foundation.dart' as io;
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/print.dart';
@@ -55,6 +56,22 @@ Future<String> generatePinHash({required String passcode, String salt = 'TODO:'}
   );
 
   return base64.encode(await newSecretKey.extractBytes());
+}
+
+Future<bool> generatePinHashWrapper(Map params) async {
+  final String hash = params['hash'] ?? '';
+  final String passcode = params['passcode'] ?? '';
+
+  return await generatePinHash(passcode: passcode) == hash;
+}
+
+Future<bool> verifyPinHashIsolate({required String passcode, required String hash}) async {
+  final Map params = {
+    'passcode': passcode,
+    'hash': hash,
+  };
+
+  return io.compute(generatePinHashWrapper, params);
 }
 
 Future<bool> verifyPinHash({required String passcode, required String hash}) async {

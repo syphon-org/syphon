@@ -11,9 +11,6 @@ void main() async {
   // init platform specific code
   await initPlatformDependencies();
 
-  // TODO: remove after 0.2.3
-  await migrateContexts_MIGRATION();
-
   // pull current context / nullable
   final context = await loadContextCurrent();
 

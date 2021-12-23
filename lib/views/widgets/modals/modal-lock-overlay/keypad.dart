@@ -4,6 +4,7 @@ import 'package:flutter_screen_lock/buttons/hidden_button.dart';
 import 'package:flutter_screen_lock/buttons/input_button.dart';
 import 'package:flutter_screen_lock/configurations/input_button_config.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/views/widgets/modals/modal-lock-overlay/lock-buttons.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/lock-controller.dart';
 
 /// In order to arrange the buttons neatly by their size,
@@ -56,21 +57,27 @@ class KeyPad extends StatelessWidget {
   }
 
   Widget _buildRightSideButton() {
-    return StreamBuilder<String>(
-      stream: lockController.currentInput,
-      builder: (context, snapshot) {
-        if (snapshot.hasData == false || snapshot.data!.isEmpty) {
-          return HiddenButton();
-        } else {
-          return CustomizableButton(
-            onPressed: () => lockController.verify(),
-            child: const Icon(
-              Icons.check_circle,
-              size: Dimensions.iconSizeLarge,
-            ),
-          );
-        }
-      },
+    return StreamBuilder<bool>(
+      stream: lockController.loading,
+      builder: (context, loadingData) => StreamBuilder<String>(
+        stream: lockController.currentInput,
+        builder: (context, currentInput) {
+          final loading = loadingData.data ?? false;
+
+          if (currentInput.hasData == false || currentInput.data!.isEmpty) {
+            return HiddenButton();
+          } else {
+            return LockButton(
+              disabled: loading,
+              onPressed: () => lockController.verify(),
+              child: const Icon(
+                Icons.check_circle,
+                size: Dimensions.iconSizeLarge,
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 
