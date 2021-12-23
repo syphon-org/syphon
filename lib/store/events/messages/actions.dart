@@ -321,7 +321,6 @@ ThunkAction<AppState> sendMessageEncrypted({
         ));
       }
 
-      printJson({'content': pending.content});
       // Encrypt the message event
       final encryptedEvent = await store.dispatch(
         encryptMessageContent(
