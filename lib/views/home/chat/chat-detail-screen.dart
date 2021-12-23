@@ -152,6 +152,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           await props.onLeaveChat();
+          Navigator.pop(dialogContext);
           Navigator.popUntil(context, (route) => route.isFirst);
         },
       ),

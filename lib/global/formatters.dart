@@ -14,7 +14,7 @@ String formatUserId(String displayName, {String homeserver = Values.homeserverDe
 
 String findLocale(String language, {required BuildContext context}) {
   // TODO: remove length > 2 - accounting for pre 0.2 users
-  if (language.isEmpty && language.length > 2) {
+  if (language.isEmpty || language.length > 2) {
     return Localizations.localeOf(context).languageCode;
   }
 
