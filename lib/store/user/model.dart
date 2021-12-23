@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 
 part 'model.g.dart';
 

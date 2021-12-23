@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -10,6 +9,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
@@ -20,12 +20,17 @@ import 'package:syphon/views/widgets/input/text-field-edit.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+const MESSAGE_MARGIN_VERTICAL_LARGE = 6.0;
+const MESSAGE_MARGIN_VERTICAL_NORMAL = 4.0;
+const MESSAGE_MARGIN_VERTICAL_SMALL = 1.0;
+
 class MessageWidget extends StatelessWidget {
   const MessageWidget({
     Key? key,
     required this.message,
     this.isUserSent = false,
     this.messageOnly = false,
+    this.isNewContext = false,
     this.isLastSender = false,
     this.isNextSender = false,
     this.isEditing = false,
@@ -47,6 +52,7 @@ class MessageWidget extends StatelessWidget {
   }) : super(key: key);
 
   final bool messageOnly;
+  final bool isNewContext;
   final bool isLastSender;
   final bool isNextSender;
   final bool isUserSent;
@@ -243,7 +249,8 @@ class MessageWidget extends StatelessWidget {
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
     var alignmentMessageText = CrossAxisAlignment.start;
-    var bubbleSpacing = EdgeInsets.symmetric(vertical: 4);
+    var bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_NORMAL);
+    var showInfoRow = true;
     var showStatus = true;
 
     var fontStyle;
@@ -266,20 +273,26 @@ class MessageWidget extends StatelessWidget {
       if (isLastSender) {
         if (isNextSender) {
           // Message in the middle of a sender messages block
-          bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+          bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderMiddleUser;
-          showStatus = false;
+          showInfoRow = isNewContext;
         } else {
           // Message at the beginning of a user sender messages block
-          bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
+          bubbleMargin = EdgeInsets.only(
+            top: MESSAGE_MARGIN_VERTICAL_LARGE,
+            bottom: MESSAGE_MARGIN_VERTICAL_SMALL,
+          );
           bubbleBorder = Styles.bubbleBorderTopUser;
-          showStatus = false;
+          showInfoRow = isNewContext;
         }
       }
 
       if (!isLastSender && isNextSender) {
         // End of a sender messages block
-        bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
+        bubbleMargin = EdgeInsets.only(
+          top: MESSAGE_MARGIN_VERTICAL_SMALL,
+          bottom: MESSAGE_MARGIN_VERTICAL_LARGE,
+        );
         bubbleBorder = Styles.bubbleBorderBottomUser;
       }
       // External User Sent Styling
@@ -287,19 +300,24 @@ class MessageWidget extends StatelessWidget {
       if (isLastSender) {
         if (isNextSender) {
           // Message in the middle of a sender messages block
-          bubbleSpacing = EdgeInsets.symmetric(vertical: 2);
+          bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderMiddleSender;
           showSender = false;
+          showInfoRow = isNewContext;
         } else {
           // Message at the beginning of a sender messages block
-          bubbleSpacing = EdgeInsets.only(top: 8, bottom: 2);
+          bubbleMargin = EdgeInsets.only(top: 8, bottom: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderTopSender;
+          showInfoRow = isNewContext;
         }
       }
 
       if (!isLastSender && isNextSender) {
         // End of a sender messages block
-        bubbleSpacing = EdgeInsets.only(top: 2, bottom: 8);
+        bubbleMargin = EdgeInsets.only(
+          top: MESSAGE_MARGIN_VERTICAL_SMALL,
+          bottom: MESSAGE_MARGIN_VERTICAL_LARGE,
+        );
         bubbleBorder = Styles.bubbleBorderBottomSender;
       }
     }
@@ -336,31 +354,24 @@ class MessageWidget extends StatelessWidget {
     if (message.failed) {
       status = Strings.alertMessageSendingFailed;
       showStatus = true;
+      showInfoRow = true;
     }
 
     if (message.edited) {
       status += ' (Edited)';
+      showInfoRow = true;
     }
 
-    String body = message.body ?? '';
+    final String body = selectEventBody(message);
 
+    // Indicates special event text instead of the message body
+    if (message.body != body) {
+      fontStyle = FontStyle.italic;
+    }
     // efficent way to check if Matrix message is a reply
     if (body.length > 1 && body[0] == '>') {
       final isLight = (luminance ?? 0.0) > 0.5;
       replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
-    }
-
-    if (message.type == EventTypes.encrypted) {
-      if (message.body!.isEmpty) {
-        body = Strings.labelEncryptedMessage;
-      }
-    }
-
-    // TODO: confirm - 2021
-    // deleted messages returned remotely will have empty 'body' fields
-    if (message.body == null || message.body!.isEmpty) {
-      body = Strings.labelDeletedMessage;
-      fontStyle = FontStyle.italic;
     }
 
     return Swipeable(
@@ -407,10 +418,8 @@ class MessageWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  margin: bubbleSpacing, // spacing between different user bubbles
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                  ),
+                  margin: bubbleMargin, // spacing between different user bubbles
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Flex(
                     direction: Axis.horizontal,
                     mainAxisAlignment: alignmentMessage,
@@ -449,9 +458,11 @@ class MessageWidget extends StatelessWidget {
                           children: [
                             Container(
                               constraints: BoxConstraints(
-                                // TODO: issue shrinking the message based on width
+                                // NOTE: issue shrinking the message based on width
                                 maxWidth:
                                     !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
+                                // NOTE: prevents exposing the reply icon
+                                minWidth: 72,
                               ),
                               padding: EdgeInsets.only(
                                 // make an image span the message width
@@ -459,7 +470,11 @@ class MessageWidget extends StatelessWidget {
                                 // make an image span the message width
                                 right: removePadding ? 0 : 12,
                                 top: isMedia && !showSender ? 0 : 8,
-                                bottom: isMedia ? 12 : 8,
+                                bottom: isMedia
+                                    ? 12
+                                    : !showInfoRow
+                                        ? 0
+                                        : 8,
                               ),
                               margin: EdgeInsets.only(
                                 bottom: hasReactions ? 14 : 0,
@@ -568,134 +583,139 @@ class MessageWidget extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: removePadding ? 12 : 0,
-                                    ),
-                                    child: Flex(
-                                      /// *** Message Status Row ***
-                                      direction: Axis.horizontal,
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: alignmentMessageText,
-                                      children: [
-                                        Visibility(
-                                          visible:
-                                              !isUserSent && message.type == EventTypes.encrypted,
-                                          child: Container(
-                                            width: Dimensions.indicatorSize,
-                                            height: Dimensions.indicatorSize,
-                                            margin: EdgeInsets.only(right: 4),
-                                            child: Icon(
-                                              Icons.lock,
-                                              color: textColor,
-                                              size: Dimensions.iconSizeMini,
-                                            ),
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible: showStatus,
-                                          child: Container(
-                                            // timestamp and error message
-                                            margin: EdgeInsets.only(right: 4),
-                                            child: Text(
-                                              status,
-                                              style: TextStyle(
-                                                fontSize: 12,
+                                  Visibility(
+                                    visible: showInfoRow,
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: removePadding ? 12 : 0,
+                                      ),
+                                      child: Flex(
+                                        /// *** Message Status Row ***
+                                        direction: Axis.horizontal,
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: alignmentMessageText,
+                                        children: [
+                                          Visibility(
+                                            visible:
+                                                !isUserSent && message.type == EventTypes.encrypted,
+                                            child: Container(
+                                              width: Dimensions.indicatorSize,
+                                              height: Dimensions.indicatorSize,
+                                              margin: EdgeInsets.only(right: 4),
+                                              child: Icon(
+                                                Icons.lock,
                                                 color: textColor,
-                                                fontWeight: FontWeight.w100,
+                                                size: Dimensions.iconSizeMini,
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Visibility(
-                                          visible:
-                                              isUserSent && message.type == EventTypes.encrypted,
-                                          child: Container(
-                                            width: Dimensions.indicatorSize,
-                                            height: Dimensions.indicatorSize,
-                                            margin: EdgeInsets.only(left: 2),
-                                            child: Icon(
-                                              Icons.lock,
-                                              color: textColor,
-                                              size: Dimensions.iconSizeMini,
-                                            ),
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible: isUserSent && message.failed,
-                                          child: Container(
-                                            width: Dimensions.indicatorSize,
-                                            height: Dimensions.indicatorSize,
-                                            margin: EdgeInsets.only(left: 3),
-                                            child: Icon(
-                                              Icons.close,
-                                              color: Colors.redAccent,
-                                              size: Dimensions.indicatorSize,
-                                            ),
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible: isUserSent && !message.failed,
-                                          child: Stack(children: [
-                                            Visibility(
-                                              visible: message.pending,
-                                              child: Container(
-                                                width: Dimensions.indicatorSize,
-                                                height: Dimensions.indicatorSize,
-                                                margin: EdgeInsets.only(left: 4),
-                                                child: CircularProgressIndicator(
-                                                  strokeWidth: Dimensions.strokeWidthThin,
+                                          Visibility(
+                                            visible: showStatus,
+                                            child: Container(
+                                              // timestamp and error message
+                                              margin: EdgeInsets.only(right: 4),
+                                              child: Text(
+                                                status,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: textColor,
+                                                  fontWeight: FontWeight.w100,
                                                 ),
                                               ),
                                             ),
-                                            Visibility(
-                                              visible: !message.pending,
-                                              child: Container(
-                                                width: Dimensions.indicatorSize,
-                                                height: Dimensions.indicatorSize,
-                                                margin: EdgeInsets.only(left: 4),
-                                                decoration: ShapeDecoration(
-                                                  color: indicatorColor,
-                                                  shape: CircleBorder(
-                                                    side: BorderSide(
-                                                      color: indicatorIconColor!,
-                                                      width: isRead ? 1.5 : 1,
+                                          ),
+                                          Visibility(
+                                            visible:
+                                                isUserSent && message.type == EventTypes.encrypted,
+                                            child: Container(
+                                              width: Dimensions.indicatorSize,
+                                              height: Dimensions.indicatorSize,
+                                              margin: EdgeInsets.only(left: 2),
+                                              child: Icon(
+                                                Icons.lock,
+                                                color: textColor,
+                                                size: Dimensions.iconSizeMini,
+                                              ),
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible: isUserSent && message.failed,
+                                            child: Container(
+                                              width: Dimensions.indicatorSize,
+                                              height: Dimensions.indicatorSize,
+                                              margin: EdgeInsets.only(left: 3),
+                                              child: Icon(
+                                                Icons.close,
+                                                color: Colors.redAccent,
+                                                size: Dimensions.indicatorSize,
+                                              ),
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible: isUserSent && !message.failed,
+                                            child: Stack(
+                                              children: [
+                                                Visibility(
+                                                  visible: message.pending,
+                                                  child: Container(
+                                                    width: Dimensions.indicatorSize,
+                                                    height: Dimensions.indicatorSize,
+                                                    margin: EdgeInsets.only(left: 4),
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: Dimensions.strokeWidthThin,
                                                     ),
                                                   ),
                                                 ),
-                                                child: Icon(
-                                                  Icons.check,
-                                                  size: 10,
-                                                  color: indicatorIconColor,
-                                                ),
-                                              ),
-                                            ),
-                                            Visibility(
-                                              visible: !message.syncing,
-                                              child: Container(
-                                                width: Dimensions.indicatorSize,
-                                                height: Dimensions.indicatorSize,
-                                                margin: EdgeInsets.only(left: 11),
-                                                decoration: ShapeDecoration(
-                                                  color: indicatorColor,
-                                                  shape: CircleBorder(
-                                                    side: BorderSide(
+                                                Visibility(
+                                                  visible: !message.pending,
+                                                  child: Container(
+                                                    width: Dimensions.indicatorSize,
+                                                    height: Dimensions.indicatorSize,
+                                                    margin: EdgeInsets.only(left: 4),
+                                                    decoration: ShapeDecoration(
+                                                      color: indicatorColor,
+                                                      shape: CircleBorder(
+                                                        side: BorderSide(
+                                                          color: indicatorIconColor!,
+                                                          width: isRead ? 1.5 : 1,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.check,
+                                                      size: 10,
                                                       color: indicatorIconColor,
-                                                      width: isRead ? 1.5 : 1,
                                                     ),
                                                   ),
                                                 ),
-                                                child: Icon(
-                                                  Icons.check,
-                                                  size: 10,
-                                                  color: indicatorIconColor,
+                                                Visibility(
+                                                  visible: !message.syncing,
+                                                  child: Container(
+                                                    width: Dimensions.indicatorSize,
+                                                    height: Dimensions.indicatorSize,
+                                                    margin: EdgeInsets.only(left: 11),
+                                                    decoration: ShapeDecoration(
+                                                      color: indicatorColor,
+                                                      shape: CircleBorder(
+                                                        side: BorderSide(
+                                                          color: indicatorIconColor,
+                                                          width: isRead ? 1.5 : 1,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.check,
+                                                      size: 10,
+                                                      color: indicatorIconColor,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
+                                              ],
                                             ),
-                                          ]),
-                                        ),
-                                      ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],

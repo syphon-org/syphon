@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -13,12 +14,15 @@ import 'package:syphon/store/crypto/keys/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
+import 'package:syphon/store/settings/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/syphon.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/modals/modal-lock-overlay/show-lock-overlay.dart';
 
 class PrivacySettingsScreen extends StatelessWidget {
   const PrivacySettingsScreen({Key? key}) : super(key: key);
@@ -109,10 +113,76 @@ class PrivacySettingsScreen extends StatelessWidget {
     );
   }
 
+  onSetScreenLockPin({
+    required _Props props,
+    required BuildContext context,
+  }) {
+    if (props.screenLockEnabled) {
+      return showDialog(
+        context: context,
+        builder: (dialogContext) => DialogConfirm(
+          title: 'Remove Screen Lock',
+          content:
+              'Are you sure you want to remove the screen lock? This will also remove the pin protection of the cache',
+          loading: props.loading,
+          confirmText: 'Remove',
+          confirmStyle: TextStyle(color: Colors.red),
+          onDismiss: () => Navigator.pop(dialogContext),
+          onConfirm: () async {
+            Navigator.of(dialogContext).pop();
+
+            showLockOverlay(
+              context: context,
+              canCancel: true,
+              maxRetries: 0,
+              onMaxRetries: (stuff) {
+                Navigator.of(context).pop();
+              },
+              onLeftButtonTap: () {
+                Navigator.of(context).pop();
+                return Future.value();
+              },
+              title: Text('Enter your current screen lock pin'),
+              onVerify: (String answer) async {
+                return Future.value(true);
+              },
+              onConfirmed: (String matchedText) async {
+                await props.onRemoveScreenLock(matchedText);
+                Syphon.reloadCurrentContext(context);
+              },
+            );
+          },
+        ),
+      );
+    }
+
+    return showLockOverlay(
+      context: context,
+      canCancel: true,
+      confirmMode: true,
+      onLeftButtonTap: () {
+        Navigator.of(context).pop();
+        return Future.value();
+      },
+      title: Text('Enter your new screen lock pin'),
+      confirmTitle: Text('Enter your pin again to verify'),
+      onVerify: (String answer) async {
+        return Future.value(true);
+      },
+      onConfirmed: (String matchedText) async {
+        await props.onSetScreenLock(matchedText);
+        Syphon.reloadCurrentContext(context);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(
+          store,
+          Syphon.getAppContext(context),
+        ),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
 
@@ -263,7 +333,6 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            enabled: false,
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Screen lock',
@@ -273,8 +342,9 @@ class PrivacySettingsScreen extends StatelessWidget {
                               style: Theme.of(context).textTheme.caption,
                             ),
                             trailing: Switch(
-                              value: false,
-                              onChanged: null,
+                              value: props.screenLockEnabled,
+                              onChanged: (enabled) =>
+                                  onSetScreenLockPin(props: props, context: context),
                             ),
                           ),
                           ListTile(
@@ -378,6 +448,7 @@ class PrivacySettingsScreen extends StatelessWidget {
 class _Props extends Equatable {
   final bool loading;
   final bool? typingIndicators;
+  final bool screenLockEnabled;
 
   final String sessionId;
   final String sessionName;
@@ -390,10 +461,13 @@ class _Props extends Equatable {
   final Function onDisabled;
   final Function onDeactivateAccount;
   final Function onResetConfirmAuth;
+  final Function onSetScreenLock;
+  final Function onRemoveScreenLock;
 
   const _Props({
     required this.loading,
     required this.readReceipts,
+    required this.screenLockEnabled,
     required this.typingIndicators,
     required this.sessionId,
     required this.sessionName,
@@ -404,6 +478,8 @@ class _Props extends Equatable {
     required this.onImportDeviceKey,
     required this.onDeactivateAccount,
     required this.onResetConfirmAuth,
+    required this.onSetScreenLock,
+    required this.onRemoveScreenLock,
   });
 
   @override
@@ -414,24 +490,26 @@ class _Props extends Equatable {
         sessionId,
         sessionName,
         sessionKey,
+        screenLockEnabled
       ];
 
-  static _Props mapStateToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
         loading: store.state.authStore.loading,
+        screenLockEnabled: selectScreenLockEnabled(context),
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
         readReceipts: selectReadReceiptsString(store.state.settingsStore.readReceipts),
-        sessionId: store.state.authStore.user.deviceId ?? Values.EMPTY,
+        sessionId: store.state.authStore.user.deviceId ?? Values.empty,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),
+        onSetScreenLock: (String matchedPin) async =>
+            await store.dispatch(setScreenLock(pin: matchedPin)),
+        onRemoveScreenLock: (String matchedPin) async =>
+            await store.dispatch(removeScreenLock(pin: matchedPin)),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
-        onToggleTypingIndicators: () => store.dispatch(
-          toggleTypingIndicators(),
-        ),
+        onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
-        onImportDeviceKey: () => store.dispatch(
-          importDeviceKeysOwned(),
-        ),
+        onImportDeviceKey: () => store.dispatch(importDeviceKeysOwned()),
         onDeactivateAccount: (BuildContext context) async {
           // Attempt to deactivate account
           await store.dispatch(deactivateAccount());

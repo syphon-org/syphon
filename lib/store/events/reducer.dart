@@ -40,6 +40,71 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       return state.copyWith(reactions: reactionsUpdated);
 
+    // set the messages map to exactly what's passed in
+    // helps with message revisions after lazy loads
+    case SetMessages:
+      final _action = action as SetMessages;
+
+      final messagesAll = _action.all;
+      final existingAll = state.messages;
+
+      final combinedAll = Map<String, List<Message>>.from(existingAll);
+
+      messagesAll.forEach((roomId, messages) {
+        // convert to map to merge old and new messages based on ids
+        // ignore previous messages and only save the newest to local state if "clear"ing
+        final messagesOld = Map<String, Message>.fromIterable(
+          state.messages[roomId] ?? [],
+          key: (msg) => msg.id,
+          value: (msg) => msg,
+        );
+
+        final messagesNew = Map<String, Message>.fromIterable(
+          messages,
+          key: (msg) => msg.id,
+          value: (msg) => msg,
+        );
+
+        // prioritize new message data though over the old (invalidates using Map overwrite)
+        final combinedNew = messagesOld..addAll(messagesNew);
+
+        combinedAll[roomId] = combinedNew.values.toList();
+      });
+
+      return state.copyWith(messages: combinedAll);
+
+    // set the decrypted map to exactly what's passed in
+    // helps with message revisions after lazy loads
+    case SetMessagesDecrypted:
+      final _action = action as SetMessagesDecrypted;
+
+      final messagesAll = _action.all;
+      final existingAll = state.messagesDecrypted;
+
+      final combinedAll = Map<String, List<Message>>.from(existingAll);
+
+      messagesAll.forEach((roomId, messages) {
+        // convert to map to merge old and new messages based on ids
+        // ignore previous messages and only save the newest to local state if "clear"ing
+        final messagesOld = Map<String, Message>.fromIterable(
+          state.messages[roomId] ?? [],
+          key: (msg) => msg.id,
+          value: (msg) => msg,
+        );
+
+        final messagesNew = Map<String, Message>.fromIterable(
+          messages,
+          key: (msg) => msg.id,
+          value: (msg) => msg,
+        );
+
+        // prioritize new message data though over the old (invalidates using Map overwrite)
+        final combinedNew = messagesOld..addAll(messagesNew);
+
+        combinedAll[roomId] = combinedNew.values.toList();
+      });
+
+      return state.copyWith(messagesDecrypted: combinedAll);
     case AddMessages:
       final _action = action as AddMessages;
       if (_action.messages.isEmpty) {
@@ -48,16 +113,15 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       final roomId = _action.roomId;
 
-      final messages = Map<String, List<Message>>.from(
-        state.messages,
-      );
-
       // convert to map to merge old and new messages based on ids
-      final messagesOld = Map<String, Message>.fromIterable(
-        messages[roomId] ?? [],
-        key: (msg) => msg.id,
-        value: (msg) => msg,
-      );
+      // ignore previous messages and only save the newest to local state if "clear"ing
+      final messagesOld = _action.clear
+          ? <String, Message>{}
+          : Map<String, Message>.fromIterable(
+              state.messages[roomId] ?? [],
+              key: (msg) => msg.id,
+              value: (msg) => msg,
+            );
 
       final messagesNew = Map<String, Message>.fromIterable(
         action.messages,
@@ -67,6 +131,11 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic action])
 
       // prioritize new message data though over the old (invalidates using Map overwrite)
       final messagesAll = messagesOld..addAll(messagesNew);
+
+      // TODO: check if "messages" can be mutateable here
+      final messages = Map<String, List<Message>>.from(state.messages);
+
+      // update values in the mutateable map for only the room involved
       messages[roomId] = messagesAll.values.toList();
 
       // remove locally saved outbox messages if they've now been received from a server

@@ -5,18 +5,22 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:device_info/device_info.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/context/auth.dart';
+import 'package:syphon/context/storage.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/libs/matrix/utils.dart';
+import 'package:syphon/global/libs/storage/key-storage.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/auth/credential/model.dart';
@@ -181,7 +185,6 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
         }
 
         _sub = uriLinkStream.listen((Uri? uri) {
-          printInfo('SSO URI CAUGHT $uri');
           final token = uri!.queryParameters['loginToken'];
           store.dispatch(loginUserSSO(token: token));
         }, onError: (err) {
@@ -222,7 +225,11 @@ ThunkAction<AppState> startAuthObserver() {
 
     onAuthStateChanged(User? user) async {
       if (user != null && user.accessToken != null) {
-        await store.dispatch(fetchAuthUserProfile());
+        if (user.displayName?.isEmpty ?? true) {
+          store.dispatch(fetchAuthUserProfile());
+        }
+
+        // fetch devices to check uploaded OTKs
         await store.dispatch(fetchDevices());
 
         // init encryption for E2EE
@@ -233,7 +240,10 @@ ThunkAction<AppState> startAuthObserver() {
           await store.dispatch(initialSync());
         }
 
-        // init notifications
+        // start syncing for user
+        await store.dispatch(startSyncObserver());
+
+        // init notifications server
         globalNotificationPluginInstance = await initNotifications(
           onSelectNotification: (String? payload) {
             dismissAllNotifications(
@@ -249,12 +259,10 @@ ThunkAction<AppState> startAuthObserver() {
           },
         );
 
+        // eanble notifications
         if (store.state.settingsStore.notificationSettings.enabled) {
           store.dispatch(startNotifications());
         }
-
-        // start syncing for user
-        await store.dispatch(startSyncObserver());
       } else {
         // wipe sensitive redux state
         await store.dispatch(ResetRooms());
@@ -290,25 +298,25 @@ ThunkAction<AppState> stopAuthObserver() {
 ///
 /// Used in matrix to distinguish devices
 /// for encryption and verification
-ThunkAction<AppState> generateDeviceId({String? salt}) {
+ThunkAction<AppState> generateDeviceId({String salt = ''}) {
   return (Store<AppState> store) async {
     final defaultId = Random.secure().nextInt(1 << 31).toString();
 
     try {
-      final deviceInfoPlugin = DeviceInfoPlugin();
+      final deviceId = Random.secure().nextInt(1 << 31).toString();
 
-      var deviceId;
+      // TODO: enable device persistant sessions to better
+      // TODO: keep track of device identity anonymously
+      // final deviceInfoPlugin = DeviceInfoPlugin();
 
       // Find a unique value for the type of device
-      if (Platform.isAndroid) {
-        final info = await deviceInfoPlugin.androidInfo;
-        deviceId = info.androidId;
-      } else if (Platform.isIOS) {
-        final info = await deviceInfoPlugin.iosInfo;
-        deviceId = info.identifierForVendor;
-      } else {
-        deviceId = Random.secure().nextInt(1 << 31).toString();
-      }
+      // if (Platform.isAndroid) {
+      //   final info = await deviceInfoPlugin.androidInfo;
+      //   deviceId = info.androidId;
+      // } else if (Platform.isIOS) {
+      //   final info = await deviceInfoPlugin.iosInfo;
+      //   deviceId = info.identifierForVendor;
+      // }
 
       // hash it
       final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
@@ -1280,6 +1288,85 @@ ThunkAction<AppState> setPassword({
     store.dispatch(SetPasswordValid(
       valid: (currentPassword == currentConfirm || ignoreConfirm) && password.length > 8,
     ));
+  };
+}
+
+ThunkAction<AppState> removeScreenLock({required String pin}) {
+  return (Store<AppState> store) async {
+    try {
+      final currentContext = await loadContextCurrent();
+      final storageKeyId = '${currentContext.id}-${Storage.keyLocation}';
+      final pinHash = await generatePinHash(passcode: pin);
+
+      if (pinHash != currentContext.pinHash) {
+        throw Exception('Pin entered was not correct');
+      }
+
+      final unlockedKey = await unlockSecretKey(currentContext, pin);
+
+      await overrideKey(storageKeyId, value: unlockedKey);
+
+      await saveContext(AppContext(
+        id: currentContext.id,
+        pinHash: '',
+        secretKeyEncrypted: '',
+      ));
+
+      await store.dispatch(addConfirmation(
+        message: 'Screen lock was removed successfully for this account.',
+      ));
+
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        origin: 'removeScreenLock',
+        message: DEBUG_MODE
+            ? error.toString()
+            : 'Failure to remove screen lock. Try again or contact support.',
+        error: error,
+      ));
+      return false;
+    }
+  };
+}
+
+ThunkAction<AppState> setScreenLock({required String pin}) {
+  return (Store<AppState> store) async {
+    try {
+      final currentContext = await loadContextCurrent();
+      final storageKeyId = '${currentContext.id}-${Storage.keyLocation}';
+      final storageKey = await loadKey(storageKeyId);
+
+      final contextConverted = AppContext(
+        id: currentContext.id,
+        pinHash: await generatePinHash(passcode: pin),
+        secretKeyEncrypted: await convertSecretKey(currentContext, pin, storageKey),
+      );
+
+      final unlockedKey = await unlockSecretKey(contextConverted, pin);
+
+      if (unlockedKey != storageKey) {
+        throw Exception('Keys did not match after decryption');
+      }
+
+      await saveContext(contextConverted);
+
+      // Clears the key but doesn't invalidate the key ID
+      await clearKey(storageKeyId);
+
+      await store.dispatch(addConfirmation(
+        message: 'Screen lock pin was set successfully for this account.',
+      ));
+
+      return true;
+    } catch (error) {
+      store.dispatch(addAlert(
+        origin: 'setScreenLock',
+        message: error.toString(),
+        error: error,
+      ));
+      return false;
+    }
   };
 }
 

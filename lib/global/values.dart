@@ -13,7 +13,7 @@ class Values {
   static const appDisplayName = 'Syphon';
 
   static const EMPTY_CHAT = 'Empty Chat';
-  static const EMPTY = '';
+  static const empty = '';
   static const UNKNOWN = 'Unknown';
   static const DEFAULT_PROTOCOL = 'https://';
 
@@ -97,7 +97,8 @@ class SupportedLanguages {
   ];
 
   static final list = all.map((locale) => Locale(locale)).toList();
-  static final displayNames = all.map((locale) => Locale(locale).toDisplayName().capitalize()).toList();
+  static final displayNames =
+      all.map((locale) => Locale(locale).toDisplayName().capitalize()).toList();
 }
 
 // https://stackoverflow.com/questions/53999971/how-to-get-languages-full-name-from-languagecode-e-g-from-en-to-english
@@ -166,7 +167,10 @@ extension DisplayName on Locale {
     'hu': {'name': 'Hungarian', 'nativeName': 'Magyar'},
     'ia': {'name': 'Interlingua', 'nativeName': 'Interlingua'},
     'id': {'name': 'Indonesian', 'nativeName': 'Bahasa Indonesia'},
-    'ie': {'name': 'Interlingue', 'nativeName': 'Originally called Occidental; then Interlingue after WWII'},
+    'ie': {
+      'name': 'Interlingue',
+      'nativeName': 'Originally called Occidental; then Interlingue after WWII'
+    },
     'ga': {'name': 'Irish', 'nativeName': 'Gaeilge'},
     'ig': {'name': 'Igbo', 'nativeName': 'Asụsụ Igbo'},
     'ik': {'name': 'Inupiaq', 'nativeName': 'Iñupiaq, Iñupiatun'},

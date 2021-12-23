@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/colours.dart';
-
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class TypingIndicator extends StatefulWidget {
@@ -32,18 +30,15 @@ class TypingIndicator extends StatefulWidget {
 ///
 /// Mostly an example for myself on how to override styling or other options on
 /// existing components app wide
-class TypingIndicatorState extends State<TypingIndicator>
-    with TickerProviderStateMixin {
+class TypingIndicatorState extends State<TypingIndicator> with TickerProviderStateMixin {
   double fullSize = 1;
 
   @protected
-  wrapAnimation({Widget? animatedWidget, int? milliseconds}) =>
-      TweenAnimationBuilder(
+  wrapAnimation({Widget? animatedWidget, int? milliseconds}) => TweenAnimationBuilder(
         tween: Tween<double>(begin: 0, end: widget.typing! ? 1 : 0),
         duration: Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        builder: (BuildContext context, double size, Widget? child) =>
-            GestureDetector(
+        builder: (BuildContext context, double size, Widget? child) => GestureDetector(
           onTap: () => setState(() {
             fullSize = fullSize == 1 ? 0.0 : 1;
           }),
@@ -122,8 +117,7 @@ class TypingIndicatorState extends State<TypingIndicator>
                             ? null
                             : Avatar(
                                 uri: userTyping.avatarUri,
-                                alt:
-                                    userTyping.displayName ?? userTyping.userId,
+                                alt: userTyping.displayName ?? userTyping.userId,
                                 size: Dimensions.avatarSizeMessage,
                                 background: Colours.hashedColorUser(userTyping),
                               ),

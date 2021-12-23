@@ -12,6 +12,7 @@ import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/lists/list-item-user.dart';
@@ -75,7 +76,7 @@ class SearchUserState extends State<SearchUserScreen> {
   onCreateChat({required BuildContext context, _Props? props, User? user}) async {
     return showDialog(
       context: context,
-      builder: (BuildContext context) => DialogStartChat(
+      builder: (BuildContext dialogContext) => DialogStartChat(
         user: user,
         title: 'Chat with ${formatUsername(user!)}',
         content: Strings.confirmStartChat,
@@ -85,12 +86,11 @@ class SearchUserState extends State<SearchUserScreen> {
           });
           final newRoomId = await props!.onCreateChatDirect(user: user);
 
-          Navigator.pop(context);
+          Navigator.pop(dialogContext);
 
           if (newRoomId != null) {
-            Navigator.popAndPushNamed(
-              context,
-              '/home/chat',
+            Navigator.of(context).popAndPushNamed(
+              Routes.chat,
               arguments: ChatScreenArguments(
                 roomId: newRoomId,
                 title: user.displayName,
@@ -111,7 +111,7 @@ class SearchUserState extends State<SearchUserScreen> {
   onAttemptChat({required User user, required BuildContext context, _Props? props}) async {
     return showDialog(
       context: context,
-      builder: (BuildContext context) => DialogStartChat(
+      builder: (BuildContext dialogContext) => DialogStartChat(
         user: user,
         title: 'Try chatting with ${formatUsername(user)}',
         content: Strings.confirmAttemptChat,
@@ -121,12 +121,11 @@ class SearchUserState extends State<SearchUserScreen> {
           });
           final newRoomId = await props!.onCreateChatDirect(user: user);
 
-          Navigator.pop(context);
+          Navigator.pop(dialogContext);
 
           if (newRoomId != null) {
-            Navigator.popAndPushNamed(
-              context,
-              '/home/chat',
+            Navigator.of(context).popAndPushNamed(
+              Routes.chat,
               arguments: ChatScreenArguments(
                 roomId: newRoomId,
                 title: user.displayName,

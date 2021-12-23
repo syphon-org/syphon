@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/context/types.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -10,8 +10,10 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
+import 'package:syphon/views/syphon.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/modals/modal-context-switcher.dart';
 
@@ -45,7 +47,8 @@ class SettingsScreen extends StatelessWidget {
     var content = 'Are you sure you want to log out?';
 
     if (props.accountsAvailable > 1) {
-      content += '\n\nSince you have other accounts, logging out will switch you to another account session.';
+      content +=
+          '\n\nSince you have other accounts, logging out will switch you to another account session.';
     }
 
     return showDialog(
@@ -73,7 +76,10 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
       distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+      converter: (Store<AppState> store) => _Props.mapStateToProps(
+            store,
+            Syphon.getAppContext(context),
+          ),
       builder: (context, props) => Scaffold(
             appBar: AppBar(
               leading: IconButton(
@@ -172,7 +178,7 @@ class SettingsScreen extends StatelessWidget {
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                             subtitle: Text(
-                              'Screen Lock Off, Registration Lock Off',
+                              'Screen Lock ${props.screenLockEnabled ?? false ? "On" : "Off"}, Registration Lock Off',
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ),
@@ -296,6 +302,7 @@ class _Props extends Equatable {
   final bool loading;
   final bool authLoading;
   final bool accountLoading;
+  final bool? screenLockEnabled;
   final int accountsAvailable;
   final bool? notificationsEnabled;
   final String? fontName;
@@ -313,6 +320,7 @@ class _Props extends Equatable {
     required this.accountLoading,
     required this.accountsAvailable,
     required this.notificationsEnabled,
+    required this.screenLockEnabled,
     required this.onAddInfo,
     required this.onDisabled,
     required this.onLogoutUser,
@@ -327,10 +335,11 @@ class _Props extends Equatable {
         accountLoading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
         accountLoading: !store.state.cryptoStore.oneTimeKeysStable ||
             !store.state.syncStore.synced ||
             store.state.syncStore.lastSince == null,
+        screenLockEnabled: selectScreenLockEnabled(context),
         accountsAvailable: selectAvailableAccounts(store.state),
         fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
         themeTypeName: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),

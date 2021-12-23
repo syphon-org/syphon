@@ -7,7 +7,7 @@ import 'package:syphon/cache/middleware.dart';
 import 'package:syphon/cache/serializer.dart';
 import 'package:syphon/cache/storage.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/storage/middleware/load-storage-middleware.dart';
 import 'package:syphon/storage/middleware/save-storage-middleware.dart';
@@ -143,7 +143,6 @@ AppState appReducer(AppState state, action) => AppState(
 ///
 Future<Store<AppState>> initStore(
   Database? cache,
-  Database? storageOld,
   StorageDatabase? storage, {
   AppState? existingState,
   bool existingUser = false,
@@ -151,9 +150,9 @@ Future<Store<AppState>> initStore(
   AppState? initialState;
   Map<String, dynamic> preloaded = {};
 
-  if (storageOld != null) {
+  if (storage != null) {
     // synchronously load mandatory cold storage to rehydrate cache
-    preloaded = await loadStorage(storageOld, storage!);
+    preloaded = await loadStorage(storage);
   }
 
   // Configure redux persist instance

@@ -106,7 +106,7 @@ ThunkAction<AppState> backfillDecryptMessages(
       )) as List<Message>;
 
       return await store.dispatch(addMessagesDecrypted(
-        room: room,
+        roomId: room.id,
         messages: decrypted,
       ));
     } catch (error) {

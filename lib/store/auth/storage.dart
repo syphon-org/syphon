@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
-import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/auth/state.dart';
 
 ///
@@ -47,29 +46,6 @@ Future<int> saveAuth(
 Future<AuthStore?> loadAuth({required StorageDatabase storage}) async {
   try {
     return storage.selectAuthStore();
-  } catch (error) {
-    printError(error.toString(), title: 'loadAuth');
-    return null;
-  }
-}
-
-/// Load Messages (Cold Storage)
-///
-/// In storage, messages are indexed by eventId
-/// In redux, they're indexed by RoomID and placed in a list
-///
-///
-Future<AuthStore?> loadAuthOld({required Database storage}) async {
-  try {
-    final store = StoreRef<String, String>(StorageKeys.AUTH);
-
-    final auth = await store.record(StorageKeys.AUTH).get(storage);
-
-    if (auth == null) {
-      return null;
-    }
-
-    return AuthStore.fromJson(json.decode(auth));
   } catch (error) {
     printError(error.toString(), title: 'loadAuth');
     return null;

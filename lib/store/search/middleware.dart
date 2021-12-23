@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:redux/redux.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/events/messages/storage.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/search/actions.dart';
@@ -22,7 +22,8 @@ searchMiddleware(StorageDatabase? coldStorage) {
     next(action);
 
     if (coldStorage == null) {
-      printWarning('storage is null, skipping saving cold storage data!!!', title: 'searchMiddleware');
+      printWarning('storage is null, skipping saving cold storage data!!!',
+          title: 'searchMiddleware');
       return;
     }
 

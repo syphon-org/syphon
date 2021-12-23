@@ -72,6 +72,8 @@ class Strings {
   static final labelKnownUsers = tr('label-users-known');
   static final labelGroupsEmpty = tr('label-groups-empty');
   static final labelUsersResults = tr('label-users-results');
+  static final labelCallInvite = tr('label-call-invite');
+  static final labelCallHangup = tr('label-call-hangup');
   static final labelMessagesEmpty = tr('label-messages-empty');
   static final labelSendEncrypted = tr('label-send-encrypted');
   static final labelDownloadImage = tr('label-download-image');

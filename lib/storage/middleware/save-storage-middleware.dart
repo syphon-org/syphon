@@ -1,6 +1,6 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/auth/storage.dart';

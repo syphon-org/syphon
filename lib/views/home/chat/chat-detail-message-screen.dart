@@ -30,7 +30,7 @@ class MessageDetailsScreen extends StatelessWidget {
   @protected
   Widget buildUserReadList(_Props props, double width) {
     final Receipt readReceipts = props.readReceipts[props.message!.id!] ?? Receipt();
-    final Map<String, int> userReads = readReceipts.userReads;
+    final userReads = Map<String, int>.from(readReceipts.userReads);
 
     final List<User?> users = userReads.keys.map((userId) => props.users[userId]).toList();
 
