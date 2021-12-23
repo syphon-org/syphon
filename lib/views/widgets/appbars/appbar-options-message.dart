@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/colours.dart';
@@ -24,6 +23,7 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
     this.brightness = Brightness.dark,
     this.elevation,
     this.focusNode,
+    this.isUserSent = false,
     this.onCopy,
     this.onDelete,
     this.onEdit,
@@ -37,6 +37,8 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
 
   final Room? room;
   final User user;
+
+  final bool isUserSent;
 
   final Message? message;
   final double? elevation;
@@ -65,6 +67,8 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
   void initState() {
     super.initState();
   }
+
+  bool get isMessageDeleted => widget.message?.body?.isNotEmpty ?? true;
 
   @override
   Widget build(BuildContext context) => AppBar(
@@ -111,33 +115,39 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               }
             },
           ),
-          IconButton(
-            icon: Icon(Icons.delete),
-            iconSize: 28.0,
-            tooltip: 'Delete Message',
-            color: Colors.white,
-            onPressed: () {
-              if (widget.onDelete != null) {
-                widget.onDelete!();
-              }
-              if (widget.onDismiss != null) {
-                widget.onDismiss!();
-              }
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.edit_rounded),
-            iconSize: 28.0,
-            tooltip: 'Edit Message',
-            color: Colors.white,
-            onPressed: () {
-              if (widget.onEdit != null) {
-                widget.onEdit!();
-              }
-            },
+          Visibility(
+            visible: isMessageDeleted && widget.isUserSent,
+            child: IconButton(
+              icon: Icon(Icons.delete),
+              iconSize: 28.0,
+              tooltip: 'Delete Message',
+              color: Colors.white,
+              onPressed: () {
+                if (widget.onDelete != null) {
+                  widget.onDelete!();
+                }
+                if (widget.onDismiss != null) {
+                  widget.onDismiss!();
+                }
+              },
+            ),
           ),
           Visibility(
-            visible: isTextMessage(message: widget.message!),
+            visible: isMessageDeleted && widget.isUserSent,
+            child: IconButton(
+              icon: Icon(Icons.edit_rounded),
+              iconSize: 28.0,
+              tooltip: 'Edit Message',
+              color: Colors.white,
+              onPressed: () {
+                if (widget.onEdit != null) {
+                  widget.onEdit!();
+                }
+              },
+            ),
+          ),
+          Visibility(
+            visible: isTextMessage(message: widget.message ?? Message()),
             child: IconButton(
               icon: Icon(Icons.content_copy),
               iconSize: 22.0,

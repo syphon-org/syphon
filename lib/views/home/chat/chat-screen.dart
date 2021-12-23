@@ -593,10 +593,13 @@ class ChatScreenState extends State<ChatScreen> {
           );
 
           if (selectedMessage != null) {
+            final isUserSent = props.currentUser.userId == (selectedMessage?.senderKey ?? '');
+
             appBar = AppBarMessageOptions(
               user: props.currentUser,
               room: props.room,
               message: selectedMessage,
+              isUserSent: isUserSent,
               onEdit: () => onToggleEdit(),
               onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
