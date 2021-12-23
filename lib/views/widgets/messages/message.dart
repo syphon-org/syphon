@@ -215,9 +215,11 @@ class MessageWidget extends StatelessWidget {
         onConfirm: () async {
           Navigator.of(dialogContext).pop();
 
-          if (await canLaunch(url)) {
+          // TODO: confirm it can launch a URL with new Android 11 privacy settings
+          // if (await canLaunch(url)) {
+          try {
             return launch(url, forceSafariVC: false);
-          } else {
+          } catch (error) {
             throw 'Could not launch $url';
           }
         },
