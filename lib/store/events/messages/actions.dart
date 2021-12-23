@@ -90,13 +90,7 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
       }));
     }
 
-    // TODO: remove after loadAsync works
-    // printJson({'loadAync': 'COMPUTE MUTATION STARTED ${room.id}'});
-
     final messagesLists = await Future.wait(mutations);
-
-    // TODO: remove after loadAsync works
-    // printJson({'loadAync': 'COMPUTE MUTATION COMPLETED ${room.id}'});
 
     await store.dispatch(addMessages(
       roomId: room.id,
@@ -109,9 +103,6 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
         messages: messagesLists[1],
       ));
     }
-
-    // TODO: remove after loadAsync works
-    // printJson({'loadAync': 'MUTATE ROOM COMPLETED ${room.id}'});
   };
 }
 
