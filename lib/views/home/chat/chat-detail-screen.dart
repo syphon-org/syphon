@@ -117,7 +117,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
         title: Strings.buttonBlockUser,
-        content: Strings.confirmBlockUser(name: user?.displayName),
+        content: Strings.confirmBlockUser(user?.displayName),
         onConfirm: () async {
           await props.onBlockUser(user);
           Navigator.popUntil(context, (route) => route.isFirst);

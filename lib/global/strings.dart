@@ -100,7 +100,7 @@ class Strings {
   static final listItemSettingsProxyHost = tr('list-item-settings-proxy-host');
   static final listItemSettingsProxyPort = tr('list-item-settings-proxy-port');
 
-  static String listItemUserDetailsStartChat({String? name}) => tr('list-item-user-details-start-chat', args: ['$name']);
+  static String listItemUserDetailsStartChat(String? name) => tr('list-item-user-details-start-chat', args: ['$name']);
   static final listItemUserDetailsRoomInvite = tr('list-item-user-details-room-invite');
   static final listItemUserDetailsSendMessage = tr('list-item-user-details-send-message');
   static final listItemUserDetailsViewProfile = tr('list-item-user-details-view-profile');
@@ -112,7 +112,7 @@ class Strings {
   static final listItemImageOptionsPickFromGallery = tr('list-item-image-options-pick-from-gallery');
   static final listItemImageOptionsRemovePhoto = tr('list-item-image-options-remove-photo');
 
-  static String listItemContextSwitcherUserDisplayName({String? username}) => tr('list-item-context-switcher-user-display-name', args: ['$username']);
+  static String listItemContextSwitcherUserDisplayName(String? username) => tr('list-item-context-switcher-user-display-name', args: ['$username']);
   static final listItemContextSwitcherAccounts = tr('list-item-context-switcher-accounts');
   static final listItemContextSwitcherAddAccount = tr('list-item-context-switcher-add-account');
 
@@ -178,7 +178,7 @@ class Strings {
   static final alertHiddenReadReceipts = tr('alert-hidden-read-receipts');
   static final alertOffline = tr('alert-offline');
   static final alertUnknown = tr('alert-unknown');
-  static String alertCouldNotLaunchURL({String? url}) => tr('alert-could-not-launch-url', args: ['$url']);
+  static String alertCouldNotLaunchURL(String? url) => tr('alert-could-not-launch-url', args: ['$url']);
   static final alertNoImagesFound = tr('alert-no-images-found');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
@@ -260,7 +260,7 @@ class Strings {
     return s;
   }
 
-  static String confirmBlockUser({String? name}) => tr('confirm-block-user', args: ['$name']);
+  static String confirmBlockUser(String? name) => tr('confirm-block-user', args: ['$name']);
 
   // Accessibility
   static final semanticsImageIntro = tr('semnatics-image-intro');
