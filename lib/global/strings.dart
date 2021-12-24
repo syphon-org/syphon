@@ -176,6 +176,7 @@ class Strings {
   static final alertHiddenReadReceipts = tr('alert-hidden-read-receipts');
   static final alertOffline = tr('alert-offline');
   static final alertUnknown = tr('alert-unknown');
+  static String alertCouldNotLaunchURL({String? url}) => tr('alert-could-not-launch-url', args: ['$url']);
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
   static const alertBackgroundService = 'Background connection enabled';
@@ -202,6 +203,8 @@ class Strings {
 
   static final contentProxyHost = tr('content-proxy-host');
   static final contentProxyPort = tr('content-proxy-port');
+
+  static final messageEditedAppend = tr('message-edited-append');
 
   // Confirmations (use confirm*)
 
