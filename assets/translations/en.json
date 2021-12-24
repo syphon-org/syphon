@@ -23,6 +23,8 @@
     "title-proxy-use-proxy": "Use a Proxy",
     "title-proxy-host": "Modify Proxy Host",
     "title-proxy-port": "Modify Proxy Port",
+    "title-lock-overlay": "Please enter passcode.",
+    "title-confirm-lock-overlay": "Please confirm passcode.",
     "title-dialog-delete-keys": "Confirm Deleting Keys",
     "title-dialog-confirm-linkout": "Confirm Opening Link",
     "title-dialog-encryption": "Encrypt Chat?",

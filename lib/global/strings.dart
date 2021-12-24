@@ -38,6 +38,8 @@ class Strings {
   static final titleUseProxyServer = tr('title-proxy-use-proxy');
   static final titleProxyHost = tr('title-proxy-host');
   static final titleProxyPort = tr('title-proxy-port');
+  static final titleLockOverlay = tr('title-lock-overlay');
+  static final titleConfirmLockOverlay = tr('title-confirm-lock-overlay');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
