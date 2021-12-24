@@ -34,6 +34,7 @@
     "title-dialog-email-requirement": "Email requirement",
     "title-dialog-email-requirement-verified": "Email verification",
     "title-dialog-color-picker": "Color Picker",
+    "title-dialog-confirm-password": "Confirm Password (Default)",
     "title-user-verification": "User verification",
     "title-confirm-password": "Confirm Password",
     "title-confirm-email": "Confirm Email",
@@ -159,6 +160,7 @@
     "content-sync-interval": "Syncing works by submitting a long poll request to a matrix server. The sync interval is not how frequently it will sync, but how frequently it will attempt a new long poll request.",
     "content-proxy-host": "The host for your proxy",
     "content-proxy-port": "The port your proxy is listening on",
+    "content-dialog-confirm-password": "Please confirm your password (Default)",
     "message-edited-append": " (Edited)",
     "confirm-linkout": "Are you sure you want to open the following link?\n\n{}",
     "confirm-delete-keys": "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.",
@@ -200,5 +202,6 @@
     "semantics-image-password-reset": "Person resting arm ontop a letter with a checkbox inside",
     "semantics-create-public-room": "Create A Public Room",
     "label-proxy-host": "Hostname",
-    "label-proxy-port": "Port"
+    "label-proxy-port": "Port",
+    "label-password": "password"
 }
