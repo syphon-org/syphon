@@ -608,8 +608,10 @@ class ChatScreenState extends State<ChatScreen> {
             final isUserSent = props.currentUser.userId == (selectedMessage?.sender ?? '');
             final backgroundColorDark = HSLColor.fromColor(backgroundColor);
 
+            final backgroundLightness =
+                backgroundColorDark.lightness > 0.2 ? backgroundColorDark.lightness : 0.2;
             backgroundColor =
-                backgroundColorDark.withLightness(backgroundColorDark.lightness - 0.2).toColor();
+                backgroundColorDark.withLightness(backgroundLightness - 0.2).toColor();
 
             appBar = AppBarMessageOptions(
               user: props.currentUser,
