@@ -1,6 +1,6 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.3+2004
+version: 0.2.4+2005
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -25,7 +25,7 @@ scripts:
   list-android: emulator -list-avds
   boot-android: emulator -avd #<device_id>
   inspect-android: adb shell && run-as org.tether.tether # cache inspection
-  log-all: adb logcat ActivityManager:I flutter:I *:S
+  log-android: adb logcat ActivityManager:I flutter:I *:S
 
   # configuration and troubleshooting
   init-repo: git submodule update --init --recursive
@@ -61,6 +61,7 @@ dependencies:
   olm: ^2.0.0
   crypto: ^3.0.1
   encrypt: ^5.0.0
+  cryptography: ^2.0.5
   canonical_json: 1.1.0
 
   ### cache/storage
@@ -81,7 +82,7 @@ dependencies:
   http_parser: ^4.0.0
   easy_localization: ^3.0.0
   flutter_dotenv: ^4.0.0-nullsafety.0
-  android_alarm_manager: ^2.0.0
+  android_alarm_manager_plus: ^2.0.3
   uni_links: ^0.5.0
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
@@ -104,6 +105,7 @@ dependencies:
   emoji_picker_flutter: ^1.0.3
   flutter_speed_dial: ^4.2.0
   fab_circular_menu: ^1.0.2
+  flutter_screen_lock: ^4.0.0
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ### data
@@ -122,11 +124,6 @@ dev_dependencies:
 
 # TODO: remove when similar functionality is merged
 dependency_overrides:
-  # sqlparser: # TODO: for moor_generator Uint8List error output
-  #   git:
-  #     url: https://github.com/simolus3/moor.git
-  #     ref: cc7d98d110204acb72d415312a78ed7821382d69
-  #     path: sqlparser
   swipeable: # TODO: null saftey version
     git:
       url: https://github.com/ereio/swipeable.git

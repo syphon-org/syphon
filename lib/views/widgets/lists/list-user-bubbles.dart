@@ -118,7 +118,7 @@ class ListUserBubbles extends StatelessWidget {
                             Radius.circular(Dimensions.avatarSize),
                           ),
                           border: Border.all(
-                            width: 1,
+                            width: 4,
                             color: Theme.of(context).textTheme.caption!.color!,
                           ),
                         ),

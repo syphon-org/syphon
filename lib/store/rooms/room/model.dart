@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -222,8 +222,8 @@ class Room implements drift.Insertable<Room> {
         .fromStateEvents(
           invite: invite,
           limited: limited,
-          currentUser: currentUser,
           events: events.state,
+          currentUser: currentUser,
         )
         .fromMessageEvents(
           lastBatch: lastBatch,
@@ -484,7 +484,7 @@ class Room implements drift.Insertable<Room> {
         lastUpdate: lastUpdate,
         // oldest hash in the timeline
         lastBatch: lastBatch ?? this.lastBatch ?? prevBatch,
-        // TODO: fetchMessages maks this temporarily misassigned
+        // TODO: fetchMessages makes this temporarily misassigned
         // most recent prev_batch from the last /sync
         prevBatch: prevBatch ?? this.prevBatch,
         // next hash in the timeline

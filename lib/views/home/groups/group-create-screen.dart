@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -101,7 +100,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
-          final double imageSize = Dimensions.avatarSizeDetails;
+          const double imageSize = Dimensions.avatarSizeDetails;
 
           final backgroundColor = selectAvatarBackground(props.themeType);
 
@@ -294,8 +293,8 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                   label: 'Name*',
                                                   textInputAction: TextInputAction.next,
                                                   controller: nameController,
-                                                  onSubmitted: (text) =>
-                                                      FocusScope.of(context).requestFocus(topicFocus),
+                                                  onSubmitted: (text) => FocusScope.of(context)
+                                                      .requestFocus(topicFocus),
                                                   onChanged: (text) => setState(() {
                                                     name = text;
                                                   }),

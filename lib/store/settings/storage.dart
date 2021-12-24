@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
-import 'package:sembast/sembast.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/settings/state.dart';
 
 ///
@@ -49,27 +48,6 @@ Future<SettingsStore?> loadSettings({required StorageDatabase storage}) async {
     return storage.selectSettingStore();
   } catch (error) {
     printError(error.toString(), title: 'loadAuth');
-    return null;
-  }
-}
-
-/// Load Settings (Cold Storage)
-///
-/// In storage, the Settings store is saved in it's entirety
-/// in a separate thread/isolate
-Future<SettingsStore?> loadSettingsOld({required Database storage}) async {
-  try {
-    final store = StoreRef<String, String>(StorageKeys.SETTINGS);
-
-    final settings = await store.record(StorageKeys.SETTINGS).get(storage);
-
-    if (settings == null) {
-      return null;
-    }
-
-    return SettingsStore.fromJson(json.decode(settings));
-  } catch (error) {
-    printError(error.toString(), title: 'loadSettings');
     return null;
   }
 }

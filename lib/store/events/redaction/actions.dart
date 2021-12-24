@@ -85,7 +85,7 @@ ThunkAction<AppState> redactEvents({required Room room, List<Redaction> redactio
 
       // add messages back to cache having been redacted
       await store.dispatch(addReactions(reactions: reactions));
-      store.dispatch(addMessages(room: room, messages: messages));
+      store.dispatch(addMessages(roomId: room.id, messages: messages));
 
       // save redactions to cold storage
       store.dispatch(SaveRedactions(redactions: redactions));

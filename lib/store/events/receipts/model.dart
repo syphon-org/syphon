@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 
 part 'model.g.dart';
 

@@ -25,7 +25,7 @@ a privacy centric matrix client - now in open alpha*
 <p align='center'>
     <img src="https://img.shields.io/github/license/syphon-org/syphon?color=teal"/>
     <img src="https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases&color=teal"/>
-    <img src="https://img.shields.io/github/commits-since/syphon-org/syphon/0.1.13?color=teal"/> 
+    <img src="https://img.shields.io/github/commits-since/syphon-org/syphon/0.2.3?color=teal"/> 
     <a href="https://pub.dev/packages/lint">
         <img src="https://img.shields.io/badge/style-lint-4BC0F5.svg?color=teal"/> 
     </a>
@@ -80,7 +80,7 @@ Syphon will always be a not for profit, community driven application.
 - [ ] cli client using ncurses and the same redux store contained here (common)
  
 ## 🌙 Nightlies
-- Nightly dev builds - per pushed commit builds - can be found under our [Gitea Releases](https://git.syphon.org/syphon-org/syphon/releases)
+- Nightly dev builds - and feature branch builds - can be found under our [Gitea Releases](https://git.syphon.org/syphon-org/syphon/releases)
 - Unofficial "community" Windows x64 releases can be found under [@EdGeraghty's fork](https://github.com/EdGeraghty/syphon/releases)
 
 ## 📝 Contributing
@@ -142,10 +142,10 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 ## 📐 Architecture
 
 ### store
-- views (flutter)
-- state (redux)
-- cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast))
-- storage (sembast + sqflite + [codec cipher](https://github.com/tekartik/sembast.dart/blob/master/sembast/doc/codec.md))
+- views (flutter + MVVM)
+- state management (redux)
+- cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast) + [codec cipher](https://github.com/tekartik/sembast.dart/blob/master/sembast/doc/codec.md))
+- storage ([drift](https://pub.dev/packages/drift) + sqflite + sqlcipher)
 
 ### assets
 - Looking for branding or design files? They can all be found [here](https://github.com/syphon-org/syphon/tree/main/assets), in the top level assets folder.

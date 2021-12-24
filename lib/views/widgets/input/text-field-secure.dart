@@ -1,10 +1,11 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:syphon/global/dimensions.dart';
+
+const DEFAULT_BORDER_WIDTH = 1.2;
 
 ///
 /// Secured Text Field Input
@@ -24,25 +25,31 @@ class TextFieldSecure extends StatelessWidget {
     this.maxLines = 1,
     this.valid = true,
     this.disabled = false,
+    this.readOnly = false,
     this.obscureText = false,
     this.disableSpacing = false,
     this.autocorrect = false,
     this.enabledSuggestions = false,
+    this.enableInteractiveSelection = true,
     this.textAlign = TextAlign.left,
     this.formatters = const [],
     this.onChanged,
     this.onSubmitted,
     this.onEditingComplete,
+    this.onTap,
     this.textInputAction,
     this.autofillHints,
+    this.mouseCursor = MaterialStateMouseCursor.textable,
   }) : super(key: key);
 
   final bool valid;
   final bool disabled;
+  final bool readOnly;
   final bool obscureText;
   final bool disableSpacing;
   final bool autocorrect;
   final bool enabledSuggestions;
+  final bool enableInteractiveSelection;
 
   final int maxLines;
   final Widget? suffix; // include actions
@@ -58,7 +65,49 @@ class TextFieldSecure extends StatelessWidget {
   final Function? onChanged;
   final Function? onSubmitted;
   final Function? onEditingComplete;
-  final Iterable<String>? autofillHints;
+  final Function? onTap;
+  final Iterable<String>? autofillHints; 
+  final MaterialStateMouseCursor? mouseCursor;
+
+  buildBorderColorFocused(BuildContext context) {
+    if (disabled) {
+      return BorderSide(
+        color: Theme.of(context).disabledColor,
+      );
+    }
+
+    if (!valid) {
+      return BorderSide(
+        color: Theme.of(context).errorColor,
+        width: DEFAULT_BORDER_WIDTH,
+      );
+    }
+
+    return BorderSide(
+      color: Theme.of(context).primaryColor,
+      width: DEFAULT_BORDER_WIDTH,
+    );
+  }
+
+  buildBorderColor(BuildContext context) {
+    if (disabled) {
+      return BorderSide(
+        color: Theme.of(context).disabledColor,
+      );
+    }
+
+    if (!valid) {
+      return BorderSide(
+        color: Theme.of(context).errorColor.withOpacity(0.75),
+        width: DEFAULT_BORDER_WIDTH,
+      );
+    }
+
+    return BorderSide(
+      color: Theme.of(context).dividerColor,
+      width: DEFAULT_BORDER_WIDTH,
+    );
+  } 
 
   @override
   Widget build(BuildContext context) => Container(
@@ -69,6 +118,7 @@ class TextFieldSecure extends StatelessWidget {
         ),
         child: TextField(
           enabled: !disabled,
+          readOnly: readOnly,
           maxLines: maxLines,
           focusNode: focusNode,
           controller: controller,
@@ -76,10 +126,12 @@ class TextFieldSecure extends StatelessWidget {
           onSubmitted: onSubmitted as void Function(String)?,
           textInputAction: textInputAction,
           onEditingComplete: onEditingComplete as void Function()?,
+          onTap: onTap as void Function()?,
           autocorrect: autocorrect,
           enableSuggestions: enabledSuggestions,
           autofillHints: disabled ? null : autofillHints,
           selectionHeightStyle: BoxHeightStyle.max,
+          enableInteractiveSelection: enableInteractiveSelection,
           inputFormatters: !disableSpacing
               ? [
                   FilteringTextInputFormatter.deny(RegExp(r'\t')),
@@ -97,17 +149,20 @@ class TextFieldSecure extends StatelessWidget {
           obscureText: obscureText,
           cursorColor: Theme.of(context).primaryColor,
           keyboardAppearance: Theme.of(context).brightness,
+          mouseCursor: mouseCursor,
           decoration: InputDecoration(
             labelText: label,
             hintText: hint,
             suffixIcon: suffix,
             contentPadding: Dimensions.inputPadding,
-            border: OutlineInputBorder(
-              borderSide: !valid
-                  ? BorderSide()
-                  : BorderSide(
-                      color: Theme.of(context).primaryColor,
-                    ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: buildBorderColorFocused(context),
+              borderRadius: BorderRadius.circular(
+                Dimensions.inputBorderRadius,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: buildBorderColor(context),
               borderRadius: BorderRadius.circular(
                 Dimensions.inputBorderRadius,
               ),
