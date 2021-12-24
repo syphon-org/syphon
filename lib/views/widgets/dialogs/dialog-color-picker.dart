@@ -8,7 +8,7 @@ import 'package:syphon/global/strings.dart';
 class DialogColorPicker extends StatefulWidget {
   const DialogColorPicker({
     Key? key,
-    this.title = 'Color Picker',
+    this.title = Strings.titleDialogColorPicker,
     required this.currentColor,
     this.advanced = false,
     this.resetColor,

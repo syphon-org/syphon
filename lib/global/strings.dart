@@ -52,6 +52,7 @@ class Strings {
   static final titleRenameDevice = tr('title-device-rename');
   static final titleConfirmDeleteKeys = tr('title-dialog-delete-keys');
   static final titleConfirmEmail = tr('title-confirm-email');
+  static final titleDialogColorPicker = tr('title-dialog-color-picker');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
