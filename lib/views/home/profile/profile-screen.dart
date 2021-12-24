@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
@@ -221,12 +223,26 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   maxHeight: Dimensions.inputHeight,
                                   maxWidth: Dimensions.inputWidthMax,
                                 ),
-                                child: TextFieldSecure(
-                                  disabled: true,
-                                  onChanged: null,
-                                  label: 'User ID',
-                                  controller: userIdController,
-                                ),
+                                child: Row(
+                                  children: [
+                                    TextFieldSecure(
+                                      disabled: false,
+                                      readOnly: true,
+                                      onChanged: null,
+                                      enableInteractiveSelection: false,
+                                      label: 'User ID',
+                                      controller: userIdController,
+                                      mouseCursor: MaterialStateMouseCursor.clickable,
+                                      onTap: () async {
+                                        await props.copyToClipboard();
+                                      },
+                                      suffix: IconButton(
+                                        onPressed: () => props.copyToClipboard(),
+                                        icon: Icon(Icons.copy),
+                                      ),
+                                    ),
+                                  ]
+                                )
                               ),
                             ],
                           ),
@@ -298,12 +314,14 @@ class _Props extends Equatable {
   final bool loading;
   final ThemeType themeType;
   final Function onSaveProfile;
+  final Function copyToClipboard;
 
   const _Props({
     required this.user,
     required this.loading,
     required this.themeType,
     required this.onSaveProfile,
+    required this.copyToClipboard,
   });
 
   @override
@@ -341,5 +359,9 @@ class _Props extends Equatable {
           await store.dispatch(fetchAuthUserProfile());
           return true;
         },
+        copyToClipboard: () async {
+          await Clipboard.setData(ClipboardData(text: store.state.authStore.user.userId));
+          store.dispatch(addInfo(message: 'Copied User ID to clipboard')); //TODO i18n
+        }
       );
 }
