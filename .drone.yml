@@ -1,5 +1,25 @@
 kind: pipeline
 type: docker
+name: test release
+trigger:
+  event:
+    - push
+steps:
+  - name: release test
+    image: golang:1.17
+    environment:
+      GITEA_SERVER_TOKEN:
+        from_secret: GITEA_API_TOKEN
+    commands:
+      # Modify the existing release and add the android apk
+      - go get code.gitea.io/tea
+      - go install code.gitea.io/tea
+      - tea --version
+      - tea login add -u https://git.syphon.org
+      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.testing.linux.x64.tar.gz
+---
+kind: pipeline
+type: docker
 name: android nightly
 trigger:
   branch:
@@ -46,7 +66,6 @@ steps:
       # Modify the existing release and add the android apk
       - go get code.gitea.io/tea
       - go install code.gitea.io/tea
-      - tea --version
       - tea login add -u https://git.syphon.org -n syphon
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-android" --asset ./syphon.nightly.android.apk
 
@@ -92,13 +111,14 @@ steps:
       - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
 
   - name: release android
-    image: golang:1.17
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
       # Modify the existing release and add the android apk
-      - go install code.gitea.io/tea@latest
+      - go get code.gitea.io/tea
+      - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org -n syphon
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
 ---
@@ -133,14 +153,14 @@ steps:
       - tar -cvzf syphon.nightly.linux.x64.tar.gz -C build/linux/x64/release/bundle .
 
   - name: release linux
-    image: golang:1.17
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
-      # Create a build timestamp for the release title
-      - echo $(date -Iseconds) > BUILD_START_TIME
-      - go install code.gitea.io/tea@latest
+      # Modify the existing release and add the android apk
+      - go get code.gitea.io/tea
+      - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-linux" --asset ./syphon.nightly.linux.x64.tar.gz
 ---
@@ -175,14 +195,14 @@ steps:
       - tar -cvzf syphon.nightly.linux.x64.tar.gz -C build/linux/x64/release/bundle .
 
   - name: release linux
-    image: golang:1.17
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
-      # Create a build timestamp for the release title
-      - echo $(date -Iseconds) > BUILD_START_TIME
-      - go install code.gitea.io/tea@latest
+      # Modify the existing release and add the android apk
+      - go get code.gitea.io/tea
+      - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-linux" --asset ./syphon.nightly.linux.x64.tar.gz
 ---
@@ -218,13 +238,13 @@ steps:
       - tar -cvzf syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz -C build/linux/x64/release/bundle .
 
   - name: release linux
-    image: golang:1.17
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
-      # Create a build timestamp for the release title
-      - echo $(date -Iseconds) > BUILD_START_TIME
-      - go install code.gitea.io/tea@latest
+      # Modify the existing release and add the android apk
+      - go get code.gitea.io/tea
+      - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz
