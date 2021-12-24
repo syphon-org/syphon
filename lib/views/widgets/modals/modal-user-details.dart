@@ -58,7 +58,7 @@ class ModalUserDetails extends StatelessWidget {
       barrierDismissible: false,
       builder: (BuildContext dialogContext) => DialogStartChat(
         user: user,
-        title: 'Chat with ${user.displayName}',
+        title: Strings.listItemUserDetailsStartChat(user.displayName),
         content: Strings.confirmStartChat,
         onStartChat: () async {
           final newRoomId = await props.onCreateChatDirect(user: user);
@@ -176,7 +176,7 @@ class ModalUserDetails extends StatelessWidget {
                         props: props,
                       ),
                       title: Text(
-                        'Send A Message',
+                        Strings.listItemUserDetailsSendMessage,
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       leading: Container(
@@ -187,7 +187,7 @@ class ModalUserDetails extends StatelessWidget {
                           fit: BoxFit.contain,
                           width: Dimensions.iconSize - 2,
                           height: Dimensions.iconSize - 2,
-                          semanticsLabel: 'Create A Public Room',
+                          semanticsLabel: Strings.semanticsCreatePublicRoom,
                           color: Theme.of(context).iconTheme.color,
                         ),
                       ),
@@ -198,7 +198,7 @@ class ModalUserDetails extends StatelessWidget {
                         props: props,
                       ),
                       title: Text(
-                        'Invite To Room',
+                        Strings.listItemUserDetailsRoomInvite,
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       leading: Container(
@@ -215,7 +215,7 @@ class ModalUserDetails extends StatelessWidget {
                         props: props,
                       ),
                       title: Text(
-                        'View Profile',
+                        Strings.listItemUserDetailsViewProfile,
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       leading: Container(
@@ -232,7 +232,9 @@ class ModalUserDetails extends StatelessWidget {
                         Navigator.pop(context);
                       },
                       title: Text(
-                        props.blocked ? 'Unblock User' : 'Block User',
+                        props.blocked
+                          ? Strings.listItemUserDetailsUnblockUser
+                          : Strings.listItemUserDetailsBlockUser,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),

@@ -96,6 +96,13 @@ class Strings {
   static final listItemSettingsProxyHost = tr('list-item-settings-proxy-host');
   static final listItemSettingsProxyPort = tr('list-item-settings-proxy-port');
 
+  static String listItemUserDetailsStartChat({String? name}) => tr('list-item-user-details-start-chat', args: ['$name']);
+  static final listItemUserDetailsRoomInvite = tr('list-item-user-details-room-invite');
+  static final listItemUserDetailsSendMessage = tr('list-item-user-details-send-message');
+  static final listItemUserDetailsViewProfile = tr('list-item-user-details-view-profile');
+  static final listItemUserDetailsUnblockUser = tr('list-item-user-details-unblock-user');
+  static final listItemUserDetailsBlockUser = tr('list-item-user-details-block-user');
+
   // Buttons
   static final buttonLogin = tr('button-login');
   static final buttonNext = tr('button-next');
@@ -243,6 +250,7 @@ class Strings {
   static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');
   static final semanticsImageSignupUsername = tr('semantics-image-signup-username');
   static final semanticsImagePasswordReset = tr('semantics-image-password-reset');
+  static final semanticsCreatePublicRoom = tr('semantics-create-public-room');
 
   // Labels
   static final labelProxyHost = tr('label-proxy-host');

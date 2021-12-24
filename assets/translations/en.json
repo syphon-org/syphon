@@ -107,6 +107,12 @@
     "list-item-settings-proxy": "Proxy Settings",
     "list-item-settings-proxy-host": "Host",
     "list-item-settings-proxy-port": "Port",
+    "list-item-user-details-invite-to-room": "Invite to Room",
+    "list-item-user-details-confirm-start-chat": "Chat with {}",
+    "list-item-user-details-send-message": "Send A Message",
+    "list-item-user-details-view-profile": "View Profile",
+    "list-item-user-details-unblock-user": "Unblock User",
+    "list-item-user-details-block-user": "Block User",
     "alert-restart-app-effect": "You'll need to close and restart the app for this to take effect",
     "alert-invite-user-unknown": "This user doesn't appear to exist within matrix, but you can attempt to invite them anyway.\n\nMake sure you have the correct name before trying.",
     "alert-feature-in-progress": "🛠 This feature is coming soon",
@@ -178,6 +184,7 @@
     "semantics-image-terms-of-service": "Hand holding a phone with a terms of service checkbox checked",
     "semantics-image-signup-username": "Person resting elbow on I.D. card",
     "semantics-image-password-reset": "Person resting arm ontop a letter with a checkbox inside",
+    "semantics-create-public-room": "Create A Public Room",
     "label-proxy-host": "Hostname",
     "label-proxy-port": "Port"
 }
