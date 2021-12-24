@@ -103,6 +103,11 @@ class Strings {
   static final listItemUserDetailsUnblockUser = tr('list-item-user-details-unblock-user');
   static final listItemUserDetailsBlockUser = tr('list-item-user-details-block-user');
 
+  static final listItemImageOptionsPhotoSelectMethod = tr('list-item-image-options-photo-select-method');
+  static final listItemImageOptionsTakePhoto = tr('list-item-image-options-take-photo');
+  static final listItemImageOptionsPickFromGallery = tr('list-item-image-options-pick-from-gallery');
+  static final listItemImageOptionsREmovePhoto = tr('list-item-image-options-remove-photo');
+
   // Buttons
   static final buttonLogin = tr('button-login');
   static final buttonNext = tr('button-next');
@@ -127,6 +132,7 @@ class Strings {
   static final buttonSelectAll = tr('button-select-all');
   static final buttonRoomDetails = tr('button-chat-details');
   static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
+  static final buttonDismiss = tr('button-dismiss');
 
   // Buttons (Text)
   static final buttonTextLogin = tr('button-text-login'); // 'Login';

@@ -364,7 +364,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       ),
       duration: alert.duration,
       action: SnackBarAction(
-        label: alert.action ?? 'Dismiss',
+        label: alert.action ?? Strings.buttonDismiss,
         textColor: Colors.white,
         onPressed: () {
           if (alert.onAction != null) {
