@@ -10,6 +10,7 @@
 
 🐛 Bug Fixes
 - major performance improvements and fixes
+- fixed improper cache checks when loading older messages
 - fixed editing encrypted messages 
 - fixed deleting encrypted messages
 - fixed read receipts locally if toggled on
