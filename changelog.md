@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.2.4](https://github.com/syphon-org/syphon/releases/tag/0.2.4) - 2021-12-23
+
+### Added 
+- Screen Lock
+- Pin Protected Encrypted Storage
+- Improved Edit Message UI
+- Improved Chat UI spacing
+
+### Fixed
+- major performance improvements and optimizations
+- fixed editing encrypted messages 
+- fixed deleting encrypted messages
+- fixed read receipts locally if toggled on
+- fixed defaulting to device language
+- fixed editing messages higher in the chat
+- fixed opening links in Android 11
+- fixed showing more icon in user previews
+- fixed input text border regression
+
+### Changed
+
 ## [0.1.6](https://github.com/syphon-org/syphon/releases/tag/0.1.5) - 20XX-XX-XX
 
 ### Added 
