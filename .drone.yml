@@ -45,7 +45,7 @@ steps:
     commands:
       # Modify the existing release and add the android apk
       - go get code.gitea.io/tea
-      - go install code.gitea.io/tea@latest
+      - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org -n syphon
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-android" --asset ./syphon.nightly.android.apk
 
