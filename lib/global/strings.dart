@@ -155,6 +155,8 @@ class Strings {
   static final alertCheckHomeserver = tr('alert-homeserver-invalid'); // 'Message Failed To Send';
   static final alertFeatureInProgress = tr('alert-feature-in-progress');
   static final alertHiddenReadReceipts = tr('alert-hidden-read-receipts');
+  static final alertOffline = tr('alert-offline');
+  static final alertUnknown = tr('alert-unknown');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
   static const alertBackgroundService = 'Background connection enabled';

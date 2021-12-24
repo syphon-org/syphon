@@ -13,6 +13,7 @@ import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/database.dart';
@@ -335,13 +336,13 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     switch (alert.type) {
       case 'error':
         if (!ConnectionService.isConnected() && !alert.offline) {
-          alertOverride = 'Looks like you may be offline. Check your connection and try again.';
+          alertOverride = Strings.alertOffline;
         }
         color = Colors.red;
         break;
       case 'warning':
         if (!ConnectionService.isConnected() && !alert.offline) {
-          alertOverride = 'Looks like you may be offline. Check your connection and try again.';
+          alertOverride = Strings.alertOffline;
         }
         color = Colors.red;
         break;
@@ -353,7 +354,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         color = Colors.grey;
     }
 
-    final alertMessage = alertOverride ?? alert.message ?? alert.error ?? 'Unknown Error Occurred';
+    final alertMessage = alertOverride ?? alert.message ?? alert.error ?? Strings.alertUnknown;
 
     globalScaffold.currentState?.showSnackBar(SnackBar(
       backgroundColor: color,
