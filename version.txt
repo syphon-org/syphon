@@ -1,2 +1,2 @@
 versionName=0.2.4
-versionCode=2005
+versionCode=2006
