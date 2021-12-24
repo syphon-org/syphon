@@ -1,0 +1,24 @@
+0.2.4
+
+🔮 New Features:
+- Screen Lock
+- Pin Protected Encrypted Storage
+
+✨ Improvements
+- Improved Edit Message UI
+- Improved Chat UI spacing
+
+🐛 Bug Fixes
+- major performance improvements and fixes
+- fixed improper cache checks when loading older messages
+- fixed editing encrypted messages 
+- fixed deleting encrypted messages
+- fixed read receipts locally if toggled on
+- fixed defaulting to device language
+- fixed editing messages higher in the chat
+- fixed opening links in Android 11
+- fixed showing more icon in user previews
+- fixed input text border regression
+
+📐 Refactoring
+- Lots!
