@@ -110,6 +110,10 @@ class Strings {
   static final listItemImageOptionsPickFromGallery = tr('list-item-image-options-pick-from-gallery');
   static final listItemImageOptionsRemovePhoto = tr('list-item-image-options-remove-photo');
 
+  static String listItemContextSwitcherUserDisplayName({String? username}) => tr('list-item-context-switcher-user-display-name', args: ['$username']);
+  static final listItemContextSwitcherAccounts = tr('list-item-context-switcher-accounts');
+  static final listItemContextSwitcherAddAccount = tr('list-item-context-switcher-add-account');
+
   // Buttons
   static final buttonLogin = tr('button-login');
   static final buttonNext = tr('button-next');
