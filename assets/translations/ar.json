@@ -144,7 +144,7 @@
     "button-archive-chat": "أرشفة الدردشة",
     "button-text-create-group": "مجموعة جديدة",
     "button-select-all": "حدد الكل",
-    "button-room-details": "تفاصيل الغرفة",
+    "button-chat-details": "تفاصيل الغرفة",
     "button-text-settings": "الإعدادات",
     "button-text-support": "التعليمات",
     "content-captcha-warning": "تتطلب بعض خوادم Matrix تأكيدا من captcha تقدمه Google من خلال reCAPTCHA. \n\nإذا كنت تفضل عدم إكمال هذا captcha، قد تحتاج إلى العودة إلى تحديد الخادم واختيار خادم مختلف لإنشاء حساب.",

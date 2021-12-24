@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -154,6 +153,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
         onConfirm: () async {
           await props.onLeaveChat();
           Navigator.popUntil(context, (route) => route.isFirst);
+          Navigator.pop(dialogContext);
         },
       ),
     );
@@ -306,6 +306,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               child: ListUserBubbles(
                                 users: props.users,
                                 roomId: props.room.id,
+                                forceOption: props.users.length < props.room.totalJoinedUsers,
                               ),
                             )
                           ],

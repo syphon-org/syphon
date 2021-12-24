@@ -1,5 +1,5 @@
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/schema.dart';
 

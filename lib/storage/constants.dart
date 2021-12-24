@@ -17,9 +17,6 @@ class StorageKeys {
   static const String RECEIPTS = 'receipts';
   static const String REACTIONS = 'reactions';
   static const String REDACTIONS = 'redactions';
-
-  // internal
-  static const String CHECK = 'check';
 }
 
 enum StorageKey {
@@ -38,4 +35,4 @@ enum StorageKey {
   redactions
 }
 
-const int LOAD_LIMIT = 25;
+const int DEFAULT_LOAD_LIMIT = 25;

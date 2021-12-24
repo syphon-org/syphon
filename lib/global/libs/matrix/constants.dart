@@ -23,6 +23,10 @@ class EventTypes {
   static const redaction = 'm.room.redaction';
   static const reaction = 'm.reaction';
 
+  static const callInvite = 'm.call.invite';
+  static const callCandidates = 'm.call.candidates';
+  static const callHangup = 'm.call.hangup';
+
   static const guestAccess = 'm.room.guest_access';
   static const joinRules = 'm.room.join_rules';
   static const historyVisibility = 'm.room.history_visibility';

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -14,6 +13,7 @@ import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/formatters.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/encryption.dart';
@@ -28,9 +28,31 @@ import 'package:syphon/store/user/model.dart';
 /// mutations by matrix after the message has been sent
 /// such as reactions, redactions, and edits
 ///
-ThunkAction<AppState> mutateMessages({List<Message>? messages, List<Message>? existing}) {
+Future<List<Message>> reviseMessages({
+  List<Message>? messages,
+  List<Message>? existing,
+  Map<String, List<Reaction>>? reactions,
+}) async {
+  return compute(reviseMessagesThreaded, {
+    'reactions': reactions,
+    'messages': (messages ?? []) + (existing ?? []),
+  });
+}
+
+///
+/// Mutate Messages
+///
+/// Add/mutate to accomodate all the required, necessary
+/// mutations by matrix after the message has been sent
+/// such as reactions, redactions, and edits
+///
+ThunkAction<AppState> mutateMessages({
+  List<Message>? messages,
+  List<Message>? existing,
+  Map<String, List<Reaction>>? reactionsMap,
+}) {
   return (Store<AppState> store) async {
-    final reactions = store.state.eventStore.reactions;
+    final reactions = reactionsMap ?? store.state.eventStore.reactions;
 
     final revisedMessages = await compute(reviseMessagesThreaded, {
       'reactions': reactions,
@@ -38,27 +60,6 @@ ThunkAction<AppState> mutateMessages({List<Message>? messages, List<Message>? ex
     });
 
     return revisedMessages;
-  };
-}
-
-///
-/// Mutate Messages All
-///
-/// Add/mutate to accomodate all messages avaiable with
-/// the required, necessary mutations by matrix after the
-/// message has been sent (such as reactions, redactions, and edits)
-///
-ThunkAction<AppState> mutateMessagesAll() {
-  return (Store<AppState> store) async {
-    final rooms = store.state.roomStore.roomList;
-
-    await Future.wait(rooms.map((room) async {
-      try {
-        await store.dispatch(mutateMessagesRoom(room: room));
-      } catch (error) {
-        printError('[mutateMessagesAll] error ${room.id} ${error.toString()}');
-      }
-    }));
   };
 }
 
@@ -92,16 +93,68 @@ ThunkAction<AppState> mutateMessagesRoom({required Room room}) {
     final messagesLists = await Future.wait(mutations);
 
     await store.dispatch(addMessages(
-      room: Room(id: room.id),
+      roomId: room.id,
       messages: messagesLists[0],
     ));
 
     if (room.encryptionEnabled) {
       await store.dispatch(addMessagesDecrypted(
-        room: Room(id: room.id),
+        roomId: room.id,
         messages: messagesLists[1],
       ));
     }
+  };
+}
+
+///
+/// Mutate Messages All
+///
+/// Add/mutate to accomodate all messages avaiable with
+/// the required, necessary mutations by matrix after the
+/// message has been sent (such as reactions, redactions, and edits)
+///
+ThunkAction<AppState> mutateMessagesAll() {
+  return (Store<AppState> store) async {
+    final rooms = store.state.roomStore.roomList;
+
+    final messages = store.state.eventStore.messages;
+    final decrypted = store.state.eventStore.messagesDecrypted;
+    final reactions = store.state.eventStore.reactions;
+
+    final messagesUpdated = <String, List<Message>>{};
+    final decryptedUpdated = <String, List<Message>>{};
+
+    await Future.forEach(rooms, (Room room) async {
+      try {
+        final messagesRoom = messages[room.id];
+        final messagesDecryptedRoom = decrypted[room.id];
+
+        final messagesRoomUpdated = reviseMessages(
+          messages: messagesRoom,
+          reactions: reactions,
+        );
+
+        final decryptedRoomUpdated = !room.encryptionEnabled
+            ? Future.value(<Message>[])
+            : reviseMessages(
+                messages: messagesDecryptedRoom,
+                reactions: reactions,
+              );
+
+        final allUpdated = await Future.wait([
+          messagesRoomUpdated,
+          decryptedRoomUpdated,
+        ]);
+
+        messagesUpdated.addAll({room.id: allUpdated[0]});
+        decryptedUpdated.addAll({room.id: allUpdated[1]});
+      } catch (error) {
+        printError('[mutateMessagesAll] error ${room.id} ${error.toString()}');
+      }
+    });
+
+    store.dispatch(SetMessages(all: messagesUpdated));
+    store.dispatch(SetMessagesDecrypted(all: decryptedUpdated));
   };
 }
 
@@ -172,20 +225,18 @@ ThunkAction<AppState> sendMessage({
         throw data['error'];
       }
 
-      if (edit) {
-        return true;
-      }
-
       // Update sent message with event id but needs
       // to be syncing to remove from outbox
-      store.dispatch(SaveOutboxMessage(
-        tempId: tempId,
-        pendingMessage: pending.copyWith(
-          id: data['event_id'],
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          syncing: true,
-        ),
-      ));
+      if (!edit) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending.copyWith(
+            id: data['event_id'],
+            timestamp: DateTime.now().millisecondsSinceEpoch,
+            syncing: true,
+          ),
+        ));
+      }
 
       return true;
     } catch (error) {
@@ -211,8 +262,10 @@ ThunkAction<AppState> sendMessage({
 ThunkAction<AppState> sendMessageEncrypted({
   required String roomId,
   required Message message, // temp - contains all unencrypted info being sent
+  Message? related,
   File? file,
   EncryptInfo? info,
+  bool edit = false,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -228,31 +281,45 @@ ThunkAction<AppState> sendMessageEncrypted({
       // Save unsent message to outbox
       final tempId = Random.secure().nextInt(1 << 32).toString();
       final reply = room.reply;
+      final hasReply = reply != null && reply.body != null;
+      final hasReplacement = related != null && related.id != null;
 
       // pending outbox message
       Message pending = await formatMessageContent(
         tempId: tempId,
         userId: userId,
         message: message,
+        related: related,
         room: room,
         file: file,
         info: info,
+        edit: edit,
       );
 
+      // spec requires some data is unencrypted
       final unencryptedData = {};
 
-      if (reply != null && reply.body != null) {
+      if (hasReply) {
         unencryptedData['m.relates_to'] = {
-          'm.in_reply_to': {'event_id': reply.id}
+          'm.in_reply_to': {'event_id': reply!.id}
         };
 
         pending = formatMessageReply(room, pending, reply);
       }
 
-      store.dispatch(SaveOutboxMessage(
-        tempId: tempId,
-        pendingMessage: pending,
-      ));
+      if (hasReplacement) {
+        unencryptedData['m.relates_to'] = {
+          'event_id': related!.id,
+          'rel_type': RelationTypes.replace,
+        };
+      }
+
+      if (!edit) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending,
+        ));
+      }
 
       // Encrypt the message event
       final encryptedEvent = await store.dispatch(
@@ -290,14 +357,16 @@ ThunkAction<AppState> sendMessageEncrypted({
         throw data['error'];
       }
 
-      store.dispatch(SaveOutboxMessage(
-        tempId: tempId,
-        pendingMessage: pending.copyWith(
-          id: data['event_id'],
-          timestamp: DateTime.now().millisecondsSinceEpoch,
-          syncing: true,
-        ),
-      ));
+      if (!edit) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending.copyWith(
+            id: data['event_id'],
+            timestamp: DateTime.now().millisecondsSinceEpoch,
+            syncing: true,
+          ),
+        ));
+      }
 
       return true;
     } catch (error) {

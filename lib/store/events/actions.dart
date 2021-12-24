@@ -13,6 +13,7 @@ import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/sync/actions.dart';
 
 class ResetEvents {}
 
@@ -22,15 +23,33 @@ class SetEvents {
   SetEvents({this.roomId, this.events});
 }
 
+class SetMessages {
+  final Map<String, List<Message>> all;
+
+  SetMessages({
+    required this.all,
+  });
+}
+
+class SetMessagesDecrypted {
+  final Map<String, List<Message>> all;
+
+  SetMessagesDecrypted({
+    required this.all,
+  });
+}
+
 class AddMessagesDecrypted {
   final String roomId;
   final List<Message> messages;
   final List<Message> outbox;
+  final bool clear;
 
   AddMessagesDecrypted({
     required this.roomId,
     this.messages = const [],
     this.outbox = const [],
+    this.clear = false,
   });
 }
 
@@ -78,16 +97,20 @@ class DeleteMessage {
 }
 
 ThunkAction<AppState> addMessages({
-  required Room room,
+  required String roomId,
   List<Message> messages = const [],
   List<Message> outbox = const [],
+  bool clear = false,
 }) =>
     (Store<AppState> store) {
       if (messages.isEmpty && outbox.isEmpty) return;
 
-      return store.dispatch(
-        AddMessages(roomId: room.id, messages: messages, outbox: outbox),
-      );
+      return store.dispatch(AddMessages(
+        roomId: roomId,
+        messages: messages,
+        outbox: outbox,
+        clear: clear,
+      ));
     };
 
 ///
@@ -96,15 +119,21 @@ ThunkAction<AppState> addMessages({
 /// Saves in memory only version of the decrypted message
 ///
 ThunkAction<AppState> addMessagesDecrypted({
-  required Room room,
+  required String roomId,
   required List<Message> messages,
   List<Message> outbox = const [],
+  bool clear = false,
 }) =>
     (Store<AppState> store) {
       if (messages.isEmpty && outbox.isEmpty) return;
 
       return store.dispatch(
-        AddMessagesDecrypted(roomId: room.id, messages: messages, outbox: outbox),
+        AddMessagesDecrypted(
+          roomId: roomId,
+          messages: messages,
+          outbox: outbox,
+          clear: clear,
+        ),
       );
     };
 
@@ -116,15 +145,11 @@ ThunkAction<AppState> addMessagesDecrypted({
 ///
 /// Make sure these have been exhausted before calling fetchMessageEvents
 ///
-/// TODO: will need to handle loading all encrypted messages under new
-/// sessions in order to decrypt correctly, at least up until the previous
-/// session was created
-///
 ThunkAction<AppState> loadMessagesCached({
   Room? room,
   String? batch,
   int timestamp = 0, // offset
-  int limit = LOAD_LIMIT,
+  int limit = DEFAULT_LOAD_LIMIT,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -133,7 +158,7 @@ ThunkAction<AppState> loadMessagesCached({
       final messagesStored = await loadMessages(
         storage: Storage.database!,
         roomId: room.id,
-        limit: !room.encryptionEnabled ? limit : 0,
+        limit: limit,
         timestamp: timestamp,
         batch: batch,
       );
@@ -152,30 +177,34 @@ ThunkAction<AppState> loadMessagesCached({
   };
 }
 
+///
 /// Fetch Message Events
 ///
 /// https://matrix.org/docs/spec/client_server/latest#syncing
 /// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-rooms-roomid-messages
 ///
-/// Pulls next message events remote from homeserver
+/// Pulls next message events remote from homeserver or storage
+///
 ThunkAction<AppState> fetchMessageEvents({
   Room? room,
   String? to,
   String? from,
   int timestamp = 0,
-  int limit = LOAD_LIMIT,
+  int loadLimit = DEFAULT_LOAD_LIMIT,
+  bool? override,
 }) {
   return (Store<AppState> store) async {
     try {
       final cached = await store.dispatch(
-        loadMessagesCached(room: room, batch: from, limit: limit, timestamp: timestamp),
+        loadMessagesCached(room: room, batch: from, limit: loadLimit, timestamp: timestamp),
       ) as List<Message>;
 
-      final oldest = cached.isEmpty;
-
-      if (!oldest) {
+      // known cached messages for this batch will be loaded
+      if (cached.isNotEmpty) {
         return;
       }
+
+      final oldest = cached.isEmpty;
 
       // mark syncing (to show loading indicators) since it needs to pull remotely
       store.dispatch(UpdateRoom(id: room!.id, syncing: true));
@@ -185,7 +214,7 @@ ThunkAction<AppState> fetchMessageEvents({
         'homeserver': store.state.authStore.user.homeserver,
         'accessToken': store.state.authStore.user.accessToken,
         'roomId': room.id,
-        'limit': limit,
+        'limit': loadLimit,
         'from': from ?? room.prevBatch,
         'to': to,
       });
@@ -210,6 +239,7 @@ ThunkAction<AppState> fetchMessageEvents({
             'last_batch': oldest ? end ?? from : null,
             'prev_batch': end,
             'limited': end == start || end == null ? false : null,
+            'override': override,
           }
         },
       }));
@@ -336,7 +366,11 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
       // deleted messages returned remotely will have empty 'body' fields
       final messageDeleted = message.copyWith(body: '');
 
-      return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
+      if (room.encryptionEnabled) {
+        return store.dispatch(AddMessagesDecrypted(roomId: room.id, messages: [messageDeleted]));
+      } else {
+        return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
+      }
     } catch (error) {
       printError('[deleteMessage] $error');
     }

@@ -1,6 +1,5 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -8,6 +7,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
+import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
@@ -28,6 +28,8 @@ class MessageList extends StatefulWidget {
   final bool editing;
   final bool showAvatars;
   final Message? selectedMessage;
+  final TextEditingController editorController;
+
   final ScrollController scrollController;
 
   final Function? onSendEdit;
@@ -39,6 +41,7 @@ class MessageList extends StatefulWidget {
     Key? key,
     required this.roomId,
     required this.scrollController,
+    required this.editorController,
     this.showAvatars = true,
     this.editing = false,
     this.selectedMessage,
@@ -73,7 +76,27 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
     });
   }
 
-  @protected
+  onSelectReply(Message? message) {
+    final store = StoreProvider.of<AppState>(context);
+    final roomId = widget.roomId;
+
+    try {
+      store.dispatch(selectReply(roomId: roomId, message: message));
+    } catch (error) {
+      printError(error.toString());
+    }
+  }
+
+  onToggleReaction({Message? message, String? emoji}) {
+    final store = StoreProvider.of<AppState>(context);
+    final roomId = widget.roomId;
+    final room = selectRoom(id: roomId, state: store.state);
+
+    store.dispatch(
+      toggleReaction(room: room, message: message, emoji: emoji),
+    );
+  }
+
   onInputReaction({Message? message, _Props? props}) async {
     final height = MediaQuery.of(context).size.height;
     await showModalBottomSheet(
@@ -107,7 +130,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
               ),
             ),
             onEmojiSelected: (category, emoji) {
-              props!.onToggleReaction(
+              onToggleReaction(
                 emoji: emoji.emoji,
                 message: message,
               );
@@ -124,12 +147,13 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
         builder: (context, props) {
+          final lockScrolling = widget.selectedMessage != null && !widget.editing;
           return GestureDetector(
             onTap: () => widget.onToggleSelectedMessage!(null),
             child: ListView(
               reverse: true,
               padding: EdgeInsets.only(bottom: 16),
-              physics: widget.selectedMessage != null ? const NeverScrollableScrollPhysics() : null,
+              physics: lockScrolling ? const NeverScrollableScrollPhysics() : null,
               controller: widget.scrollController,
               children: [
                 TypingIndicator(
@@ -144,7 +168,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                   shrinkWrap: true,
                   // TODO: add padding based on widget height to allow
                   // TODO: user to always pull down to load regardless of list size
-                  padding: EdgeInsets.only(bottom: 0),
+                  padding: EdgeInsets.only(bottom: 0, top: props.messages.length < 10 ? 200 : 0),
                   addRepaintBoundaries: true,
                   addAutomaticKeepAlives: true,
                   itemCount: props.messages.length,
@@ -155,6 +179,10 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                     final lastMessage = index != 0 ? props.messages[index - 1] : null;
                     final nextMessage =
                         index + 1 < props.messages.length ? props.messages[index + 1] : null;
+
+                    // was sent at least 2 minutes after the previous message
+                    final isNewContext =
+                        ((lastMessage?.timestamp ?? 0) - message.timestamp) > 120000;
 
                     final isLastSender =
                         lastMessage != null && lastMessage.sender == message.sender;
@@ -174,10 +202,12 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                     return MessageWidget(
                       key: Key(message.id ?? ''),
                       message: message,
+                      editorController: widget.editorController,
                       isEditing: widget.editing,
                       isUserSent: isUserSent,
                       isLastSender: isLastSender,
                       isNextSender: isNextSender,
+                      isNewContext: isNewContext,
                       messageOnly: !isUserSent && !widget.showAvatars,
                       lastRead: props.room.lastRead,
                       selectedMessageId: selectedMessageId,
@@ -188,7 +218,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                       luminance: luminance,
                       timeFormat: props.timeFormat,
                       onSendEdit: widget.onSendEdit,
-                      onSwipe: props.onSelectReply,
+                      onSwipe: onSelectReply,
                       onPressAvatar: () => widget.onViewUserDetails!(
                         message: message,
                         user: user,
@@ -199,7 +229,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                         message: message,
                         props: props,
                       ),
-                      onToggleReaction: (emoji) => props.onToggleReaction(
+                      onToggleReaction: (emoji) => onToggleReaction(
                         emoji: emoji,
                         message: message,
                       ),
@@ -223,9 +253,6 @@ class _Props extends Equatable {
   final List<Message> messagesRaw;
   final Color? chatColorPrimary;
 
-  final Function onToggleReaction;
-  final Function onSelectReply;
-
   const _Props({
     required this.room,
     required this.themeType,
@@ -235,8 +262,6 @@ class _Props extends Equatable {
     required this.currentUser,
     required this.timeFormat,
     required this.chatColorPrimary,
-    required this.onToggleReaction,
-    required this.onSelectReply,
   });
 
   @override
@@ -264,19 +289,5 @@ class _Props extends Equatable {
             store.state,
           ),
         ),
-        onSelectReply: (Message? message) {
-          try {
-            store.dispatch(selectReply(roomId: roomId, message: message));
-          } catch (error) {
-            printError(error.toString());
-          }
-        },
-        onToggleReaction: ({Message? message, String? emoji}) {
-          final room = selectRoom(id: roomId, state: store.state);
-
-          store.dispatch(
-            toggleReaction(room: room, message: message, emoji: emoji),
-          );
-        },
       );
 }

@@ -87,7 +87,7 @@
     "button-delete-chat": "borrar el chat",
     "button-archive-chat": "archivar conversación",
     "button-select-all": "seleccionar todo",
-    "button-room-details": "detalles de la sala",
+    "button-chat-details": "detalles de la sala",
     "button-send-verification": "enviar correo de verificación",
     "button-confirm-verification": "confirmar la verificación",
     "button-reset-password": "restablecer contraseña",

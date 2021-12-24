@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/storage/drift/database.dart';
+import 'package:syphon/storage/database.dart';
 
-extension Version4 on StorageDatabase {
+extension Version6 on StorageDatabase {
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) {
@@ -10,9 +10,8 @@ extension Version4 on StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
-          if (from == 3) {
-            await m.renameColumn(messages, 'filename', messages.file);
-            await m.addColumn(messages, messages.url);
+          if (from == 5) {
+            m.createTable(reactions);
           }
         },
       );
