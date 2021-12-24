@@ -108,7 +108,7 @@ class Strings {
   static final listItemImageOptionsPhotoSelectMethod = tr('list-item-image-options-photo-select-method');
   static final listItemImageOptionsTakePhoto = tr('list-item-image-options-take-photo');
   static final listItemImageOptionsPickFromGallery = tr('list-item-image-options-pick-from-gallery');
-  static final listItemImageOptionsREmovePhoto = tr('list-item-image-options-remove-photo');
+  static final listItemImageOptionsRemovePhoto = tr('list-item-image-options-remove-photo');
 
   // Buttons
   static final buttonLogin = tr('button-login');
