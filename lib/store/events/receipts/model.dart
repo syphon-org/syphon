@@ -20,7 +20,13 @@ class Receipt implements drift.Insertable<Receipt> {
     this.userReadsMapped = const {},
   });
 
-  Map<String, int> get userReads => (userReadsMapped ?? {}) as Map<String, int>;
+  Map<String, int> get userReads {
+    try {
+      return Map<String, int>.from(userReadsMapped ?? {});
+    } catch (error) {
+      return {};
+    }
+  }
 
   factory Receipt.fromMatrix(String eventId, Map<String, dynamic> receipt) {
     final usersRead = <String, int>{};
