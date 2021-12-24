@@ -132,6 +132,7 @@
     "alert-offline": "Looks like you may be offline. Check your connection and try again.",
     "alert-unknown": "Unknown Error Occurred",
     "alert-could-not-launch-url": "Could not launch {}",
+    "alert-no-images-found": "No Images Found.",
     "prompt-homeserver-select": "Select your username and homeserver",
     "prompt-confirm-deactivate": "Enter your password below to confirm deactivation",
     "placeholder-topic": "No Topic Description",

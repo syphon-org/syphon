@@ -177,6 +177,7 @@ class Strings {
   static final alertOffline = tr('alert-offline');
   static final alertUnknown = tr('alert-unknown');
   static String alertCouldNotLaunchURL({String? url}) => tr('alert-could-not-launch-url', args: ['$url']);
+  static final alertNoImagesFound = tr('alert-no-images-found');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
   static const alertBackgroundService = 'Background connection enabled';

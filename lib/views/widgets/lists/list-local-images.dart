@@ -84,7 +84,7 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
                 ),
               ),
               Text(
-                'No Images Found',
+                Strings.alertNoImagesFound,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.button?.copyWith(
                       fontWeight: FontWeight.w400,
