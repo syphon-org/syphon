@@ -38,7 +38,7 @@ steps:
       - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.nightly.android.apk
 
   - name: release android
-    image: golang:1.16
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
