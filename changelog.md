@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pin Protected Encrypted Storage
 - Improved Edit Message UI
 - Improved Chat UI spacing
+- UserID Quick Copy
 
 ### Fixed
 - major performance improvements and optimizations

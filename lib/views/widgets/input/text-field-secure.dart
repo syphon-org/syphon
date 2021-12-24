@@ -1,13 +1,9 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
 const DEFAULT_BORDER_WIDTH = 1.2;
 
