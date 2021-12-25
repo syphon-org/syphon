@@ -6,12 +6,13 @@ trigger:
     - push
 steps:
   - name: release test
-    image: golang:1.17
+    image: golang:1.15
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
-      - go install code.gitea.io/tea@v0.8.0
+      - go get code.gitea.io/tea
+      - go install code.gitea.io/tea
       - tea --version
       - which tea
       - tea login add -u https://git.syphon.org
