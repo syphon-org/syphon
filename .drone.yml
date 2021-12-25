@@ -11,7 +11,7 @@ steps:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
-      - go install code.gitea.io/tea@latest
+      - go install code.gitea.io/tea@v0.8.0
       - tea --version
       - which tea
       - tea login add -u https://git.syphon.org
