@@ -11,9 +11,9 @@ steps:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
-      - go get code.gitea.io/tea
       - go install code.gitea.io/tea@latest
       - tea --version
+      - which tea
       - tea login add -u https://git.syphon.org
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.testing.linux.x64.tar.gz
 ---
