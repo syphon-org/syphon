@@ -1,24 +1,5 @@
 kind: pipeline
 type: docker
-name: test release
-trigger:
-  event:
-    - push
-steps:
-  - name: release test
-    image: golang:1.17
-    environment:
-      GITEA_SERVER_TOKEN:
-        from_secret: GITEA_API_TOKEN
-    commands:
-      - go install code.gitea.io/tea@development
-      - tea --version
-      - which tea
-      - tea login add -u https://git.syphon.org
-      - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.testing.linux.x64.tar.gz
----
-kind: pipeline
-type: docker
 name: android nightly
 trigger:
   branch:
@@ -67,7 +48,6 @@ steps:
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org -n syphon
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-android" --asset ./syphon.nightly.android.apk
-
 ---
 kind: pipeline
 type: docker
@@ -247,3 +227,24 @@ steps:
       - go install code.gitea.io/tea
       - tea login add -u https://git.syphon.org
       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz
+# ---
+# TODO: Remove to test Tea updates
+# kind: pipeline
+# type: docker
+# name: test release
+# trigger:
+#   event:
+#     - push
+# steps:
+#   - name: release test
+#     image: golang:1.17
+#     environment:
+#       GITEA_SERVER_TOKEN:
+#         from_secret: GITEA_API_TOKEN
+#     commands:
+#       - go install code.gitea.io/tea@latest
+#       - tea --version
+#       - which tea
+#       - tea login add -u https://git.syphon.org
+#       - tea release create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.testing.linux.x64.tar.gz
+# ---
