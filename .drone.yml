@@ -11,7 +11,6 @@ steps:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
     commands:
-      # Modify the existing release and add the android apk
       - go get code.gitea.io/tea
       - go install code.gitea.io/tea
       - tea --version
