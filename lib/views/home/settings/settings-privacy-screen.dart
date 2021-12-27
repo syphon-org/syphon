@@ -171,6 +171,7 @@ class PrivacySettingsScreen extends StatelessWidget {
       onConfirmed: (String matchedText) async {
         await props.onSetScreenLock(matchedText);
         Syphon.reloadCurrentContext(context);
+        Navigator.of(context).pop();
       },
     );
   }

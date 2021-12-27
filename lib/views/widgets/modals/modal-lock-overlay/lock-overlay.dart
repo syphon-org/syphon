@@ -161,9 +161,9 @@ class _LockOverlayState extends State<LockOverlay> {
     super.initState();
     lockController = widget.lockController ?? LockController();
     lockController.initialize(
-      isConfirmed: widget.confirmMode,
       maxLength: widget.maxLength,
       onVerifyInput: widget.onVerify,
+      isConfirmMode: widget.confirmMode,
     );
 
     lockController.currentInput.listen((event) {
@@ -188,7 +188,7 @@ class _LockOverlayState extends State<LockOverlay> {
         );
       }
 
-      if (unlocking) return;
+      if (unlocking || widget.confirmMode) return;
 
       unlocking = true;
 
