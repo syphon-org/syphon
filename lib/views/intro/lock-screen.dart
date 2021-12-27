@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/types.dart';
-import 'package:syphon/global/print.dart';
 
 import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/prelock.dart';
@@ -50,6 +48,7 @@ class _LockScreenState extends State<LockScreen> with Lifecycle<LockScreen> {
         },
         onUnlocked: (String pin) {
           Prelock.toggleLocked(context, pin);
+          Navigator.of(context).pop();
         });
   }
 

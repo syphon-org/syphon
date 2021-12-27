@@ -173,15 +173,9 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
         ));
       }
 
-      // TODO: remove after loadAsync works
-      // printJson({'loadAync': 'SQL LOAD COMPLETED'});
-
       store.dispatch(LoadMedia(mediaMap: medias));
       store.dispatch(LoadReceipts(receiptsMap: receipts));
       store.dispatch(LoadReactions(reactionsMap: reactions));
-
-      // TODO: remove after loadAsync works
-      // printJson({'loadAync': 'STATE LOAD COMPLETED'});
 
       // mutate messages
       store.dispatch(mutateMessagesAll());

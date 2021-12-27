@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:syphon/global/print.dart';
+
 class LockController {
   LockController();
 
-  late bool _isConfirmed;
+  late bool _isConfirmMode;
   late int _maxLength;
   late Future<bool> Function(String input) _onVerifyInput;
 
@@ -74,15 +76,16 @@ class LockController {
 
     final inputText = _currentInputs.join();
 
-    if (!_isConfirmed) {
+    if (!_isConfirmMode) {
       final verified = await _onVerifyInput(inputText);
 
       if (!verified) {
         loadingController.add(false);
       }
-
       return verifyController.add(verified);
     } else {
+      loadingController.add(false);
+
       if (_firstInput.isEmpty) {
         setConfirmed();
         clear();
@@ -94,15 +97,13 @@ class LockController {
       } else {
         verifyController.add(false);
       }
-
-      loadingController.add(false);
     }
   }
 
   /// Create each stream.
   void initialize({
     int maxLength = 9, // DEFAULT MAX LENGTH
-    bool isConfirmed = false,
+    bool isConfirmMode = false,
     required Future<bool> Function(String input) onVerifyInput,
   }) {
     loadingController = StreamController.broadcast();
@@ -111,7 +112,7 @@ class LockController {
     confirmedController = StreamController.broadcast();
 
     _onVerifyInput = onVerifyInput;
-    _isConfirmed = isConfirmed;
+    _isConfirmMode = isConfirmMode;
     _maxLength = maxLength;
   }
 
