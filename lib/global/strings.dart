@@ -40,6 +40,7 @@ class Strings {
   static final titleProxyPort = tr('title-proxy-port');
   static final titleLockOverlay = tr('title-lock-overlay');
   static final titleConfirmLockOverlay = tr('title-confirm-lock-overlay');
+  static final titleSearchUnencrypted = tr('title-search-unencrypted');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -90,6 +91,7 @@ class Strings {
   static final labelOn = tr('label-on'); // 'On';
   static final labelOff = tr('label-off'); // 'Off';
   static final labelTermsOfService = tr('label-terms-of-service');
+  static final labelSearchUnencrypted = tr('label-search-unencrypted');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
@@ -284,4 +286,9 @@ class Strings {
   static final labelProxyPort = tr('label-proxy-port');
 
   static final labelPassword = tr('label-password');
+
+  // Tooltips
+  static final tooltipProfileAndSettings = tr('tooltip-profile-settings');
+  static final tooltipSearchChats = tr('tooltip-search-chats');
+  static final tooltipSearchUnencrypted = tr('tooltip-search-unencrypted');
 }

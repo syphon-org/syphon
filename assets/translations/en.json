@@ -24,6 +24,7 @@
     "title-proxy-host": "Modify Proxy Host",
     "title-proxy-port": "Modify Proxy Port",
     "title-lock-overlay": "Please enter passcode.",
+    "title-search-unencrypted": "Search Unencrypted",
     "title-confirm-lock-overlay": "Please confirm passcode.",
     "title-dialog-delete-keys": "Confirm Deleting Keys",
     "title-dialog-confirm-linkout": "Confirm Opening Link",
@@ -67,6 +68,7 @@
     "label-message-matrix-unencrypted": "Matrix message (unencrypted)",
     "label-deleted-message": "This message was deleted",
     "label-terms-of-service": "Terms of Service",
+    "label-search-unencrypted": "Search Unencrypted",
     "button-login": "log in",
     "button-login-sso": "single sign on",
     "button-save": "save",
@@ -208,5 +210,8 @@
     "semantics-create-public-room": "Create A Public Room",
     "label-proxy-host": "Hostname",
     "label-proxy-port": "Port",
-    "label-password": "password"
+    "label-password": "password",
+    "tooltip-profile-settings": "Profile and Settings",
+    "tooltip-search-chats": "Search Chats",
+    "tooltip-search-unencrypted": "Search Unencrypted"
 }

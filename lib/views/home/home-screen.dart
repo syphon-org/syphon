@@ -307,7 +307,7 @@ class HomeState extends State<HomeScreen> {
             offline: props.offline,
             syncing: props.syncing,
             unauthed: props.unauthed,
-            tooltip: 'Profile and Settings',
+            tooltip: Strings.tooltipProfileAndSettings,
             onPressed: () {
               Navigator.pushNamed(context, Routes.settingsProfile);
             },
@@ -325,7 +325,7 @@ class HomeState extends State<HomeScreen> {
         IconButton(
           color: assetColor,
           icon: Icon(Icons.search),
-          tooltip: 'Search Chats',
+          tooltip: Strings.tooltipSearchChats,
           onPressed: () => onToggleSearch(),
         ),
         RoundedPopupMenu<Options>(
@@ -690,9 +690,9 @@ class HomeState extends State<HomeScreen> {
 
           if (searching) {
             currentAppBar = AppBarSearch(
-              title: 'Search Unencrypted',
-              label: 'Search Unencrypted',
-              tooltip: 'Search Unencrypted',
+              title: Strings.titleSearchUnencrypted,
+              label: Strings.labelSearchUnencrypted,
+              tooltip: Strings.tooltipSearchUnencrypted,
               forceFocus: true,
               navigate: false,
               startFocused: true,
@@ -848,7 +848,7 @@ class _Props extends Equatable {
             if (await canLaunch(Values.openHelpUrl)) {
               await launch(Values.openHelpUrl);
             } else {
-              throw 'Could not launch ${Values.openHelpUrl}';
+              throw Strings.alertCouldNotLaunchURL(Values.openHelpUrl);
             }
           } catch (error) {}
         },
