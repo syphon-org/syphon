@@ -107,6 +107,7 @@
     "button-text-invite": "Invite Friends",
     "button-text-settings": "Settings",
     "button-text-support": "Help",
+    "button-text-lets-encrypt": "let's encrypt",
     "button-save-message-edit": "Save Message Edit",
     "button-gallery": "Gallery",
     "button-file": "File",
@@ -221,5 +222,6 @@
     "label-password": "password",
     "tooltip-profile-settings": "Profile and Settings",
     "tooltip-search-chats": "Search Chats",
-    "tooltip-search-unencrypted": "Search Unencrypted"
+    "tooltip-search-unencrypted": "Search Unencrypted",
+    "tooltip-cancel-reply": "Cancel Reply"
 }

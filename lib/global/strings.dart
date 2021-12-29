@@ -165,6 +165,7 @@ class Strings {
   static final buttonTextLoadCaptcha = tr('button-text-load-captcha');
   static final buttonTextConfirmed = tr('button-text-confirmed');
   static final buttonTextDeleteKeys = tr('button-delete-keys'); //  'delete keys';
+  static final buttonTextLetsEncrypt = tr('button-text-lets-encrypt');
 
   // Buttons (Options)
   static final buttonTextCreateGroup = tr('button-text-create-group');
@@ -299,4 +300,5 @@ class Strings {
   static final tooltipProfileAndSettings = tr('tooltip-profile-settings');
   static final tooltipSearchChats = tr('tooltip-search-chats');
   static final tooltipSearchUnencrypted = tr('tooltip-search-unencrypted');
+  static final tooltipCancelReply = tr('tooltip-cancel-reply');
 }
