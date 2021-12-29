@@ -423,7 +423,7 @@ class ChatInputState extends State<ChatInput> {
                               Icons.close,
                               size: Dimensions.iconSize,
                             ),
-                            tooltip: 'Cancel Reply',
+                            tooltip: Strings.tooltipCancelReply,
                           ),
                         ),
                       ],
