@@ -141,6 +141,7 @@ class Strings {
   static final buttonRoomDetails = tr('button-chat-details');
   static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
   static final buttonDismiss = tr('button-dismiss');
+  static final buttonSaveMessageEdit = tr('button-save-message-edit');
 
   // Buttons (Text)
   static final buttonTextLogin = tr('button-text-login'); // 'Login';
@@ -159,6 +160,12 @@ class Strings {
   static final buttonTextInvite = tr('button-text-invite');
   static final buttonTextSettings = tr('button-text-settings');
   static final buttonTextSupport = tr('button-text-support');
+
+  // Buttons (Media Cards)
+  static final buttonGallery = tr('button-gallery');
+  static final buttonFile = tr('button-file');
+  static final buttonContact = tr('button-contact');
+  static final buttonLocation = tr('button-location');
 
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');
