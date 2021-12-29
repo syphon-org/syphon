@@ -58,6 +58,8 @@ class Strings {
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
+  static final subtitleSettingsSyncInterval = tr('subtitle-settings-sync-interval');
+  static final subtitleSettingsSyncToggle = tr('subtitle-settings-sync-toggle');
 
   // Headers
   static final headerIntro = tr('header-intro');
@@ -101,6 +103,8 @@ class Strings {
   static final listItemSettingsProxy = tr('list-item-settings-proxy');
   static final listItemSettingsProxyHost = tr('list-item-settings-proxy-host');
   static final listItemSettingsProxyPort = tr('list-item-settings-proxy-port');
+  static final listItemSettingsSyncInterval = tr('list-item-settings-sync-interval');
+  static final listItemSettingsSyncToggle = tr('list-item-settings-sync-toggle');
 
   static String listItemUserDetailsStartChat(String? name) => tr('list-item-user-details-start-chat', args: ['$name']);
   static final listItemUserDetailsRoomInvite = tr('list-item-user-details-room-invite');
@@ -117,6 +121,13 @@ class Strings {
   static String listItemContextSwitcherUserDisplayName(String? username) => tr('list-item-context-switcher-user-display-name', args: ['$username']);
   static final listItemContextSwitcherAccounts = tr('list-item-context-switcher-accounts');
   static final listItemContextSwitcherAddAccount = tr('list-item-context-switcher-add-account');
+
+  static final listItemAdvancedSettingsLicenses = tr('list-item-advanced-settings-licenses');
+  static final listItemAdvancedSettingsStartBackground = tr('list-item-advanced-settings-start-background');
+  static final listItemAdvancedSettingsStopBackground = tr('list-item-advanced-settings-stop-background');
+  static final listItemAdvancedSettingsTestNotifications = tr('list-item-advanced-settings-test-notifications');
+  static final listItemAdvancedSettingsTestSyncLoop = tr('list-item-advanced-settings-test-sync-loop');
+  static final listItemAdvancedSettingsForceFunction = tr('list-item-advanced-settings-force-function');
 
   // Buttons
   static final buttonLogin = tr('button-login');
