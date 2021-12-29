@@ -224,6 +224,7 @@
     "label-proxy-host": "Hostname",
     "label-proxy-port": "Port",
     "label-password": "password",
+    "tooltip-search-users": "Search users",
     "tooltip-profile-settings": "Profile and Settings",
     "tooltip-search-chats": "Search Chats",
     "tooltip-search-unencrypted": "Search Unencrypted",

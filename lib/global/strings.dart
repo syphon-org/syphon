@@ -305,4 +305,5 @@ class Strings {
   static final tooltipSearchChats = tr('tooltip-search-chats');
   static final tooltipSearchUnencrypted = tr('tooltip-search-unencrypted');
   static final tooltipCancelReply = tr('tooltip-cancel-reply');
+  static final tooltipSearchUsers = tr('tooltip-search-users');
 }
