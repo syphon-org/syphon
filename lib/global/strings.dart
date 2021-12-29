@@ -54,6 +54,7 @@ class Strings {
   static final titleConfirmDeleteKeys = tr('title-dialog-delete-keys');
   static final titleConfirmEmail = tr('title-confirm-email');
   static final titleDialogColorPicker = tr('title-dialog-color-picker');
+  static final titleDialogAcceptInvite = tr('title-dialog-accept-invite');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -166,6 +167,9 @@ class Strings {
   static final buttonTextConfirmed = tr('button-text-confirmed');
   static final buttonTextDeleteKeys = tr('button-delete-keys'); //  'delete keys';
   static final buttonTextLetsEncrypt = tr('button-text-lets-encrypt');
+  static final buttonTextGoBack = tr('button-text-go-back');
+  static final buttonTextReject = tr('button-text-reject');
+  static final buttonTextAccept = tr('button-text-accept');
 
   // Buttons (Options)
   static final buttonTextCreateGroup = tr('button-text-create-group');
