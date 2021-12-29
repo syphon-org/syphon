@@ -41,6 +41,7 @@ class Strings {
   static final titleLockOverlay = tr('title-lock-overlay');
   static final titleConfirmLockOverlay = tr('title-confirm-lock-overlay');
   static final titleSearchUnencrypted = tr('title-search-unencrypted');
+  static final titleMessageDetails = tr('title-message-details');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -128,6 +129,12 @@ class Strings {
   static final listItemAdvancedSettingsTestNotifications = tr('list-item-advanced-settings-test-notifications');
   static final listItemAdvancedSettingsTestSyncLoop = tr('list-item-advanced-settings-test-sync-loop');
   static final listItemAdvancedSettingsForceFunction = tr('list-item-advanced-settings-force-function');
+
+  static final listItemSent = tr('list-item-sent');
+  static final listItemReceived = tr('list-item-received');
+  static final listItemVia = tr('list-item-via');
+  static final listItemFrom = tr('list-item-from');
+  static final listItemReadBy = tr('list-item-read-by');
 
   // Buttons
   static final buttonLogin = tr('button-login');
