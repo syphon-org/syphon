@@ -56,6 +56,7 @@ class Strings {
   static final titleConfirmEmail = tr('title-confirm-email');
   static final titleDialogColorPicker = tr('title-dialog-color-picker');
   static final titleDialogAcceptInvite = tr('title-dialog-accept-invite');
+  static final titleDialogChatColor = tr('title-dialog-chat-color');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -95,6 +96,9 @@ class Strings {
   static final labelOff = tr('label-off'); // 'Off';
   static final labelTermsOfService = tr('label-terms-of-service');
   static final labelSearchUnencrypted = tr('label-search-unencrypted');
+  static final labelAbout = tr('label-about');
+  static final labelChatSettings = tr('label-chat-settings');
+  static final labelColor = tr('label-color');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
@@ -135,6 +139,14 @@ class Strings {
   static final listItemVia = tr('list-item-via');
   static final listItemFrom = tr('list-item-from');
   static final listItemReadBy = tr('list-item-read-by');
+
+  static final listItemChatDetailToggleDirectChat = tr('list-item-chat-detail-toggle-direct-chat');
+  static final listItemChatDetailNotificationSetting = tr('list-item-chat-detail-notification-setting');
+  static final listItemChatDetailNotifications = tr('list-item-chat-detail-notifications');
+  static final listItemChatDetailVibrate = tr('list-item-chat-detail-vibrate');
+  static final listItemChatDetailNotificationSound = tr('list-item-chat-detail-notification-sound');
+  static final listItemChatDetailPrivacyStatus = tr('list-item-chat-detail-privacy-status');
+  static final listItemChatDetailViewKey = tr('list-item-chat-detail-view-key');
 
   // Buttons
   static final buttonLogin = tr('button-login');
@@ -195,6 +207,7 @@ class Strings {
   static final placeholderTopic = tr('placeholder-topic');
   static final placeholderMatrixEncrypted = tr('label-message-matrix');
   static final placeholderMatrixUnencrypted = tr('label-message-matrix-unencrypted');
+  static final placeholderDefaultRoomNotification = tr('label-default-room-notification');
 
   // Warnings
   static final warningDeactivateAccount = tr('warning-deactivate-account');
@@ -306,6 +319,7 @@ class Strings {
   static final labelProxyPort = tr('label-proxy-port');
 
   static final labelPassword = tr('label-password');
+  static final labelDefault = tr('label-default');
 
   // Tooltips
   static final tooltipProfileAndSettings = tr('tooltip-profile-settings');
