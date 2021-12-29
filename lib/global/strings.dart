@@ -54,7 +54,6 @@ class Strings {
   static final titleConfirmDeleteKeys = tr('title-dialog-delete-keys');
   static final titleConfirmEmail = tr('title-confirm-email');
   static final titleDialogColorPicker = tr('title-dialog-color-picker');
-  static final titleDialogConfirmPassword = tr('title-dialog-confirm-password');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -226,8 +225,6 @@ class Strings {
 
   static final contentProxyHost = tr('content-proxy-host');
   static final contentProxyPort = tr('content-proxy-port');
-
-  static final contentDialogConfirmPassword = tr('content-dialog-confirm-password');
 
   static final messageEditedAppend = tr('message-edited-append');
 

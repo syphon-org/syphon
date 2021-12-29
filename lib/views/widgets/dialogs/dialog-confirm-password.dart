@@ -16,8 +16,8 @@ import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 class DialogConfirmPassword extends StatelessWidget {
   const DialogConfirmPassword({
     Key? key,
-    this.title = Strings.titleDialogConfirmPassword,
-    this.content = Strings.contentDialogConfirmPassword,
+    required this.title, // i18n Strings isn't a constant. You gotta pass it in
+    required this.content, // i18n Strings isn't a constant. You gotta pass it in
     this.onConfirm,
     this.onCancel,
   }) : super(key: key);

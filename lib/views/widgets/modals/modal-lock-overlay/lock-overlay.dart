@@ -14,8 +14,8 @@ class LockOverlay extends StatefulWidget {
   const LockOverlay({
     Key? key,
     required this.onVerify,
-    this.title = const HeadingTitle(text: Strings.titleLockOverlay),
-    this.confirmTitle = const HeadingTitle(text: Strings.titleConfirmLockOverlay),
+    required this.title, // i18n Strings isn't a constant. You gotta pass it in
+    required this.confirmTitle, // i18n Strings isn't a constant. You gotta pass it in
     this.screenLockConfig = const ScreenLockConfig(),
     this.inputSecretsConfig = const InputSecretsConfig(),
     this.inputButtonConfig = const InputButtonConfig(),
