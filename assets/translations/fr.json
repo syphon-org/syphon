@@ -175,5 +175,7 @@
     "title-proxy-port": "Modifier le port du proxy",
     "list-item-settings-proxy": "Paramètres du proxy",
     "list-item-settings-proxy-port": "Port",
-    "label-proxy-host": "Nom d'hôte"
+    "label-proxy-host": "Nom d'hôte",
+    "label-call-invite": "L'utilisateur vous a invité à participer à un appel",
+    "label-call-hangup": "L'utilisateur à mis fin à l'appel"
 }
