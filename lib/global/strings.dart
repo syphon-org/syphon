@@ -308,10 +308,10 @@ class Strings {
   static String confirmBlockUser(String? name) => tr('confirm-block-user', args: ['$name']);
 
   // Accessibility
-  static final semanticsImageIntro = tr('semnatics-image-intro');
-  static final semanticsPrivateMessage = tr('semnatics-image-private-message');
-  static final semanticsIntroFinal = tr('semnatics-image-intro-section-four');
-  static final semanticsIntroThird = tr('semnatics-image-intro-section-third');
+  static final semanticsImageIntro = tr('semantics-image-intro');
+  static final semanticsPrivateMessage = tr('semantics-image-private-message');
+  static final semanticsIntroFinal = tr('semantics-image-intro-section-four');
+  static final semanticsIntroThird = tr('semantics-image-intro-section-third');
   static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');
   static final semanticsImageSignupUsername = tr('semantics-image-signup-username');
   static final semanticsImagePasswordReset = tr('semantics-image-password-reset');
