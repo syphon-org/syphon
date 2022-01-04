@@ -3,8 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screen_lock/configurations/input_button_config.dart';
 import 'package:flutter_screen_lock/configurations/screen_lock_config.dart';
-import 'package:flutter_screen_lock/heading_title.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/input-secrets-config.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/input-secrets.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/keypad.dart';

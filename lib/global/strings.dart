@@ -320,7 +320,6 @@ class Strings {
   // Labels
   static final labelProxyHost = tr('label-proxy-host');
   static final labelProxyPort = tr('label-proxy-port');
-
   static final labelPassword = tr('label-password');
   static final labelDefault = tr('label-default');
 
