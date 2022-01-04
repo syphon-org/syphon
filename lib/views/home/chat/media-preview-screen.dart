@@ -81,7 +81,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
 
           return Scaffold(
             appBar: AppBarNormal(
-              title: 'Draft Preview',
+              title: Strings.titleDialogDraftPreview,
               actions: [
                 IconButton(
                   icon: Icon(Icons.close, color: Colors.white),
@@ -113,8 +113,8 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                         padding: EdgeInsets.only(right: 8),
                         child: Text(
                           encryptionEnabled
-                              ? 'Send Media Message'
-                              : 'Send Media Message (Unencrypted)',
+                              ? Strings.titleSendMediaMessage
+                              : Strings.titleSendMediaMessageUnencrypted,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.subtitle2?.copyWith(
                                 fontWeight: FontWeight.w400,

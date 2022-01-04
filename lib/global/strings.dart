@@ -42,6 +42,8 @@ class Strings {
   static final titleConfirmLockOverlay = tr('title-confirm-lock-overlay');
   static final titleSearchUnencrypted = tr('title-search-unencrypted');
   static final titleMessageDetails = tr('title-message-details');
+  static final titleSendMediaMessage = tr('title-send-media-message');
+  static final titleSendMediaMessageUnencrypted = tr('title-send-media-message-unencrypted');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -57,6 +59,7 @@ class Strings {
   static final titleDialogColorPicker = tr('title-dialog-color-picker');
   static final titleDialogAcceptInvite = tr('title-dialog-accept-invite');
   static final titleDialogChatColor = tr('title-dialog-chat-color');
+  static final titleDialogDraftPreview = tr('title-dialog-draft-preview');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
