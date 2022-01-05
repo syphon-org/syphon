@@ -117,7 +117,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
         title: Strings.buttonBlockUser,
-        content: Strings.confirmBlockUser(name: user?.displayName),
+        content: Strings.confirmBlockUser(user?.displayName),
         onConfirm: () async {
           await props.onBlockUser(user);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -135,7 +135,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
       showDialog(
         context: context,
         builder: (BuildContext context) => DialogColorPicker(
-          title: 'Select Chat Color',
+          title: Strings.titleDialogChatColor,
           currentColor: originalColor,
           onSelectColor: onSelectColor,
         ),
@@ -321,7 +321,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               width: width,
                               padding: titlePadding,
                               child: Text(
-                                'About',
+                                Strings.labelAbout,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -371,7 +371,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               width: width,
                               padding: contentPadding,
                               child: Text(
-                                'Chat Settings',
+                                Strings.labelChatSettings,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -379,7 +379,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                             ListTile(
                               contentPadding: contentPadding,
                               title: Text(
-                                'Color',
+                                Strings.labelColor,
                                 style: Theme.of(context).textTheme.subtitle1,
                               ),
                               trailing: Container(
@@ -399,7 +399,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               enabled: !props.loading,
                               contentPadding: contentPadding,
                               title: Text(
-                                'Toggle Direct Chat',
+                                Strings.listItemChatDetailToggleDirectChat,
                                 style: Theme.of(context).textTheme.subtitle1,
                               ),
                               trailing: Switch(
@@ -423,7 +423,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               width: width,
                               padding: contentPadding,
                               child: Text(
-                                'Notification Settings',
+                                Strings.listItemChatDetailNotificationSetting,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -432,7 +432,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               onTap: () => props.onToggleRoomNotifications(),
                               contentPadding: contentPadding,
                               title: Text(
-                                'Notifications',
+                                Strings.listItemChatDetailNotifications,
                               ),
                               trailing: Switch(
                                 value: notificationsEnabled,
@@ -443,12 +443,12 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               enabled: false,
                               contentPadding: contentPadding,
                               title: Text(
-                                'Vibrate',
+                                Strings.listItemChatDetailVibrate,
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
-                                  'Default',
+                                  Strings.labelDefault,
                                   style: Theme.of(context)
                                       .textTheme
                                       .subtitle1!
@@ -460,12 +460,12 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               enabled: false,
                               contentPadding: contentPadding,
                               title: Text(
-                                'Notification Sound',
+                                Strings.listItemChatDetailNotificationSound,
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
-                                  'Default (Argon)',
+                                  Strings.placeholderDefaultRoomNotification,
                                   style: Theme.of(context)
                                       .textTheme
                                       .subtitle1!
@@ -483,7 +483,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               width: width,
                               padding: contentPadding,
                               child: Text(
-                                'Privacy and Status',
+                                Strings.listItemChatDetailPrivacyStatus,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -492,7 +492,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                               enabled: false,
                               contentPadding: contentPadding,
                               title: Text(
-                                'View Encryption Key',
+                                Strings.listItemChatDetailViewKey,
                               ),
                             ),
                           ],
@@ -511,7 +511,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                                   ),
                                   contentPadding: contentPadding,
                                   title: Text(
-                                    'Block User',
+                                    Strings.buttonBlockUser,
                                     style: Theme.of(context).textTheme.subtitle1!.copyWith(
                                           color: Colors.redAccent,
                                         ),
@@ -522,7 +522,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                                 onTap: () => onLeaveChat(props),
                                 contentPadding: contentPadding,
                                 title: Text(
-                                  'Leave Chat',
+                                  Strings.buttonLeaveChat,
                                   style: Theme.of(context).textTheme.subtitle1!.copyWith(
                                         color: Colors.redAccent,
                                       ),

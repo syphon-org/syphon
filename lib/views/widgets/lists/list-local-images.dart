@@ -9,6 +9,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 _empty(File file) {}
@@ -84,7 +85,7 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
                 ),
               ),
               Text(
-                'No Images Found',
+                Strings.alertNoImagesFound,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.button?.copyWith(
                       fontWeight: FontWeight.w400,

@@ -55,7 +55,7 @@ class DialogEncryption extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: Text(
-                'let\'s encrypt',
+                Strings.buttonTextLetsEncrypt,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),

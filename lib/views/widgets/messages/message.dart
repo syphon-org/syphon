@@ -222,7 +222,7 @@ class MessageWidget extends StatelessWidget {
           try {
             return launch(url, forceSafariVC: false);
           } catch (error) {
-            throw 'Could not launch $url';
+            throw Strings.alertCouldNotLaunchURL(url);
           }
         },
       ),
@@ -362,7 +362,7 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (message.edited) {
-      status += ' (Edited)';
+      status += Strings.messageEditedAppend;
       showInfoRow = true;
     }
 

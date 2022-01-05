@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/index.dart';
@@ -66,7 +67,7 @@ class MessageDetailsScreen extends StatelessWidget {
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
-                'Message Details',
+                Strings.titleMessageDetails,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
@@ -103,7 +104,7 @@ class MessageDetailsScreen extends StatelessWidget {
                   dense: true,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Sent',
+                    Strings.listItemSent,
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
@@ -121,7 +122,7 @@ class MessageDetailsScreen extends StatelessWidget {
                   dense: true,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Received',
+                    Strings.listItemReceived,
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
@@ -139,7 +140,7 @@ class MessageDetailsScreen extends StatelessWidget {
                   dense: true,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Via',
+                    Strings.listItemVia,
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
@@ -157,7 +158,7 @@ class MessageDetailsScreen extends StatelessWidget {
                   dense: true,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'From',
+                    Strings.listItemFrom,
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
@@ -175,7 +176,7 @@ class MessageDetailsScreen extends StatelessWidget {
                 ListTile(
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Read By',
+                    Strings.listItemReadBy,
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,

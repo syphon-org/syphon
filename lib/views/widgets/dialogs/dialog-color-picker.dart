@@ -8,7 +8,7 @@ import 'package:syphon/global/strings.dart';
 class DialogColorPicker extends StatefulWidget {
   const DialogColorPicker({
     Key? key,
-    this.title = 'Color Picker',
+    required this.title, // i18n Strings isn't a constant. You gotta pass it in
     required this.currentColor,
     this.advanced = false,
     this.resetColor,

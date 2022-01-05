@@ -20,7 +20,7 @@ class DialogInvite extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('Accept Invite?'),
+        title: Text(Strings.titleDialogAcceptInvite),
         contentPadding: Dimensions.dialogPadding,
         children: <Widget>[
           Container(
@@ -44,7 +44,7 @@ class DialogInvite extends StatelessWidget {
                   }
                 },
                 child: Text(
-                  'go back',
+                  Strings.buttonTextGoBack,
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
               ),
@@ -63,7 +63,7 @@ class DialogInvite extends StatelessWidget {
                       }
                     },
                     child: Text(
-                      'reject',
+                      Strings.buttonTextReject,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
@@ -80,7 +80,7 @@ class DialogInvite extends StatelessWidget {
                       Navigator.pop(context);
                     },
                     child: Text(
-                      'accept',
+                      Strings.buttonTextAccept,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
