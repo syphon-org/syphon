@@ -250,6 +250,7 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       sending = false;
       editing = false;
+      selectedMessage = null;
     });
   }
 
