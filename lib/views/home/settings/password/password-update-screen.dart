@@ -1,17 +1,14 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
-import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
+
 import 'password-update-step.dart';
 
 class PasswordUpdateScreen extends StatefulWidget {
@@ -69,10 +66,8 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width:
-                      width, // set actual height and width for flex constraints
-                  height:
-                      height, // set actual height and width for flex constraints
+                  width: width, // set actual height and width for flex constraints
+                  height: height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -100,8 +95,7 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
+                                    onboarding = index != 0 && index != sections.length - 1;
                                   });
                                 },
                               ),
@@ -125,8 +119,7 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
                               child: ButtonSolid(
                                 text: Strings.buttonSave,
                                 loading: props.loading,
-                                disabled:
-                                    !props.isPasswordValid || props.loading,
+                                disabled: !props.isPasswordValid || props.loading,
                                 onPressed: () async {
                                   final result = await props.onSavePassword();
                                   if (result) {

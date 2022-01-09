@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:sembast/sembast.dart';
 import 'package:syphon/cache/index.dart';

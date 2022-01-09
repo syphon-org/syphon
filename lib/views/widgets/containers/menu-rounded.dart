@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-/**
- * RoundedPopupMenu
- * Mostly an example for myself on how to override styling or other options on
- * existing components app wide
- */
+/// RoundedPopupMenu
+/// Mostly an example for myself on how to override styling or other options on
+/// existing components app wide
 class RoundedPopupMenu<T> extends StatelessWidget {
   const RoundedPopupMenu({
     Key? key,

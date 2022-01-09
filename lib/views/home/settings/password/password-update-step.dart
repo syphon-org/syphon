@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -16,11 +13,12 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 class PasswordUpdateStep extends StatefulWidget {
   const PasswordUpdateStep({Key? key}) : super(key: key);
 
+  @override
   PasswordUpdateStepState createState() => PasswordUpdateStepState();
 }
 
 class PasswordUpdateStepState extends State<PasswordUpdateStep> {
-  PasswordUpdateStepState({Key? key});
+  PasswordUpdateStepState();
 
   bool visibility = false;
   FocusNode currentFocusNode = FocusNode();
@@ -41,7 +39,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
+          final double width = MediaQuery.of(context).size.width;
 
           return Container(
             child: Column(
@@ -59,8 +57,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                     ),
                     child: SvgPicture.asset(
                       Assets.heroSignupPassword,
-                      semanticsLabel:
-                          'User thinking up a password in a swirl of wind',
+                      semanticsLabel: 'User thinking up a password in a swirl of wind',
                     ),
                   ),
                 ),
@@ -158,7 +155,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
 
                           // Do your stuff
                           setState(() {
-                            visibility = !this.visibility;
+                            visibility = !visibility;
                           });
 
                           if (!passwordFocusNode.hasFocus) {
@@ -208,7 +205,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                             borderRadius: BorderRadius.circular(24),
                           ),
                           child: Container(
-                            padding: EdgeInsets.all((6)),
+                            padding: EdgeInsets.all(6),
                             child: Icon(
                               Icons.check,
                               color: Colors.white,

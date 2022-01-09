@@ -3,7 +3,6 @@ import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 ///
 /// Alert Middleware

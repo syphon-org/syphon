@@ -1,18 +1,14 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
-
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
@@ -25,11 +21,12 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 class EmailStep extends StatefulWidget {
   const EmailStep({Key? key}) : super(key: key);
 
+  @override
   EmailStepState createState() => EmailStepState();
 }
 
 class EmailStepState extends State<EmailStep> {
-  EmailStepState({Key? key});
+  EmailStepState();
 
   Timer? typingTimeout;
   final emailController = TextEditingController();
@@ -61,7 +58,7 @@ class EmailStepState extends State<EmailStep> {
           ),
         );
 
-        if (!props.loading && this.typingTimeout == null) {
+        if (!props.loading && typingTimeout == null) {
           if (props.isEmailValid && props.isEmailAvailable) {
             suffixWidget = Icon(
               Icons.check,
@@ -135,8 +132,7 @@ class EmailStepState extends State<EmailStep> {
                             onTap: () {
                               showDialog(
                                 context: context,
-                                builder: (BuildContext context) =>
-                                    DialogExplaination(
+                                builder: (BuildContext context) => DialogExplaination(
                                   title: Strings.titleEmailRequirement,
                                   content: Strings.contentEmailRequirement,
                                   onConfirm: () {
@@ -227,7 +223,7 @@ class EmailStepState extends State<EmailStep> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Container(
-                          padding: EdgeInsets.all((6)),
+                          padding: EdgeInsets.all(6),
                           child: suffixWidget,
                         ),
                       ),

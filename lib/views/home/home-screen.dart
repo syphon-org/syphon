@@ -41,7 +41,6 @@ import 'package:syphon/views/widgets/containers/fabs/fab-ring.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
 

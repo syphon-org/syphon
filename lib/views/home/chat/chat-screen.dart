@@ -13,7 +13,6 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
@@ -26,6 +25,7 @@ import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/encryption.dart';
+import 'package:syphon/store/media/filters.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
@@ -275,7 +275,7 @@ class ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  onSendMedia(File file, MessageType type, _Props props) async {
+  onSendMedia(File rawFile, MessageType type, _Props props) async {
     final store = StoreProvider.of<AppState>(context);
     final encryptionEnabled = props.room.encryptionEnabled;
 
@@ -290,6 +290,13 @@ class ChatScreenState extends State<ChatScreen> {
 
     File? encryptedFile;
     EncryptInfo? info;
+
+    // TODO: confirm this doesn't persist the potato filter 🥔
+    var file = await scrubMedia(localFile: rawFile);
+
+    if (file == null) {
+      file = rawFile;
+    }
 
     try {
       if (encryptionEnabled) {

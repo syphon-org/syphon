@@ -1,22 +1,17 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
-import 'package:syphon/views/widgets/containers/card-section.dart';
-import 'package:syphon/views/widgets/loader/index.dart';
-import 'package:syphon/views/widgets/modals/modal-user-details.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
+import 'package:syphon/views/widgets/containers/card-section.dart';
+import 'package:syphon/views/widgets/loader/index.dart';
+import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class BlockedScreen extends StatefulWidget {
   const BlockedScreen({Key? key}) : super(key: key);
@@ -28,7 +23,7 @@ class BlockedScreen extends StatefulWidget {
 class BlockedScreenState extends State<BlockedScreen> {
   bool loading = false;
 
-  BlockedScreenState({Key? key});
+  BlockedScreenState();
 
   // componentDidMount(){}
   @override
@@ -83,9 +78,7 @@ class BlockedScreenState extends State<BlockedScreen> {
                   user.userId!,
                   style: Theme.of(context).textTheme.caption!.merge(
                         TextStyle(
-                          color: props.loading
-                              ? Color(Colours.greyDisabled)
-                              : null,
+                          color: props.loading ? Color(Colours.greyDisabled) : null,
                         ),
                       ),
                 ),
@@ -109,7 +102,7 @@ class BlockedScreenState extends State<BlockedScreen> {
             buildUserList(context, props),
             Positioned(
               child: Loader(
-                loading: this.loading,
+                loading: loading,
               ),
             ),
           ],
@@ -123,7 +116,7 @@ class _Props extends Equatable {
   final bool loading;
   final List<User?> usersBlocked;
 
-  _Props({
+  const _Props({
     required this.loading,
     required this.usersBlocked,
   });
@@ -136,8 +129,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.roomStore.loading,
-        usersBlocked: store.state.userStore.blocked
-            .map((id) => store.state.userStore.users[id])
-            .toList(),
+        usersBlocked:
+            store.state.userStore.blocked.map((id) => store.state.userStore.users[id]).toList(),
       );
 }

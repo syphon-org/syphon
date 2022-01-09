@@ -1,13 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -23,11 +20,12 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 class UsernameStep extends StatefulWidget {
   const UsernameStep({Key? key}) : super(key: key);
 
+  @override
   UsernameStepState createState() => UsernameStepState();
 }
 
 class UsernameStepState extends State<UsernameStep> {
-  UsernameStepState({Key? key});
+  UsernameStepState();
 
   Timer? typingTimeout;
   final usernameController = TextEditingController();
@@ -120,8 +118,7 @@ class UsernameStepState extends State<UsernameStep> {
                     maxWidth: Dimensions.inputWidthMax,
                   ),
                   child: TextFieldSecure(
-                    label:
-                        props.isUsernameValid ? props.fullUserId : 'Username',
+                    label: props.isUsernameValid ? props.fullUserId : 'Username',
                     disableSpacing: true,
                     valid: props.isUsernameValid,
                     controller: usernameController,
@@ -167,7 +164,7 @@ class UsernameStepState extends State<UsernameStep> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Container(
-                          padding: EdgeInsets.all((6)),
+                          padding: EdgeInsets.all(6),
                           child: suffixWidget,
                         ),
                       ),

@@ -219,10 +219,13 @@ class ChatInputState extends State<ChatInput> {
   }
 
   onAddPhoto() async {
+    // TODO: has bug with file path
+    // final pickerResult = await ImagePicker().pickImage(
+    //   source: ImageSource.gallery,
+    // );
+
     final pickerResult = await ImagePicker().getImage(
       source: ImageSource.gallery,
-      maxWidth: Dimensions.avatarSizeMax,
-      maxHeight: Dimensions.avatarSizeMax,
     );
 
     if (pickerResult == null) return;

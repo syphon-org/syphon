@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_image_provider/device_image.dart';
 import 'package:local_image_provider/local_image.dart';
@@ -41,7 +40,10 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
   onMounted() async {
     final hasPermission = await imageProvider.initialize();
     if (hasPermission) {
-      final latestImages = await imageProvider.findLatest(10);
+      final latestMedia = await imageProvider.findLatest(10);
+
+      // TODO: handle video previews
+      final latestImages = latestMedia.where((media) => media.isImage).toList();
 
       setState(() {
         images = latestImages;
@@ -102,6 +104,10 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
       itemBuilder: (BuildContext context, int index) {
         final image = images[index];
 
+        if (image.isVideo) {
+          // TODO: handle video previews here
+        }
+
         ///
         /// Image Media Preview
         ///
@@ -115,8 +121,8 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(15.0)),
             ),
-            height: widget.imageSize,
             width: widget.imageSize,
+            height: widget.imageSize,
             padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
             child: Stack(
               children: <Widget>[
