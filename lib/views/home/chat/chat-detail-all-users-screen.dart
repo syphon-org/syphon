@@ -129,7 +129,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
         appBar: AppBarSearch(
           title: Strings.titleChatUsers,
           label: Strings.labelSearchUser,
-          tooltip: 'Search users',
+          tooltip: Strings.tooltipSearchUsers,
           focusNode: searchInputFocusNode,
           onChange: (text) {
             props.onSearch(text);

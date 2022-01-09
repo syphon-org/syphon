@@ -356,7 +356,7 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (message.edited) {
-      status += ' (Edited)';
+      status += Strings.messageEditedAppend;
       showInfoRow = true;
     }
 

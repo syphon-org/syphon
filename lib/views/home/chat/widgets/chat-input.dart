@@ -423,7 +423,7 @@ class ChatInputState extends State<ChatInput> {
                               Icons.close,
                               size: Dimensions.iconSize,
                             ),
-                            tooltip: 'Cancel Reply',
+                            tooltip: Strings.tooltipCancelReply,
                           ),
                         ),
                       ],
@@ -450,7 +450,7 @@ class ChatInputState extends State<ChatInput> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               ButtonText(
-                                text: 'Save Message Edit',
+                                text: Strings.buttonSaveMessageEdit,
                                 size: 18.0,
                                 disabled: widget.sending || !isSendable,
                                 onPressed: () => onSubmit(),
@@ -559,7 +559,7 @@ class ChatInputState extends State<ChatInput> {
                         Padding(
                           padding: EdgeInsets.only(right: 2),
                           child: MediaCard(
-                            text: 'Gallery',
+                            text: Strings.buttonGallery,
                             icon: Icons.photo,
                             onPress: () => onAddPhoto(),
                           ),
@@ -567,7 +567,7 @@ class ChatInputState extends State<ChatInput> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 2),
                           child: MediaCard(
-                            text: 'File',
+                            text: Strings.buttonFile,
                             icon: Icons.note_add,
                             onPress: () => onAddInProgress(),
                           ),
@@ -575,7 +575,7 @@ class ChatInputState extends State<ChatInput> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 2),
                           child: MediaCard(
-                            text: 'Contact',
+                            text: Strings.buttonContact,
                             icon: Icons.person,
                             onPress: () => onAddInProgress(),
                           ),
@@ -583,7 +583,7 @@ class ChatInputState extends State<ChatInput> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 2),
                           child: MediaCard(
-                            text: 'Location',
+                            text: Strings.buttonLocation,
                             icon: Icons.near_me_rounded,
                             onPress: () => onAddInProgress(),
                           ),

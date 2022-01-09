@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 
 class ModalImageOptions extends StatelessWidget {
   const ModalImageOptions({
@@ -38,7 +39,7 @@ class ModalImageOptions extends StatelessWidget {
                 horizontal: 24,
               ),
               child: Text(
-                'Photo Select Method',
+                Strings.listItemImageOptionsPhotoSelectMethod,
                 textAlign: TextAlign.start,
               ),
             ),
@@ -51,7 +52,7 @@ class ModalImageOptions extends StatelessWidget {
                 ),
               ),
               title: Text(
-                'Take Photo',
+                Strings.listItemImageOptionsTakePhoto,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               onTap: () async {
@@ -80,7 +81,7 @@ class ModalImageOptions extends StatelessWidget {
                 ),
               ),
               title: Text(
-                'Pick from gallery',
+                Strings.listItemImageOptionsPickFromGallery,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
               onTap: () async {
@@ -111,7 +112,7 @@ class ModalImageOptions extends StatelessWidget {
                 ),
               ),
               title: Text(
-                'Remove photo',
+                Strings.listItemImageOptionsRemovePhoto,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),

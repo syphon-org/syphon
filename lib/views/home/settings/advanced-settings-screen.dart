@@ -71,7 +71,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     onTap: () => props.onStartBackgroundSync(),
                     contentPadding: Dimensions.listPadding,
                     title: Text(
-                      'Start Background Service',
+                      Strings.listItemAdvancedSettingsStartBackground,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
@@ -88,7 +88,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     },
                     contentPadding: Dimensions.listPadding,
                     title: Text(
-                      'Stop All Services',
+                      Strings.listItemAdvancedSettingsStopBackground,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
@@ -103,7 +103,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                       );
                     },
                     contentPadding: Dimensions.listPadding,
-                    title: Text('Test Notifications', style: Theme.of(context).textTheme.subtitle1),
+                    title: Text(Strings.listItemAdvancedSettingsTestNotifications, style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 Visibility(
@@ -114,7 +114,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                       await notificationSyncTEST();
                     },
                     contentPadding: Dimensions.listPadding,
-                    title: Text('Test Background Sync Loop',
+                    title: Text(Strings.listItemAdvancedSettingsTestSyncLoop,
                         style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
@@ -126,7 +126,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     onTap: () {
                       props.onForceFunction();
                     },
-                    title: Text('Force Function', style: Theme.of(context).textTheme.subtitle1),
+                    title: Text(Strings.listItemAdvancedSettingsForceFunction, style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 ListTile(
@@ -136,7 +136,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   },
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Open Source Licenses',
+                    Strings.listItemAdvancedSettingsLicenses,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
@@ -156,11 +156,11 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   onTap: () => props.onEditSyncInterval(context),
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Sync Interval',
+                    Strings.listItemSettingsSyncInterval,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   subtitle: Text(
-                    'Amount of time in seconds the app wait\nbetween syncing',
+                    Strings.subtitleSettingsSyncInterval,
                   ),
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
@@ -175,11 +175,11 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   onTap: props.onToggleSyncing as void Function()?,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Toggle Syncing',
+                    Strings.listItemSettingsSyncToggle,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   subtitle: Text(
-                    'Toggle syncing with the matrix server',
+                    Strings.subtitleSettingsSyncToggle,
                   ),
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
