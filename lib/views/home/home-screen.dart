@@ -13,6 +13,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
@@ -844,13 +845,7 @@ class _Props extends Equatable {
           return Future(() => true);
         },
         onSelectHelp: () async {
-          try {
-            if (await canLaunch(Values.openHelpUrl)) {
-              await launch(Values.openHelpUrl);
-            } else {
-              throw 'Could not launch ${Values.openHelpUrl}';
-            }
-          } catch (error) {}
+          await launchUrl(Values.openHelpUrl);
         },
       );
 }

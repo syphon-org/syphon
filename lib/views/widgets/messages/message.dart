@@ -8,6 +8,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/index.dart';
@@ -216,14 +217,7 @@ class MessageWidget extends StatelessWidget {
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           Navigator.of(dialogContext).pop();
-
-          // TODO: confirm it can launch a URL with new Android 11 privacy settings
-          // if (await canLaunch(url)) {
-          try {
-            return launch(url, forceSafariVC: false);
-          } catch (error) {
-            throw 'Could not launch $url';
-          }
+          await launchUrl(url);
         },
       ),
     );

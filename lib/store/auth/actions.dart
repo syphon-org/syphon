@@ -20,6 +20,7 @@ import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
@@ -426,11 +427,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
       if (token == null) {
         final ssoUrl = 'https://${homeserver.baseUrl}${Values.matrixSSOUrl}';
 
-        if (await canLaunch(ssoUrl)) {
-          return await launch(ssoUrl, forceSafariVC: false);
-        } else {
-          throw 'Could not launch $ssoUrl';
-        }
+        return await launchUrl(ssoUrl, forceSafariVC: false);
       }
 
       final username = store.state.authStore.username;
