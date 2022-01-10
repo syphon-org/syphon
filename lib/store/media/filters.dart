@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
@@ -26,10 +27,13 @@ Future<File?> scrubMedia({
     final mimeTypeOption = lookupMimeType(localFile.path);
     final mimeType = convertMimeTypes(localFile, mimeTypeOption);
 
-    // Setting up params for saving encrypted file
+    // Image file info
     final String fileType = mimeType;
     final String fileExtension = fileType.split('/')[1];
     final String fileName = '$mediaName-scrubbed.$fileExtension';
+    final fileImage = await decodeImageFromList(
+      localFile.readAsBytesSync(),
+    );
 
     var format;
 
@@ -46,13 +50,16 @@ Future<File?> scrubMedia({
       case 'webp':
         format = CompressFormat.webp;
         break;
+      default:
+        // Can't remove exif info for this media type
+        return localFile;
     }
 
     final mediaScrubbed = await FlutterImageCompress.compressWithFile(
       localFile.absolute.path,
       quality: 100,
-      // minWidth: ,
-      // minHeight: ,
+      minWidth: fileImage.width,
+      minHeight: fileImage.height,
       format: format,
       keepExif: false,
       numberOfRetries: 1,

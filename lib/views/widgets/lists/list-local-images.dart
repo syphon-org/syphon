@@ -8,6 +8,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
@@ -58,8 +59,11 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
       image.pixelWidth!,
     );
 
+    // NOTE: !!! default from imageProvider.imageBytes !!!
+    const imageType = 'jpeg';
+    final filename = '${image.id}.$imageType';
+
     final directory = await getTemporaryDirectory();
-    final filename = image.id;
     final file = File(path.join(directory.path, filename));
 
     await file.writeAsBytes(imageBytes);

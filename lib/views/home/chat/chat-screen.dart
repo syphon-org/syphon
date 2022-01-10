@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:equatable/equatable.dart';
+import 'package:exif/exif.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,7 +14,9 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
@@ -291,7 +294,10 @@ class ChatScreenState extends State<ChatScreen> {
     File? encryptedFile;
     EncryptInfo? info;
 
-    // TODO: confirm this doesn't persist the potato filter 🥔
+    printDebug('STUFFF');
+    printDebug(rawFile.path);
+    printDebug(rawFile.uri.toString());
+
     var file = await scrubMedia(localFile: rawFile);
 
     if (file == null) {

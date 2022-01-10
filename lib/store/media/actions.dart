@@ -47,7 +47,7 @@ class UpdateMediaCache {
 
 ThunkAction<AppState> uploadMedia({
   required File localFile,
-  String? mediaName = 'profile-photo',
+  String? mediaName = 'media-default',
 }) {
   return (Store<AppState> store) async {
     try {
