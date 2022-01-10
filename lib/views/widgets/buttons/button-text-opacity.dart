@@ -1,11 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:syphon/global/colours.dart';
 
 import 'package:syphon/global/dimensions.dart';
 
 class ButtonTextOpacity extends StatefulWidget {
-  ButtonTextOpacity({
+  const ButtonTextOpacity({
     Key? key,
     this.text,
     this.textWidget,

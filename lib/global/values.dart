@@ -12,9 +12,9 @@ class Values {
   static const appNameLong = 'Syphon Messenger';
   static const appDisplayName = 'Syphon';
 
-  static const EMPTY_CHAT = 'Empty Chat';
   static const empty = '';
   static const UNKNOWN = 'Unknown';
+  static const EMPTY_CHAT = 'Empty Chat';
   static const DEFAULT_PROTOCOL = 'https://';
 
   // Notifications and Background service
@@ -27,31 +27,22 @@ class Values {
   static const channel_name_background_service = 'Background Sync';
   static const channel_description = '$appName messaging client message and status notifications';
 
-  static const captchaMatrixSiteKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
-
+  // syphon related
   static const supportEmail = 'hello@syphon.org';
-
-  static const matrixSSOUrl =
-      '/_matrix/client/r0/login/sso/redirect?redirectUrl=syphon://syphon.org/login/token';
-
   static const openHelpUrl =
       'mailto:$supportEmail?subject=Syphon%20Support%20-%20App&body=Hey%20Syphon%20Team%2C%0D%0A%0D%0A%3CLeave%20your%20feedback%2C%20questions%20or%20concerns%20here%3E%0D%0A%0D%0AThanks!';
 
-  static const openSourceLibraries = [
-    {'title': 'testing', 'license': 'MIT', 'version': '1.2.3'},
-  ];
-
+  // matrix values
   static const homeserverDefault = 'matrix.org';
+  static const clientSecretMatrix = 'MDWVwN79p5xIz7bgazVXvO8aabbVD0LN';
+  static const captchaMatrixSiteKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
+  static const matrixSSOUrl =
+      '/_matrix/client/r0/login/sso/redirect?redirectUrl=syphon://syphon.org/login/token';
 
-  // hello darkness, my old friend
+  // regexs - hello darkness, my old friend
   static const emailRegex = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
-
   static const urlRegex =
       r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)';
-
-  static const clientSecretMatrix = 'MDWVwN79p5xIz7bgazVXvO8aabbVD0LN';
-
-  static const redacted = 'redacted';
 
   // Animations
   static const animationDurationDefault = 350; // millis

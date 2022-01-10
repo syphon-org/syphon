@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -89,7 +89,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
-          final double imageSize = Dimensions.avatarSizeDetails;
+          const double imageSize = Dimensions.avatarSizeDetails;
 
           final backgroundColor = selectAvatarBackground(props.themeType);
 
@@ -295,8 +295,8 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                   label: 'Name*',
                                                   textInputAction: TextInputAction.next,
                                                   controller: nameController,
-                                                  onSubmitted: (text) =>
-                                                      FocusScope.of(context).requestFocus(aliasFocus),
+                                                  onSubmitted: (text) => FocusScope.of(context)
+                                                      .requestFocus(aliasFocus),
                                                   onChanged: (text) => setState(() {
                                                     name = text;
                                                   }),
@@ -313,8 +313,8 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                   textInputAction: TextInputAction.next,
                                                   disableSpacing: true,
                                                   focusNode: aliasFocus,
-                                                  onSubmitted: (text) =>
-                                                      FocusScope.of(context).requestFocus(topicFocus),
+                                                  onSubmitted: (text) => FocusScope.of(context)
+                                                      .requestFocus(topicFocus),
                                                   onChanged: (text) => setState(() {
                                                     alias = text;
                                                   }),

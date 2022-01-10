@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_image_provider/device_image.dart';
 import 'package:local_image_provider/local_image.dart';
@@ -9,6 +8,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 _empty(File file) {}
@@ -40,7 +41,10 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
   onMounted() async {
     final hasPermission = await imageProvider.initialize();
     if (hasPermission) {
-      final latestImages = await imageProvider.findLatest(10);
+      final latestMedia = await imageProvider.findLatest(10);
+
+      // TODO: handle video previews
+      final latestImages = latestMedia.where((media) => media.isImage).toList();
 
       setState(() {
         images = latestImages;
@@ -55,8 +59,11 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
       image.pixelWidth!,
     );
 
+    // NOTE: !!! default from imageProvider.imageBytes !!!
+    const imageType = 'jpeg';
+    final filename = '${image.id}.$imageType';
+
     final directory = await getTemporaryDirectory();
-    final filename = image.id;
     final file = File(path.join(directory.path, filename));
 
     await file.writeAsBytes(imageBytes);
@@ -84,7 +91,7 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
                 ),
               ),
               Text(
-                'No Images Found',
+                Strings.alertNoImagesFound,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.button?.copyWith(
                       fontWeight: FontWeight.w400,
@@ -101,6 +108,10 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
       itemBuilder: (BuildContext context, int index) {
         final image = images[index];
 
+        if (image.isVideo) {
+          // TODO: handle video previews here
+        }
+
         ///
         /// Image Media Preview
         ///
@@ -114,8 +125,8 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
             decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(15.0)),
             ),
-            height: widget.imageSize,
             width: widget.imageSize,
+            height: widget.imageSize,
             padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
             child: Stack(
               children: <Widget>[

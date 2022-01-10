@@ -3,6 +3,12 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 
+bool selectIsMedia(Message message) {
+  final isBodyNull = message.body == null || message.body!.isEmpty;
+
+  return message.url != null && !isBodyNull;
+}
+
 String selectEventBody(Message message) {
   final isBodyEmpty = message.body == null || message.body!.isEmpty;
 
@@ -37,6 +43,44 @@ String selectEventBody(Message message) {
       default:
         return Strings.labelEncryptedMessage;
     }
+  }
+
+  return message.body ?? '';
+}
+
+// TODO: switch to this when you have more time
+String selectEventBodyNew(Message message) {
+  final isBodyEmpty = message.body == null || message.body!.isEmpty;
+
+  var messageType = message.type;
+
+  if (message.typeDecrypted != null) {
+    messageType = message.typeDecrypted;
+  }
+
+  switch (messageType) {
+    case EventTypes.encrypted:
+      if (isBodyEmpty) {
+        return Strings.labelEncryptedMessage;
+      }
+      break;
+    case EventTypes.message:
+      // ignore: invariant_booleans
+      if (isBodyEmpty) {
+        return Strings.labelDeletedMessage;
+      }
+      break;
+    case EventTypes.callInvite:
+      return Strings.labelCallInvite;
+
+    case EventTypes.callHangup:
+      return Strings.labelCallHangup;
+
+    default:
+      if (message.typeDecrypted != null) {
+        return Strings.labelEncryptedMessage;
+      }
+      break;
   }
 
   return message.body ?? '';

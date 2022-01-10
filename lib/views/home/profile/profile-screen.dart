@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -92,7 +92,7 @@ class ProfileScreenState extends State<ProfileScreen> {
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       onInitialBuild: onMounted,
       builder: (context, props) {
-        final double imageSize = Dimensions.avatarSizeDetails;
+        const double imageSize = Dimensions.avatarSizeDetails;
 
         // Space for confirming rebuilding
         Widget avatarWidget = Avatar(
@@ -218,13 +218,12 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               Container(
-                                margin: const EdgeInsets.all(8.0),
-                                constraints: BoxConstraints(
-                                  maxHeight: Dimensions.inputHeight,
-                                  maxWidth: Dimensions.inputWidthMax,
-                                ),
-                                child: Row(
-                                  children: [
+                                  margin: const EdgeInsets.all(8.0),
+                                  constraints: BoxConstraints(
+                                    maxHeight: Dimensions.inputHeight,
+                                    maxWidth: Dimensions.inputWidthMax,
+                                  ),
+                                  child: Row(children: [
                                     TextFieldSecure(
                                       disabled: false,
                                       readOnly: true,
@@ -241,9 +240,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                         icon: Icon(Icons.copy),
                                       ),
                                     ),
-                                  ]
-                                )
-                              ),
+                                  ])),
                             ],
                           ),
                           Container(
@@ -332,36 +329,35 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
-        user: store.state.authStore.user,
-        loading: store.state.authStore.loading,
-        themeType: store.state.settingsStore.themeSettings.themeType,
-        onSaveProfile: ({
-          File? avatarFileNew,
-          String? userIdNew,
-          String? displayNameNew,
-        }) async {
-          final currentUser = store.state.authStore.user;
+      user: store.state.authStore.user,
+      loading: store.state.authStore.loading,
+      themeType: store.state.settingsStore.themeSettings.themeType,
+      onSaveProfile: ({
+        File? avatarFileNew,
+        String? userIdNew,
+        String? displayNameNew,
+      }) async {
+        final currentUser = store.state.authStore.user;
 
-          if (displayNameNew != null && currentUser.displayName != displayNameNew) {
-            final bool successful = await store.dispatch(
-              updateDisplayName(displayNameNew),
-            );
-            if (!successful) return false;
-          }
-
-          if (avatarFileNew != null) {
-            final bool successful = await store.dispatch(
-              updateAvatar(localFile: avatarFileNew),
-            );
-            if (!successful) return false;
-          }
-
-          await store.dispatch(fetchAuthUserProfile());
-          return true;
-        },
-        copyToClipboard: () async {
-          await Clipboard.setData(ClipboardData(text: store.state.authStore.user.userId));
-          store.dispatch(addInfo(message: 'Copied User ID to clipboard')); //TODO i18n
+        if (displayNameNew != null && currentUser.displayName != displayNameNew) {
+          final bool successful = await store.dispatch(
+            updateDisplayName(displayNameNew),
+          );
+          if (!successful) return false;
         }
-      );
+
+        if (avatarFileNew != null) {
+          final bool successful = await store.dispatch(
+            updateAvatar(localFile: avatarFileNew),
+          );
+          if (!successful) return false;
+        }
+
+        await store.dispatch(fetchAuthUserProfile());
+        return true;
+      },
+      copyToClipboard: () async {
+        await Clipboard.setData(ClipboardData(text: store.state.authStore.user.userId));
+        store.dispatch(addInfo(message: 'Copied User ID to clipboard')); //TODO i18n
+      });
 }

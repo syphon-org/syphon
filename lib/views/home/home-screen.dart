@@ -13,6 +13,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
@@ -40,7 +41,6 @@ import 'package:syphon/views/widgets/containers/fabs/fab-ring.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
 
@@ -307,7 +307,7 @@ class HomeState extends State<HomeScreen> {
             offline: props.offline,
             syncing: props.syncing,
             unauthed: props.unauthed,
-            tooltip: 'Profile and Settings',
+            tooltip: Strings.tooltipProfileAndSettings,
             onPressed: () {
               Navigator.pushNamed(context, Routes.settingsProfile);
             },
@@ -325,7 +325,7 @@ class HomeState extends State<HomeScreen> {
         IconButton(
           color: assetColor,
           icon: Icon(Icons.search),
-          tooltip: 'Search Chats',
+          tooltip: Strings.tooltipSearchChats,
           onPressed: () => onToggleSearch(),
         ),
         RoundedPopupMenu<Options>(
@@ -690,9 +690,9 @@ class HomeState extends State<HomeScreen> {
 
           if (searching) {
             currentAppBar = AppBarSearch(
-              title: 'Search Unencrypted',
-              label: 'Search Unencrypted',
-              tooltip: 'Search Unencrypted',
+              title: Strings.titleSearchUnencrypted,
+              label: Strings.labelSearchUnencrypted,
+              tooltip: Strings.tooltipSearchUnencrypted,
               forceFocus: true,
               navigate: false,
               startFocused: true,
@@ -844,13 +844,7 @@ class _Props extends Equatable {
           return Future(() => true);
         },
         onSelectHelp: () async {
-          try {
-            if (await canLaunch(Values.openHelpUrl)) {
-              await launch(Values.openHelpUrl);
-            } else {
-              throw 'Could not launch ${Values.openHelpUrl}';
-            }
-          } catch (error) {}
+          await launchUrl(Values.openHelpUrl);
         },
       );
 }

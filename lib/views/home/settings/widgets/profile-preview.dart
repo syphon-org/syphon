@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
@@ -67,8 +64,7 @@ class ProfilePreview extends StatelessWidget {
                     width: Dimensions.avatarSize,
                     height: Dimensions.avatarSize,
                     child: IconButton(
-                      onPressed: () =>
-                          onModifyAccounts != null ? onModifyAccounts!() : null,
+                      onPressed: () => onModifyAccounts != null ? onModifyAccounts!() : null,
                       icon: Icon(
                         Icons.more_horiz_rounded,
                         color: Color(Colours.greyDefault),

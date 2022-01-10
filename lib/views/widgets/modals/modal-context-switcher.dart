@@ -7,6 +7,7 @@ import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
@@ -68,7 +69,7 @@ class ModalContextSwitcher extends StatelessWidget {
 
                     final userContext = User(
                       userId: context.id,
-                      displayName: '${context.id} (Encrypted User)',
+                      displayName: Strings.listItemContextSwitcherUserDisplayName(context.id),
                     );
 
                     return ListItemAccount(
@@ -120,7 +121,7 @@ class ModalContextSwitcher extends StatelessWidget {
                     horizontal: Dimensions.paddingLarge,
                   ),
                   child: Text(
-                    'Accounts',
+                    Strings.listItemContextSwitcherAccounts,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headline5?.copyWith(
                           fontWeight: FontWeight.w600,
@@ -152,7 +153,7 @@ class ModalContextSwitcher extends StatelessWidget {
                               horizontal: Dimensions.paddingContainer,
                             ),
                             title: Text(
-                              'Add account',
+                              Strings.listItemContextSwitcherAddAccount,
                               style: Theme.of(context).textTheme.bodyText2,
                             ),
                             leading: Container(

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -326,7 +326,8 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
-        session: store.state.authStore.authSession != null && store.state.authStore.authSession!.isNotEmpty,
+        session: store.state.authStore.authSession != null &&
+            store.state.authStore.authSession!.isNotEmpty,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },

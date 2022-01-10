@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -361,7 +361,9 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                                       maxHeight: 180,
                                     ),
                                     child: SvgPicture.asset(
-                                      avatarHash % 2 == 0 ? Assets.heroAvatarFemale : Assets.heroAvatarMale,
+                                      avatarHash % 2 == 0
+                                          ? Assets.heroAvatarFemale
+                                          : Assets.heroAvatarMale,
                                       width: width * 0.35,
                                       height: width * 0.35,
                                     ),
@@ -437,30 +439,35 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                                   child: ButtonSolid(
                                     text: Strings.buttonLogin,
                                     loading: props.loading && currentAuthType == AuthTypes.Password,
-                                    disabled: !props.isPasswordLoginAttemptable || currentAuthType != null,
+                                    disabled: !props.isPasswordLoginAttemptable ||
+                                        currentAuthType != null,
                                     onPressed: () => onLoginPassword(props),
                                   ),
                                 ),
                                 Visibility(
-                                  visible: props.isSSOLoginAvailable && !props.isPasswordLoginAvailable,
+                                  visible:
+                                      props.isSSOLoginAvailable && !props.isPasswordLoginAvailable,
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 12, bottom: 12),
                                     child: ButtonSolid(
                                       text: Strings.buttonLoginSSO,
                                       loading: props.loading && currentAuthType == AuthTypes.SSO,
-                                      disabled: !props.isSSOLoginAttemptable || currentAuthType != null,
+                                      disabled:
+                                          !props.isSSOLoginAttemptable || currentAuthType != null,
                                       onPressed: () => onLoginSSO(props),
                                     ),
                                   ),
                                 ),
                                 Visibility(
-                                  visible: props.isSSOLoginAvailable && props.isPasswordLoginAvailable,
+                                  visible:
+                                      props.isSSOLoginAvailable && props.isPasswordLoginAvailable,
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 12, bottom: 12),
                                     child: ButtonText(
                                       text: Strings.buttonLoginSSO,
                                       loading: props.loading && currentAuthType == AuthTypes.SSO,
-                                      disabled: !props.isSSOLoginAttemptable || currentAuthType != null,
+                                      disabled:
+                                          !props.isSSOLoginAttemptable || currentAuthType != null,
                                       onPressed: () => onLoginSSO(props),
                                     ),
                                   ),
@@ -606,10 +613,12 @@ class _Props extends Equatable {
             await store.dispatch(selectHomeserver(hostname: hostname));
             final _homeserver = store.state.authStore.homeserver;
 
-            if (_homeserver.signupTypes.isEmpty && !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+            if (_homeserver.signupTypes.isEmpty &&
+                !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
               store.dispatch(addInfo(
                 origin: 'selectHomeserver',
-                message: 'No new signups allowed on this server, try another if creating an account',
+                message:
+                    'No new signups allowed on this server, try another if creating an account',
               ));
             }
           }

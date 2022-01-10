@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -129,7 +129,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
         appBar: AppBarSearch(
           title: Strings.titleChatUsers,
           label: Strings.labelSearchUser,
-          tooltip: 'Search users',
+          tooltip: Strings.tooltipSearchUsers,
           focusNode: searchInputFocusNode,
           onChange: (text) {
             props.onSearch(text);
