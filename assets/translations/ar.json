@@ -3,8 +3,8 @@
     "title-view-search-users": "البحث عن المستخدمين",
     "button-start-chat": "فلندردش",
     "header-signup-username": "يُرجى إنشاء اسم المستخدم",
-    "header-intro": "الخصوصية والحرية\nدون متاعب.",
-    "title-intro": "أهلا بك في {}",
+    "header-intro": "الخصوصية والحرية\nبدون متاعب.",
+    "title-intro": "مرحبًا بك في {}",
     "label-send-encrypted": "سحب السهم الأيمن لإرسال رسالة",
     "semantics-image-password-reset": "شخص يستريح بذراعه أعلى حرف به مربع اختيار بالداخل",
     "semantics-image-signup-username": "شخص يستريح بمرفقه على بطاقة الهوية. التعريفية",
@@ -135,7 +135,7 @@
     "title-view-search-groups": "استكشاف المجموعات",
     "title-view-delete-devices": "تأكيد إزالة الجهاز",
     "title-verification": "التحقق",
-    "header-login": "استعادة الدردشة",
+    "header-login": "استرجع الدردشة",
     "label-send": "ارسل",
     "button-leave-chat": "ترك الدردشة",
     "label-back": "الرجوع للخلف",
@@ -175,5 +175,7 @@
     "title-proxy-port": "تعديل منفذ الوكيل",
     "subtitle-proxy-use-proxy": "سيؤدي هذا إلى إجبار كل حركة المرور التي تغادر Siphon على القيام بذلك عبر وكيل",
     "label-proxy-host": "اسم المضيف",
-    "label-proxy-port": "المنفذ"
+    "label-proxy-port": "المنفذ",
+    "label-call-invite": "دعاك المستخدم إلى مكالمة صوتية",
+    "label-call-hangup": "أنهى المستخدم المكالمة الصوتية"
 }

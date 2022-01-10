@@ -151,5 +151,6 @@
     "button-text-mark-all-read": "Marcar todos como lidos",
     "button-text-invite": "Convidar amigos",
     "button-text-settings": "Configurações",
-    "button-text-support": "Ajuda"
+    "button-text-support": "Ajuda",
+    "label-proxy-port": "Porta"
 }
