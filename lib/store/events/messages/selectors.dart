@@ -4,7 +4,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
 
 bool selectIsMedia(Message message) {
-  final isBodyNull = message.body == null;
+  final isBodyNull = message.body == null || message.body!.isEmpty;
 
   return message.url != null && !isBodyNull;
 }
