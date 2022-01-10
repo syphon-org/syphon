@@ -175,5 +175,7 @@
     "content-proxy-port": "A porta em que o proxy está a \"escutar\"",
     "label-proxy-host": "Hostname",
     "title-proxy-host": "Alterar o host do proxy",
-    "title-proxy-port": "Alterar a porta do proxy"
+    "title-proxy-port": "Alterar a porta do proxy",
+    "label-call-hangup": "O utilizador terminou uma chamada de voz",
+    "label-call-invite": "O utilizador convidou-o para uma chamada de voz"
 }

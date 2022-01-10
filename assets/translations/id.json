@@ -175,5 +175,7 @@
     "warning-deactivate-account": "INI AKAN MENGHAPUS AKUN ANDA SECARA PERMANEN\n\nAnda tidak akan dapat memulihkan data apa pun atau mengakses akun ini setelah menonaktifkannya.\nHarap pertimbangkan baik-baik sebelum melakukan ini!",
     "semnatics-image-intro-section-third": "Orang-orang menyantai dan mengirim pesan ke sesama",
     "semantics-image-empty-chat-list": "Beberapa monster kecil dan imut mengintip dari balik dedaunan.",
-    "label-proxy-port": "Port"
+    "label-proxy-port": "Port",
+    "label-call-invite": "Pengguna mengundang Anda ke sebuah panggilan suara",
+    "label-call-hangup": "Pengguna mengakhiri sebuah panggilan suara"
 }
