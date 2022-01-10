@@ -114,28 +114,37 @@ class Strings {
   static final listItemSettingsSyncInterval = tr('list-item-settings-sync-interval');
   static final listItemSettingsSyncToggle = tr('list-item-settings-sync-toggle');
 
-  static String listItemUserDetailsStartChat(String? name) => tr('list-item-user-details-start-chat', args: ['$name']);
+  static String listItemUserDetailsStartChat(String? name) =>
+      tr('list-item-user-details-start-chat', args: ['$name']);
   static final listItemUserDetailsRoomInvite = tr('list-item-user-details-room-invite');
   static final listItemUserDetailsSendMessage = tr('list-item-user-details-send-message');
   static final listItemUserDetailsViewProfile = tr('list-item-user-details-view-profile');
   static final listItemUserDetailsUnblockUser = tr('list-item-user-details-unblock-user');
   static final listItemUserDetailsBlockUser = tr('list-item-user-details-block-user');
 
-  static final listItemImageOptionsPhotoSelectMethod = tr('list-item-image-options-photo-select-method');
+  static final listItemImageOptionsPhotoSelectMethod =
+      tr('list-item-image-options-photo-select-method');
   static final listItemImageOptionsTakePhoto = tr('list-item-image-options-take-photo');
-  static final listItemImageOptionsPickFromGallery = tr('list-item-image-options-pick-from-gallery');
+  static final listItemImageOptionsPickFromGallery =
+      tr('list-item-image-options-pick-from-gallery');
   static final listItemImageOptionsRemovePhoto = tr('list-item-image-options-remove-photo');
 
-  static String listItemContextSwitcherUserDisplayName(String? username) => tr('list-item-context-switcher-user-display-name', args: ['$username']);
+  static String listItemContextSwitcherUserDisplayName(String? username) =>
+      tr('list-item-context-switcher-user-display-name', args: ['$username']);
   static final listItemContextSwitcherAccounts = tr('list-item-context-switcher-accounts');
   static final listItemContextSwitcherAddAccount = tr('list-item-context-switcher-add-account');
 
   static final listItemAdvancedSettingsLicenses = tr('list-item-advanced-settings-licenses');
-  static final listItemAdvancedSettingsStartBackground = tr('list-item-advanced-settings-start-background');
-  static final listItemAdvancedSettingsStopBackground = tr('list-item-advanced-settings-stop-background');
-  static final listItemAdvancedSettingsTestNotifications = tr('list-item-advanced-settings-test-notifications');
-  static final listItemAdvancedSettingsTestSyncLoop = tr('list-item-advanced-settings-test-sync-loop');
-  static final listItemAdvancedSettingsForceFunction = tr('list-item-advanced-settings-force-function');
+  static final listItemAdvancedSettingsStartBackground =
+      tr('list-item-advanced-settings-start-background');
+  static final listItemAdvancedSettingsStopBackground =
+      tr('list-item-advanced-settings-stop-background');
+  static final listItemAdvancedSettingsTestNotifications =
+      tr('list-item-advanced-settings-test-notifications');
+  static final listItemAdvancedSettingsTestSyncLoop =
+      tr('list-item-advanced-settings-test-sync-loop');
+  static final listItemAdvancedSettingsForceFunction =
+      tr('list-item-advanced-settings-force-function');
 
   static final listItemSent = tr('list-item-sent');
   static final listItemReceived = tr('list-item-received');
@@ -144,7 +153,8 @@ class Strings {
   static final listItemReadBy = tr('list-item-read-by');
 
   static final listItemChatDetailToggleDirectChat = tr('list-item-chat-detail-toggle-direct-chat');
-  static final listItemChatDetailNotificationSetting = tr('list-item-chat-detail-notification-setting');
+  static final listItemChatDetailNotificationSetting =
+      tr('list-item-chat-detail-notification-setting');
   static final listItemChatDetailNotifications = tr('list-item-chat-detail-notifications');
   static final listItemChatDetailVibrate = tr('list-item-chat-detail-vibrate');
   static final listItemChatDetailNotificationSound = tr('list-item-chat-detail-notification-sound');
@@ -225,7 +235,8 @@ class Strings {
   static final alertHiddenReadReceipts = tr('alert-hidden-read-receipts');
   static final alertOffline = tr('alert-offline');
   static final alertUnknown = tr('alert-unknown');
-  static String alertCouldNotLaunchURL(String? url) => tr('alert-could-not-launch-url', args: ['$url']);
+  static String alertCouldNotLaunchURL(String? url) =>
+      tr('alert-could-not-launch-url', args: ['$url']);
   static final alertNoImagesFound = tr('alert-no-images-found');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
@@ -257,9 +268,8 @@ class Strings {
   static final messageEditedAppend = tr('message-edited-append');
 
   // Confirmations (use confirm*)
-
   static final confirmInvite = tr('confirm-invite');
-  static final confirmInvites = tr('confirm-invite-multiple');
+  static final confirmInvites = tr('confirm-invites-multiple');
   static final confirmStartChat = tr('confirm-start-chat');
   static final confirmDeactivate = tr('prompt-confirm-deactivate');
   static final confirmAttemptChat = tr('confirm-attempt-chat');

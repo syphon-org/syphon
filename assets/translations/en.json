@@ -204,7 +204,7 @@
     "message-edited-append": " (Edited)",
     "confirm-linkout": "Are you sure you want to open the following link?\n\n{}",
     "confirm-delete-keys": "Are you sure you want to delete your encryption keys for this device? This is very destructive and will probably render all your encrypted messages undecryptable.",
-    "confirm-invite": "Are you sure you want to invite the following user to the following chat?",
+    "confirm-invite": "Are you sure you want to invite the following users?",
     "confirm-invites-multiple": "Are you sure you want to invite the selected users to the following chat?",
     "confirm-start-chat": "Even if you don't send a message, the user will still see your invite to chat.",
     "confirm-attempt-chat": "Even if you don't send a message, the user will still see your invite to chat if they exist.\n\nDo you want to try chatting with this username?",

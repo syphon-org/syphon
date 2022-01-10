@@ -175,18 +175,18 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
     // Confirm sending the invites with a dialog
     return showDialog(
       context: context,
-      builder: (BuildContext context) => DialogInviteUsers(
+      builder: (BuildContext dialogContext) => DialogInviteUsers(
         users: invites,
         title: 'Invite To ${room!.name}',
         content:
-            '${Strings.confirmInvites}${'\n\nSend ${invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?'}',
+            '${Strings.confirmInvite}${'\n\nSend ${invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?'}',
         action: 'send ${invitePlurialized.toLowerCase()}',
         onInviteUsers: () async {
           await Future.wait(invites.map((user) async {
             return props.onSendInvite(room: Room(id: roomId), user: user);
           }));
 
-          Navigator.pop(context);
+          Navigator.pop(dialogContext);
           Navigator.pop(context);
         },
       ),
