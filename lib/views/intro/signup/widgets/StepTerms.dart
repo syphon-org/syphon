@@ -1,22 +1,16 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
-
-// Store
-
-// Styling
 
 class TermsStep extends StatelessWidget {
   TermsStep({Key? key}) : super(key: key);
@@ -27,7 +21,7 @@ class TermsStep extends StatelessWidget {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        double width = MediaQuery.of(context).size.width;
+        final double width = MediaQuery.of(context).size.width;
         return Container(
           child: Flex(
             direction: Axis.vertical,
@@ -49,8 +43,7 @@ class TermsStep extends StatelessWidget {
                     children: [
                       SvgPicture.asset(
                         Assets.heroSyncFiles,
-                        semanticsLabel:
-                            'A couple of documents with a checked circle on the bottom',
+                        semanticsLabel: 'A couple of documents with a checked circle on the bottom',
                       ),
                       Positioned(
                         bottom: 0,
@@ -91,7 +84,7 @@ class TermsStep extends StatelessWidget {
                     ),
                     Container(
                       child: Stack(
-                        overflow: Overflow.visible,
+                        clipBehavior: Clip.none,
                         children: <Widget>[
                           Container(
                             padding: EdgeInsets.symmetric(
@@ -151,9 +144,7 @@ class TermsStep extends StatelessWidget {
                                 props.onToggleAgreement();
                               },
                               child: Icon(
-                                props.agreement
-                                    ? Icons.check_box
-                                    : Icons.check_box_outline_blank,
+                                props.agreement ? Icons.check_box : Icons.check_box_outline_blank,
                               ),
                             ),
                           ),
@@ -169,13 +160,9 @@ class TermsStep extends StatelessWidget {
                                 children: <TextSpan>[
                                   TextSpan(
                                     text: 'terms of service',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .subtitle1!
-                                        .copyWith(
+                                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
                                           fontWeight: FontWeight.w400,
-                                          decorationStyle:
-                                              TextDecorationStyle.solid,
+                                          decorationStyle: TextDecorationStyle.solid,
                                         ),
                                   ),
                                 ],
@@ -201,7 +188,7 @@ class _Props extends Equatable {
   final Function onToggleAgreement;
   final Function onViewTermsOfService;
 
-  _Props({
+  const _Props({
     required this.homeserver,
     required this.agreement,
     required this.onToggleAgreement,
@@ -228,11 +215,7 @@ class _Props extends Equatable {
       onViewTermsOfService: () async {
         try {
           final termsOfServiceUrl = store.state.authStore.credential!.termsUrl!;
-          if (await canLaunch(termsOfServiceUrl)) {
-            await launch(termsOfServiceUrl);
-          } else {
-            throw 'Could not launch $termsOfServiceUrl';
-          }
+          launchUrl(termsOfServiceUrl);
         } catch (error) {}
       });
 

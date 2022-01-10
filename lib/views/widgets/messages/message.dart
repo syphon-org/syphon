@@ -8,6 +8,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/index.dart';
@@ -18,7 +19,6 @@ import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:syphon/views/widgets/input/text-field-edit.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 const MESSAGE_MARGIN_VERTICAL_LARGE = 6.0;
 const MESSAGE_MARGIN_VERTICAL_NORMAL = 4.0;
@@ -216,14 +216,7 @@ class MessageWidget extends StatelessWidget {
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           Navigator.of(dialogContext).pop();
-
-          // TODO: confirm it can launch a URL with new Android 11 privacy settings
-          // if (await canLaunch(url)) {
-          try {
-            return launch(url, forceSafariVC: false);
-          } catch (error) {
-            throw Strings.alertCouldNotLaunchURL(url);
-          }
+          await launchUrl(url);
         },
       ),
     );
@@ -238,7 +231,8 @@ class MessageWidget extends StatelessWidget {
     final hasReactions = message.reactions.isNotEmpty || selected;
     final isRead = message.timestamp < lastRead;
     final showAvatar = !isLastSender && !isUserSent && !messageOnly;
-    final isMedia = message.url != null;
+    final body = selectEventBody(message);
+    final isMedia = selectIsMedia(message);
     final removePadding = isMedia || (isEditing && selected);
 
     var textColor = Colors.white;
@@ -365,8 +359,6 @@ class MessageWidget extends StatelessWidget {
       status += Strings.messageEditedAppend;
       showInfoRow = true;
     }
-
-    final String body = selectEventBody(message);
 
     // Indicates special event text instead of the message body
     if (message.body != body) {

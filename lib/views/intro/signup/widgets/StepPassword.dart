@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -17,6 +14,7 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 class PasswordStep extends StatefulWidget {
   const PasswordStep({Key? key}) : super(key: key);
 
+  @override
   PasswordStepState createState() => PasswordStepState();
 }
 
@@ -88,8 +86,7 @@ class PasswordStepState extends State<PasswordStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupPassword,
-                    semanticsLabel:
-                        'User thinking up a password in a swirl of wind',
+                    semanticsLabel: 'User thinking up a password in a swirl of wind',
                   ),
                 ),
               ),

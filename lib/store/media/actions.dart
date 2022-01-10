@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-
 import 'package:mime/mime.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -48,7 +47,7 @@ class UpdateMediaCache {
 
 ThunkAction<AppState> uploadMedia({
   required File localFile,
-  String? mediaName = 'profile-photo',
+  String? mediaName = 'media-default',
 }) {
   return (Store<AppState> store) async {
     try {

@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -189,8 +186,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           ),
                           trailing: Switch(
                             value: props.roomTypeBadgesEnabled,
-                            onChanged: (value) =>
-                                props.onToggleRoomTypeBadges(),
+                            onChanged: (value) => props.onToggleRoomTypeBadges(),
                             activeColor: Color(props.primaryColor),
                           ),
                           onTap: () => props.onToggleRoomTypeBadges(),
@@ -353,21 +349,15 @@ class _Props extends Equatable {
         primaryColor: store.state.settingsStore.themeSettings.primaryColor,
         accentColor: store.state.settingsStore.themeSettings.accentColor,
         appBarColor: store.state.settingsStore.themeSettings.appBarColor,
-        themeType: selectThemeTypeString(
-            store.state.settingsStore.themeSettings.themeType),
+        themeType: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
         language: store.state.settingsStore.language,
-        fontName: selectFontNameString(
-            store.state.settingsStore.themeSettings.fontName),
-        fontSize: selectFontSizeString(
-            store.state.settingsStore.themeSettings.fontSize),
-        messageSize: selectMessageSizeString(
-            store.state.settingsStore.themeSettings.messageSize),
-        avatarShape: selectAvatarShapeString(
-            store.state.settingsStore.themeSettings.avatarShape),
+        fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
+        fontSize: selectFontSizeString(store.state.settingsStore.themeSettings.fontSize),
+        messageSize: selectMessageSizeString(store.state.settingsStore.themeSettings.messageSize),
+        avatarShape: selectAvatarShapeString(store.state.settingsStore.themeSettings.avatarShape),
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         mainFabType: selectMainFabType(store.state.settingsStore.themeSettings),
-        mainFabLocation:
-            selectMainFabLocation(store.state.settingsStore.themeSettings),
+        mainFabLocation: selectMainFabLocation(store.state.settingsStore.themeSettings),
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),
         ),

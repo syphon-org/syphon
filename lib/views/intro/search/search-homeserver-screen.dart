@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -76,7 +76,9 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
           // ignore: cast_nullable_to_non_nullable
-          signup: (ModalRoute.of(context)!.settings.arguments as SearchHomeserverArguments?)?.signup ?? false,
+          signup:
+              (ModalRoute.of(context)!.settings.arguments as SearchHomeserverArguments?)?.signup ??
+                  false,
         ),
         builder: (context, props) => Scaffold(
           appBar: AppBarSearch(
@@ -220,8 +222,9 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                   ),
                 ),
                 Visibility(
-                  visible:
-                      props.searchText.isNotEmpty && props.searchText.isNotEmpty && props.homeservers.isEmpty,
+                  visible: props.searchText.isNotEmpty &&
+                      props.searchText.isNotEmpty &&
+                      props.homeservers.isEmpty,
                   child: Container(
                     padding: EdgeInsets.only(top: 8, bottom: 8),
                     child: GestureDetector(

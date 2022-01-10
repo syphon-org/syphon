@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
@@ -233,8 +233,8 @@ class ModalUserDetails extends StatelessWidget {
                       },
                       title: Text(
                         props.blocked
-                          ? Strings.listItemUserDetailsUnblockUser
-                          : Strings.listItemUserDetailsBlockUser,
+                            ? Strings.listItemUserDetailsUnblockUser
+                            : Strings.listItemUserDetailsBlockUser,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),

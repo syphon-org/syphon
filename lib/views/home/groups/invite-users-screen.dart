@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
@@ -145,7 +145,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   /// also attempts to invite users directly if a room id already exists
   ///
   onConfirmInvites(_Props props) async {
-    final InviteUsersArguments arguments = ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
+    final InviteUsersArguments arguments =
+        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
     final roomId = arguments.roomId;
 
     if (roomId != null && invites.isNotEmpty) {
@@ -161,7 +162,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   ///
   onSendInvites(_Props props) async {
     FocusScope.of(context).unfocus();
-    final InviteUsersArguments arguments = ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
+    final InviteUsersArguments arguments =
+        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
     final store = StoreProvider.of<AppState>(context);
 
     final roomId = arguments.roomId;
@@ -173,18 +175,18 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
     // Confirm sending the invites with a dialog
     return showDialog(
       context: context,
-      builder: (BuildContext context) => DialogInviteUsers(
+      builder: (BuildContext dialogContext) => DialogInviteUsers(
         users: invites,
         title: 'Invite To ${room!.name}',
         content:
-            '${Strings.confirmInvites}${'\n\nSend ${invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?'}',
+            '${Strings.confirmInvite}${'\n\nSend ${invites.length} ${invitePlurialized.toLowerCase()} to ${room.name}?'}',
         action: 'send ${invitePlurialized.toLowerCase()}',
         onInviteUsers: () async {
           await Future.wait(invites.map((user) async {
             return props.onSendInvite(room: Room(id: roomId), user: user);
           }));
 
-          Navigator.pop(context);
+          Navigator.pop(dialogContext);
           Navigator.pop(context);
         },
       ),
@@ -263,7 +265,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
 
         final showManualUser = searchable.isNotEmpty && foundResult < 0 && !props.loading;
         final usersList = searchable.isEmpty ? props.usersRecent : props.searchResults;
-        final usersListLabel = searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
+        final usersListLabel =
+            searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
 
         return Scaffold(
           appBar: AppBarSearch(
@@ -335,8 +338,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                           Visibility(
                             visible: showManualUser,
                             child: ListItemUser(
-                              onPress: () =>
-                                  onAttemptInvite(props: props, context: context, user: attemptableUser),
+                              onPress: () => onAttemptInvite(
+                                  props: props, context: context, user: attemptableUser),
                               type: ListItemUserType.Selectable,
                               user: attemptableUser,
                               enabled: creatingRoomDisplayName != searchable,
@@ -359,7 +362,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                                 selected: invites.contains(user),
                                 loading: props.loading,
                                 onPress: () => onToggleInvite(user: user),
-                                onPressAvatar: () => onShowUserDetails(context: context, user: user),
+                                onPressAvatar: () =>
+                                    onShowUserDetails(context: context, user: user),
                               );
                             },
                           )

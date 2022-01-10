@@ -1,8 +1,8 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 ///
 /// Alert Middleware
@@ -26,14 +26,9 @@ dynamic alertMiddleware<State>(
       // and conditions acceptance
       if (alert.contains(MatrixErrorsSoft.terms_and_conditions)) {
         final termsUrl = 'https${alert.split('https')[1]}';
-        final termsUrlFormatted =
-            termsUrl.replaceFirst('.', '', termsUrl.length - 1);
+        final termsUrlFormatted = termsUrl.replaceFirst('.', '', termsUrl.length - 1);
 
-        if (await canLaunch(termsUrlFormatted)) {
-          return await launch(termsUrlFormatted, forceSafariVC: false);
-        } else {
-          throw 'Could not launch $termsUrl';
-        }
+        await launchUrl(termsUrlFormatted);
       }
 
       break;

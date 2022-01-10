@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -71,10 +71,8 @@ class PasswordResetState extends State<ResetPasswordScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width:
-                      width, // set actual height and width for flex constraints
-                  height:
-                      height, // set actual height and width for flex constraints
+                  width: width, // set actual height and width for flex constraints
+                  height: height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -101,8 +99,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
-                                    onboarding = index != 0 &&
-                                        index != sections.length - 1;
+                                    onboarding = index != 0 && index != sections.length - 1;
                                   });
                                 },
                                 children: sections,
@@ -127,8 +124,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                               child: ButtonSolid(
                                 text: Strings.buttonResetPassword,
                                 loading: props.loading,
-                                disabled:
-                                    !props.isPasswordValid || props.loading,
+                                disabled: !props.isPasswordValid || props.loading,
                                 onPressed: () async {
                                   final result = await props.onResetPassword();
 

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -103,7 +103,8 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                       );
                     },
                     contentPadding: Dimensions.listPadding,
-                    title: Text(Strings.listItemAdvancedSettingsTestNotifications, style: Theme.of(context).textTheme.subtitle1),
+                    title: Text(Strings.listItemAdvancedSettingsTestNotifications,
+                        style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 Visibility(
@@ -126,7 +127,8 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     onTap: () {
                       props.onForceFunction();
                     },
-                    title: Text(Strings.listItemAdvancedSettingsForceFunction, style: Theme.of(context).textTheme.subtitle1),
+                    title: Text(Strings.listItemAdvancedSettingsForceFunction,
+                        style: Theme.of(context).textTheme.subtitle1),
                   ),
                 ),
                 ListTile(

@@ -1,8 +1,8 @@
 import 'package:syphon/store/auth/context/actions.dart';
 
-import '../user/model.dart';
 import './actions.dart';
 import './state.dart';
+import '../user/model.dart';
 
 AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
   switch (action.runtimeType) {
@@ -79,8 +79,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       final availableUser = _action.availableUser;
       final availableUsers = List<User>.from(state.availableUsers);
 
-      final existingIndex = availableUsers
-          .indexWhere((user) => user.userId == availableUser.userId);
+      final existingIndex =
+          availableUsers.indexWhere((user) => user.userId == availableUser.userId);
 
       if (existingIndex == -1) {
         availableUsers.add(availableUser);
@@ -92,8 +92,8 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
       final availableUser = _action.availableUser;
       final availableUsers = List<User>.from(state.availableUsers);
 
-      final existingIndex = availableUsers
-          .indexWhere((user) => user.userId == availableUser.userId);
+      final existingIndex =
+          availableUsers.indexWhere((user) => user.userId == availableUser.userId);
 
       if (existingIndex != -1) {
         availableUsers.remove(availableUser);

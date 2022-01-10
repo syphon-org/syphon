@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -50,8 +49,7 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => AppBar().preferredSize;
 }
 
-class AppBarSearchState extends State<AppBarSearch>
-    with Lifecycle<AppBarSearch> {
+class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch> {
   final focusNode = FocusNode();
 
   bool searching = false;

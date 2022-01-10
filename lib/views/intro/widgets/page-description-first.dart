@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
@@ -45,7 +44,7 @@ class FirstDescriptionPage extends StatelessWidget {
                   text: TextSpan(
                     text: Strings.contentIntroFirstPartOne,
                     style: Theme.of(context).textTheme.subtitle1,
-                    children: <TextSpan>[
+                    children: const <TextSpan>[
                       TextSpan(
                         text: 'Matrix',
                         style: TextStyle(

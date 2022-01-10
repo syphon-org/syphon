@@ -13,6 +13,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
 import 'package:syphon/store/index.dart';
@@ -40,7 +41,6 @@ import 'package:syphon/views/widgets/containers/fabs/fab-ring.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
 
@@ -844,13 +844,7 @@ class _Props extends Equatable {
           return Future(() => true);
         },
         onSelectHelp: () async {
-          try {
-            if (await canLaunch(Values.openHelpUrl)) {
-              await launch(Values.openHelpUrl);
-            } else {
-              throw Strings.alertCouldNotLaunchURL(Values.openHelpUrl);
-            }
-          } catch (error) {}
+          await launchUrl(Values.openHelpUrl);
         },
       );
 }

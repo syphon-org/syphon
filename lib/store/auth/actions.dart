@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
-import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -20,6 +19,7 @@ import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/storage/index.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
@@ -39,7 +39,6 @@ import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:uni_links/uni_links.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../user/model.dart';
 
@@ -176,7 +175,7 @@ class ResetAuthStore {}
 
 class ResetSession {}
 
-late StreamSubscription _sub;
+late StreamSubscription _deeplinkSubscription;
 
 ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
       try {
@@ -184,11 +183,13 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
           return;
         }
 
-        _sub = uriLinkStream.listen((Uri? uri) {
+        _deeplinkSubscription = uriLinkStream.listen((Uri? uri) {
           final token = uri!.queryParameters['loginToken'];
+          store.dispatch(SetLoading(loading: true));
           store.dispatch(loginUserSSO(token: token));
         }, onError: (err) {
           printError('[streamUniLinks] error $err');
+          store.dispatch(SetLoading(loading: false));
         });
       } on PlatformException {
         store.dispatch(addAlert(
@@ -205,7 +206,7 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
 
 ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
       try {
-        _sub.cancel();
+        _deeplinkSubscription.cancel();
       } catch (error) {
         printError(error.toString());
       }
@@ -426,11 +427,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
       if (token == null) {
         final ssoUrl = 'https://${homeserver.baseUrl}${Values.matrixSSOUrl}';
 
-        if (await canLaunch(ssoUrl)) {
-          return await launch(ssoUrl, forceSafariVC: false);
-        } else {
-          throw 'Could not launch $ssoUrl';
-        }
+        return await launchUrl(ssoUrl, forceSafariVC: false);
       }
 
       final username = store.state.authStore.username;
