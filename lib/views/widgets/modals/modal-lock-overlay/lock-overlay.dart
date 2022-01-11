@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screen_lock/configurations/input_button_config.dart';
 import 'package:flutter_screen_lock/configurations/screen_lock_config.dart';
-import 'package:flutter_screen_lock/heading_title.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/input-secrets-config.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/input-secrets.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/keypad.dart';
@@ -13,8 +12,8 @@ class LockOverlay extends StatefulWidget {
   const LockOverlay({
     Key? key,
     required this.onVerify,
-    this.title = const HeadingTitle(text: 'Please enter passcode.'),
-    this.confirmTitle = const HeadingTitle(text: 'Please confirm passcode.'),
+    required this.title, // i18n Strings isn't a constant. You gotta pass it in
+    required this.confirmTitle, // i18n Strings isn't a constant. You gotta pass it in
     this.screenLockConfig = const ScreenLockConfig(),
     this.inputSecretsConfig = const InputSecretsConfig(),
     this.inputButtonConfig = const InputButtonConfig(),

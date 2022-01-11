@@ -65,7 +65,7 @@
     "prompt-homeserver-select": "Wybierz swoją nazwę użytkownika i serwer domowy",
     "prompt-confirm-deactivate": "Wpisz swoje hasło poniżej aby potwierdzić deaktywacje",
     "content-intro-section-one": "{} działa za pomocą szyfrowanego \ni zdecentralizowanego protokołu \nzwanego ",
-    "content-intro-section-two": "Matrix pozwala na wysyłanie wiadomości\nz",
+    "content-intro-section-two": "Matrix umożliwia wysyłanie wiadomości do innych",
     "content-intro-section-two-part-two": "\nprywatnie i z kontrolą ",
     "content-intro-section-two-part-three": "gdzie wiadomości\nsą przechowywane",
     "content-intro-section-three": "Zarówno Matrix jak i {} są tworzone\nprzez organizacje i ludzi,\na nie korporacje",
@@ -175,5 +175,7 @@
     "content-proxy-port": "Port gdzie serwer proxy oczekuje na połączenia",
     "confirm-linkout": "Czy na pewno chcesz otworzyć następujący link?\n\n{}",
     "label-proxy-host": "Nazwa serwera",
-    "label-proxy-port": "Port"
+    "label-proxy-port": "Port",
+    "label-call-invite": "Użytkownik zaprosił Cię do połączenia głosowego",
+    "label-call-hangup": "Użytkownik zakończył połączenie głosowe"
 }

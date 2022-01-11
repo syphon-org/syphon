@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mime/mime.dart';
-import 'package:drift/drift.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:syphon/global/print.dart';
@@ -50,8 +50,7 @@ class EncryptInfo {
 
   Map<String, dynamic> toJson() => _$EncryptInfoToJson(this);
 
-  factory EncryptInfo.fromJson(Map<String, dynamic> json) =>
-      _$EncryptInfoFromJson(json);
+  factory EncryptInfo.fromJson(Map<String, dynamic> json) => _$EncryptInfoFromJson(json);
 }
 
 ///
@@ -83,8 +82,7 @@ Future<File?> encryptMedia({
     final keyUsed = Key.fromBase64(info.key!);
     final cipher = AES(keyUsed, mode: AESMode.ctr, padding: null);
 
-    final encryptedMedia =
-        cipher.encrypt(await localFile.readAsBytes(), iv: ivUsed);
+    final encryptedMedia = cipher.encrypt(await localFile.readAsBytes(), iv: ivUsed);
     final directory = await getTemporaryDirectory();
     final encryptFile = File(path.join(directory.path, fileName));
 
@@ -107,8 +105,7 @@ Future<Uint8List?> decryptMediaData({
     final keyUsed = Key.fromBase64(base64.normalize(key!));
     final cipher = AES(keyUsed, mode: AESMode.ctr, padding: null);
 
-    return cipher.decrypt(Encrypted.fromBase64(base64.encode(localData)),
-        iv: ivUsed);
+    return cipher.decrypt(Encrypted.fromBase64(base64.encode(localData)), iv: ivUsed);
   } catch (error) {
     printError(error.toString());
     rethrow;

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 

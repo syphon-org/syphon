@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -16,8 +13,8 @@ import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 class DialogConfirmPassword extends StatelessWidget {
   const DialogConfirmPassword({
     Key? key,
-    this.title = 'Confirm Password (Default)',
-    this.content = 'Please confirm your password (Default)',
+    required this.title, // i18n Strings isn't a constant. You gotta pass it in
+    required this.content, // i18n Strings isn't a constant. You gotta pass it in
     this.onConfirm,
     this.onCancel,
   }) : super(key: key);
@@ -91,7 +88,7 @@ class DialogConfirmPassword extends StatelessWidget {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),
-                      labelText: 'password',
+                      labelText: Strings.labelPassword,
                     ),
                   ),
                 ),

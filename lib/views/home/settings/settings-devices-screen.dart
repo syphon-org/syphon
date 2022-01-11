@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -110,10 +110,7 @@ class DeviceViewState extends State<DevicesScreen> {
           color: Colors.white,
           onPressed: selectedDevices!.length != 1
               ? null
-              : () => props!.onRenameDevice(
-                    context,
-                    selectedDevices![0]
-                  ),
+              : () => props!.onRenameDevice(context, selectedDevices![0]),
         ),
         IconButton(
           icon: Icon(Icons.delete),
@@ -347,7 +344,8 @@ class _Props extends Equatable {
               content: Strings.contentRenameDevice,
               label: device.displayName ?? '',
               onConfirm: (String newDisplayName) async {
-                await store.dispatch(renameDevice(deviceId: device.deviceId, displayName: newDisplayName));
+                await store
+                    .dispatch(renameDevice(deviceId: device.deviceId, displayName: newDisplayName));
                 store.dispatch(resetInteractiveAuth());
                 Navigator.of(dialogContext).pop();
               },

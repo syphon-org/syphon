@@ -1,17 +1,14 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
@@ -23,8 +20,7 @@ class VerificationScreen extends StatefulWidget {
   VerificationScreenState createState() => VerificationScreenState();
 }
 
-class VerificationScreenState extends State<VerificationScreen>
-    with WidgetsBindingObserver {
+class VerificationScreenState extends State<VerificationScreen> with WidgetsBindingObserver {
   late bool sending;
   bool? success;
 
@@ -118,7 +114,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                 ),
                               ),
                               Stack(
-                                overflow: Overflow.visible,
+                                clipBehavior: Clip.none,
                                 children: <Widget>[
                                   Container(
                                     padding: EdgeInsets.symmetric(
@@ -128,8 +124,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                     child: Text(
                                       'Verify your email address',
                                       textAlign: TextAlign.center,
-                                      style:
-                                          Theme.of(context).textTheme.headline5,
+                                      style: Theme.of(context).textTheme.headline5,
                                     ),
                                   ),
                                   Positioned(
@@ -139,12 +134,9 @@ class VerificationScreenState extends State<VerificationScreen>
                                       onTap: () {
                                         showDialog(
                                           context: context,
-                                          builder: (BuildContext context) =>
-                                              DialogExplaination(
-                                            title: Strings
-                                                .titleDialogSignupEmailVerification,
-                                            content: Strings
-                                                .contentEmailVerification,
+                                          builder: (BuildContext context) => DialogExplaination(
+                                            title: Strings.titleDialogSignupEmailVerification,
+                                            content: Strings.contentEmailVerification,
                                             onConfirm: () {
                                               Navigator.pop(context);
                                             },
@@ -156,9 +148,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                         width: 20,
                                         child: Icon(
                                           Icons.info_outline,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
+                                          color: Theme.of(context).colorScheme.secondary,
                                           size: 20,
                                         ),
                                       ),
@@ -187,8 +177,7 @@ class VerificationScreenState extends State<VerificationScreen>
                                   loading: sending || props.loading,
                                   disabled: sending || props.loading,
                                   onPressed: () async {
-                                    final result = await props.onCreateUser(
-                                        enableErrors: true);
+                                    final result = await props.onCreateUser(enableErrors: true);
                                     setState(() {
                                       success = result;
                                     });

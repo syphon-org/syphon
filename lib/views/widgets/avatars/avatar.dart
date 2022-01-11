@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -57,7 +57,8 @@ class Avatar extends StatelessWidget {
         builder: (context, props) {
           // TODO: uri is parsed as an empty string under dendrite
           final bool emptyAvi = uri == null && url == null || (uri?.isEmpty ?? true);
-          final Color backgroundColor = !emptyAvi || force ? Colors.transparent : background ?? Colors.grey;
+          final Color backgroundColor =
+              !emptyAvi || force ? Colors.transparent : background ?? Colors.grey;
 
           var borderRadius = BorderRadius.circular(size);
 

@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
@@ -61,8 +58,7 @@ class DialogCaptcha extends StatelessWidget {
                   child: Captcha(
                     baseUrl: props.hostname,
                     publicKey: props.publicKey,
-                    onVerified: (token) =>
-                        props.onCompleteCaptcha(token, context: context),
+                    onVerified: (token) => props.onCompleteCaptcha(token, context: context),
                   ),
                 ),
               ),
@@ -111,12 +107,11 @@ class Props extends Equatable {
         hostname: store.state.authStore.hostname,
         completed: store.state.authStore.captcha,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params']
-                  [MatrixAuthTypes.RECAPTCHA]['public_key'] ??
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]
+                  ['public_key'] ??
               '';
         }(),
-        onCompleteCaptcha: (String token,
-            {required BuildContext context}) async {
+        onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
             value: token.toString(),

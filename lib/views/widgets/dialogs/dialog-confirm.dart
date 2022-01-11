@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:syphon/global/dimensions.dart';
@@ -58,11 +57,7 @@ class DialogConfirm extends StatelessWidget {
                   onPressed: () => onDismiss!(),
                   textWidget: Text(
                     Strings.buttonCancel.capitalize(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle1
-                        ?.merge(dismissStyle)
-                        .copyWith(
+                    style: Theme.of(context).textTheme.subtitle1?.merge(dismissStyle).copyWith(
                           fontWeight: FontWeight.w500,
                         ),
                   ),
@@ -70,16 +65,15 @@ class DialogConfirm extends StatelessWidget {
                 ButtonText(
                   disabled: loading,
                   onPressed: () => onConfirm!(),
-                  textWidget:
-                      Text(confirmText ?? Strings.buttonConfirm.capitalize(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .subtitle1
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.secondary,
-                                fontWeight: FontWeight.w500,
-                              )
-                              .merge(confirmStyle)),
+                  textWidget: Text(confirmText ?? Strings.buttonConfirm.capitalize(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .subtitle1
+                          ?.copyWith(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontWeight: FontWeight.w500,
+                          )
+                          .merge(confirmStyle)),
                 ),
               ],
             ),

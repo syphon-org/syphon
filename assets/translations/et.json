@@ -86,5 +86,15 @@
     "prompt-homeserver-select": "Vali oma kasutajanimi ja koduserver",
     "prompt-confirm-deactivate": "Kasutajakonto lõpliku eemaldamise kinnitamiseks palun sisesta oma kasutajanimi",
     "content-thanks": "Tänud, et kasutasid rakendust {}!\n\n",
-    "content-dialog-device-rename": "Sisesta seadme uus kõigile nähtav nimi."
+    "content-dialog-device-rename": "Sisesta seadme uus kõigile nähtav nimi.",
+    "label-search-homeservers": "Otsi koduserverit…",
+    "label-search-user": "Otsi kasutajat…",
+    "label-search-users": "Otsi kasutajaid…",
+    "label-users-results": "Leitud kasutajad",
+    "label-users-known": "Teadaolevad kasutajad",
+    "button-deactivate": "eemalda kasutusest",
+    "label-call-invite": "Said häälkõne kutse",
+    "label-call-hangup": "Teine osapool lõpetas kõne",
+    "button-chat-details": "vestluse teave",
+    "placeholder-topic": "Teema kirjeldus puudub"
 }

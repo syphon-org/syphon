@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -142,7 +142,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
 
   onDidChange(_Props? oldProps, _Props props) {
     final ssoLoginChanged = props.isSSOLoginAvailable != oldProps?.isSSOLoginAvailable;
-    final passwordLoginChanged = props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
+    final passwordLoginChanged =
+        props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
 
     final signupTypesChanged = props.homeserver.signupTypes != oldProps?.homeserver.signupTypes;
 
@@ -210,7 +211,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
           }
 
           final _homeserver = store.state.authStore.homeserver;
-          if (_homeserver.signupTypes.isEmpty && !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+          if (_homeserver.signupTypes.isEmpty &&
+              !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
             store.dispatch(addInfo(
               origin: 'selectHomeserver',
               message: 'No new signups allowed on this server, try another if creating an account',
@@ -311,7 +313,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        onWillChange: onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
+        onWillChange:
+            onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -381,7 +384,8 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
                           direction: Axis.vertical,
                           children: <Widget>[
                             Visibility(
-                              visible: !(!props.isPasswordLoginAvailable && props.isSSOLoginAvailable),
+                              visible:
+                                  !(!props.isPasswordLoginAvailable && props.isSSOLoginAvailable),
                               child: Container(
                                 padding: const EdgeInsets.only(top: 12, bottom: 12),
                                 child: ButtonSolid(

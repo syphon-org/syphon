@@ -38,6 +38,12 @@ class Strings {
   static final titleUseProxyServer = tr('title-proxy-use-proxy');
   static final titleProxyHost = tr('title-proxy-host');
   static final titleProxyPort = tr('title-proxy-port');
+  static final titleLockOverlay = tr('title-lock-overlay');
+  static final titleConfirmLockOverlay = tr('title-confirm-lock-overlay');
+  static final titleSearchUnencrypted = tr('title-search-unencrypted');
+  static final titleMessageDetails = tr('title-message-details');
+  static final titleSendMediaMessage = tr('title-send-media-message');
+  static final titleSendMediaMessageUnencrypted = tr('title-send-media-message-unencrypted');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -50,9 +56,15 @@ class Strings {
   static final titleRenameDevice = tr('title-device-rename');
   static final titleConfirmDeleteKeys = tr('title-dialog-delete-keys');
   static final titleConfirmEmail = tr('title-confirm-email');
+  static final titleDialogColorPicker = tr('title-dialog-color-picker');
+  static final titleDialogAcceptInvite = tr('title-dialog-accept-invite');
+  static final titleDialogChatColor = tr('title-dialog-chat-color');
+  static final titleDialogDraftPreview = tr('title-dialog-draft-preview');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
+  static final subtitleSettingsSyncInterval = tr('subtitle-settings-sync-interval');
+  static final subtitleSettingsSyncToggle = tr('subtitle-settings-sync-toggle');
 
   // Headers
   static final headerIntro = tr('header-intro');
@@ -86,6 +98,10 @@ class Strings {
   static final labelOn = tr('label-on'); // 'On';
   static final labelOff = tr('label-off'); // 'Off';
   static final labelTermsOfService = tr('label-terms-of-service');
+  static final labelSearchUnencrypted = tr('label-search-unencrypted');
+  static final labelAbout = tr('label-about');
+  static final labelChatSettings = tr('label-chat-settings');
+  static final labelColor = tr('label-color');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
@@ -95,6 +111,55 @@ class Strings {
   static final listItemSettingsProxy = tr('list-item-settings-proxy');
   static final listItemSettingsProxyHost = tr('list-item-settings-proxy-host');
   static final listItemSettingsProxyPort = tr('list-item-settings-proxy-port');
+  static final listItemSettingsSyncInterval = tr('list-item-settings-sync-interval');
+  static final listItemSettingsSyncToggle = tr('list-item-settings-sync-toggle');
+
+  static String listItemUserDetailsStartChat(String? name) =>
+      tr('list-item-user-details-start-chat', args: ['$name']);
+  static final listItemUserDetailsRoomInvite = tr('list-item-user-details-room-invite');
+  static final listItemUserDetailsSendMessage = tr('list-item-user-details-send-message');
+  static final listItemUserDetailsViewProfile = tr('list-item-user-details-view-profile');
+  static final listItemUserDetailsUnblockUser = tr('list-item-user-details-unblock-user');
+  static final listItemUserDetailsBlockUser = tr('list-item-user-details-block-user');
+
+  static final listItemImageOptionsPhotoSelectMethod =
+      tr('list-item-image-options-photo-select-method');
+  static final listItemImageOptionsTakePhoto = tr('list-item-image-options-take-photo');
+  static final listItemImageOptionsPickFromGallery =
+      tr('list-item-image-options-pick-from-gallery');
+  static final listItemImageOptionsRemovePhoto = tr('list-item-image-options-remove-photo');
+
+  static String listItemContextSwitcherUserDisplayName(String? username) =>
+      tr('list-item-context-switcher-user-display-name', args: ['$username']);
+  static final listItemContextSwitcherAccounts = tr('list-item-context-switcher-accounts');
+  static final listItemContextSwitcherAddAccount = tr('list-item-context-switcher-add-account');
+
+  static final listItemAdvancedSettingsLicenses = tr('list-item-advanced-settings-licenses');
+  static final listItemAdvancedSettingsStartBackground =
+      tr('list-item-advanced-settings-start-background');
+  static final listItemAdvancedSettingsStopBackground =
+      tr('list-item-advanced-settings-stop-background');
+  static final listItemAdvancedSettingsTestNotifications =
+      tr('list-item-advanced-settings-test-notifications');
+  static final listItemAdvancedSettingsTestSyncLoop =
+      tr('list-item-advanced-settings-test-sync-loop');
+  static final listItemAdvancedSettingsForceFunction =
+      tr('list-item-advanced-settings-force-function');
+
+  static final listItemSent = tr('list-item-sent');
+  static final listItemReceived = tr('list-item-received');
+  static final listItemVia = tr('list-item-via');
+  static final listItemFrom = tr('list-item-from');
+  static final listItemReadBy = tr('list-item-read-by');
+
+  static final listItemChatDetailToggleDirectChat = tr('list-item-chat-detail-toggle-direct-chat');
+  static final listItemChatDetailNotificationSetting =
+      tr('list-item-chat-detail-notification-setting');
+  static final listItemChatDetailNotifications = tr('list-item-chat-detail-notifications');
+  static final listItemChatDetailVibrate = tr('list-item-chat-detail-vibrate');
+  static final listItemChatDetailNotificationSound = tr('list-item-chat-detail-notification-sound');
+  static final listItemChatDetailPrivacyStatus = tr('list-item-chat-detail-privacy-status');
+  static final listItemChatDetailViewKey = tr('list-item-chat-detail-view-key');
 
   // Buttons
   static final buttonLogin = tr('button-login');
@@ -120,6 +185,8 @@ class Strings {
   static final buttonSelectAll = tr('button-select-all');
   static final buttonRoomDetails = tr('button-chat-details');
   static final buttonResetPassword = tr('button-reset-password'); // 'reset password';
+  static final buttonDismiss = tr('button-dismiss');
+  static final buttonSaveMessageEdit = tr('button-save-message-edit');
 
   // Buttons (Text)
   static final buttonTextLogin = tr('button-text-login'); // 'Login';
@@ -131,6 +198,10 @@ class Strings {
   static final buttonTextLoadCaptcha = tr('button-text-load-captcha');
   static final buttonTextConfirmed = tr('button-text-confirmed');
   static final buttonTextDeleteKeys = tr('button-delete-keys'); //  'delete keys';
+  static final buttonTextLetsEncrypt = tr('button-text-lets-encrypt');
+  static final buttonTextGoBack = tr('button-text-go-back');
+  static final buttonTextReject = tr('button-text-reject');
+  static final buttonTextAccept = tr('button-text-accept');
 
   // Buttons (Options)
   static final buttonTextCreateGroup = tr('button-text-create-group');
@@ -139,10 +210,17 @@ class Strings {
   static final buttonTextSettings = tr('button-text-settings');
   static final buttonTextSupport = tr('button-text-support');
 
+  // Buttons (Media Cards)
+  static final buttonGallery = tr('button-gallery');
+  static final buttonFile = tr('button-file');
+  static final buttonContact = tr('button-contact');
+  static final buttonLocation = tr('button-location');
+
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');
   static final placeholderMatrixEncrypted = tr('label-message-matrix');
   static final placeholderMatrixUnencrypted = tr('label-message-matrix-unencrypted');
+  static final placeholderDefaultRoomNotification = tr('label-default-room-notification');
 
   // Warnings
   static final warningDeactivateAccount = tr('warning-deactivate-account');
@@ -155,6 +233,11 @@ class Strings {
   static final alertCheckHomeserver = tr('alert-homeserver-invalid'); // 'Message Failed To Send';
   static final alertFeatureInProgress = tr('alert-feature-in-progress');
   static final alertHiddenReadReceipts = tr('alert-hidden-read-receipts');
+  static final alertOffline = tr('alert-offline');
+  static final alertUnknown = tr('alert-unknown');
+  static String alertCouldNotLaunchURL(String? url) =>
+      tr('alert-could-not-launch-url', args: ['$url']);
+  static final alertNoImagesFound = tr('alert-no-images-found');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
   static const alertBackgroundService = 'Background connection enabled';
@@ -182,10 +265,11 @@ class Strings {
   static final contentProxyHost = tr('content-proxy-host');
   static final contentProxyPort = tr('content-proxy-port');
 
-  // Confirmations (use confirm*)
+  static final messageEditedAppend = tr('message-edited-append');
 
+  // Confirmations (use confirm*)
   static final confirmInvite = tr('confirm-invite');
-  static final confirmInvites = tr('confirm-invite-multiple');
+  static final confirmInvites = tr('confirm-invites-multiple');
   static final confirmStartChat = tr('confirm-start-chat');
   static final confirmDeactivate = tr('prompt-confirm-deactivate');
   static final confirmAttemptChat = tr('confirm-attempt-chat');
@@ -231,18 +315,28 @@ class Strings {
     return s;
   }
 
-  static String confirmBlockUser({String? name}) => tr('confirm-block-user', args: ['$name']);
+  static String confirmBlockUser(String? name) => tr('confirm-block-user', args: ['$name']);
 
   // Accessibility
-  static final semanticsImageIntro = tr('semnatics-image-intro');
-  static final semanticsPrivateMessage = tr('semnatics-image-private-message');
-  static final semanticsIntroFinal = tr('semnatics-image-intro-section-four');
-  static final semanticsIntroThird = tr('semnatics-image-intro-section-third');
+  static final semanticsImageIntro = tr('semantics-image-intro');
+  static final semanticsPrivateMessage = tr('semantics-image-private-message');
+  static final semanticsIntroFinal = tr('semantics-image-intro-section-four');
+  static final semanticsIntroThird = tr('semantics-image-intro-section-third');
   static final semanticsHomeDefault = tr('semantics-image-empty-chat-list');
   static final semanticsImageSignupUsername = tr('semantics-image-signup-username');
   static final semanticsImagePasswordReset = tr('semantics-image-password-reset');
+  static final semanticsCreatePublicRoom = tr('semantics-create-public-room');
 
   // Labels
   static final labelProxyHost = tr('label-proxy-host');
   static final labelProxyPort = tr('label-proxy-port');
+  static final labelPassword = tr('label-password');
+  static final labelDefault = tr('label-default');
+
+  // Tooltips
+  static final tooltipProfileAndSettings = tr('tooltip-profile-settings');
+  static final tooltipSearchChats = tr('tooltip-search-chats');
+  static final tooltipSearchUnencrypted = tr('tooltip-search-unencrypted');
+  static final tooltipCancelReply = tr('tooltip-cancel-reply');
+  static final tooltipSearchUsers = tr('tooltip-search-users');
 }

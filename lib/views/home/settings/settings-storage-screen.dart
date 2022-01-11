@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
@@ -75,7 +72,7 @@ class _Props extends Equatable {
   final Function onExportDeviceKey;
   final Function onImportDeviceKey;
 
-  _Props({
+  const _Props({
     required this.onExportDeviceKey,
     required this.onImportDeviceKey,
   });

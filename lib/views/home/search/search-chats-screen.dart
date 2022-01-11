@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
@@ -60,7 +60,8 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
   Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
-    final ChatSearchArguments arguments = ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
+    final ChatSearchArguments arguments =
+        ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
     final user = arguments.user!;
     final username = formatUsername(user);
 

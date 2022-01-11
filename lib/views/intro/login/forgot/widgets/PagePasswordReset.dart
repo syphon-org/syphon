@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
@@ -16,11 +13,12 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 class PasswordResetStep extends StatefulWidget {
   const PasswordResetStep({Key? key}) : super(key: key);
 
+  @override
   PasswordResetStepState createState() => PasswordResetStepState();
 }
 
 class PasswordResetStepState extends State<PasswordResetStep> {
-  PasswordResetStepState({Key? key});
+  PasswordResetStepState();
 
   bool visibility = false;
 
@@ -57,7 +55,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          double width = MediaQuery.of(context).size.width;
+          final double width = MediaQuery.of(context).size.width;
 
           return Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -74,8 +72,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                   ),
                   child: SvgPicture.asset(
                     Assets.heroSignupPassword,
-                    semanticsLabel:
-                        'User thinking up a password in a swirl of wind',
+                    semanticsLabel: 'User thinking up a password in a swirl of wind',
                   ),
                 ),
               ),

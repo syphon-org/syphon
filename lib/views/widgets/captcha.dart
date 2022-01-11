@@ -1,13 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
-
 import 'package:webview_flutter/webview_flutter.dart';
-
-import 'package:syphon/global/values.dart';
 
 /*
  * Captcha
@@ -55,9 +52,7 @@ class CaptchaState extends State<Captcha> with Lifecycle<Captcha> {
     return Stack(
       children: [
         WebView(
-          baseUrl: widget.baseUrl != null
-              ? 'https://${widget.baseUrl}'
-              : 'https://matrix.org',
+          baseUrl: widget.baseUrl != null ? 'https://${widget.baseUrl}' : 'https://matrix.org',
           javascriptMode: JavascriptMode.unrestricted,
           javascriptChannels: {
             JavascriptChannel(
