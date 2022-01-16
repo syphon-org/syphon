@@ -1,7 +1,7 @@
 <br>
 
 <p align='center'>
-<img height="128"  src="assets/logo/current/app_logo_cyan.svg"/>
+<img height="128"  src="assets/logo/app_logo_cyan.svg"/>
 </p>
 
 <p align='center'>
