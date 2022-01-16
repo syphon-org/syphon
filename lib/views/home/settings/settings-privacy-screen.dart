@@ -83,7 +83,7 @@ class PrivacySettingsScreen extends StatelessWidget {
         confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
-          await store.dispatch(exportDeviceKeysOwned());
+          await store.dispatch(exportSessionKeys());
           Navigator.of(dialogContext).pop();
         },
       ),
@@ -509,7 +509,7 @@ class _Props extends Equatable {
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
-        onImportDeviceKey: () => store.dispatch(importDeviceKeysOwned()),
+        onImportDeviceKey: () => store.dispatch(importSessionKeys()),
         onDeactivateAccount: (BuildContext context) async {
           // Attempt to deactivate account
           await store.dispatch(deactivateAccount());

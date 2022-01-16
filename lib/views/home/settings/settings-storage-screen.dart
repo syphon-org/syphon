@@ -85,10 +85,10 @@ class _Props extends Equatable {
   ) =>
       _Props(
         onExportDeviceKey: () {
-          store.dispatch(exportDeviceKeysOwned());
+          store.dispatch(exportSessionKeys());
         },
         onImportDeviceKey: () {
-          store.dispatch(importDeviceKeysOwned());
+          store.dispatch(importSessionKeys());
         },
       );
 }
