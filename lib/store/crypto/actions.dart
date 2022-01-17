@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:canonical_json/canonical_json.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
@@ -1103,9 +1105,6 @@ Future<String> encryptSessionExport({
   required String serializedJson,
   required String password,
 }) async {
-  const HEADERLINE = '-----BEGIN MEGOLM SESSION DATA-----';
-  const TRAILERLINE = '-----END MEGOLM SESSION DATA-----';
-
   final encryptor = encrypt.AES(
     encrypt.Key.fromBase64(password),
     mode: encrypt.AESMode.ctr,
@@ -1185,30 +1184,70 @@ ThunkAction<AppState> exportSessionKeys(String password) {
   };
 }
 
-ThunkAction<AppState> importSessionKeys() {
+///
+/// Import Session Keys
+///
+/// Responsible for decrypting the key import file as well
+/// Below is a block table for the encrypted data
+///
+/// - 1 	Export format version, which must be 0x01.
+/// - 16 	The salt S.
+/// - 16 	The initialization vector IV.
+/// - 4 	The number of rounds N, as a big-endian unsigned 32-bit integer.
+/// - variable 	The encrypted JSON object.
+/// - 32 	The HMAC-SHA-256 of all the above string concatenated together, using K' as the key.
+///
+ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password}) {
   return (Store<AppState> store) async {
     try {
-      final authUser = store.state.authStore.user;
-      final FilePickerResult file = await (FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['.txt'],
-      ) as Future<FilePickerResult>);
-
       final keyFile = File(file.paths[0]!);
+      final keyFileDataHeaded = await keyFile.readAsString();
 
-      final importData = await json.decode(await keyFile.readAsString());
+      final keyFileString = keyFileDataHeaded
+          .replaceAll(Values.SESSION_EXPORT_HEADER, '')
+          .replaceAll(Values.SESSION_EXPORT_FOOTER, '')
+          .trim();
 
-      store.dispatch(SetOlmAccountBackup(
-        olmAccountKey: importData['account_key'],
-      ));
+      // decrypt imported session key file if necessary
+      if (password != null && password.isNotEmpty) {
+        printInfo('[importSessionKeys] decrypting file');
 
-      store.dispatch(SetDeviceKeysOwned(
-        deviceKeysOwned: {
-          authUser.deviceId!: DeviceKey.fromMatrix(
-            importData['device_keys'],
-          ),
-        },
-      ));
+        final keyFileBytes = keyFileString.codeUnits;
+
+        final version = keyFileBytes.sublist(0, 1);
+        final salt = keyFileBytes.sublist(1, 17);
+        final iv = keyFileBytes.sublist(17, 33);
+        final rounds = keyFileBytes.sublist(33, 37);
+        final keySha = keyFileBytes.sublist(keyFileBytes.length - 32, keyFileBytes.length);
+
+        printJson({
+          'version': version,
+          'salt': salt,
+          'iv': iv,
+          'roundbytes': rounds,
+          'rounds':
+              ByteData.view(Uint8List.fromList(rounds.toList()).buffer).getUint32(0, Endian.big),
+          'keySha': keySha,
+        });
+
+        final data = keyFileBytes.sublist(36, keyFileBytes.length - 32);
+
+        printJson({
+          'data': String.fromCharCodes(data),
+        });
+
+        // final encryptor = encrypt.AES(
+        //   encrypt.Key.fromBase64(password),
+        //   mode: encrypt.AESMode.ctr,
+        //   padding: null,
+        // );
+
+        // final keyFileDecrypted = encryptor.decrypt(
+        //   encrypt.Encrypted.fromBase64(keyFileData),
+        // );
+
+        // keyFileData = String.fromCharCodes(keyFileDecrypted);
+      }
     } catch (error) {
       store.dispatch(addAlert(
         error: error,

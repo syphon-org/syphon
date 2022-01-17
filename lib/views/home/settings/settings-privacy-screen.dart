@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -68,7 +69,37 @@ class PrivacySettingsScreen extends StatelessWidget {
     );
   }
 
-  onExportDeviceKey({
+  onImportSessionKeys({
+    required _Props props,
+    required BuildContext context,
+  }) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    final file = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt'],
+    );
+
+    if (file == null) return;
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: 'Confirm Importing Keys',
+        content: Strings.contentKeyExportWarning,
+        loading: props.loading,
+        confirmText: 'Find Import',
+        confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          await store.dispatch(importSessionKeys(file, password: ''));
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
+  }
+
+  onExportSessionKeys({
     required _Props props,
     required BuildContext context,
   }) async {
@@ -83,7 +114,7 @@ class PrivacySettingsScreen extends StatelessWidget {
         confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
-          await store.dispatch(exportSessionKeys());
+          await store.dispatch(exportSessionKeys(''));
           Navigator.of(dialogContext).pop();
         },
       ),
@@ -377,7 +408,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap: props.onImportDeviceKey as void Function()?,
+                              onTap: () => onImportSessionKeys(context: context, props: props),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Import Keys',
@@ -388,7 +419,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             onTap: () => props.onDisabled(),
                             child: ListTile(
                               enabled: false,
-                              onTap: () => onExportDeviceKey(context: context, props: props),
+                              onTap: () => onExportSessionKeys(context: context, props: props),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Export Keys',
@@ -457,7 +488,6 @@ class _Props extends Equatable {
 
   final Function onToggleTypingIndicators;
   final Function onIncrementReadReceipts;
-  final Function onImportDeviceKey;
   final Function onDisabled;
   final Function onDeactivateAccount;
   final Function onResetConfirmAuth;
@@ -475,7 +505,6 @@ class _Props extends Equatable {
     required this.onDisabled,
     required this.onToggleTypingIndicators,
     required this.onIncrementReadReceipts,
-    required this.onImportDeviceKey,
     required this.onDeactivateAccount,
     required this.onResetConfirmAuth,
     required this.onSetScreenLock,
@@ -509,7 +538,6 @@ class _Props extends Equatable {
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
-        onImportDeviceKey: () => store.dispatch(importSessionKeys()),
         onDeactivateAccount: (BuildContext context) async {
           // Attempt to deactivate account
           await store.dispatch(deactivateAccount());

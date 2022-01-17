@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,14 +7,78 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
-class ProxySettingsScreen extends StatelessWidget {
-  const ProxySettingsScreen({Key? key}) : super(key: key);
+///
+/// Intro Settings Screen
+///
+/// Contains settings available in an unauthenticated state
+///
+class IntroSettingsScreen extends StatelessWidget {
+  const IntroSettingsScreen({Key? key}) : super(key: key);
+
+  onImportSessionKeys(BuildContext context) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    final file = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt'],
+    );
+
+    if (file == null) {
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Import Session Keys',
+        content: 'Enter the password for this session key import.',
+        label: Strings.labelPassword,
+        initialValue: '',
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          store.dispatch(importSessionKeys(file, password: password));
+
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
+  }
+
+  onExportSessionKeys(BuildContext context) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Export Session Keys',
+        content: 'Enter a password to encrypt your session keys with.',
+        label: Strings.labelPassword,
+        initialValue: '',
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          store.dispatch(exportSessionKeys(password));
+
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
@@ -84,6 +149,49 @@ class ProxySettingsScreen extends StatelessWidget {
                               ),
                             ),
                           )
+                        ],
+                      ),
+                    ),
+                    CardSection(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: width,
+                            padding: Dimensions.listPadding,
+                            child: Text(
+                              'Key Management Testing',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.subtitle2,
+                            ),
+                          ),
+                          Visibility(
+                            visible: DEBUG_MODE,
+                            child: ListTile(
+                              dense: true,
+                              contentPadding: Dimensions.listPadding,
+                              onTap: () {
+                                onExportSessionKeys(context);
+                              },
+                              title: Text(
+                                'Export Device Key',
+                                style: Theme.of(context).textTheme.subtitle1,
+                              ),
+                            ),
+                          ),
+                          Visibility(
+                            visible: DEBUG_MODE,
+                            child: ListTile(
+                              dense: true,
+                              contentPadding: Dimensions.listPadding,
+                              onTap: () {
+                                onImportSessionKeys(context);
+                              },
+                              title: Text(
+                                'Import Device Key',
+                                style: Theme.of(context).textTheme.subtitle1,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),

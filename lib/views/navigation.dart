@@ -25,7 +25,6 @@ import 'package:syphon/views/home/settings/settings-languages-screen.dart';
 import 'package:syphon/views/home/settings/settings-notifications-screen.dart';
 import 'package:syphon/views/home/settings/settings-privacy-screen.dart';
 import 'package:syphon/views/home/settings/settings-screen.dart';
-import 'package:syphon/views/home/settings/settings-storage-screen.dart';
 import 'package:syphon/views/home/settings/settings-theme-screen.dart';
 import 'package:syphon/views/intro/intro-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
@@ -36,7 +35,7 @@ import 'package:syphon/views/intro/signup/loading-screen.dart';
 import 'package:syphon/views/intro/signup/signup-screen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
-import 'home/settings/settings-proxy-screen.dart';
+import 'home/settings/settings-intro-screen.dart';
 
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -113,7 +112,6 @@ class Routes {
   static const settings = '/home/settings';
   static const settingsChat = '/home/settings/chat';
   static const settingsProfile = '/home/settings/profile';
-  static const settingsStorage = '/home/settings/storage';
   static const settingsPrivacy = '/home/settings/privacy';
   static const settingsDevices = '/home/settings/devices';
   static const settingsBlocked = '/home/settings/blocked';
@@ -156,8 +154,7 @@ class NavigationProvider {
         Routes.settingsNotifications: (BuildContext context) => const NotificationSettingsScreen(),
         Routes.settingsLanguages: (BuildContext context) => const LanguageSettingsScreen(),
         Routes.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),
-        Routes.settingsProxy: (BuildContext context) => const ProxySettingsScreen(),
-        Routes.settingsStorage: (BuildContext context) => const StorageSettingsScreen(),
+        Routes.settingsProxy: (BuildContext context) => const IntroSettingsScreen(),
         Routes.settingsPassword: (BuildContext context) => const PasswordUpdateScreen(),
         Routes.licenses: (BuildContext context) =>
             const LicensePage(applicationName: Values.appName),
