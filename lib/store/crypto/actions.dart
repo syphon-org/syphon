@@ -1206,13 +1206,26 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
       final keyFileString = keyFileDataHeaded
           .replaceAll(Values.SESSION_EXPORT_HEADER, '')
           .replaceAll(Values.SESSION_EXPORT_FOOTER, '')
+          .replaceAll('\n', '')
           .trim();
+
+      printJson({
+        'keyFileString': keyFileString,
+      });
 
       // decrypt imported session key file if necessary
       if (password != null && password.isNotEmpty) {
         printInfo('[importSessionKeys] decrypting file');
 
-        final keyFileBytes = keyFileString.codeUnits;
+        final keyFileBytes = base64.decode(keyFileString);
+        final byteData = ByteData.view(keyFileBytes.buffer);
+
+        for (var i = 4; i < byteData.lengthInBytes - 4; i++) {
+          final testing = byteData.getUint32(i);
+          printInfo('[$i] $testing\n');
+        }
+
+        printInfo('------- clear ------ \n');
 
         final version = keyFileBytes.sublist(0, 1);
         final salt = keyFileBytes.sublist(1, 17);
@@ -1230,11 +1243,9 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
           'keySha': keySha,
         });
 
-        final data = keyFileBytes.sublist(36, keyFileBytes.length - 32);
+        // final data = keyFileBytes.sublist(36, keyFileBytes.length - 32);
 
-        printJson({
-          'data': String.fromCharCodes(data),
-        });
+        // printJson({'data': String.fromCharCodes(data)});
 
         // final encryptor = encrypt.AES(
         //   encrypt.Key.fromBase64(password),
