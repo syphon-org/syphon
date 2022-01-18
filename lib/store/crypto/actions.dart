@@ -1209,55 +1209,67 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
           .replaceAll('\n', '')
           .trim();
 
-      printJson({
-        'keyFileString': keyFileString,
-      });
-
       // decrypt imported session key file if necessary
       if (password != null && password.isNotEmpty) {
-        printInfo('[importSessionKeys] decrypting file');
+        printDebug('[importSessionKeys] decrypting file');
 
         final keyFileBytes = base64.decode(keyFileString);
-        final byteData = ByteData.view(keyFileBytes.buffer);
 
-        for (var i = 4; i < byteData.lengthInBytes - 4; i++) {
-          final testing = byteData.getUint32(i);
-          printInfo('[$i] $testing\n');
-        }
-
-        printInfo('------- clear ------ \n');
+        final dataEnd = keyFileBytes.length - 32;
 
         final version = keyFileBytes.sublist(0, 1);
         final salt = keyFileBytes.sublist(1, 17);
         final iv = keyFileBytes.sublist(17, 33);
         final rounds = keyFileBytes.sublist(33, 37);
-        final keySha = keyFileBytes.sublist(keyFileBytes.length - 32, keyFileBytes.length);
+        final encryptedJson = keyFileBytes.sublist(36, dataEnd);
+        final keySha = keyFileBytes.sublist(dataEnd, keyFileBytes.length);
+
+        final roundsFormatted = ByteData.view(
+          Uint8List.fromList(rounds.toList()).buffer,
+        ).getUint32(0, Endian.big);
+
+        final ivFormatted = base64.encode(iv);
+        final encryptedJsonFormatted = base64.encode(encryptedJson);
 
         printJson({
           'version': version,
-          'salt': salt,
-          'iv': iv,
-          'roundbytes': rounds,
-          'rounds':
-              ByteData.view(Uint8List.fromList(rounds.toList()).buffer).getUint32(0, Endian.big),
-          'keySha': keySha,
+          'salt': base64.encode(salt),
+          'iv': ivFormatted,
+          'rounds': roundsFormatted,
+          'keySha': base64.encode(keySha),
         });
 
-        // final data = keyFileBytes.sublist(36, keyFileBytes.length - 32);
+        final pbkdf2 = Pbkdf2(
+          macAlgorithm: Hmac.sha512(),
+          iterations: roundsFormatted,
+          bits: 512,
+        );
 
-        // printJson({'data': String.fromCharCodes(data)});
+        final encryptionKeySecret = await pbkdf2.deriveKey(
+          secretKey: SecretKey(utf8.encode(password)),
+          nonce: salt,
+        );
 
-        // final encryptor = encrypt.AES(
-        //   encrypt.Key.fromBase64(password),
-        //   mode: encrypt.AESMode.ctr,
-        //   padding: null,
-        // );
+        // TODO: split on 256 offset, for K and K'
+        final encryptionKey = base64.encode(
+          await encryptionKeySecret.extractBytes(),
+        );
 
-        // final keyFileDecrypted = encryptor.decrypt(
-        //   encrypt.Encrypted.fromBase64(keyFileData),
-        // );
+        final codec = encrypt.AES(
+          encrypt.Key.fromBase64(encryptionKey),
+          mode: encrypt.AESMode.ctr,
+          padding: null,
+        );
 
-        // keyFileData = String.fromCharCodes(keyFileDecrypted);
+        final data = codec.decrypt(
+          encrypt.Encrypted.fromBase64(encryptedJsonFormatted),
+          iv: encrypt.IV.fromBase64(ivFormatted),
+        );
+
+        // TODO: should be session json - close!
+        printJson({
+          'test': utf8.decode(data),
+        });
       }
     } catch (error) {
       store.dispatch(addAlert(

@@ -35,27 +35,25 @@ class IntroSettingsScreen extends StatelessWidget {
       return;
     }
 
-    store.dispatch(importSessionKeys(file, password: 't'));
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Import Session Keys',
+        content: 'Enter the password for this session key import.',
+        label: Strings.labelPassword,
+        initialValue: '',
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          store.dispatch(importSessionKeys(file, password: password));
 
-    // showDialog(
-    //   context: context,
-    //   barrierDismissible: true,
-    //   builder: (dialogContext) => DialogTextInput(
-    //     title: 'Import Session Keys',
-    //     content: 'Enter the password for this session key import.',
-    //     label: Strings.labelPassword,
-    //     initialValue: '',
-    //     inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
-    //     onCancel: () async {
-    //       Navigator.of(dialogContext).pop();
-    //     },
-    //     onConfirm: (String password) async {
-    //       store.dispatch(importSessionKeys(file, password: password));
-
-    //       Navigator.of(dialogContext).pop();
-    //     },
-    //   ),
-    // );
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
   }
 
   onExportSessionKeys(BuildContext context) async {
