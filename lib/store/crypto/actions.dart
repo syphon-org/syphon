@@ -1221,7 +1221,7 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         final salt = keyFileBytes.sublist(1, 17);
         final iv = keyFileBytes.sublist(17, 33);
         final rounds = keyFileBytes.sublist(33, 37);
-        final encryptedJson = keyFileBytes.sublist(36, dataEnd);
+        final encryptedJson = keyFileBytes.sublist(37, dataEnd);
         final keySha = keyFileBytes.sublist(dataEnd, keyFileBytes.length);
 
         final roundsFormatted = ByteData.view(
@@ -1250,9 +1250,11 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
           nonce: salt,
         );
 
+        final allKeys = await encryptionKeySecret.extractBytes();
+
         // TODO: split on 256 offset, for K and K'
         final encryptionKey = base64.encode(
-          await encryptionKeySecret.extractBytes(),
+          allKeys.sublist(0, 32),
         );
 
         final codec = encrypt.AES(
