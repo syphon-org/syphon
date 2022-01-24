@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/context/types.dart';
@@ -11,6 +12,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/keys/selectors.dart';
+import 'package:syphon/store/crypto/management/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
@@ -22,6 +24,7 @@ import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/show-lock-overlay.dart';
 
 class PrivacySettingsScreen extends StatelessWidget {
@@ -69,10 +72,7 @@ class PrivacySettingsScreen extends StatelessWidget {
     );
   }
 
-  onImportSessionKeys({
-    required _Props props,
-    required BuildContext context,
-  }) async {
+  onImportSessionKeys(BuildContext context) async {
     final store = StoreProvider.of<AppState>(context);
 
     final file = await FilePicker.platform.pickFiles(
@@ -80,19 +80,25 @@ class PrivacySettingsScreen extends StatelessWidget {
       allowedExtensions: ['txt'],
     );
 
-    if (file == null) return;
+    if (file == null) {
+      return;
+    }
 
-    await showDialog(
+    showDialog(
       context: context,
-      builder: (dialogContext) => DialogConfirm(
-        title: 'Confirm Importing Keys',
-        content: Strings.contentKeyExportWarning,
-        loading: props.loading,
-        confirmText: 'Find Import',
-        confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
-        onDismiss: () => Navigator.pop(dialogContext),
-        onConfirm: () async {
-          await store.dispatch(importSessionKeys(file, password: ''));
+      barrierDismissible: true,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Import Session Keys',
+        content: 'Enter the password for this session key import.',
+        label: Strings.labelPassword,
+        initialValue: '',
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          store.dispatch(importSessionKeys(file, password: password));
+
           Navigator.of(dialogContext).pop();
         },
       ),
@@ -106,15 +112,19 @@ class PrivacySettingsScreen extends StatelessWidget {
     final store = StoreProvider.of<AppState>(context);
     await showDialog(
       context: context,
-      builder: (dialogContext) => DialogConfirm(
-        title: 'Confirm Exporting Keys',
-        content: Strings.contentKeyExportWarning,
-        loading: props.loading,
-        confirmText: 'Export Keys',
-        confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
-        onDismiss: () => Navigator.pop(dialogContext),
-        onConfirm: () async {
-          await store.dispatch(exportSessionKeys(''));
+      barrierDismissible: true,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Export Session Keys',
+        content: 'Enter a password for this session key export.',
+        label: Strings.labelPassword,
+        initialValue: '',
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          await store.dispatch(exportSessionKeys(password));
+
           Navigator.of(dialogContext).pop();
         },
       ),
@@ -404,15 +414,11 @@ class PrivacySettingsScreen extends StatelessWidget {
                               style: Theme.of(context).textTheme.subtitle2,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () => props.onDisabled(),
-                            child: ListTile(
-                              enabled: false,
-                              onTap: () => onImportSessionKeys(context: context, props: props),
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'Import Keys',
-                              ),
+                          ListTile(
+                            onTap: () => onImportSessionKeys(context),
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Import Keys',
                             ),
                           ),
                           GestureDetector(

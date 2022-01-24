@@ -1,23 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:canonical_json/canonical_json.dart';
-import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:file_picker/file_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:olm/olm.dart' as olm;
-import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/model.dart';
@@ -80,12 +73,12 @@ class SetOneTimeKeysClaimed {
   SetOneTimeKeysClaimed({this.oneTimeKeys});
 }
 
-class SaveKeySession {
+class AddKeySession {
   String session;
   String sessionId;
   String identityKey;
 
-  SaveKeySession({
+  AddKeySession({
     required this.session,
     required this.sessionId,
     required this.identityKey,
@@ -740,7 +733,7 @@ ThunkAction<AppState> saveKeySession({
   required String identityKey,
 }) {
   return (Store<AppState> store) {
-    store.dispatch(SaveKeySession(
+    store.dispatch(AddKeySession(
       session: session,
       sessionId: sessionId,
       identityKey: identityKey,
@@ -761,7 +754,7 @@ ThunkAction<AppState> createKeySessionOutbound({
     outboundKeySession.create_outbound(account, identityKey!, oneTimeKey!);
 
     // sychronous
-    await store.dispatch(SaveKeySession(
+    await store.dispatch(AddKeySession(
       identityKey: identityKey,
       sessionId: outboundKeySession.session_id(),
       session: outboundKeySession.pickle(deviceId),
@@ -1115,169 +1108,4 @@ Future<String> encryptSessionExport({
 
   // TODO: remove
   return serializedJson;
-}
-
-ThunkAction<AppState> exportSessionKeys(String password) {
-  return (Store<AppState> store) async {
-    try {
-      final user = store.state.authStore.user;
-      final deviceId = user.deviceId;
-      final messageSessions = store.state.cryptoStore.inboundMessageSessions;
-
-      final sessionData = [];
-
-      // prepend session keys to an array per spec
-      for (final roomSession in messageSessions.entries) {
-        final roomId = roomSession.key;
-        final sessions = roomSession.value;
-        final roomMessageIndexs = store.state.cryptoStore.messageSessionIndex[roomId];
-
-        for (final session in sessions.entries) {
-          final identityKey = session.key;
-          final sessionSerialized = session.value;
-          final identityMessageIndex = roomMessageIndexs?[identityKey] ?? -1;
-
-          // attempt to decrypt with any existing sessions
-          final inboundSession = olm.InboundGroupSession()..unpickle(deviceId!, sessionSerialized);
-
-          // session
-          final sessionId = inboundSession.session_id();
-          final sessionKey = inboundSession.export_session(identityMessageIndex);
-
-          sessionData.add({
-            'algorithm': Algorithms.megolmv1,
-            'forwarding_curve25519_key_chain': [], // TODO:
-            'room_id': roomId,
-            'sender_key': identityKey,
-            'sender_claimed_keys': {
-              // TODO:
-              'ed25519': '<device ed25519 identity key>',
-            },
-            'session_id': sessionId,
-            'session_key': sessionKey,
-          });
-        }
-      }
-
-      // encrypt exported session keys
-      final String encryptedExport = await encryptSessionExport(
-        serializedJson: json.encode(sessionData),
-        password: password,
-      );
-
-      // create file
-      final directory = await getApplicationDocumentsDirectory();
-
-      final currentTime = DateTime.now();
-      final formattedTime = DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
-
-      final fileName = '${directory.path}/${Values.appName}_export_$formattedTime.txt';
-      final file = File(fileName);
-
-      await file.writeAsString(encryptedExport);
-    } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        origin: 'exportSessionKeys',
-      ));
-    }
-  };
-}
-
-///
-/// Import Session Keys
-///
-/// Responsible for decrypting the key import file as well
-/// Below is a block table for the encrypted data
-///
-/// - 1 	Export format version, which must be 0x01.
-/// - 16 	The salt S.
-/// - 16 	The initialization vector IV.
-/// - 4 	The number of rounds N, as a big-endian unsigned 32-bit integer.
-/// - variable 	The encrypted JSON object.
-/// - 32 	The HMAC-SHA-256 of all the above string concatenated together, using K' as the key.
-///
-ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password}) {
-  return (Store<AppState> store) async {
-    try {
-      final keyFile = File(file.paths[0]!);
-      final keyFileDataHeaded = await keyFile.readAsString();
-
-      final keyFileString = keyFileDataHeaded
-          .replaceAll(Values.SESSION_EXPORT_HEADER, '')
-          .replaceAll(Values.SESSION_EXPORT_FOOTER, '')
-          .replaceAll('\n', '')
-          .trim();
-
-      // decrypt imported session key file if necessary
-      if (password != null && password.isNotEmpty) {
-        printDebug('[importSessionKeys] decrypting file');
-
-        final keyFileBytes = base64.decode(keyFileString);
-
-        final dataEnd = keyFileBytes.length - 32;
-
-        final version = keyFileBytes.sublist(0, 1);
-        final salt = keyFileBytes.sublist(1, 17);
-        final iv = keyFileBytes.sublist(17, 33);
-        final rounds = keyFileBytes.sublist(33, 37);
-        final encryptedJson = keyFileBytes.sublist(37, dataEnd);
-        final keySha = keyFileBytes.sublist(dataEnd, keyFileBytes.length);
-
-        final roundsFormatted = ByteData.view(
-          Uint8List.fromList(rounds.toList()).buffer,
-        ).getUint32(0, Endian.big);
-
-        final ivFormatted = base64.encode(iv);
-        final encryptedJsonFormatted = base64.encode(encryptedJson);
-
-        printJson({
-          'version': version,
-          'salt': base64.encode(salt),
-          'iv': ivFormatted,
-          'rounds': roundsFormatted,
-          'keySha': base64.encode(keySha),
-        });
-
-        final pbkdf2 = Pbkdf2(
-          macAlgorithm: Hmac.sha512(),
-          iterations: roundsFormatted,
-          bits: 512,
-        );
-
-        final encryptionKeySecret = await pbkdf2.deriveKey(
-          secretKey: SecretKey(utf8.encode(password)),
-          nonce: salt,
-        );
-
-        final allKeys = await encryptionKeySecret.extractBytes();
-
-        // TODO: split on 256 offset, for K and K'
-        final encryptionKey = base64.encode(
-          allKeys.sublist(0, 32),
-        );
-
-        final codec = encrypt.AES(
-          encrypt.Key.fromBase64(encryptionKey),
-          mode: encrypt.AESMode.ctr,
-          padding: null,
-        );
-
-        final data = codec.decrypt(
-          encrypt.Encrypted.fromBase64(encryptedJsonFormatted),
-          iv: encrypt.IV.fromBase64(ivFormatted),
-        );
-
-        // TODO: should be session json - close!
-        printJson({
-          'test': utf8.decode(data),
-        });
-      }
-    } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        origin: 'importSessionKeys',
-      ));
-    }
-  };
 }

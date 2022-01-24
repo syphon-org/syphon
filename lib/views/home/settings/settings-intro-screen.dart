@@ -9,6 +9,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/management/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';

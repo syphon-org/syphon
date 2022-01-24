@@ -150,17 +150,15 @@ class ChatScreenState extends State<ChatScreen> {
   onCheatCode(_Props props) async {
     final store = StoreProvider.of<AppState>(context);
 
-    setState(() {
-      sending = false;
-    });
-
-    // try {
-    //   await store.dispatch(mutateMessagesRoom(
-    //     room: props.room,
-    //   ));
-    // } catch (error) {
-    //   printError(error.toString());
-    // }
+    try {
+      printInfo('TESTING');
+      await store.dispatch(backfillDecryptMessages(
+        props.room.id,
+      ));
+      printInfo('WHAT');
+    } catch (error) {
+      printError(error.toString());
+    }
   }
 
   onAttemptDecryption(_Props props) async {

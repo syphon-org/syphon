@@ -158,7 +158,7 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case AddInboundMessageSession:
       case AddOutboundMessageSession:
       case UpdateMessageSessionOutbound:
-      case SaveKeySession:
+      case AddKeySession:
       case ResetCrypto:
         saveCrypto(store.state.cryptoStore, storage: storage);
         break;

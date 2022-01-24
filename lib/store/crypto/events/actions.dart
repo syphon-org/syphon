@@ -98,7 +98,13 @@ ThunkAction<AppState> backfillDecryptMessages(
       final roomMessages = messages[roomId] ?? [];
       final roomDecrypted = messagesDecrypted[roomId] ?? [];
 
-      final undecrypted = roomMessages.where((msg) => roomDecrypted.contains(msg)).toList();
+      final undecryptedOriginal =
+          roomMessages.where((msg) => !roomDecrypted.contains(msg)).toList();
+      final undecryptedErrored = roomDecrypted
+          .where((msg) => (msg.body ?? '').isEmpty && (msg.url ?? '').isEmpty)
+          .toList();
+
+      final undecrypted = [...undecryptedOriginal, ...undecryptedErrored];
 
       final decrypted = await store.dispatch(decryptMessages(
         room,
@@ -409,7 +415,7 @@ ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
 ///     "type": "m.room_key"
 ///   },
 /// }
-ThunkAction<AppState> saveSessionKey({
+ThunkAction<AppState> saveMessageSession({
   Map? event,
   String? identityKey,
 }) {
@@ -442,7 +448,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
       // can be run in parrallel unlike message decryption
       await Future.wait(events.map((event) async {
         final eventType = event['type'];
-        final identityKeySender = event['content']['sender_key'];
+        final senderKey = event['content']['sender_key'];
 
         switch (eventType) {
           case EventTypes.encrypted:
@@ -457,9 +463,9 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 final roomId = eventDecrypted['content']['room_id'] as String;
 
                 // save decrepted user session key under roomId
-                await store.dispatch(saveSessionKey(
+                await store.dispatch(saveMessageSession(
                   event: eventDecrypted,
-                  identityKey: identityKeySender,
+                  identityKey: senderKey,
                 ));
 
                 backfillDecryptMessages(roomId);
