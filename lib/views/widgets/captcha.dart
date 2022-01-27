@@ -48,44 +48,42 @@ class CaptchaState extends State<Captcha> with Lifecycle<Captcha> {
 
   // Matrix Public Key
   @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        WebView(
-          baseUrl: widget.baseUrl != null ? 'https://${widget.baseUrl}' : 'https://matrix.org',
-          javascriptMode: JavascriptMode.unrestricted,
-          javascriptChannels: {
-            JavascriptChannel(
-              name: 'Captcha',
-              onMessageReceived: (JavascriptMessage message) {
-                String token = message.message;
-                if (token.contains('verify')) {
-                  token = token.substring(7);
-                }
-                widget.onVerified(token);
-              },
-            ),
-          },
-          onPageFinished: (_) {
-            setState(() {
-              loading = false;
-            });
-          },
-          onWebViewCreated: (WebViewController webViewController) {
-            setState(() {
-              loading = true;
-            });
-            controller = webViewController;
-            loadLocalHtml();
-          },
-        ),
-        Visibility(
-          visible: loading,
-          child: Center(
-            child: LoadingIndicator(loading: loading),
+  Widget build(BuildContext context) => Stack(
+        children: [
+          WebView(
+            baseUrl: widget.baseUrl != null ? 'https://${widget.baseUrl}' : 'https://matrix.org',
+            javascriptMode: JavascriptMode.unrestricted,
+            javascriptChannels: {
+              JavascriptChannel(
+                name: 'Captcha',
+                onMessageReceived: (JavascriptMessage message) {
+                  String token = message.message;
+                  if (token.contains('verify')) {
+                    token = token.substring(7);
+                  }
+                  widget.onVerified(token);
+                },
+              ),
+            },
+            onPageFinished: (_) {
+              setState(() {
+                loading = false;
+              });
+            },
+            onWebViewCreated: (WebViewController webViewController) {
+              setState(() {
+                loading = true;
+              });
+              controller = webViewController;
+              loadLocalHtml();
+            },
           ),
-        ),
-      ],
-    );
-  }
+          Visibility(
+            visible: loading,
+            child: Center(
+              child: LoadingIndicator(loading: loading),
+            ),
+          ),
+        ],
+      );
 }
