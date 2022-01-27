@@ -41,6 +41,11 @@ PODS:
     - DKImagePickerController/PhotoGallery
     - Flutter
   - Flutter (1.0.0)
+  - flutter_image_compress (0.0.1):
+    - Flutter
+    - Mantle
+    - SDWebImage
+    - SDWebImageWebPCoder
   - flutter_keyboard_visibility (0.0.1):
     - Flutter
   - flutter_local_notifications (0.0.1):
@@ -52,8 +57,20 @@ PODS:
   - FMDB/standard (2.7.5)
   - image_picker (0.0.1):
     - Flutter
+  - libwebp (1.2.1):
+    - libwebp/demux (= 1.2.1)
+    - libwebp/mux (= 1.2.1)
+    - libwebp/webp (= 1.2.1)
+  - libwebp/demux (1.2.1):
+    - libwebp/webp
+  - libwebp/mux (1.2.1):
+    - libwebp/demux
+  - libwebp/webp (1.2.1)
   - local_image_provider (0.0.1):
     - Flutter
+  - Mantle (2.2.0):
+    - Mantle/extobjc (= 2.2.0)
+  - Mantle/extobjc (2.2.0)
   - OLMKit (3.1.0):
     - OLMKit/olmc (= 3.1.0)
     - OLMKit/olmcpp (= 3.1.0)
@@ -67,6 +84,9 @@ PODS:
   - SDWebImage (5.10.0):
     - SDWebImage/Core (= 5.10.0)
   - SDWebImage/Core (5.10.0)
+  - SDWebImageWebPCoder (0.8.4):
+    - libwebp (~> 1.0)
+    - SDWebImage/Core (~> 5.10)
   - shared_preferences (0.0.1):
     - Flutter
   - sqflite (0.0.2):
@@ -94,6 +114,7 @@ DEPENDENCIES:
   - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
+  - flutter_image_compress (from `.symlinks/plugins/flutter_image_compress/ios`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
@@ -114,9 +135,12 @@ SPEC REPOS:
     - DKImagePickerController
     - DKPhotoGallery
     - FMDB
+    - libwebp
+    - Mantle
     - OLMKit
     - Reachability
     - SDWebImage
+    - SDWebImageWebPCoder
     - SQLCipher
     - SwiftyGif
 
@@ -131,6 +155,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: Flutter
+  flutter_image_compress:
+    :path: ".symlinks/plugins/flutter_image_compress/ios"
   flutter_keyboard_visibility:
     :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
   flutter_local_notifications:
@@ -166,17 +192,21 @@ SPEC CHECKSUMS:
   emoji_picker_flutter: 4f9a1ac31d355e1bf9622a1e821a809149130127
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  flutter_image_compress: fd2b476345226e1a10ea352fa306af95704642c1
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_picker: 9aa50e1d8cdacdbed739e925b7eea16d014367e6
+  libwebp: 98a37e597e40bfdb4c911fc98f2c53d0b12d05fc
   local_image_provider: 05b1af32561482c0ca5a440fbc7f489ad818c962
+  Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
   OLMKit: 4ee0159d63feeb86d836fdcfefe418e163511639
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   SDWebImage: 9169792e9eec3e45bba2a0c02f74bf8bd922d1ee
+  SDWebImageWebPCoder: f93010f3f6c031e2f8fb3081ca4ee6966c539815
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   SQLCipher: 155ffeafc9ac102e5c9b68e3e9a1297a98a27096

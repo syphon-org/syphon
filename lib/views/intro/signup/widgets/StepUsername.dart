@@ -12,10 +12,7 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
-
-// Store
-
-// Styling
+import 'package:syphon/views/widgets/lifecycle.dart';
 
 class UsernameStep extends StatefulWidget {
   const UsernameStep({Key? key}) : super(key: key);
@@ -24,19 +21,13 @@ class UsernameStep extends StatefulWidget {
   UsernameStepState createState() => UsernameStepState();
 }
 
-class UsernameStepState extends State<UsernameStep> {
+class UsernameStepState extends State<UsernameStep> with Lifecycle<UsernameStep> {
   UsernameStepState();
 
   Timer? typingTimeout;
   final usernameController = TextEditingController();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
-  }
-
-  @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     usernameController.text = trimAlias(store.state.authStore.username);
@@ -120,6 +111,7 @@ class UsernameStepState extends State<UsernameStep> {
                   child: TextFieldSecure(
                     label: props.isUsernameValid ? props.fullUserId : 'Username',
                     disableSpacing: true,
+                    dirty: usernameController.text.length > 6,
                     valid: props.isUsernameValid,
                     controller: usernameController,
                     onSubmitted: (_) {
