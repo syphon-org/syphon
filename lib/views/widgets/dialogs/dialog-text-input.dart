@@ -15,6 +15,7 @@ class DialogTextInput extends StatefulWidget {
     this.initialValue = '',
     this.loading = false,
     this.valid = false,
+    this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.inputFormatters = const [],
     this.editingController,
@@ -30,6 +31,7 @@ class DialogTextInput extends StatefulWidget {
 
   final bool loading;
   final bool valid;
+  final bool obscureText;
   final TextInputType keyboardType;
   final List<TextInputFormatter> inputFormatters;
   final TextEditingController? editingController;
@@ -122,6 +124,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
                   ),
                   labelText: widget.label,
                 ),
+                obscureText: widget.obscureText,
                 onChanged: (value) {
                   if (widget.onChange != null) {
                     widget.onChange!(value);
