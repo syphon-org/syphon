@@ -1,123 +1,84 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/captcha.dart';
 
-class DialogCaptcha extends StatelessWidget {
+class DialogCaptcha extends StatefulWidget {
   const DialogCaptcha({
     Key? key,
-    this.onConfirm,
+    this.hostname,
+    this.publicKey,
     this.onCancel,
+    this.onComplete,
   }) : super(key: key);
 
-  final Function? onConfirm;
-  final Function? onCancel;
-
-  @override
-  Widget build(BuildContext context) => StoreConnector<AppState, Props>(
-      distinct: true,
-      converter: (Store<AppState> store) => Props.mapStateToProps(store),
-      builder: (context, props) {
-        final double width = MediaQuery.of(context).size.width;
-        final double height = MediaQuery.of(context).size.height;
-
-        return SimpleDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          titlePadding: EdgeInsets.only(
-            left: 24,
-            right: 16,
-            top: 16,
-            bottom: 16,
-          ),
-          contentPadding: EdgeInsets.only(
-            left: 8,
-            right: 8,
-            bottom: 16,
-          ),
-          title: Text(Strings.titleDialogCaptcha),
-          children: <Widget>[
-            Container(
-              width: width,
-              child: SingleChildScrollView(
-                child: Container(
-                  width: width,
-                  height: height * 0.5,
-                  constraints: BoxConstraints(
-                    minWidth: Dimensions.inputWidthMin,
-                    maxWidth: Dimensions.inputWidthMax,
-                  ),
-                  child: Captcha(
-                    baseUrl: props.hostname,
-                    publicKey: props.publicKey,
-                    onVerified: (token) => props.onCompleteCaptcha(token, context: context),
-                  ),
-                ),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                ButtonText(
-                  text: Strings.buttonCancel,
-                  onPressed: () {
-                    if (onCancel != null) {
-                      onCancel!();
-                    }
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            )
-          ],
-        );
-      });
-}
-
-class Props extends Equatable {
-  final bool completed;
   final String? hostname;
   final String? publicKey;
 
-  final Function onCompleteCaptcha;
-
-  const Props({
-    required this.hostname,
-    required this.completed,
-    required this.publicKey,
-    required this.onCompleteCaptcha,
-  });
+  final Function? onCancel;
+  final Function? onComplete;
 
   @override
-  List<Object?> get props => [
-        hostname,
-        completed,
-        publicKey,
-      ];
+  State<DialogCaptcha> createState() => _DialogCaptchaState();
+}
 
-  static Props mapStateToProps(Store<AppState> store) => Props(
-        hostname: store.state.authStore.hostname,
-        completed: store.state.authStore.captcha,
-        publicKey: () {
-          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]
-                  ['public_key'] ??
-              '';
-        }(),
-        onCompleteCaptcha: (String token, {required BuildContext context}) async {
-          await store.dispatch(updateCredential(
-            type: MatrixAuthTypes.RECAPTCHA,
-            value: token.toString(),
-          ));
-          await store.dispatch(toggleCaptcha(completed: true));
-          Navigator.of(context).pop();
-        },
-      );
+class _DialogCaptchaState extends State<DialogCaptcha> {
+  @override
+  Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
+    return SimpleDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      titlePadding: EdgeInsets.only(
+        left: 24,
+        right: 16,
+        top: 16,
+        bottom: 16,
+      ),
+      contentPadding: EdgeInsets.only(
+        left: 8,
+        right: 8,
+        bottom: 16,
+      ),
+      title: Text(Strings.titleDialogCaptcha),
+      children: <Widget>[
+        Container(
+          width: width,
+          child: SingleChildScrollView(
+            child: Container(
+              width: width,
+              height: height * 0.5,
+              constraints: BoxConstraints(
+                minWidth: Dimensions.inputWidthMin,
+                maxWidth: Dimensions.inputWidthMax,
+              ),
+              child: Captcha(
+                baseUrl: widget.hostname,
+                publicKey: widget.publicKey,
+                onVerified: (token) => widget.onComplete!(token),
+              ),
+            ),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            ButtonText(
+              text: Strings.buttonCancel,
+              onPressed: () {
+                if (widget.onCancel != null) {
+                  widget.onCancel!();
+                }
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        )
+      ],
+    );
+  }
 }

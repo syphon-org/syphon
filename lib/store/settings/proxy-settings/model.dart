@@ -9,10 +9,17 @@ class ProxySettings extends Equatable {
   final String host;
   final String port;
 
+  final bool authenticationEnabled; // proxy authentication enabled
+  final String username; // proxy username
+  final String password; // proxy password
+
   const ProxySettings({
     this.enabled = false,
     this.host = '127.0.0.1',
     this.port = '8118',
+    this.authenticationEnabled = false,
+    this.username = 'username',
+    this.password = 'password',
   });
 
   @override
@@ -20,17 +27,26 @@ class ProxySettings extends Equatable {
         enabled,
         host,
         port,
+        authenticationEnabled,
+        username,
+        password,
       ];
 
   ProxySettings copyWith({
     enabled,
     host,
     port,
+    authenticationEnabled,
+    username,
+    password,
   }) =>
       ProxySettings(
         enabled: enabled ?? this.enabled,
         host: host ?? this.host,
         port: port ?? this.port,
+        authenticationEnabled: authenticationEnabled ?? this.authenticationEnabled,
+        username: username ?? this.username,
+        password: password ?? this.password,
       );
 
   Map<String, dynamic> toJson() => _$ProxySettingsToJson(this);
