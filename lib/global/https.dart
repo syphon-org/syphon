@@ -76,6 +76,16 @@ http.Client createClient({ProxySettings? proxySettings}) {
 
   customClient.findProxy = (uri) {
     if (proxySettings != null && proxySettings.enabled) {
+      // Adding credentials if the proxy authentication is enabled
+      if (proxySettings.authenticationEnabled) {
+        customClient.addProxyCredentials(
+            proxySettings.host,
+            int.parse(proxySettings.port), // port input allows numbers only, so no try/catch
+            'Basic', // Basic authentication
+            HttpClientBasicCredentials(proxySettings.username, proxySettings.password)
+        );
+      }
+
       return 'PROXY ${proxySettings.host}:${proxySettings.port};';
     }
     else {
