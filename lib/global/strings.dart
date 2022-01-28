@@ -38,6 +38,9 @@ class Strings {
   static final titleUseProxyServer = tr('title-proxy-use-proxy');
   static final titleProxyHost = tr('title-proxy-host');
   static final titleProxyPort = tr('title-proxy-port');
+  static final titleProxyUseBasicAuthentication = tr('title-proxy-use-basic-authentication');
+  static final titleProxyUsername = tr('title-proxy-username');
+  static final titleProxyPassword = tr('title-proxy-password');
   static final titleLockOverlay = tr('title-lock-overlay');
   static final titleConfirmLockOverlay = tr('title-confirm-lock-overlay');
   static final titleSearchUnencrypted = tr('title-search-unencrypted');
@@ -63,6 +66,7 @@ class Strings {
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
+  static final subtitleProxyUseBasicAuthentication = tr('subtitle-proxy-use-basic-authentication');
   static final subtitleSettingsSyncInterval = tr('subtitle-settings-sync-interval');
   static final subtitleSettingsSyncToggle = tr('subtitle-settings-sync-toggle');
 
@@ -111,6 +115,8 @@ class Strings {
   static final listItemSettingsProxy = tr('list-item-settings-proxy');
   static final listItemSettingsProxyHost = tr('list-item-settings-proxy-host');
   static final listItemSettingsProxyPort = tr('list-item-settings-proxy-port');
+  static final listItemSettingsProxyUsername = tr('list-item-settings-proxy-username');
+  static final listItemSettingsProxyPassword = tr('list-item-settings-proxy-password');
   static final listItemSettingsSyncInterval = tr('list-item-settings-sync-interval');
   static final listItemSettingsSyncToggle = tr('list-item-settings-sync-toggle');
 
@@ -264,6 +270,8 @@ class Strings {
 
   static final contentProxyHost = tr('content-proxy-host');
   static final contentProxyPort = tr('content-proxy-port');
+  static final contentProxyUsername = tr('content-proxy-username');
+  static final contentProxyPassword = tr('content-proxy-password');
 
   static final messageEditedAppend = tr('message-edited-append');
 
@@ -330,6 +338,8 @@ class Strings {
   // Labels
   static final labelProxyHost = tr('label-proxy-host');
   static final labelProxyPort = tr('label-proxy-port');
+  static final labelProxyUsername = tr('label-proxy-username');
+  static final labelProxyPassword = tr('label-proxy-password');
   static final labelPassword = tr('label-password');
   static final labelDefault = tr('label-default');
 
