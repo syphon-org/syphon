@@ -5,7 +5,7 @@
  
 🐛 Bug Fixes
 - fixed signup issues
-- fixed windows build issues
+- fixed windows config
 - fixed linux build issues
 
 📐 Refactoring
