@@ -25,7 +25,7 @@ a privacy centric matrix client - now in open alpha*
 <p align='center'>
     <img src="https://img.shields.io/github/license/syphon-org/syphon?color=teal"/>
     <img src="https://img.shields.io/github/v/release/syphon-org/syphon?include_prereleases&color=teal"/>
-    <img src="https://img.shields.io/github/commits-since/syphon-org/syphon/0.2.4?color=teal"/> 
+    <img src="https://img.shields.io/github/commits-since/syphon-org/syphon/0.2.6?color=teal"/> 
     <a href="https://pub.dev/packages/lint">
         <img src="https://img.shields.io/badge/style-lint-4BC0F5.svg?color=teal"/> 
     </a>

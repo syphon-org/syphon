@@ -6,7 +6,10 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
@@ -22,9 +25,24 @@ class CaptchaStep extends StatefulWidget {
 class CaptchaStepState extends State<CaptchaStep> {
   final focusNode = FocusNode();
 
-  @override
-  void initState() {
-    super.initState();
+  onShowDialog(BuildContext context, _Props props) async {
+    final store = StoreProvider.of<AppState>(context);
+    final authSession = store.state.authStore.authSession;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) => DialogCaptcha(
+        key: Key(authSession!),
+        hostname: props.hostname,
+        publicKey: props.publicKey,
+        onComplete: (String token) {
+          props.onCompleteCaptcha(token);
+
+          printInfo('COMPLETED');
+          Navigator.pop(dialogContext);
+        },
+      ),
+    );
   }
 
   @override
@@ -127,9 +145,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                         : Color(Colours.cyanSyphonAlpha),
                     loading: props.loading,
                     disabled: props.completed,
-                    onPressed: () => props.onShowCaptcha(
-                      context,
-                    ),
+                    onPressed: () => onShowDialog(context, props),
                   ),
                 ],
               ),
@@ -143,12 +159,17 @@ class _Props extends Equatable {
   final bool loading;
   final bool completed;
 
-  final Function onShowCaptcha;
+  final String? hostname;
+  final String? publicKey;
+
+  final Function onCompleteCaptcha;
 
   const _Props({
     required this.loading,
     required this.completed,
-    required this.onShowCaptcha,
+    required this.hostname,
+    required this.publicKey,
+    required this.onCompleteCaptcha,
   });
 
   @override
@@ -160,16 +181,18 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
         completed: store.state.authStore.captcha,
-        onShowCaptcha: (BuildContext context) async {
-          final authSession = store.state.authStore.authSession;
-          await showDialog(
-            context: context,
-            builder: (context) {
-              return DialogCaptcha(
-                key: Key(authSession!),
-              );
-            },
-          );
+        hostname: store.state.authStore.hostname,
+        publicKey: () {
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]
+                  ['public_key'] ??
+              '';
+        }(),
+        onCompleteCaptcha: (String token) async {
+          await store.dispatch(updateCredential(
+            type: MatrixAuthTypes.RECAPTCHA,
+            value: token.toString(),
+          ));
+          await store.dispatch(toggleCaptcha(completed: true));
         },
       );
 }

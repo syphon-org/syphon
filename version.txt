@@ -1,2 +1,2 @@
-versionName=0.2.7
-versionCode=2008
+versionName=0.2.8
+versionCode=2010

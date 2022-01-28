@@ -24,6 +24,7 @@ class TextFieldSecure extends StatelessWidget {
     this.controller,
     this.maxLines = 1,
     this.valid = true,
+    this.dirty = false,
     this.disabled = false,
     this.readOnly = false,
     this.obscureText = false,
@@ -43,6 +44,7 @@ class TextFieldSecure extends StatelessWidget {
   }) : super(key: key);
 
   final bool valid;
+  final bool dirty;
   final bool disabled;
   final bool readOnly;
   final bool obscureText;
@@ -66,7 +68,7 @@ class TextFieldSecure extends StatelessWidget {
   final Function? onSubmitted;
   final Function? onEditingComplete;
   final Function? onTap;
-  final Iterable<String>? autofillHints; 
+  final Iterable<String>? autofillHints;
   final MaterialStateMouseCursor? mouseCursor;
 
   buildBorderColorFocused(BuildContext context) {
@@ -76,7 +78,7 @@ class TextFieldSecure extends StatelessWidget {
       );
     }
 
-    if (!valid) {
+    if (!valid && dirty) {
       return BorderSide(
         color: Theme.of(context).errorColor,
         width: DEFAULT_BORDER_WIDTH,
@@ -96,7 +98,7 @@ class TextFieldSecure extends StatelessWidget {
       );
     }
 
-    if (!valid) {
+    if (!valid && dirty) {
       return BorderSide(
         color: Theme.of(context).errorColor.withOpacity(0.75),
         width: DEFAULT_BORDER_WIDTH,
@@ -107,7 +109,7 @@ class TextFieldSecure extends StatelessWidget {
       color: Theme.of(context).dividerColor,
       width: DEFAULT_BORDER_WIDTH,
     );
-  } 
+  }
 
   @override
   Widget build(BuildContext context) => Container(
