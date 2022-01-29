@@ -265,7 +265,10 @@ class ChatInputState extends State<ChatInput> {
           final imageHeight =
               keyboardHeight > 0 ? maxMediaHeight * 0.65 : imageWidth; // 2 images in view
 
-          final isSendable = sendable && !widget.sending;
+          final isSendable = (sendable && !widget.sending) ||
+              // account for if editing
+              widget.editing && (widget.editorController?.text.isNotEmpty ?? false);
+
           final double messageInputWidth = isSendable ? width - 72 : width * 0.99;
 
           Color sendButtonColor = const Color(Colours.blueBubbly);
