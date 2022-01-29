@@ -611,16 +611,6 @@ class _Props extends Equatable {
 
           if (hostname != homeserver.hostname) {
             await store.dispatch(selectHomeserver(hostname: hostname));
-            final _homeserver = store.state.authStore.homeserver;
-
-            if (_homeserver.signupTypes.isEmpty &&
-                !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
-              store.dispatch(addInfo(
-                origin: 'selectHomeserver',
-                message:
-                    'No new signups allowed on this server, try another if creating an account',
-              ));
-            }
           }
         },
         onChangePassword: (String text) {
