@@ -519,7 +519,7 @@ class ChatInputState extends State<ChatInput> {
                     ),
                   ),
                   Container(
-                    width: Dimensions.buttonSendSize,
+                    width: isSendable ? Dimensions.buttonSendSize : 0,
                     padding: EdgeInsets.symmetric(vertical: 4),
                     child: Visibility(
                       visible: isSendable,
