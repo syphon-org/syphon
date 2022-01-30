@@ -1317,8 +1317,7 @@ ThunkAction<AppState> resolveUsername({String? username}) {
         store.dispatch(setEmail(email: localpart));
       }
     }
-
-    if (int.tryParse(localpart) != null) { //msisdn 3pid
+    else if (int.tryParse(localpart) != null) { //msisdn 3pid
       store.dispatch(setMsisdn(msisdn: int.parse(localpart)));
     }
 
