@@ -13,6 +13,7 @@ abstract class MatrixApi {
 
   // Auth
   static const loginUser = Auth.loginUser;
+  static const loginUser3pid = Auth.loginUser3pid;
   static const loginUserToken = Auth.loginUserToken;
   static const loginType = Auth.loginType;
   static const logoutUser = Auth.logoutUser;
