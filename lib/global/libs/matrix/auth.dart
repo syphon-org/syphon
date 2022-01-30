@@ -61,6 +61,8 @@ abstract class Auth {
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/login';
 
+    //TODO: email/msisdn 3pid login based on state
+
     final Map body = {
       'type': type,
       'identifier': {'type': 'm.id.user', 'user': username},

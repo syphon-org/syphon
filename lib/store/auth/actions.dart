@@ -379,6 +379,8 @@ ThunkAction<AppState> loginUser() {
         homeserver = await store.dispatch(fetchBaseUrl(homeserver: homeserver));
       } catch (error) {/* still attempt login */}
 
+      //TODO: 3pid login logic
+
       final data = await MatrixApi.loginUser(
         protocol: protocol,
         type: MatrixAuthTypes.PASSWORD,
@@ -1264,6 +1266,8 @@ ThunkAction<AppState> resolveUsername({String? username}) {
   return (Store<AppState> store) {
     final hostname = store.state.authStore.hostname;
     final homeserver = store.state.authStore.homeserver;
+
+    //TODO: teh logic for where it should be stored username/email/msisdn
 
     var formatted = username!.trim();
     if (formatted.length > 1) {
