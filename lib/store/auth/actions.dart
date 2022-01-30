@@ -1304,7 +1304,7 @@ ThunkAction<AppState> resolveUsername({String? username}) {
     final homeserver = store.state.authStore.homeserver;
 
     var localpart = username!.trim().split(':')[0];
-    var hostname  = username!.trim().split(':')[1];
+    final hostname  = username.trim().split(':')[1];
 
     if (localpart.isEmpty) { return; }
 
