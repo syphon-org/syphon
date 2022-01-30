@@ -48,6 +48,7 @@ class AuthStore extends Equatable {
   // TODO: extract / cache in case user force closes app during signup
   // temp state values for signup
   final String email;
+  final int msisdn;
   final String username;
   final String password;
   final String passwordCurrent;
@@ -62,6 +63,7 @@ class AuthStore extends Equatable {
   final bool stopgap;
   final bool creating;
   final bool verificationNeeded;
+  final bool isMsisdnValid;
   final bool isEmailValid;
   final bool isEmailAvailable;
   final bool isUsernameValid;
@@ -79,6 +81,7 @@ class AuthStore extends Equatable {
     this.contextObserver,
     this.protocol = Values.DEFAULT_PROTOCOL,
     this.email = '',
+    this.msisdn = 0, //invalid number, can't use null
     this.username = '',
     this.password = '',
     this.passwordCurrent = '',
@@ -97,6 +100,7 @@ class AuthStore extends Equatable {
       ],
     ),
     this.interactiveAuths = const {},
+    this.isMsisdnValid = false,
     this.isEmailValid = false,
     this.isEmailAvailable = true,
     this.isUsernameValid = false,
@@ -127,6 +131,7 @@ class AuthStore extends Equatable {
         hostname,
         homeserver,
         completed,
+        isMsisdnValid,
         isEmailValid,
         isEmailAvailable,
         isUsernameValid,
@@ -149,6 +154,7 @@ class AuthStore extends Equatable {
     String? protocol,
     bool? verified,
     email,
+    msisdn,
     loading,
     username,
     password,
@@ -163,6 +169,7 @@ class AuthStore extends Equatable {
     isUsernameValid,
     isUsernameAvailable,
     isPasswordValid,
+    isMsisdnValid,
     isEmailValid,
     isEmailAvailable,
     interactiveAuths,
@@ -181,6 +188,7 @@ class AuthStore extends Equatable {
         protocol: protocol ?? this.protocol,
         verified: verified ?? this.verified,
         email: email ?? this.email,
+        msisdn: msisdn ?? this.msisdn,
         loading: loading ?? this.loading,
         authObserver: authObserver ?? this.authObserver,
         contextObserver: contextObserver ?? this.contextObserver,
@@ -193,6 +201,7 @@ class AuthStore extends Equatable {
         homeserver: homeserver ?? this.homeserver,
         completed: completed ?? this.completed,
         captcha: captcha ?? this.captcha,
+        isMsisdnValid: isMsisdnValid ?? this.isMsisdnValid,
         isEmailValid: isEmailValid ?? this.isEmailValid,
         isEmailAvailable: isEmailAvailable ?? this.isEmailAvailable,
         isUsernameValid: isUsernameValid ?? this.isUsernameValid,

@@ -112,6 +112,16 @@ class SetEmail {
   SetEmail({this.email});
 }
 
+class SetMsisdn {
+  final int? msisdn;
+  SetMsisdn({this.msisdn});
+}
+
+class SetMsisdnValid {
+  final bool? valid;
+  SetMsisdnValid({this.valid});
+}
+
 class SetEmailValid {
   final bool? valid;
   SetEmailValid({this.valid});
@@ -1229,6 +1239,17 @@ ThunkAction<AppState> setEmail({String? email}) {
     ));
     store.dispatch(SetEmail(email: email));
     store.dispatch(SetEmailAvailability(available: true));
+  };
+}
+
+ThunkAction<AppState> setMsisdn({int? msisdn}) {
+  return (Store<AppState> store) {
+    final validMsisdn = RegExp(Values.msisdnRegex).hasMatch(msisdn!.toString());
+
+    store.dispatch(SetMsisdnValid(
+      valid: validMsisdn,
+    ));
+    store.dispatch(SetMsisdn(msisdn: msisdn));
   };
 }
 
