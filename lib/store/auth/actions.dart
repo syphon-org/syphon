@@ -367,29 +367,66 @@ ThunkAction<AppState> loginUser() {
       });
 
       var homeserver = store.state.authStore.homeserver;
-      final username = store.state.authStore.username.replaceAll('@', '');
+      final username = store.state.authStore.username;
+      final email    = store.state.authStore.email;
+      final msisdn   = store.state.authStore.msisdn;
       final password = store.state.authStore.password;
       final protocol = store.state.authStore.protocol;
 
-      final Device device = await store.dispatch(
-        generateDeviceId(salt: username),
-      );
+      final Device device;
+
+      if (msisdn > 0) {
+        device = await store.dispatch(
+          generateDeviceId(salt: msisdn.toString()),
+        );
+      }
+      else {
+        device = await store.dispatch(
+          generateDeviceId(salt: username + email),
+        );
+      }
 
       try {
         homeserver = await store.dispatch(fetchBaseUrl(homeserver: homeserver));
       } catch (error) {/* still attempt login */}
 
-      //TODO: 3pid login logic
+      final data;
 
-      final data = await MatrixApi.loginUser(
-        protocol: protocol,
-        type: MatrixAuthTypes.PASSWORD,
-        homeserver: homeserver.baseUrl!,
-        username: username,
-        password: password,
-        deviceId: device.deviceId,
-        deviceName: device.displayName,
-      );
+      if (store.state.authStore.isEmailValid) {
+        data = await MatrixApi.loginUser3pid(
+          protocol: protocol,
+          type: MatrixAuthTypes.PASSWORD,
+          homeserver: homeserver.baseUrl!,
+          medium: ThirdPartyIDMedium.email,
+          address: email,
+          password: password,
+          deviceId: device.deviceId,
+          deviceName: device.displayName,
+        );
+      }
+      else if (store.state.authStore.isMsisdnValid) {
+        data = await MatrixApi.loginUser3pid(
+            protocol: protocol,
+            type: MatrixAuthTypes.PASSWORD,
+            homeserver: homeserver.baseUrl!,
+            medium: ThirdPartyIDMedium.msisn,
+            address: msisdn.toString(),
+            password: password,
+            deviceId: device.deviceId,
+            deviceName: device.displayName,
+        );
+      }
+      else {
+        data = await MatrixApi.loginUser(
+          protocol: protocol,
+          type: MatrixAuthTypes.PASSWORD,
+          homeserver: homeserver.baseUrl!,
+          username: username,
+          password: password,
+          deviceId: device.deviceId,
+          deviceName: device.displayName,
+        );
+      }
 
       final errorCode = data['errcode'];
 
@@ -1264,22 +1301,30 @@ ThunkAction<AppState> setUsername({String? username}) {
 
 ThunkAction<AppState> resolveUsername({String? username}) {
   return (Store<AppState> store) {
-    final hostname = store.state.authStore.hostname;
     final homeserver = store.state.authStore.homeserver;
 
-    //TODO: teh logic for where it should be stored username/email/msisdn
+    var localpart = username!.trim().split(':')[0];
+    var hostname  = username!.trim().split(':')[1];
 
-    var formatted = username!.trim();
-    if (formatted.length > 1) {
-      formatted = formatted.replaceFirst('@', '', 1);
+    if (localpart.isEmpty) { return; }
+
+    if (localpart.contains('@')) {
+      if (localpart.indexOf('@') == 0) { // matrix
+        localpart = localpart.replaceFirst('@', '', 1);
+        store.dispatch(setUsername(username: localpart));
+      }
+      else { // email 3pid
+        store.dispatch(setEmail(email: localpart));
+      }
     }
-    final alias = formatted.split(':');
 
-    store.dispatch(setUsername(username: alias[0]));
+    if (int.tryParse(localpart) != null) { //msisdn 3pid
+      store.dispatch(setMsisdn(msisdn: int.parse(localpart)));
+    }
 
     // If user enters full username, make sure to set homeserver
-    if (username.contains(':')) {
-      store.dispatch(setHostname(hostname: alias[1]));
+    if (hostname.isNotEmpty) {
+      store.dispatch(setHostname(hostname: hostname));
     } else {
       if (!hostname.contains('.')) {
         store.dispatch(setHostname(
