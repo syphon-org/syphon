@@ -1312,7 +1312,7 @@ ThunkAction<AppState> resolveUsername({String? username}) {
 
     if (localpart.contains('@')) {
       if (localpart.indexOf('@') == 0) { // matrix
-        localpart = localpart.replaceFirst('@', '', 1);
+        localpart = localpart.replaceFirst('@', '');
         store.dispatch(setUsername(username: localpart));
       }
       else { // email 3pid
