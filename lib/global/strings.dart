@@ -273,6 +273,10 @@ class Strings {
   static final contentProxyUsername = tr('content-proxy-username');
   static final contentProxyPassword = tr('content-proxy-password');
 
+  static final contentNotificationStyleTypeInbox = tr('content-notification-style-type-inbox');
+  static final contentNotificationStyleTypeLatest = tr('content-notification-style-type-latest');
+  static final contentNotificationStyleTypeItemized = tr('content-notification-style-type-itemized');
+
   static final messageEditedAppend = tr('message-edited-append');
 
   // Confirmations (use confirm*)

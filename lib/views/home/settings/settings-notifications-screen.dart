@@ -63,16 +63,14 @@ class NotificationSettingsScreen extends StatelessWidget {
 
           switch (props.styleType) {
             case StyleType.Inbox:
-              styleTypeDescription =
-                  'Notification content is formatted together within one notification';
+              styleTypeDescription = Strings.contentNotificationStyleTypeInbox;
               break;
             case StyleType.Latest:
-              styleTypeDescription =
-                  'Notifications will only show one for the most recent notification';
+              styleTypeDescription = Strings.contentNotificationStyleTypeLatest;
               break;
             case StyleType.Itemized:
             default:
-              styleTypeDescription = 'A new notification will appear for every notification';
+              styleTypeDescription = Strings.contentNotificationStyleTypeItemized;
               break;
           }
 
