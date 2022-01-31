@@ -134,7 +134,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
   }) async =>
       showDialog(
         context: context,
-        builder: (BuildContext context) => DialogColorPicker(
+        builder: (BuildContext dialogContext) => DialogColorPicker(
           title: Strings.titleDialogChatColor,
           currentColor: originalColor,
           onSelectColor: onSelectColor,

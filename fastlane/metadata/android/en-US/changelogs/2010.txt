@@ -1,0 +1,12 @@
+0.2.8
+
+🔮 New Features
+- Proxy Basic Auth Support 
+ 
+🐛 Bug Fixes
+- fixed signup issues
+- fixed windows config
+- fixed linux build issues
+
+📐 Refactoring
+- Lots!

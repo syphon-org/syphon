@@ -147,6 +147,9 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case ToggleProxy:
       case SetProxyHost:
       case SetProxyPort:
+      case ToggleProxyAuthentication:
+      case SetProxyUsername:
+      case SetProxyPassword:
         saveSettings(store.state.settingsStore, storage: storage);
         break;
       case SetOlmAccountBackup:
