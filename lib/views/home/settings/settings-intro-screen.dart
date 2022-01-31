@@ -82,14 +82,22 @@ class IntroSettingsScreen extends StatelessWidget {
         onConfirm: (String password) async {
           final sessionJson = await decryptSessionKeys(file, password: password);
 
-          printJson({'imported': sessionJson});
+          printJson({'import': sessionJson});
 
           final sessionJsonExport = await encryptSessionKeys(
             sessionJson: sessionJson,
             password: password,
           );
 
-          printInfo(sessionJsonExport);
+          printDebug(sessionJsonExport);
+
+          final sessionJsonReimport = await decryptSessionKeys(
+            file,
+            override: sessionJsonExport,
+            password: password,
+          );
+
+          printJson({'export': sessionJsonReimport});
 
           Navigator.of(dialogContext).pop();
         },

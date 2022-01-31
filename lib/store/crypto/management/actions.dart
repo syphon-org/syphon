@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
@@ -70,13 +71,13 @@ Future<String> encryptSessionKeys({
       nonce: salt.bytes,
     );
 
-    final sessionJsonFormatted = base64.encode(sessionString.codeUnits);
+    final encryptionKeys = await encryptionKeySecret.extractBytes();
 
-    final allKeys = await encryptionKeySecret.extractBytes();
+    final sessionJsonFormatted = utf8.encode(sessionString);
 
     // NOTE: split on 256 offset, for K and K'
     final encryptionKey = base64.encode(
-      allKeys.sublist(0, 32),
+      encryptionKeys.sublist(0, 32),
     );
 
     final codec = encrypt.AES(
@@ -86,7 +87,7 @@ Future<String> encryptSessionKeys({
     );
 
     final sessionData = codec.encrypt(
-      Uint8List.fromList(sessionJsonFormatted.codeUnits),
+      Uint8List.fromList(sessionJsonFormatted),
       iv: encrypt.IV.fromBase64(iv.base64),
     );
 
@@ -97,13 +98,22 @@ Future<String> encryptSessionKeys({
     byteBuilder.add(iv.bytes);
     byteBuilder.add(convertIntToBytes(DEFAULT_ROUNDS));
     byteBuilder.add(sessionData.bytes); // actual session data
-    byteBuilder.add(allKeys.sublist(0, 64));
 
-    return '''
-       ${Values.SESSION_EXPORT_HEADER}
-       ${base64.encode(byteBuilder.toBytes())}
-       ${Values.SESSION_EXPORT_FOOTER}
-    '''
+    final hmacSha256 = crypto.Hmac(crypto.sha256, encryptionKeys.sublist(32, 64));
+    final digest = hmacSha256.convert(byteBuilder.toBytes());
+
+    byteBuilder.add(digest.bytes); // HMAC-SHA-256 of all of the above together using k'
+
+    // Uncomment for testing
+    // printJson({
+    //   'version': 1,
+    //   'salt': base64.encode(salt.bytes),
+    //   'iv': base64.encode(iv.bytes),
+    //   'rounds': base64.encode(convertIntToBytes(DEFAULT_ROUNDS)),
+    //   'keySha': base64.encode(crypto.sha256.convert(encryptionKeys).bytes),
+    // });
+
+    return '''${Values.SESSION_EXPORT_HEADER}\n${base64.encode(byteBuilder.toBytes())}\n${Values.SESSION_EXPORT_FOOTER}'''
         .trim();
   } catch (error) {
     rethrow;
@@ -125,15 +135,18 @@ Future<String> encryptSessionKeys({
 ///
 Future<List<dynamic>> decryptSessionKeys(
   FilePickerResult file, {
+  String? override,
   String? password,
 }) async {
   try {
     final keyFile = File(file.paths[0]!);
-    final keyFileDataHeaded = await keyFile.readAsString();
+    final keyFileDataHeaded = override ?? await keyFile.readAsString();
 
     if (password == null || password.isEmpty) {
       return json.decode(utf8.decode(keyFile.readAsBytesSync()));
     }
+
+    printDebug(keyFileDataHeaded);
 
     final keyFileString = keyFileDataHeaded
         .replaceAll(Values.SESSION_EXPORT_HEADER, '')
@@ -160,7 +173,7 @@ Future<List<dynamic>> decryptSessionKeys(
       Uint8List.fromList(rounds.toList()).buffer,
     ).getUint32(0, Endian.big);
 
-    // Uncomment
+    // Uncomment for testing
     // printJson({
     //   'version': version,
     //   'salt': base64.encode(salt),
