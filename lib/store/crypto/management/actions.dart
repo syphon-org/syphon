@@ -223,6 +223,13 @@ ThunkAction<AppState> exportSessionKeys(String password) {
 
       final deviceKeysByDeviceId = deviceKeys.values.toList().fold<Map<String, DeviceKey>>(
           <String, DeviceKey>{}, (previous, current) => previous..addAll(current));
+
+      final deviceKeyIdentities = Map.fromIterable(
+        deviceKeysByDeviceId.values,
+        key: (device) => (device as DeviceKey).curve25519,
+        value: (device) => (device as DeviceKey).ed25519,
+      );
+
       final sessionData = [];
 
       // prepend session keys to an array per spec
@@ -235,7 +242,7 @@ ThunkAction<AppState> exportSessionKeys(String password) {
           final identityKey = session.key;
           final sessionSerialized = session.value;
           final identityMessageIndex = roomMessageIndexs?[identityKey] ?? -1;
-          final deviceKey = deviceKeysByDeviceId[identityKey] ?? DeviceKey();
+          final deviceKeyEd25519 = deviceKeyIdentities[identityKey];
 
           // attempt to decrypt with any existing sessions
           final inboundSession = olm.InboundGroupSession()..unpickle(roomId, sessionSerialized);
@@ -246,18 +253,22 @@ ThunkAction<AppState> exportSessionKeys(String password) {
 
           sessionData.add({
             'algorithm': Algorithms.megolmv1,
-            'forwarding_curve25519_key_chain': [], // TODO:
+            // TODO: support needed alongside m.forwarded_room_key events.
+            'forwarding_curve25519_key_chain': [],
             'room_id': roomId,
             'sender_key': identityKey,
             'sender_claimed_keys': {
-              // TODO: confirm is the correct ed25519 key
-              'ed25519': (deviceKey.keys ?? {})[Algorithms.ed25519],
+              'ed25519': deviceKeyEd25519,
             },
             'session_id': sessionId,
             'session_key': sessionKey,
           });
         }
       }
+
+      printJson({
+        'sessionData': sessionData,
+      });
 
       // encrypt exported session keys
       final String encryptedExport = await encryptSessionKeys(
@@ -275,6 +286,11 @@ ThunkAction<AppState> exportSessionKeys(String password) {
       final file = File(fileName);
 
       await file.writeAsString(encryptedExport);
+
+      store.dispatch(addConfirmation(
+        origin: 'exportSessionKeys',
+        message: 'Successfully backed up your current session keys',
+      ));
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
@@ -334,6 +350,11 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
       for (final roomId in roomIdsEncrypted) {
         store.dispatch(backfillDecryptMessages(roomId));
       }
+
+      store.dispatch(addConfirmation(
+        origin: 'importSessionKeys',
+        message: 'Successfully imported keys, your previous messages should be decrypting.',
+      ));
     } catch (error) {
       store.dispatch(addAlert(
         error: error,

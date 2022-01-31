@@ -92,6 +92,7 @@ class PrivacySettingsScreen extends StatelessWidget {
         content: 'Enter the password for this session key import.',
         label: Strings.labelPassword,
         initialValue: '',
+        confirmText: 'import',
         inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
         onCancel: () async {
           Navigator.of(dialogContext).pop();
@@ -114,10 +115,11 @@ class PrivacySettingsScreen extends StatelessWidget {
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) => DialogTextInput(
-        title: 'Export Session Keys',
-        content: 'Enter a password for this session key export.',
+        title: 'Backup Session Keys',
+        content: 'Enter a password for this session key backup.',
         label: Strings.labelPassword,
         initialValue: '',
+        confirmText: 'save',
         inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
         onCancel: () async {
           Navigator.of(dialogContext).pop();
@@ -421,26 +423,11 @@ class PrivacySettingsScreen extends StatelessWidget {
                               'Import Keys',
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () => props.onDisabled(),
-                            child: ListTile(
-                              enabled: false,
-                              onTap: () => onExportSessionKeys(context: context, props: props),
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'Export Keys',
-                              ),
-                            ),
-                          ),
                           ListTile(
-                            onTap: () => onDeleteDeviceKey(context: context, props: props),
+                            onTap: () => onExportSessionKeys(context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
-                              'Delete Keys',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                color: Colors.redAccent,
-                              ),
+                              'Backup Keys',
                             ),
                           ),
                         ],
@@ -456,6 +443,17 @@ class PrivacySettingsScreen extends StatelessWidget {
                               'Account Management',
                               textAlign: TextAlign.start,
                               style: Theme.of(context).textTheme.subtitle2,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () => onDeleteDeviceKey(context: context, props: props),
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Delete Keys',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.redAccent,
+                              ),
                             ),
                           ),
                           ListTile(

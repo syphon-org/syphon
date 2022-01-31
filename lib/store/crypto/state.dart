@@ -21,8 +21,7 @@ class CryptoStore extends Equatable {
   final bool oneTimeKeysStable;
 
   // TODO: Map<identityKey, Map<SessionId, serializedSession>
-  final Map<String, Map<String, String>>
-      keySessions; // both olmv1 inbound and outbound key sessions
+  final Map<String, Map<String, String>> keySessions; // both olm inbound and outbound key sessions
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - index per chat
   final Map<String, Map<String, int>> messageSessionIndex;
@@ -96,10 +95,8 @@ class CryptoStore extends Equatable {
       CryptoStore(
         olmAccount: olmAccount ?? this.olmAccount,
         olmAccountKey: olmAccountKey ?? this.olmAccountKey,
-        inboundMessageSessions:
-            inboundMessageSessions ?? this.inboundMessageSessions,
-        outboundMessageSessions:
-            outboundMessageSessions ?? this.outboundMessageSessions,
+        inboundMessageSessions: inboundMessageSessions ?? this.inboundMessageSessions,
+        outboundMessageSessions: outboundMessageSessions ?? this.outboundMessageSessions,
         messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
         keySessions: keySessions ?? this.keySessions,
         deviceKeys: deviceKeys ?? this.deviceKeys,
@@ -112,6 +109,5 @@ class CryptoStore extends Equatable {
       );
 
   Map<String, dynamic> toJson() => _$CryptoStoreToJson(this);
-  factory CryptoStore.fromJson(Map<String, dynamic> json) =>
-      _$CryptoStoreFromJson(json);
+  factory CryptoStore.fromJson(Map<String, dynamic> json) => _$CryptoStoreFromJson(json);
 }

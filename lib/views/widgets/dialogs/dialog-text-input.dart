@@ -16,6 +16,7 @@ class DialogTextInput extends StatefulWidget {
     this.loading = false,
     this.valid = false,
     this.obscureText = false,
+    this.confirmText = '',
     this.keyboardType = TextInputType.text,
     this.inputFormatters = const [],
     this.editingController,
@@ -28,6 +29,7 @@ class DialogTextInput extends StatefulWidget {
   final String content;
   final String label;
   final String initialValue;
+  final String confirmText;
 
   final bool loading;
   final bool valid;
@@ -160,7 +162,9 @@ class _DialogTextInputState extends State<DialogTextInput> {
                         widget.onConfirm!(editingController.text);
                       }
                     },
-              child: !widget.loading ? Text(Strings.buttonSave) : LoadingIndicator(size: 16),
+              child: !widget.loading
+                  ? Text(widget.confirmText.isEmpty ? Strings.buttonSave : widget.confirmText)
+                  : LoadingIndicator(size: 16),
             ),
           ],
         )
