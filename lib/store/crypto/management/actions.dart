@@ -29,6 +29,9 @@ class SetInboundMessageSessions {
 
 const DEFAULT_ROUNDS = 500000;
 
+Uint8List convertIntToBytes(int value) =>
+    Uint8List(4)..buffer.asByteData().setUint32(0, value, Endian.big);
+
 ///
 /// Encrypt Session Keys
 ///
@@ -53,8 +56,8 @@ Future<String> encryptSessionKeys({
 
     final sessionString = json.encode(sessionJson);
 
-    const iv = 'TODO:';
-    const salt = 'TODO:';
+    final iv = encrypt.SecureRandom(16);
+    final salt = encrypt.SecureRandom(16);
 
     final pbkdf2 = Pbkdf2(
       macAlgorithm: Hmac.sha512(),
@@ -64,11 +67,10 @@ Future<String> encryptSessionKeys({
 
     final encryptionKeySecret = await pbkdf2.deriveKey(
       secretKey: SecretKey(utf8.encode(password)),
-      nonce: salt.codeUnits,
+      nonce: salt.bytes,
     );
 
-    final ivFormatted = base64.encode(iv.codeUnits);
-    final encryptedJsonFormatted = base64.encode(sessionString.codeUnits);
+    final sessionJsonFormatted = base64.encode(sessionString.codeUnits);
 
     final allKeys = await encryptionKeySecret.extractBytes();
 
@@ -83,25 +85,23 @@ Future<String> encryptSessionKeys({
       padding: null,
     );
 
-    final data = codec.encrypt(
-      Uint8List.fromList(encryptedJsonFormatted.codeUnits),
-      iv: encrypt.IV.fromBase64(ivFormatted),
+    final sessionData = codec.encrypt(
+      Uint8List.fromList(sessionJsonFormatted.codeUnits),
+      iv: encrypt.IV.fromBase64(iv.base64),
     );
 
-    // final dataEnd = keyFileBytes.length - 32;
+    final byteBuilder = BytesBuilder();
 
-    // final version = keyFileBytes.sublist(0, 1);
-    // final keySha = keyFileBytes.sublist(dataEnd, keyFileBytes.length);
-
-    // // needed for decryption
-    // final salt = keyFileBytes.sublist(1, 17);
-    // final iv = keyFileBytes.sublist(17, 33);
-    // final rounds = keyFileBytes.sublist(33, 37);
-    // final encryptedJson = keyFileBytes.sublist(37, dataEnd);
+    byteBuilder.addByte(1); // version
+    byteBuilder.add(salt.bytes);
+    byteBuilder.add(iv.bytes);
+    byteBuilder.add(convertIntToBytes(DEFAULT_ROUNDS));
+    byteBuilder.add(sessionData.bytes); // actual session data
+    byteBuilder.add(allKeys.sublist(0, 64));
 
     return '''
        ${Values.SESSION_EXPORT_HEADER}
-       ${data.base64}
+       ${base64.encode(byteBuilder.toBytes())}
        ${Values.SESSION_EXPORT_FOOTER}
     '''
         .trim();

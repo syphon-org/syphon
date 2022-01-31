@@ -6,9 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/management/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
@@ -50,6 +50,46 @@ class IntroSettingsScreen extends StatelessWidget {
         },
         onConfirm: (String password) async {
           store.dispatch(importSessionKeys(file, password: password));
+
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
+  }
+
+  _onExportSessionKeysTest(BuildContext context) async {
+    final file = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt'],
+    );
+
+    if (file == null) {
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Import Session Keys',
+        content: 'Enter the password for this session key import.',
+        label: Strings.labelPassword,
+        initialValue: '',
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          final sessionJson = await decryptSessionKeys(file, password: password);
+
+          printJson({'imported': sessionJson});
+
+          final sessionJsonExport = await encryptSessionKeys(
+            sessionJson: sessionJson,
+            password: password,
+          );
+
+          printInfo(sessionJsonExport);
 
           Navigator.of(dialogContext).pop();
         },
@@ -227,7 +267,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               dense: true,
                               contentPadding: Dimensions.listPadding,
                               onTap: () {
-                                onExportSessionKeys(context);
+                                _onExportSessionKeysTest(context);
                               },
                               title: Text(
                                 'Export Device Key',
