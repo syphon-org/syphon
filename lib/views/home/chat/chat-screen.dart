@@ -290,10 +290,6 @@ class ChatScreenState extends State<ChatScreen> {
     File? encryptedFile;
     EncryptInfo? info;
 
-    printDebug('STUFFF');
-    printDebug(rawFile.path);
-    printDebug(rawFile.uri.toString());
-
     var file = await scrubMedia(localFile: rawFile);
 
     if (file == null) {

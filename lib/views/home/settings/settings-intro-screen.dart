@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/management/actions.dart';
@@ -50,54 +49,6 @@ class IntroSettingsScreen extends StatelessWidget {
         },
         onConfirm: (String password) async {
           store.dispatch(importSessionKeys(file, password: password));
-
-          Navigator.of(dialogContext).pop();
-        },
-      ),
-    );
-  }
-
-  _onExportSessionKeysTest(BuildContext context) async {
-    final file = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['txt'],
-    );
-
-    if (file == null) {
-      return;
-    }
-
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (dialogContext) => DialogTextInput(
-        title: 'Import Session Keys',
-        content: 'Enter the password for this session key import.',
-        label: Strings.labelPassword,
-        initialValue: '',
-        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
-        onCancel: () async {
-          Navigator.of(dialogContext).pop();
-        },
-        onConfirm: (String password) async {
-          final sessionJson = await decryptSessionKeys(file, password: password);
-
-          printJson({'import': sessionJson});
-
-          final sessionJsonExport = await encryptSessionKeys(
-            sessionJson: sessionJson,
-            password: password,
-          );
-
-          printDebug(sessionJsonExport);
-
-          final sessionJsonReimport = await decryptSessionKeys(
-            file,
-            override: sessionJsonExport,
-            password: password,
-          );
-
-          printJson({'export': sessionJsonReimport});
 
           Navigator.of(dialogContext).pop();
         },
@@ -275,7 +226,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               dense: true,
                               contentPadding: Dimensions.listPadding,
                               onTap: () {
-                                _onExportSessionKeysTest(context);
+                                onExportSessionKeys(context);
                               },
                               title: Text(
                                 'Export Device Key',

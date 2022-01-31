@@ -89,7 +89,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     if (!locked) {
       await _onLoadStorage();
 
-      printDebug('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+      printInfo('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushReplacement(
         PageRouteBuilder(
@@ -187,7 +187,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     } else {
       await _onLoadStorage();
 
-      printDebug('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+      printInfo('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushAndRemoveUntil(
         PageRouteBuilder(

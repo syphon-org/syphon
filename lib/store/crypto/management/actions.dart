@@ -146,8 +146,6 @@ Future<List<dynamic>> decryptSessionKeys(
       return json.decode(utf8.decode(keyFile.readAsBytesSync()));
     }
 
-    printDebug(keyFileDataHeaded);
-
     final keyFileString = keyFileDataHeaded
         .replaceAll(Values.SESSION_EXPORT_HEADER, '')
         .replaceAll(Values.SESSION_EXPORT_FOOTER, '')
@@ -296,8 +294,6 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
   return (Store<AppState> store) async {
     try {
       // decrypt imported session key file if necessary
-      printDebug('[importSessionKeys] decrypting file');
-
       final sessionJson = await decryptSessionKeys(file, password: password);
 
       final roomIdsEncrypted = [];
