@@ -60,6 +60,7 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
     case LogAppAgreement:
       return state.copyWith(
         alphaAgreement: DateTime.now().millisecondsSinceEpoch.toString(),
+        agreedToTermsOfService: true,
       );
     case SetRoomPrimaryColor:
       final chatSettings = Map<String, ChatSetting>.from(state.chatSettings);

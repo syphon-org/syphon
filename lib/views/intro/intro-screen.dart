@@ -24,7 +24,10 @@ import 'widgets/page-description-third.dart';
 import 'widgets/page-landing.dart';
 
 class IntroScreen extends StatefulWidget {
-  const IntroScreen({Key? key}) : super(key: key);
+  final bool showTermsOfService;
+
+  const IntroScreen({Key? key, this.showTermsOfService = true})
+      : super(key: key);
 
   @override
   IntroScreenState createState() => IntroScreenState();
@@ -71,6 +74,7 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
     if (alphaAgreement == null || true) {
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
+      if (widget.showTermsOfService) {
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -158,6 +162,7 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
         },
       );
     }
+  }
   }
 
   @override

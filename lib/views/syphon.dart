@@ -68,6 +68,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   final globalScaffold = GlobalKey<ScaffoldMessengerState>();
 
+  var showTermsOfService = true;
+
   Widget defaultHome = HomeScreen();
 
   SyphonState();
@@ -85,9 +87,10 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     final currentUser = store.state.authStore.user;
     final authed = currentUser.accessToken != null;
+    showTermsOfService = !store.state.settingsStore.agreedToTermsOfService;
 
     if (!authed) {
-      defaultHome = IntroScreen();
+      defaultHome = IntroScreen(showTermsOfService: showTermsOfService);
     }
 
     super.initState();
@@ -302,7 +305,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // No user is present and no contexts are availble to jump to
     if (user == null && allContexts.isEmpty && defaultScreen == HomeScreen) {
-      defaultHome = IntroScreen();
+      defaultHome = IntroScreen(showTermsOfService: showTermsOfService);
       return NavigationService.clearTo(Routes.intro, context);
     }
 
