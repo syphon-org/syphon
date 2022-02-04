@@ -129,11 +129,24 @@ Sync parseSync(Map params) {
   // TODO: remove with separate parsers, solve the issue of redundant passes over this data
   final users = Map<String, User>.from(room.usersTEMP);
 
+  int lastRead = room.lastRead;
+
+  ephemerals.readReceipts.forEach((key, value) {
+    if (value.userReadsMapped!.containsKey(currentUser.userId)) {
+      int rr = value.userReadsMapped![currentUser.userId];
+
+      if (rr > lastRead) {
+        lastRead = rr;
+      }
+    }
+  });
+
   final roomUpdated = room.copyWith(
     userTyping: ephemerals.userTyping,
     usersTyping: ephemerals.usersTyping,
     totalJoinedUsers: details.totalMembers,
     usersTEMP: <String, User>{},
+    lastRead: lastRead,
   );
 
   return Sync(
@@ -220,18 +233,12 @@ SyncEphemerals parseEphemerals({
         case 'm.receipt':
           final Map<String, dynamic> receiptEventIds = event.content;
 
-          // TODO: figure out how to pull what messages have been read from read recepts
-          // // Set a new timestamp for the latest read message if it exceeds the current
-          // latestRead = latestRead < newReadStatuses.latestRead
-          //     ? newReadStatuses.latestRead
-          //     : latestRead;
-
           // Filter through every eventId to find receipts
           receiptEventIds.forEach((eventId, receipt) {
             // convert every m.read object to a map of userIds + timestamps for read
             final receiptsNew = Receipt.fromMatrix(eventId, receipt);
 
-            // update the eventId if that event already has reads
+            // update the read receipts if that event has no reads yet
             if (!readReceipts.containsKey(eventId)) {
               readReceipts[eventId] = receiptsNew;
             } else {
