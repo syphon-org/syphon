@@ -129,11 +129,24 @@ Sync parseSync(Map params) {
   // TODO: remove with separate parsers, solve the issue of redundant passes over this data
   final users = Map<String, User>.from(room.usersTEMP);
 
+  int lastRead = room.lastRead;
+
+  ephemerals.readReceipts.forEach((key, value) {
+    if (value.userReadsMapped!.containsKey(currentUser.userId)) {
+      int rr = value.userReadsMapped![currentUser.userId];
+
+      if (rr > lastRead) {
+        lastRead = rr;
+      }
+    }
+  });
+
   final roomUpdated = room.copyWith(
     userTyping: ephemerals.userTyping,
     usersTyping: ephemerals.usersTyping,
     totalJoinedUsers: details.totalMembers,
     usersTEMP: <String, User>{},
+    lastRead: lastRead,
   );
 
   return Sync(
