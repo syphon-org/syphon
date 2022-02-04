@@ -231,7 +231,7 @@ SyncEphemerals parseEphemerals({
             // convert every m.read object to a map of userIds + timestamps for read
             final receiptsNew = Receipt.fromMatrix(eventId, receipt);
 
-            // update the eventId if that event already has reads
+            // update the read receipts if that event has no reads yet
             if (!readReceipts.containsKey(eventId)) {
               readReceipts[eventId] = receiptsNew;
             } else {
