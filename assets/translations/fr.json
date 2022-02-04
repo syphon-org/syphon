@@ -263,5 +263,9 @@
     "title-toggle-autocorrect": "Activer/Désactiver la correction automatique du clavier",
     "title-toggle-suggestions": "Activer/Désactiver la suggestions des mots au clavier",
     "subtitle-toggle-autocorrect": "Veuillez noter que les claviers peuvent envoyer des données de correction automatique à des tiers",
-    "list-item-settings-proxy-password": "Mot de passe du proxy"
+    "list-item-settings-proxy-password": "Mot de passe du proxy",
+    "list-item-chat-detail-vibrate": "Vibration",
+    "content-notification-style-type-inbox": "Regrouper les nouveaux messages dans une même notification",
+    "content-notification-style-type-latest": "Afficher une notification avec le message le plus récent",
+    "content-notification-style-type-itemized": "Une nouvelle notification apparaîtra pour chaque nouveau message"
 }
