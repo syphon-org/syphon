@@ -23,5 +23,16 @@
     "title-send-media-message": "Lähetä mediaviesti",
     "title-dialog-email-requirement-verified": "Sähköpostivarmennus",
     "title-dialog-accept-invite": "Hyväksytkö kutsun?",
-    "title-device-rename": "Nimeä laite uudelleen"
+    "title-device-rename": "Nimeä laite uudelleen",
+    "title-view-create-group-public": "Luo julkinen ryhmä",
+    "title-view-invite": "Kutsu",
+    "title-view-settings-chat": "Keskustelut",
+    "label-proxy-username": "Käyttäjätunnus",
+    "label-proxy-password": "Salasana",
+    "label-password": "salasana",
+    "tooltip-search-users": "Etsi käyttäjiä",
+    "tooltip-profile-settings": "Profiili ja asetukset",
+    "tooltip-search-chats": "Etsi keskusteluista",
+    "tooltip-cancel-reply": "Peruuta vastaus",
+    "semantics-create-public-room": "Luo julkinen huone"
 }
