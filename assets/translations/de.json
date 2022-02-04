@@ -263,5 +263,9 @@
     "content-proxy-password": "Das Passwort für die Authentifizierung bei Ihrem Proxy",
     "label-proxy-username": "Benutzername",
     "content-proxy-username": "Der Benutzername für die Authentifizierung bei Ihrem Proxy",
-    "label-proxy-password": "Passwort"
+    "label-proxy-password": "Passwort",
+    "list-item-chat-detail-vibrate": "Vibration",
+    "content-notification-style-type-inbox": "Neue Nachrichten in einer Benachrichtigung gruppieren",
+    "content-notification-style-type-latest": "Eine Benachrichtigung mit der aktuellsten Nachricht anzeigen",
+    "content-notification-style-type-itemized": "Für jede neue Nachricht wird eine neue Benachrichtigung angezeigt"
 }
