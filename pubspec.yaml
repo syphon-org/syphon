@@ -71,7 +71,7 @@ dependencies:
   sqflite_common_ffi: ^2.0.0
   sqlcipher_flutter_libs: ^0.5.0
   sqlcipher_library_windows: ^1.0.1
-  flutter_secure_storage: ^4.1.0
+  flutter_secure_storage: ^5.0.2
   drift: ^1.0.0
 
   ### services

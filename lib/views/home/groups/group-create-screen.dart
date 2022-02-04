@@ -65,18 +65,24 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
   }
 
   onToggleEncryption(_Props props) async {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => DialogEncryption(
-        content: Strings.confirmGroupEncryption,
-        onAccept: () {
-          setState(() {
-            encryption = !encryption;
-          });
-        },
-      ),
-    );
+    if (encryption) {
+      setState(() {
+        encryption = false;
+      });
+    } else { // If toggling the encryption on, show warning
+      return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => DialogEncryption(
+          content: Strings.confirmGroupEncryption,
+          onAccept: () {
+            setState(() {
+              encryption = true;
+            });
+          },
+        ),
+      );
+    }
   }
 
   onShowImageOptions() async {
