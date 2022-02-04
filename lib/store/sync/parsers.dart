@@ -220,12 +220,6 @@ SyncEphemerals parseEphemerals({
         case 'm.receipt':
           final Map<String, dynamic> receiptEventIds = event.content;
 
-          // TODO: figure out how to pull what messages have been read from read recepts
-          // // Set a new timestamp for the latest read message if it exceeds the current
-          // latestRead = latestRead < newReadStatuses.latestRead
-          //     ? newReadStatuses.latestRead
-          //     : latestRead;
-
           // Filter through every eventId to find receipts
           receiptEventIds.forEach((eventId, receipt) {
             // convert every m.read object to a map of userIds + timestamps for read
