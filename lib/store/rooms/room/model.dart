@@ -202,7 +202,6 @@ class Room implements drift.Insertable<Room> {
         guestEnabled: json['guest_can_join'],
         worldReadable: json['world_readable'],
         syncing: false,
-        lastRead: json['lastRead'],
       );
     } catch (error) {
       return Room(id: json['room_id']);
