@@ -12,7 +12,6 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -64,13 +63,10 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
 
   @override
   onMounted() async {
-    final store = StoreProvider.of<AppState>(context);
-    final alphaAgreement = store.state.settingsStore.alphaAgreement;
     final prefs = await SharedPreferences.getInstance();
     final bool? agreedToTermsOfService = prefs.getBool('agreedToTermsOfService');
     final double width = MediaQuery.of(context).size.width;
 
-    // TODO: decide on always showing alpha aggrement on intro
     if (agreedToTermsOfService == null || !agreedToTermsOfService) {
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
@@ -145,7 +141,6 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
                       child: TextButton(
                         onPressed: () async {
                           prefs.setBool('agreedToTermsOfService', true);
-                          await store.dispatch(acceptAgreement());
                           Navigator.of(dialogContext).pop();
                         },
                         child: Text(

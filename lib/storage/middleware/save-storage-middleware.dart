@@ -141,7 +141,6 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case ToggleTypingIndicators:
       case ToggleTimeFormat:
       case SetReadReceipts:
-      case LogAppAgreement:
       case SetSyncInterval:
       case SetMainFabLocation:
       case SetMainFabType:

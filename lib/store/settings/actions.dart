@@ -135,8 +135,6 @@ class SetReadReceipts {
   SetReadReceipts({this.readReceipts});
 }
 
-class LogAppAgreement {}
-
 /// Fetch Active Devices for account
 ThunkAction<AppState> fetchDevices() {
   return (Store<AppState> store) async {
@@ -270,13 +268,6 @@ ThunkAction<AppState> renameDevice({String? deviceId, String? displayName, bool?
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
-  };
-}
-
-/// Send in a hex value to be used as the primary color
-ThunkAction<AppState> acceptAgreement() {
-  return (Store<AppState> store) async {
-    store.dispatch(LogAppAgreement());
   };
 }
 
