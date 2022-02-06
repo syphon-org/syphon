@@ -73,6 +73,7 @@ dependencies:
   sqlcipher_library_windows: ^1.0.1
   flutter_secure_storage: ^5.0.2
   drift: ^1.0.0
+  shared_preferences: ^2.0.13
 
   ### services
   http: ^0.13.1

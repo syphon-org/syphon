@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'package:syphon/global/assets.dart';
@@ -62,13 +63,15 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
   }
 
   @override
-  onMounted() {
+  onMounted() async {
     final store = StoreProvider.of<AppState>(context);
     final alphaAgreement = store.state.settingsStore.alphaAgreement;
+    final prefs = await SharedPreferences.getInstance();
+    final bool? agreedToTermsOfService = prefs.getBool('agreedToTermsOfService');
     final double width = MediaQuery.of(context).size.width;
 
     // TODO: decide on always showing alpha aggrement on intro
-    if (alphaAgreement == null || true) {
+    if (agreedToTermsOfService == null || !agreedToTermsOfService) {
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
       showDialog(
@@ -141,6 +144,7 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
                       padding: EdgeInsets.symmetric(vertical: 16),
                       child: TextButton(
                         onPressed: () async {
+                          prefs.setBool('agreedToTermsOfService', true);
                           await store.dispatch(acceptAgreement());
                           Navigator.of(dialogContext).pop();
                         },
