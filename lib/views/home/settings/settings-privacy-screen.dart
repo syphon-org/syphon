@@ -89,7 +89,8 @@ class PrivacySettingsScreen extends StatelessWidget {
       barrierDismissible: false,
       builder: (dialogContext) => DialogTextInput(
         title: 'Import Session Keys',
-        content: 'Enter the password for this session key import.',
+        content:
+            'Enter the password for this session key import.\n\nPlease be aware the import may take a while to complete.',
         label: Strings.labelPassword,
         initialValue: '',
         confirmText: 'import',
@@ -118,7 +119,8 @@ class PrivacySettingsScreen extends StatelessWidget {
       barrierDismissible: false,
       builder: (dialogContext) => DialogTextInput(
         title: 'Backup Session Keys',
-        content: 'Enter a password for this session key backup.',
+        content:
+            'Enter a password for this session key backup.\n\nPlease be aware the export may take a while to complete.',
         obscureText: true,
         loading: store.state.settingsStore.loading,
         label: Strings.labelPassword,

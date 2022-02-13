@@ -47,11 +47,12 @@ class DialogTextInput extends StatefulWidget {
 }
 
 class _DialogTextInputState extends State<DialogTextInput> {
+  final inputFieldNode = FocusNode();
+
   bool isEmpty = true;
   bool visibility = false;
   bool localLoading = false;
   TextEditingController editingControllerDefault = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -81,7 +82,6 @@ class _DialogTextInputState extends State<DialogTextInput> {
         left: 24,
         right: 16,
         top: 16,
-        bottom: 16,
       ),
       contentPadding: EdgeInsets.only(
         left: 16,
@@ -109,17 +109,20 @@ class _DialogTextInputState extends State<DialogTextInput> {
               width: defaultWidgetScaling,
               height: Dimensions.inputHeight,
               margin: const EdgeInsets.only(
-                bottom: 32,
+                top: 12,
+                bottom: 20,
               ),
               constraints: BoxConstraints(
                 minWidth: Dimensions.inputWidthMin,
                 maxWidth: Dimensions.inputWidthMax,
               ),
               child: TextField(
+                enabled: !loading,
+                focusNode: inputFieldNode,
                 controller: editingController,
                 keyboardType: widget.keyboardType,
                 inputFormatters: widget.inputFormatters,
-                obscureText: widget.obscureText && !visibility,
+                obscureText: widget.obscureText && (!visibility || loading),
                 decoration: InputDecoration(
                   suffix: widget.obscureText
                       ? GestureDetector(
@@ -177,8 +180,10 @@ class _DialogTextInputState extends State<DialogTextInput> {
                   ? null
                   : () async {
                       if (widget.onConfirm != null && !isEmpty) {
+                        inputFieldNode.unfocus();
                         setState(() {
                           localLoading = true;
+                          visibility = false;
                         });
                         await widget.onConfirm!(editingController.text);
                         setState(() {

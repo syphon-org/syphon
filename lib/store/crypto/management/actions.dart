@@ -303,9 +303,12 @@ ThunkAction<AppState> exportSessionKeys(String password) {
         }
       }
 
-      printJson({
-        'sessionData': sessionData,
-      });
+      // for debugging only
+      if (DEBUG_MODE) {
+        printJson({
+          'sessionData': sessionData,
+        });
+      }
 
       // encrypt exported session keys
       final String encryptedExport = await compute(encryptSessionKeysThreaded, {
@@ -321,13 +324,17 @@ ThunkAction<AppState> exportSessionKeys(String password) {
             ((await getExternalStorageDirectories(type: StorageDirectory.documents)) ?? []).first;
 
         print('IS ANDROID ${directory.path}');
+
+        directory = Directory('/storage/emulated/0/Documents');
+
+        print('IS ANDROID ${directory.path}');
       }
 
       final currentTime = DateTime.now();
       final formattedTime = DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
+      final fileName = '${Values.appName}_key_backup_$formattedTime.txt'.toLowerCase();
 
-      final fileName = '${directory.path}/${Values.appName}_export_$formattedTime.txt';
-      final file = File(fileName);
+      final file = File('${directory.path}/$fileName');
 
       await file.writeAsString(encryptedExport);
 
