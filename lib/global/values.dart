@@ -72,6 +72,8 @@ class SupportedLanguages {
     'fr',
     'hi',
     'hu',
+    'id',
+    'it',
     'ja',
     'nl',
     'pl',
@@ -79,6 +81,7 @@ class SupportedLanguages {
     'ru',
     'si',
     'sk',
+    'tr',
   ];
 
   static const rtl = [

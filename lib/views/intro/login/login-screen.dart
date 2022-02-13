@@ -28,7 +28,6 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
-import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';

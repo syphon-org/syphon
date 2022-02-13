@@ -7,6 +7,7 @@ import 'package:crypto/crypto.dart' as crypto;
 import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
@@ -19,6 +20,7 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/settings/actions.dart';
 
 class SetInboundMessageSessions {
   Map<String, Map<String, String>> sessions;
@@ -32,6 +34,24 @@ const DEFAULT_ROUNDS = 500000;
 
 Uint8List convertIntToBytes(int value) =>
     Uint8List(4)..buffer.asByteData().setUint32(0, value, Endian.big);
+
+///
+/// Encrypt Session Keys (Threaded)
+///
+/// Responsible for decrypting the key import file as well
+/// Below is a block table for the encrypted data
+///
+/// Allows encrypting off the main thread
+///
+Future<String> encryptSessionKeysThreaded(Map params) async {
+  final List<dynamic> sessionJson = params['sessionJson'] as List<dynamic>;
+  final String? password = params['password'];
+
+  return encryptSessionKeys(
+    sessionJson: sessionJson,
+    password: password,
+  );
+}
 
 ///
 /// Encrypt Session Keys
@@ -121,6 +141,26 @@ Future<String> encryptSessionKeys({
 }
 
 ///
+/// Decrypt Session Keys (Threaded)
+///
+/// Responsible for decrypting the key import file as well
+/// Below is a block table for the encrypted data
+///
+/// Allows running decryption in a background thread
+///
+Future<List<dynamic>> decryptSessionKeysThreaded(Map params) async {
+  final String? fileData = params['fileData'];
+  final String? password = params['password'];
+  final String? override = params['override'];
+
+  return decryptSessionKeys(
+    fileData: fileData!,
+    password: password!,
+    override: override,
+  );
+}
+
+///
 /// Decrypt Session Keys
 ///
 /// Responsible for decrypting the key import file as well
@@ -133,20 +173,13 @@ Future<String> encryptSessionKeys({
 /// - variable 	The encrypted JSON object.
 /// - 32 	The HMAC-SHA-256 of all the above string concatenated together, using K' as the key.
 ///
-Future<List<dynamic>> decryptSessionKeys(
-  FilePickerResult file, {
+Future<List<dynamic>> decryptSessionKeys({
+  required String fileData,
+  required String password,
   String? override,
-  String? password,
 }) async {
   try {
-    final keyFile = File(file.paths[0]!);
-    final keyFileDataHeaded = override ?? await keyFile.readAsString();
-
-    if (password == null || password.isEmpty) {
-      return json.decode(utf8.decode(keyFile.readAsBytesSync()));
-    }
-
-    final keyFileString = keyFileDataHeaded
+    final keyFileString = fileData
         .replaceAll(Values.SESSION_EXPORT_HEADER, '')
         .replaceAll(Values.SESSION_EXPORT_FOOTER, '')
         .replaceAll('\n', '')
@@ -171,14 +204,16 @@ Future<List<dynamic>> decryptSessionKeys(
       Uint8List.fromList(rounds.toList()).buffer,
     ).getUint32(0, Endian.big);
 
-    // Uncomment for testing
-    // printJson({
-    //   'version': version,
-    //   'salt': base64.encode(salt),
-    //   'iv': ivFormatted,
-    //   'rounds': roundsFormatted,
-    //   'keySha': base64.encode(keySha),
-    // });
+    // for debugging only
+    if (DEBUG_MODE) {
+      printJson({
+        'version': version,
+        'salt': base64.encode(salt),
+        'iv': ivFormatted,
+        'rounds': roundsFormatted,
+        'keySha': base64.encode(keySha),
+      });
+    }
 
     final pbkdf2 = Pbkdf2(
       macAlgorithm: Hmac.sha512(),
@@ -218,6 +253,8 @@ Future<List<dynamic>> decryptSessionKeys(
 ThunkAction<AppState> exportSessionKeys(String password) {
   return (Store<AppState> store) async {
     try {
+      store.dispatch(SetLoadingSettings(loading: true));
+
       final deviceKeys = store.state.cryptoStore.deviceKeys;
       final messageSessions = store.state.cryptoStore.inboundMessageSessions;
 
@@ -271,13 +308,20 @@ ThunkAction<AppState> exportSessionKeys(String password) {
       });
 
       // encrypt exported session keys
-      final String encryptedExport = await encryptSessionKeys(
-        sessionJson: sessionData,
-        password: password,
-      );
+      final String encryptedExport = await compute(encryptSessionKeysThreaded, {
+        'sessionJson': sessionData,
+        'password': password,
+      });
 
       // create file
-      final directory = await getApplicationDocumentsDirectory();
+      var directory = await getApplicationDocumentsDirectory();
+
+      if (Platform.isAndroid) {
+        directory =
+            ((await getExternalStorageDirectories(type: StorageDirectory.documents)) ?? []).first;
+
+        print('IS ANDROID ${directory.path}');
+      }
 
       final currentTime = DateTime.now();
       final formattedTime = DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
@@ -296,6 +340,8 @@ ThunkAction<AppState> exportSessionKeys(String password) {
         error: error,
         origin: 'exportSessionKeys',
       ));
+    } finally {
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -309,8 +355,21 @@ ThunkAction<AppState> exportSessionKeys(String password) {
 ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password}) {
   return (Store<AppState> store) async {
     try {
-      // decrypt imported session key file if necessary
-      final sessionJson = await decryptSessionKeys(file, password: password);
+      store.dispatch(SetLoadingSettings(loading: true));
+
+      final keyFile = File(file.paths[0]!);
+      final fileData = await keyFile.readAsString();
+
+      var sessionJson;
+
+      if (password == null || password.isEmpty) {
+        sessionJson = json.decode(utf8.decode(keyFile.readAsBytesSync()));
+      } else {
+        sessionJson = await compute(
+          decryptSessionKeysThreaded,
+          {'fileData': fileData, 'password': password},
+        );
+      }
 
       final roomIdsEncrypted = [];
       final messageSessions = Map<String, Map<String, String>>.from(
@@ -324,8 +383,16 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
 
         final inboundSession = olm.InboundGroupSession()..import_session(sessionKey);
 
-        final sessionIdNew = inboundSession.session_id();
-        final sessionIndexNew = inboundSession.first_known_index();
+        // for debugging only
+        if (DEBUG_MODE) {
+          final sessionIdNew = inboundSession.session_id();
+          final sessionIndexNew = inboundSession.first_known_index();
+
+          printJson({
+            'sessionIdNew': sessionIdNew,
+            'sessionIndexNew': sessionIndexNew,
+          });
+        }
 
         messageSessions.update(
           roomId,
@@ -360,6 +427,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         error: error,
         origin: 'importSessionKeys',
       ));
+    } finally {
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }

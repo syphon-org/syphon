@@ -48,6 +48,8 @@ class DialogTextInput extends StatefulWidget {
 
 class _DialogTextInputState extends State<DialogTextInput> {
   bool isEmpty = true;
+  bool visibility = false;
+  bool localLoading = false;
   TextEditingController editingControllerDefault = TextEditingController();
 
   @override
@@ -68,6 +70,8 @@ class _DialogTextInputState extends State<DialogTextInput> {
     final double defaultWidgetScaling = width * 0.725;
 
     final editingController = widget.editingController ?? editingControllerDefault;
+
+    final loading = localLoading || widget.loading;
 
     return SimpleDialog(
       shape: RoundedRectangleBorder(
@@ -115,10 +119,25 @@ class _DialogTextInputState extends State<DialogTextInput> {
                 controller: editingController,
                 keyboardType: widget.keyboardType,
                 inputFormatters: widget.inputFormatters,
+                obscureText: widget.obscureText && !visibility,
                 decoration: InputDecoration(
+                  suffix: widget.obscureText
+                      ? GestureDetector(
+                          onTap: () => setState(() {
+                            visibility = !visibility;
+                          }),
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 16),
+                            child: Icon(
+                              visibility ? Icons.visibility : Icons.visibility_off,
+                              color: visibility ? Theme.of(context).primaryColor : null,
+                            ),
+                          ),
+                        )
+                      : null,
                   contentPadding: EdgeInsets.only(
-                    top: 32,
                     left: 20,
+                    right: !widget.obscureText ? 0 : 20,
                     bottom: 32,
                   ),
                   border: OutlineInputBorder(
@@ -126,7 +145,6 @@ class _DialogTextInputState extends State<DialogTextInput> {
                   ),
                   labelText: widget.label,
                 ),
-                obscureText: widget.obscureText,
                 onChanged: (value) {
                   if (widget.onChange != null) {
                     widget.onChange!(value);
@@ -145,7 +163,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             TextButton(
-              onPressed: widget.loading
+              onPressed: loading
                   ? null
                   : () {
                       if (widget.onCancel != null) {
@@ -157,12 +175,18 @@ class _DialogTextInputState extends State<DialogTextInput> {
             TextButton(
               onPressed: isEmpty
                   ? null
-                  : () {
+                  : () async {
                       if (widget.onConfirm != null && !isEmpty) {
-                        widget.onConfirm!(editingController.text);
+                        setState(() {
+                          localLoading = true;
+                        });
+                        await widget.onConfirm!(editingController.text);
+                        setState(() {
+                          localLoading = false;
+                        });
                       }
                     },
-              child: !widget.loading
+              child: !loading
                   ? Text(widget.confirmText.isEmpty ? Strings.buttonSave : widget.confirmText)
                   : LoadingIndicator(size: 16),
             ),

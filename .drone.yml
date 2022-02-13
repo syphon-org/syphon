@@ -159,7 +159,7 @@ steps:
 #    - push
 #steps:
 #  - name: build linux
-#    image: cirrusci/flutter:2.8.0
+#    image: cirrusci/flutter:2.8.1
 #    commands:
 #      # Install dependencies
 #      - apt-get update -y

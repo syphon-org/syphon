@@ -86,19 +86,21 @@ class PrivacySettingsScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (dialogContext) => DialogTextInput(
         title: 'Import Session Keys',
         content: 'Enter the password for this session key import.',
         label: Strings.labelPassword,
         initialValue: '',
         confirmText: 'import',
+        obscureText: true,
+        loading: store.state.settingsStore.loading,
         inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
         onCancel: () async {
           Navigator.of(dialogContext).pop();
         },
         onConfirm: (String password) async {
-          store.dispatch(importSessionKeys(file, password: password));
+          await store.dispatch(importSessionKeys(file, password: password));
 
           Navigator.of(dialogContext).pop();
         },
@@ -113,10 +115,12 @@ class PrivacySettingsScreen extends StatelessWidget {
     final store = StoreProvider.of<AppState>(context);
     await showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (dialogContext) => DialogTextInput(
         title: 'Backup Session Keys',
         content: 'Enter a password for this session key backup.',
+        obscureText: true,
+        loading: store.state.settingsStore.loading,
         label: Strings.labelPassword,
         initialValue: '',
         confirmText: 'save',
@@ -149,6 +153,7 @@ class PrivacySettingsScreen extends StatelessWidget {
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           await store.dispatch(deleteDeviceKeys());
+
           Navigator.of(dialogContext).pop();
         },
       ),

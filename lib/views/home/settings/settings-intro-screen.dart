@@ -43,6 +43,8 @@ class IntroSettingsScreen extends StatelessWidget {
         content: 'Enter the password for this session key import.',
         label: Strings.labelPassword,
         initialValue: '',
+        obscureText: true,
+        loading: store.state.settingsStore.loading,
         inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
         onCancel: () async {
           Navigator.of(dialogContext).pop();
@@ -65,6 +67,8 @@ class IntroSettingsScreen extends StatelessWidget {
       builder: (dialogContext) => DialogTextInput(
         title: 'Export Session Keys',
         content: 'Enter a password to encrypt your session keys with.',
+        obscureText: true,
+        loading: store.state.settingsStore.loading,
         label: Strings.labelPassword,
         initialValue: '',
         inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
