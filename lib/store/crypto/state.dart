@@ -4,6 +4,7 @@ import 'package:olm/olm.dart';
 
 import 'package:syphon/store/crypto/keys/model.dart';
 import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/rooms/room/model.dart';
 
 part 'state.g.dart';
 
@@ -30,7 +31,11 @@ class CryptoStore extends Equatable {
   final Map<String, String> outboundMessageSessions;
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
+  @Deprecated('Deprecated afte 0.2.8, must switch to using inboundMessageSessionsAll')
   final Map<String, Map<String, String>> inboundMessageSessions;
+
+  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
+  final Map<RoomId, Map<String, List<String>>> inboundMessageSessionsAll;
 
   /// Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   final Map<String, Map<String, DeviceKey>> deviceKeys;
@@ -51,6 +56,7 @@ class CryptoStore extends Equatable {
     this.deviceKeyVerified = false,
     this.oneTimeKeysStable = true,
     this.inboundMessageSessions = const {}, // Megolm Sessions
+    this.inboundMessageSessionsAll = const {}, // Megolm Sessions
     this.outboundMessageSessions = const {}, // Megolm Sessions
     this.keySessions = const {}, // Olm sessions
     this.messageSessionIndex = const {},

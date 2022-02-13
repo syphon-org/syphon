@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/management/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
@@ -60,6 +64,24 @@ class IntroSettingsScreen extends StatelessWidget {
 
   onExportSessionKeys(BuildContext context) async {
     final store = StoreProvider.of<AppState>(context);
+
+    // TODO: this should request read / write permissions the same as import above
+    if (Platform.isAndroid) {
+      const storageAccess = Permission.storage;
+
+      var status = await storageAccess.status;
+
+      if (!status.isGranted) {
+        status = await storageAccess.request();
+      }
+
+      if (!status.isGranted) {
+        return store.dispatch(addAlert(
+          origin: 'exportSessionKeys',
+          message: 'Storage access is required to save a session key backup file.',
+        ));
+      }
+    }
 
     showDialog(
       context: context,

@@ -255,6 +255,33 @@ ThunkAction<AppState> exportSessionKeys(String password) {
     try {
       store.dispatch(SetLoadingSettings(loading: true));
 
+      // create file
+      var directory = await getApplicationDocumentsDirectory();
+      var confirmation = 'Successfully backed up your current session keys';
+
+      if (Platform.isAndroid) {
+        directory = Directory(Values.ANDROID_DEFAULT_DIRECTORY);
+        confirmation += ' to Documents folder';
+      }
+
+      if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+        final directoryPath = await FilePicker.platform.saveFile(
+          type: FileType.custom,
+          allowedExtensions: ['txt'],
+        );
+
+        if (directoryPath == null) {
+          return store.dispatch(addAlert(
+            origin: 'exportSessionKeys',
+            message: 'A path is required to save a session key backup file.',
+          ));
+        }
+
+        directory = Directory(directoryPath);
+
+        confirmation += ' to $directoryPath';
+      }
+
       final deviceKeys = store.state.cryptoStore.deviceKeys;
       final messageSessions = store.state.cryptoStore.inboundMessageSessions;
 
@@ -316,20 +343,6 @@ ThunkAction<AppState> exportSessionKeys(String password) {
         'password': password,
       });
 
-      // create file
-      var directory = await getApplicationDocumentsDirectory();
-
-      if (Platform.isAndroid) {
-        directory =
-            ((await getExternalStorageDirectories(type: StorageDirectory.documents)) ?? []).first;
-
-        print('IS ANDROID ${directory.path}');
-
-        directory = Directory('/storage/emulated/0/Documents');
-
-        print('IS ANDROID ${directory.path}');
-      }
-
       final currentTime = DateTime.now();
       final formattedTime = DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
       final fileName = '${Values.appName}_key_backup_$formattedTime.txt'.toLowerCase();
@@ -340,12 +353,14 @@ ThunkAction<AppState> exportSessionKeys(String password) {
 
       store.dispatch(addConfirmation(
         origin: 'exportSessionKeys',
-        message: 'Successfully backed up your current session keys',
+        message: confirmation,
       ));
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
         origin: 'exportSessionKeys',
+        message:
+            'Failed to backup your current session keys, contact us at https://syphon.org/support',
       ));
     } finally {
       store.dispatch(SetLoadingSettings(loading: false));
@@ -433,6 +448,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
       store.dispatch(addAlert(
         error: error,
         origin: 'importSessionKeys',
+        message:
+            'Failed to import your session key backup, contact us at https://syphon.org/support',
       ));
     } finally {
       store.dispatch(SetLoadingSettings(loading: false));
