@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -30,7 +29,7 @@ class BackgroundSync {
   static const service_id = 255;
   static const serviceTimeout = 55; // seconds
 
-  static const notificationSettings = 'notificationSettings';
+  static const notificationSettingsKey = 'notificationSettings';
   static const notificationsUnchecked = 'notificationsUnchecked';
 
   static Future<bool> init() async {
@@ -44,11 +43,8 @@ class BackgroundSync {
 
   static Future start({
     String? protocol,
-    String? homeserver,
-    String? accessToken,
     String? lastSince,
-    String? currentUser,
-    User? user,
+    User? currentUser,
     Map<String, String?>? roomNames,
     NotificationSettings? settings,
   }) async {
@@ -61,13 +57,10 @@ class BackgroundSync {
 
     await Future.wait([
       secureStorage.write(key: Cache.protocolKey, value: protocol),
-      secureStorage.write(key: Cache.homeserverKey, value: homeserver),
-      secureStorage.write(key: Cache.accessTokenKey, value: accessToken),
       secureStorage.write(key: Cache.lastSinceKey, value: lastSince),
-      secureStorage.write(key: Cache.userIdKey, value: currentUser),
-      secureStorage.write(key: Cache.currentUserKey, value: jsonEncode(user)),
       secureStorage.write(key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
-      secureStorage.write(key: notificationSettings, value: jsonEncode(settings))
+      secureStorage.write(key: notificationSettingsKey, value: jsonEncode(settings)),
+      secureStorage.write(key: Cache.currentUserKey, value: jsonEncode(currentUser)),
     ]);
 
     await AndroidAlarmManager.periodic(
@@ -109,21 +102,19 @@ Future notificationSyncTEST() async {
         return Future.value(true);
       },
     );
+    User currentUser;
     String? protocol;
-    String? homeserver;
-    String? accessToken;
     String? lastSince;
-    String? userId;
 
     try {
       final secureStorage = FlutterSecureStorage();
-      userId = await secureStorage.read(key: Cache.userIdKey);
       protocol = await secureStorage.read(key: Cache.protocolKey);
       lastSince = await secureStorage.read(key: Cache.lastSinceKey);
-      homeserver = await secureStorage.read(key: Cache.homeserverKey);
-      accessToken = await secureStorage.read(key: Cache.accessTokenKey);
+      currentUser = User.fromJson(
+        jsonDecode(await secureStorage.read(key: Cache.currentUserKey) ?? '{}'),
+      );
     } catch (error) {
-      printThreaded('[notificationSyncIsolate] $error');
+      return printThreaded('[notificationSyncIsolate] $error');
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -132,10 +123,10 @@ Future notificationSyncTEST() async {
       pluginInstance: pluginInstance!,
       params: {
         'protocol': protocol,
-        'homeserver': homeserver,
-        'accessToken': accessToken,
+        'userId': currentUser.userId,
+        'homeserver': currentUser.homeserver,
+        'accessToken': currentUser.accessToken,
         'lastSince': lastSince,
-        'userId': userId,
         'roomNames': roomNames,
       },
     );
@@ -154,21 +145,19 @@ Future notificationSyncTEST() async {
 ///
 Future notificationSyncIsolate() async {
   try {
+    User currentUser;
     String? protocol;
-    String? homeserver;
-    String? accessToken;
     String? lastSince;
-    String? userId;
 
     try {
       final secureStorage = FlutterSecureStorage();
-      userId = await secureStorage.read(key: Cache.userIdKey);
       protocol = await secureStorage.read(key: Cache.protocolKey);
       lastSince = await secureStorage.read(key: Cache.lastSinceKey);
-      homeserver = await secureStorage.read(key: Cache.homeserverKey);
-      accessToken = await secureStorage.read(key: Cache.accessTokenKey);
+      currentUser = User.fromJson(
+        jsonDecode(await secureStorage.read(key: Cache.currentUserKey) ?? '{}'),
+      );
     } catch (error) {
-      printThreaded('[notificationSyncIsolate] $error');
+      return printThreaded('[notificationSyncIsolate] $error');
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -204,10 +193,10 @@ Future notificationSyncIsolate() async {
         pluginInstance: pluginInstance,
         params: {
           'protocol': protocol,
-          'homeserver': homeserver,
-          'accessToken': accessToken,
+          'userId': currentUser.userId,
+          'homeserver': currentUser.homeserver,
+          'accessToken': currentUser.accessToken,
           'lastSince': lastSince,
-          'userId': userId,
           'roomNames': roomNames,
         },
       );

@@ -510,12 +510,10 @@ ThunkAction<AppState> startNotifications() {
     );
 
     await BackgroundSync.start(
-      protocol: store.state.authStore.protocol,
-      homeserver: store.state.authStore.user.homeserver,
-      accessToken: store.state.authStore.user.accessToken,
-      lastSince: store.state.syncStore.lastSince,
-      currentUser: store.state.authStore.user.userId,
       roomNames: roomNames,
+      protocol: store.state.authStore.protocol,
+      lastSince: store.state.syncStore.lastSince,
+      currentUser: store.state.authStore.currentUser,
       settings: store.state.settingsStore.notificationSettings,
     );
 
