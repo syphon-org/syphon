@@ -25,6 +25,7 @@ class Cache {
   static const homeserverKey = 'homeserver';
   static const roomNamesKey = 'roomNamesKey';
   static const accessTokenKey = 'accessToken';
+  static const currentUserKey = 'currentUser';
 
   // encryption references (in memory only)
   static String? cacheKey;

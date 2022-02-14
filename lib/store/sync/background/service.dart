@@ -18,13 +18,17 @@ import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
+printThreaded(String? content) {
+  if (DEBUG_MODE) {
+    print(content);
+  }
+}
+
 /// Background Sync Service (Android Only)
 /// static class for managing service through app lifecycle
 class BackgroundSync {
   static const service_id = 255;
   static const serviceTimeout = 55; // seconds
-
-  static Isolate? backgroundIsolate;
 
   static const notificationSettings = 'notificationSettings';
   static const notificationsUnchecked = 'notificationsUnchecked';
@@ -44,6 +48,7 @@ class BackgroundSync {
     String? accessToken,
     String? lastSince,
     String? currentUser,
+    User? user,
     Map<String, String?>? roomNames,
     NotificationSettings? settings,
   }) async {
@@ -52,12 +57,15 @@ class BackgroundSync {
 
     final secureStorage = FlutterSecureStorage();
 
+    printThreaded('[BackgroundSync] starting');
+
     await Future.wait([
       secureStorage.write(key: Cache.protocolKey, value: protocol),
       secureStorage.write(key: Cache.homeserverKey, value: homeserver),
       secureStorage.write(key: Cache.accessTokenKey, value: accessToken),
       secureStorage.write(key: Cache.lastSinceKey, value: lastSince),
       secureStorage.write(key: Cache.userIdKey, value: currentUser),
+      secureStorage.write(key: Cache.currentUserKey, value: jsonEncode(user)),
       secureStorage.write(key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
       secureStorage.write(key: notificationSettings, value: jsonEncode(settings))
     ]);
@@ -68,6 +76,7 @@ class BackgroundSync {
       notificationSyncIsolate,
       exact: true,
       wakeup: true,
+      allowWhileIdle: true,
       rescheduleOnReboot: true,
     );
   }
@@ -76,7 +85,7 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      printError('[BackgroundSync] $error');
+      printThreaded('[BackgroundSync] $error');
     }
   }
 }
@@ -94,7 +103,7 @@ Future notificationSyncTEST() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        print(
+        printThreaded(
           '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
         );
         return Future.value(true);
@@ -114,7 +123,7 @@ Future notificationSyncTEST() async {
       homeserver = await secureStorage.read(key: Cache.homeserverKey);
       accessToken = await secureStorage.read(key: Cache.accessTokenKey);
     } catch (error) {
-      print('[notificationSyncIsolate] $error');
+      printThreaded('[notificationSyncIsolate] $error');
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -159,7 +168,7 @@ Future notificationSyncIsolate() async {
       homeserver = await secureStorage.read(key: Cache.homeserverKey);
       accessToken = await secureStorage.read(key: Cache.accessTokenKey);
     } catch (error) {
-      print('[notificationSyncIsolate] $error');
+      printThreaded('[notificationSyncIsolate] $error');
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -167,7 +176,7 @@ Future notificationSyncIsolate() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        print(
+        printThreaded(
           '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
         );
         return Future.value(true);
@@ -191,7 +200,6 @@ Future notificationSyncIsolate() async {
       await Future.delayed(Duration(seconds: 2));
 
       // TODO: check for on the fly disabled notification services
-
       await backgroundSyncLoop(
         pluginInstance: pluginInstance,
         params: {
@@ -205,7 +213,7 @@ Future notificationSyncIsolate() async {
       );
     }
   } catch (error) {
-    print('[notificationSyncIsolate] $error');
+    printThreaded('[notificationSyncIsolate] $error');
   }
 }
 
@@ -215,6 +223,8 @@ Future backgroundSyncLoop({
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   try {
+    printThreaded('[BackgroundSyncLoop] starting sync loop');
+
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
     final accessToken = params['accessToken'];
@@ -230,8 +240,8 @@ Future backgroundSyncLoop({
     }
 
     // Try to pull new lastSince if available
-    final currentLastSince = await loadLastSince(fallback: lastSince);
     final settings = await loadNotificationSettings();
+    final currentLastSince = await loadLastSince(fallback: lastSince);
 
     // Prevents further updates within background service if
     // disabled mid AlarmManager cycle
