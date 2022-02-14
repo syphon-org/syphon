@@ -12,6 +12,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -62,13 +63,13 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
   }
 
   @override
-  onMounted() {
+  onMounted() async {
     final store = StoreProvider.of<AppState>(context);
-    final alphaAgreement = store.state.settingsStore.alphaAgreement;
+    // TODO: should load from storageMiddleware -> state for settings instead
+    final alphaAgreement = await loadTermsAgreement();
     final double width = MediaQuery.of(context).size.width;
 
-    // TODO: decide on always showing alpha aggrement on intro
-    if (alphaAgreement == null || true) {
+    if (alphaAgreement == 0) {
       final termsTitle = Platform.isIOS ? Strings.titleDialogTerms : Strings.titleDialogTermsAlpha;
 
       showDialog(

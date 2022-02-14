@@ -141,7 +141,6 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case ToggleTypingIndicators:
       case ToggleTimeFormat:
       case SetReadReceipts:
-      case LogAppAgreement:
       case SetSyncInterval:
       case SetMainFabLocation:
       case SetMainFabType:
@@ -153,6 +152,9 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetProxyUsername:
       case SetProxyPassword:
         saveSettings(store.state.settingsStore, storage: storage);
+        break;
+      case LogAppAgreement:
+        saveTermsAgreement(timestamp: int.parse(store.state.settingsStore.alphaAgreement ?? '0'));
         break;
       case SetOlmAccountBackup:
       case SetDeviceKeysOwned:
