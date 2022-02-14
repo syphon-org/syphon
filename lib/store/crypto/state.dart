@@ -35,7 +35,7 @@ class CryptoStore extends Equatable {
   final Map<String, Map<String, String>> inboundMessageSessions;
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
-  final Map<RoomId, Map<String, List<String>>> inboundMessageSessionsAll;
+  final Map<String, Map<String, List<String>>> inboundMessageSessionsAll;
 
   /// Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   final Map<String, Map<String, DeviceKey>> deviceKeys;
