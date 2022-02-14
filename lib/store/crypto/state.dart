@@ -31,7 +31,8 @@ class CryptoStore extends Equatable {
   final Map<String, String> outboundMessageSessions;
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
-  @Deprecated('Deprecated afte 0.2.8, must switch to using inboundMessageSessionsAll')
+  @Deprecated(
+      'Deprecated afte 0.2.8, switch to inboundMessageSessionsAll to include old session for a device')
   final Map<String, Map<String, String>> inboundMessageSessions;
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
@@ -91,6 +92,7 @@ class CryptoStore extends Equatable {
     bool? oneTimeKeysStable,
     Map<String, Map<String, int>>? messageSessionIndex,
     Map<String, Map<String, String>>? inboundMessageSessions,
+    Map<String, Map<String, List<String>>>? inboundMessageSessionsAll,
     Map<String, String>? outboundMessageSessions,
     Map<String, Map<String, String>>? keySessions,
     Map<String, DeviceKey>? deviceKeysOwned,
@@ -102,6 +104,7 @@ class CryptoStore extends Equatable {
         olmAccount: olmAccount ?? this.olmAccount,
         olmAccountKey: olmAccountKey ?? this.olmAccountKey,
         inboundMessageSessions: inboundMessageSessions ?? this.inboundMessageSessions,
+        inboundMessageSessionsAll: inboundMessageSessionsAll ?? this.inboundMessageSessionsAll,
         outboundMessageSessions: outboundMessageSessions ?? this.outboundMessageSessions,
         messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
         keySessions: keySessions ?? this.keySessions,

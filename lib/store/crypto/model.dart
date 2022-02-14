@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/print.dart';
 
 part 'model.g.dart';
 
@@ -51,7 +50,6 @@ class DeviceKey extends Equatable {
 
   factory DeviceKey.fromMatrix(dynamic json) {
     try {
-      printJson(json);
       return DeviceKey(
         userId: json['user_id'],
         deviceId: json['device_id'],
