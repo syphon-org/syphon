@@ -263,5 +263,9 @@
     "title-toggle-suggestions": "Alih saran kata keyboard",
     "content-proxy-password": "Kata sandi untuk mengotentikasi dengan proksi Anda",
     "list-item-settings-proxy-username": "Nama Pengguna Proksi",
-    "content-proxy-username": "Nama pengguna untuk mengotentikasi dengan proksi Anda"
+    "content-proxy-username": "Nama pengguna untuk mengotentikasi dengan proksi Anda",
+    "content-notification-style-type-inbox": "Kelompokkan pesan baru dalam satu notifikasi",
+    "content-notification-style-type-itemized": "Sebuah notifikasi baru akan muncul untuk setiap pesan baru",
+    "list-item-chat-detail-vibrate": "Getaran",
+    "content-notification-style-type-latest": "Tampilkan satu notifikasi dengan pesan terbaru"
 }
