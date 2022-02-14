@@ -128,9 +128,9 @@ steps:
       - flutter config --enable-linux-desktop
       # Build the linux app exec
       - flutter build linux --release
-      - cp -a /usr/lib/x86_64-linux-gnu/libjsoncpp.so* build/linux/x64/release/bundle/lib/
-      - cp -a /usr/lib/x86_64-linux-gnu/libsqlite3.so build/linux/x64/release/bundle/lib/
-      - cp -a /usr/lib/x86_64-linux-gnu/libsqlcipher.so build/linux/x64/release/bundle/lib/
+      - cp -aL /usr/lib/x86_64-linux-gnu/libjsoncpp.so* build/linux/x64/release/bundle/lib/
+      - cp -aL /usr/lib/x86_64-linux-gnu/libsqlite3.so build/linux/x64/release/bundle/lib/
+      - cp -aL /usr/lib/x86_64-linux-gnu/libsqlcipher.so build/linux/x64/release/bundle/lib/
       - tar -cvzf syphon.nightly.linux.x64.tar.gz -C build/linux/x64/release/bundle .
 
   - name: release linux
@@ -172,9 +172,9 @@ steps:
 #      - flutter config --enable-linux-desktop
 #      # Build the linux app exec
 #      - flutter build linux --release
-#      - cp -a /usr/lib/aarch64-linux-gnu/libjsoncpp.so* build/linux/arm64/release/bundle/lib/
-#      - cp -a /usr/lib/aarch64-linux-gnu/libsqlite3.so build/linux/arm64/release/bundle/lib/
-#      - cp -a /usr/lib/aarch64-linux-gnu/libsqlcipher.so build/linux/arm64/release/bundle/lib/
+#      - cp -aL /usr/lib/aarch64-linux-gnu/libjsoncpp.so* build/linux/arm64/release/bundle/lib/
+#      - cp -aL /usr/lib/aarch64-linux-gnu/libsqlite3.so build/linux/arm64/release/bundle/lib/
+#      - cp -aL /usr/lib/aarch64-linux-gnu/libsqlcipher.so build/linux/arm64/release/bundle/lib/
 #      - tar -cvzf syphon.nightly.linux.x64.tar.gz -C build/linux/arm64/release/bundle .
 
 #   - name: release linux
@@ -217,9 +217,9 @@ steps:
       - flutter config --enable-linux-desktop
       # Build the linux app exec
       - flutter build linux --release
-      - cp -a /usr/lib/x86_64-linux-gnu/libjsoncpp.so* build/linux/x64/release/bundle/lib/
-      - cp -a /usr/lib/x86_64-linux-gnu/libsqlite3.so build/linux/x64/release/bundle/lib/
-      - cp -a /usr/lib/x86_64-linux-gnu/libsqlcipher.so build/linux/x64/release/bundle/lib/
+      - cp -aL /usr/lib/x86_64-linux-gnu/libjsoncpp.so* build/linux/x64/release/bundle/lib/
+      - cp -aL /usr/lib/x86_64-linux-gnu/libsqlite3.so build/linux/x64/release/bundle/lib/
+      - cp -aL /usr/lib/x86_64-linux-gnu/libsqlcipher.so build/linux/x64/release/bundle/lib/
       - tar -cvzf syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz -C build/linux/x64/release/bundle .
 
   - name: release linux

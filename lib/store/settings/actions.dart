@@ -112,6 +112,10 @@ class SetPollTimeout {
 
 class ToggleEnterSend {}
 
+class ToggleAutocorrect {}
+
+class ToggleSuggestions {}
+
 class ToggleAutoDownload {}
 
 class ToggleDismissKeyboard {}
@@ -444,6 +448,18 @@ ThunkAction<AppState> toggleTimeFormat() {
 ThunkAction<AppState> toggleEnterSend() {
   return (Store<AppState> store) async {
     store.dispatch(ToggleEnterSend());
+  };
+}
+
+ThunkAction<AppState> toggleAutocorrect() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleAutocorrect());
+  };
+}
+
+ThunkAction<AppState> toggleSuggestions() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleSuggestions());
   };
 }
 

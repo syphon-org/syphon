@@ -47,6 +47,9 @@ class Strings {
   static final titleMessageDetails = tr('title-message-details');
   static final titleSendMediaMessage = tr('title-send-media-message');
   static final titleSendMediaMessageUnencrypted = tr('title-send-media-message-unencrypted');
+  static final titleToggleAutocorrect = tr('title-toggle-autocorrect');
+  static final titleToggleSuggestions = tr('title-toggle-suggestions');
+
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -69,6 +72,8 @@ class Strings {
   static final subtitleProxyUseBasicAuthentication = tr('subtitle-proxy-use-basic-authentication');
   static final subtitleSettingsSyncInterval = tr('subtitle-settings-sync-interval');
   static final subtitleSettingsSyncToggle = tr('subtitle-settings-sync-toggle');
+  static final subtitleToggleAutocorrect = tr('subtitle-toggle-autocorrect');
+  static final subtitleToggleSuggestions = tr('subtitle-toggle-suggestions');
 
   // Headers
   static final headerIntro = tr('header-intro');
@@ -272,6 +277,10 @@ class Strings {
   static final contentProxyPort = tr('content-proxy-port');
   static final contentProxyUsername = tr('content-proxy-username');
   static final contentProxyPassword = tr('content-proxy-password');
+
+  static final contentNotificationStyleTypeInbox = tr('content-notification-style-type-inbox');
+  static final contentNotificationStyleTypeLatest = tr('content-notification-style-type-latest');
+  static final contentNotificationStyleTypeItemized = tr('content-notification-style-type-itemized');
 
   static final messageEditedAppend = tr('message-edited-append');
 

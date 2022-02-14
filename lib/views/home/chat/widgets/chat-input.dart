@@ -639,8 +639,8 @@ class _Props extends Equatable {
         inputColorBackground:
             selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
-        autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
-        suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
+        autocorrectEnabled: store.state.settingsStore.autocorrectEnabled,
+        suggestionsEnabled: store.state.settingsStore.suggestionsEnabled,
         textCapitalization: Platform.isIOS ? TextCapitalization.sentences : TextCapitalization.none,
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),

@@ -133,6 +133,8 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetDevices:
       case SetLanguage:
       case ToggleEnterSend:
+      case ToggleAutocorrect:
+      case ToggleSuggestions:
       case ToggleRoomTypeBadges:
       case ToggleMembershipEvents:
       case ToggleNotifications:

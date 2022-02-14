@@ -21,6 +21,8 @@ class SettingsStore extends Equatable {
 
   final bool smsEnabled;
   final bool enterSendEnabled;
+  final bool autocorrectEnabled;
+  final bool suggestionsEnabled;
   final bool typingIndicatorsEnabled;
   final bool membershipEventsEnabled;
   final bool roomTypeBadgesEnabled;
@@ -52,6 +54,8 @@ class SettingsStore extends Equatable {
     this.chatLists = const [],
     this.globalSortOrder = SortOrder.Latest,
     this.enterSendEnabled = false,
+    this.autocorrectEnabled = false,
+    this.suggestionsEnabled = false,
     this.smsEnabled = false,
     this.typingIndicatorsEnabled = false,
     this.membershipEventsEnabled = true,
@@ -75,6 +79,8 @@ class SettingsStore extends Equatable {
         language,
         smsEnabled,
         enterSendEnabled,
+        autocorrectEnabled,
+        suggestionsEnabled,
         typingIndicatorsEnabled,
         roomTypeBadgesEnabled,
         timeFormat24Enabled,
@@ -96,6 +102,8 @@ class SettingsStore extends Equatable {
     String? language,
     bool? smsEnabled,
     bool? enterSendEnabled,
+    bool? autocorrectEnabled,
+    bool? suggestionsEnabled,
     bool? typingIndicatorsEnabled,
     bool? membershipEventsEnabled,
     bool? roomTypeBadgesEnabled,
@@ -119,6 +127,8 @@ class SettingsStore extends Equatable {
         language: language ?? this.language,
         smsEnabled: smsEnabled ?? this.smsEnabled,
         enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
+        autocorrectEnabled: autocorrectEnabled ?? this.autocorrectEnabled,
+        suggestionsEnabled: suggestionsEnabled ?? this.suggestionsEnabled,
         typingIndicatorsEnabled: typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
         dismissKeyboardEnabled: dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,

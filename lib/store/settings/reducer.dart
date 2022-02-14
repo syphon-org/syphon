@@ -90,6 +90,14 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       return state.copyWith(
         enterSendEnabled: !state.enterSendEnabled,
       );
+    case ToggleAutocorrect:
+      return state.copyWith(
+        autocorrectEnabled: !state.autocorrectEnabled,
+      );
+    case ToggleSuggestions:
+      return state.copyWith(
+        suggestionsEnabled: !state.suggestionsEnabled,
+      );
     case SetSyncInterval:
       return state.copyWith(
         syncInterval: action.syncInterval,

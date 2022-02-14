@@ -74,7 +74,7 @@ Syphon will always be a not for profit, community driven application.
 
 ## 🚀 Goals
 - [x] desktop clients meet parity with mobile
-- [ ] screen lock and pin protected cache features
+- [x] screen lock and pin protected cache features
 - [ ] P2P messaging through a locally run server on the client
 - [ ] allow transfering user data from one homeserver to another, or from local to remote servers 
 - [ ] cli client using ncurses and the same redux store contained here (common)
