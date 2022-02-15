@@ -4,13 +4,13 @@ import 'package:syphon/global/assets.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
-import '../../../global/strings.dart';
 
 enum ListItemUserType {
   Selectable,
