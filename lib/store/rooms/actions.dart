@@ -325,7 +325,12 @@ ThunkAction<AppState> createRoom({
 
       final currentUser = store.state.authStore.user;
       final inviteIds = invites.map((user) => user.userId).toList();
+      final inviteIdsFiltered = inviteIds.whereNot(
+                                  (userId) => userId == currentUser.userId
+                                )
+                                .toList();
 
+      final invitesFiltered = invites.whereNot((user) => user.userId == store.state.authStore.currentUser.userId);
       final data = await MatrixApi.createRoom(
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
@@ -333,7 +338,7 @@ ThunkAction<AppState> createRoom({
         name: name,
         topic: topic,
         alias: alias,
-        invites: inviteIds,
+        invites: inviteIdsFiltered, //Don't invite ourself
         isDirect: isDirect,
         chatTypePreset: preset,
       );
@@ -347,7 +352,7 @@ ThunkAction<AppState> createRoom({
 
       // Add invites to the user list beforehand
       final userInviteMap = Map<String, User>.fromIterable(
-        invites,
+        invitesFiltered, //Don't invite ourself
         key: (user) => user.userId,
         value: (user) => user,
       );
