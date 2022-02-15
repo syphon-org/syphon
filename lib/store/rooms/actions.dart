@@ -362,7 +362,7 @@ ThunkAction<AppState> createRoom({
 
       // Add invites to the user list beforehand
       final userInviteMap = Map<String, User>.fromIterable(
-        invitesFiltered, //Don't invite ourself
+        invites,
         key: (user) => user.userId,
         value: (user) => user,
       );
@@ -370,23 +370,8 @@ ThunkAction<AppState> createRoom({
       // generate user invite map to cache recent users
       room = room.copyWith(usersTEMP: userInviteMap);
 
-      if (isNoteToSelf) {
-        room = room.copyWith(
-          direct: true,
-          // ignore: unnecessary_cast
-          userIds: [
-            currentUser.userId!,
-          ] as List<String>,
-          // ignore: unnecessary_cast
-          usersTEMP: {
-            currentUser.userId!: currentUser,
-          } as Map<String, User>,
-        );
-
-        await store.dispatch(toggleDirectRoom(room: room, enabled: true));
-      }
-      else if (isDirect) {
-        final User directUser = invites[0];
+      if (isDirect) {
+        final User directUser = currentUser;
         room = room.copyWith(
           direct: true,
           name: directUser.displayName ?? directUser.userId,
