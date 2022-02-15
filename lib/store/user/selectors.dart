@@ -28,11 +28,17 @@ List<User> selectFriendlyUsers(AppState state) {
   return List.from(roomsDirectUsers);
 }
 
-// Users the authed user has dm'ed
+// Users the authed user has encountered
 List<User> selectKnownUsers(AppState state) {
+  final currentUser = state.authStore.currentUser;
   final users = state.userStore.users;
-  final latestUsers = users.values.take(25);
-  return List.from(latestUsers);
+  final List<User> latestUsers = List.from(users.values.take(25));
+
+  if (!latestUsers.any((user) => user.userId == currentUser.userId)) {
+    latestUsers.insert(0, currentUser);
+  }
+
+  return latestUsers;
 }
 
 List<User?> roomUsers(AppState state, String? roomId) {
