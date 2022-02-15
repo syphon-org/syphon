@@ -143,6 +143,7 @@ class Strings {
   static final labelChatSettings = tr('label-chat-settings');
   static final labelColor = tr('label-color');
   static final labelNoteToSelf = tr('label-note-to-self');
+  static final labelNoteToSelfTopic = tr('label-note-to-self-topic');
   static final labelTimestamp = tr('label-timestamp');
   static final labelNone = tr('label-none');
   static final labelSyncing = tr('label-syncing');
