@@ -10,6 +10,8 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
+import '../../../global/strings.dart';
+
 enum ListItemUserType {
   Selectable,
   Pressable,
@@ -25,6 +27,7 @@ class ListItemUser extends StatelessWidget {
   const ListItemUser({
     Key? key,
     required this.user,
+    required this.currentUser,
     this.type = ListItemUserType.Pressable,
     this.enabled = false,
     this.loading = false,
@@ -35,6 +38,7 @@ class ListItemUser extends StatelessWidget {
   }) : super(key: key);
 
   final User user;
+  final User currentUser;
   final bool loading;
   final bool enabled;
   final bool selected;
@@ -107,17 +111,30 @@ class ListItemUser extends StatelessWidget {
               child: Stack(
                 children: [
                   Avatar(
-                    uri: user.avatarUri,
-                    alt: user.displayName ?? user.userId,
+                    uri: user.userId != currentUser.userId
+                      ? user.avatarUri
+                      : '',
+                    alt: user.userId != currentUser.userId
+                      ? user.displayName ?? user.userId
+                      : Strings.labelNoteToSelf,
+                    icon: user.userId != currentUser.userId
+                      ? null
+                      : Icons.sticky_note_2_outlined,
                     selected: selected,
                     size: Dimensions.avatarSizeMin,
-                    background: !real ? null : Colours.hashedColor(formatUsername(user)),
+                    background: !real
+                        ? null
+                        : user.userId != currentUser.userId
+                          ? Colours.hashedColor(formatUsername(user))
+                          : Theme.of(context).primaryColor,
                   ),
                 ],
               ),
             ),
             title: Text(
-              formatUsername(user),
+              user.userId != currentUser.userId
+                  ? formatUsername(user)
+                  : Strings.labelNoteToSelf,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodyText1,
             ),
