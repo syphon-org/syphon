@@ -11,6 +11,7 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -331,6 +332,15 @@ ThunkAction<AppState> createRoom({
                                 .toList();
 
       final invitesFiltered = invites.whereNot((user) => user.userId == store.state.authStore.currentUser.userId);
+
+      final isNoteToSelf = inviteIds.length == 1
+        && inviteIds.single == store.state.authStore.currentUser.userId;
+
+      if (isNoteToSelf) {
+        name = Strings.labelNoteToSelf;
+        topic = Strings.labelNoteToSelfTopic;
+      }
+
       final data = await MatrixApi.createRoom(
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
