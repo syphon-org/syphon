@@ -212,6 +212,7 @@ class SearchUserState extends State<SearchUserScreen> {
             onTap: () => onAttemptChat(props: props, context: context, user: attemptableUser),
             child: ListItemUser(
               user: attemptableUser,
+              currentUser: props.currentUser,
               enabled: creatingRoomDisplayName != searchable,
               loading: props.loading,
               real: false,
@@ -230,6 +231,7 @@ class SearchUserState extends State<SearchUserScreen> {
               onTap: () => onShowUserDetails(context: context, user: user),
               child: ListItemUser(
                 user: user,
+                currentUser: props.currentUser,
                 enabled: creatingRoomDisplayName != user.displayName,
                 loading: props.loading,
                 onPress: () => onCreateChat(
@@ -279,6 +281,7 @@ class SearchUserState extends State<SearchUserScreen> {
               onTap: () => onShowUserDetails(context: context, user: user),
               child: ListItemUser(
                 user: user,
+                currentUser: props.currentUser,
                 enabled: creatingRoomDisplayName != user.displayName,
                 loading: props.loading,
                 onPress: () => onCreateChat(
@@ -314,6 +317,7 @@ class SearchUserState extends State<SearchUserScreen> {
               onTap: () => onShowUserDetails(context: context, user: user),
               child: ListItemUser(
                 user: user,
+                currentUser: props.currentUser,
                 enabled: creatingRoomDisplayName != user.displayName,
                 loading: props.loading,
                 onPress: () => onCreateChat(
@@ -377,6 +381,7 @@ class _Props extends Equatable {
   final bool loading;
   final ThemeType themeType;
   final bool creatingRoom;
+  final User currentUser;
   final List<User> usersRecent;
   final List<User> usersKnown;
   final List<dynamic> searchResults;
@@ -389,6 +394,7 @@ class _Props extends Equatable {
     required this.loading,
     required this.creatingRoom,
     required this.searchResults,
+    required this.currentUser,
     required this.usersRecent,
     required this.usersKnown,
     required this.onSearch,
@@ -407,6 +413,7 @@ class _Props extends Equatable {
         themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
+        currentUser: store.state.authStore.currentUser,
         usersKnown: selectKnownUsers(store.state),
         usersRecent: selectFriendlyUsers(store.state),
         searchResults: store.state.searchStore.searchResults,
