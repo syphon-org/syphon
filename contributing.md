@@ -32,3 +32,14 @@ If you've taken on a task with a corresponding Github issue in the repo, make su
 ## 5. Ready Pull Request
 
 When your PR is ready, switch the PR from a `Draft` to `Ready for Review`. Maintainers will be notified and will review the project, leaving comments for necesssary changes or approval. Once approved, you can merge the PR at your lesiure or if the option is not available, we'll merge your PR shortly after approval.
+
+# Contributor License Agreement
+All contributions to this project are considered to be licensed under the under [GNU Affero General Public License version 3](https://www.gnu.org/licenses/agpl-3.0.en.html) (AGPLv3).
+
+Syphon doesn't require a CLA (Contributor License Agreement). The copyright belongs to all the individual contributors. Therefore we recommend that every contributor adds following line to the header of a file, if they changed it substantially:
+
+```
+@copyright Copyright (c) <year>, <your name>
+```
+
+In addition to adding your name to the [AUTHORS](./AUTHORS) file.
