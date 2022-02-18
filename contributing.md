@@ -6,8 +6,8 @@ We have a code of conduct, please follow it in all your interactions with the pr
 
 ## 1. [Code of Conduct](./docs/code-of-conduct.md)
 
-Syphon has a [Code of Conduct](https://github.com/syphon-org/syphon/main/blob/HEAD/code-of-conduct.md) to which all contributors must adhere. 
-Please first read through the [Standards](https://github.com/syphon-org/syphon/main/blob/HEAD/code-of-conduct.md#standards) section before continuing through this document.
+Syphon has a [Code of Conduct](./docs/code-of-conduct.md) to which all contributors must adhere. 
+Please first read through the [Standards](./docs/code-of-conduct.md#standards) section before continuing through this document.
 
 ## 2. Join the Syphon Chat or Contact Us
 
