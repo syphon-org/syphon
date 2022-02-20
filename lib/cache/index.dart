@@ -18,12 +18,6 @@ class Cache {
   // cache storage identifiers
   static const databaseLocation = '${Values.appLabel}-main-cache.db';
 
-  // background data identifiers
-  static const protocolKey = 'protocol';
-  static const lastSinceKey = 'lastSince';
-  static const roomNamesKey = 'roomNamesKey';
-  static const currentUserKey = 'currentUserKey';
-
   // encryption references (in memory only)
   static String? cacheKey;
 

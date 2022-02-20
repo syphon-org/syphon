@@ -11,8 +11,9 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/crypto/keys/selectors.dart';
-import 'package:syphon/store/crypto/management/actions.dart';
+import 'package:syphon/store/crypto/sessions/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
@@ -139,7 +140,7 @@ class PrivacySettingsScreen extends StatelessWidget {
     );
   }
 
-  onDeleteDeviceKey({
+  onDeleteSessionKeys({
     required _Props props,
     required BuildContext context,
   }) async {
@@ -154,7 +155,7 @@ class PrivacySettingsScreen extends StatelessWidget {
         confirmStyle: TextStyle(color: Colors.red),
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
-          await store.dispatch(deleteDeviceKeys());
+          await store.dispatch(resetSessionKeys());
 
           Navigator.of(dialogContext).pop();
         },
@@ -453,7 +454,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onDeleteDeviceKey(context: context, props: props),
+                            onTap: () => onDeleteSessionKeys(context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Delete Keys',

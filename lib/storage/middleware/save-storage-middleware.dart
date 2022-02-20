@@ -5,6 +5,8 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
+import 'package:syphon/store/crypto/sessions/actions.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/storage.dart';
@@ -160,8 +162,8 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetDeviceKeys:
       case SetOneTimeKeysCounts:
       case SetOneTimeKeysClaimed:
-      case AddInboundMessageSession:
-      case AddOutboundMessageSession:
+      case AddMessageSessionInbound:
+      case AddMessageSessionOutbound:
       case UpdateMessageSessionOutbound:
       case AddKeySession:
       case ResetCrypto:
