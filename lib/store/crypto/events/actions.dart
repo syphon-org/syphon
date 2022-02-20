@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:canonical_json/canonical_json.dart';
-import 'package:flutter/material.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -11,7 +10,9 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/keys/actions.dart';
-import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/crypto/keys/models.dart';
+import 'package:syphon/store/crypto/sessions/actions.dart';
+import 'package:syphon/store/crypto/sessions/model.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
@@ -190,25 +191,26 @@ ThunkAction<AppState> decryptMessage({
     // Pull out event data
     final ciphertext = message.ciphertext;
     final identityKey = message.senderKey;
-    final roomMessageIndexs = store.state.cryptoStore.messageSessionIndex[roomId];
 
     // return already decrypted events
     if (ciphertext == null || identityKey == null) {
       return message;
     }
 
-    final identityMessageIndex = roomMessageIndexs?[identityKey] ?? -1;
-
     // Load and deserialize session
-    final olm.InboundGroupSession messageSession = await store.dispatch(
+    final MessageSession messageSession = await store.dispatch(
       loadMessageSessionInbound(
         roomId: roomId,
         identityKey: identityKey,
+        ciphertext: ciphertext,
       ),
     );
 
     // Decrypt the payload with the session
-    final payloadDecrypted = messageSession.decrypt(ciphertext);
+    final currentIndex = messageSession.index;
+    final session = olm.InboundGroupSession()..unpickle(roomId, messageSession.serialized);
+
+    final payloadDecrypted = session.decrypt(ciphertext);
     final payloadScrubbed = payloadDecrypted.plaintext
         .replaceAll(RegExp(r'\n', multiLine: true), '\\n')
         .replaceAll(RegExp(r'\t', multiLine: true), '\\t');
@@ -216,9 +218,8 @@ ThunkAction<AppState> decryptMessage({
     final messageIndexNew = payloadDecrypted.message_index;
 
     // protection against replay attacks
-    if ((messageIndexNew <= identityMessageIndex && identityMessageIndex != 0) &&
-        !forceDecryption) {
-      throw '[decryptMessage] messageIndex invalid $messageIndexNew <= $identityMessageIndex';
+    if ((messageIndexNew <= currentIndex && currentIndex != 0) && !forceDecryption) {
+      throw '[decryptMessage] messageIndex invalid $messageIndexNew <= $currentIndex';
     }
 
     final decryptedJson = json.decode(payloadScrubbed);
@@ -260,7 +261,7 @@ ThunkAction<AppState> decryptMessage({
     await store.dispatch(saveMessageSessionInbound(
       roomId: roomId,
       identityKey: identityKey,
-      session: messageSession,
+      session: session,
       messageIndex: messageIndexNew,
     ));
 
@@ -417,7 +418,7 @@ ThunkAction<AppState> decryptKeyEvent({Map event = const {}}) {
 /// }
 ThunkAction<AppState> saveMessageSession({
   Map? event,
-  String? identityKey,
+  String? senderKey,
 }) {
   return (Store<AppState> store) async {
     // Extract the payload meant for this device by identity
@@ -425,14 +426,14 @@ ThunkAction<AppState> saveMessageSession({
     final String? roomId = content['room_id'];
     final String? sessionKey = content['session_key'];
 
-    if (roomId == null || sessionKey == null || identityKey == null) {
-      throw '[saveSessionKey] Failed to create message session $roomId, $sessionKey, $identityKey';
+    if (roomId == null || sessionKey == null || senderKey == null) {
+      throw '[saveSessionKey] Failed to create message session $roomId, $sessionKey, $senderKey';
     }
 
     // Load and deserialize or create session
     await store.dispatch(createMessageSessionInbound(
       roomId: roomId,
-      identityKey: identityKey,
+      senderKey: senderKey,
       sessionKey: sessionKey,
     ));
   };
@@ -465,7 +466,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 // save decrepted user session key under roomId
                 await store.dispatch(saveMessageSession(
                   event: eventDecrypted,
-                  identityKey: senderKey,
+                  senderKey: senderKey,
                 ));
 
                 backfillDecryptMessages(roomId);

@@ -2,7 +2,35 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 
-part 'model.g.dart';
+part 'models.g.dart';
+
+@JsonSerializable()
+class OneTimeKey extends Equatable {
+  final String? userId;
+  final String? deviceId;
+  // Map<identityKey, key>
+  final Map<String, String?> keys;
+  // Map<identityKey, <deviceId, signature>>
+  final Map<String, Map<String, String>> signatures;
+
+  const OneTimeKey({
+    this.userId,
+    this.deviceId,
+    this.keys = const {},
+    this.signatures = const {},
+  });
+
+  @override
+  List<Object?> get props => [
+        userId,
+        deviceId,
+        keys,
+        signatures,
+      ];
+
+  Map<String, dynamic> toJson() => _$OneTimeKeyToJson(this);
+  factory OneTimeKey.fromJson(Map<String, dynamic> json) => _$OneTimeKeyFromJson(json);
+}
 
 @JsonSerializable()
 class DeviceKey extends Equatable {
@@ -35,18 +63,16 @@ class DeviceKey extends Equatable {
         extras,
       ];
 
-  Map<String, dynamic> toMatrix() {
-    return {
-      'algorithms': [
-        Algorithms.olmv1,
-        Algorithms.megolmv1,
-      ],
-      'device_id': deviceId,
-      'keys': keys,
-      'signatures': signatures,
-      'user_id': userId,
-    };
-  }
+  Map<String, dynamic> toMatrix() => {
+        'algorithms': [
+          Algorithms.olmv1,
+          Algorithms.megolmv1,
+        ],
+        'device_id': deviceId,
+        'keys': keys,
+        'signatures': signatures,
+        'user_id': userId,
+      };
 
   factory DeviceKey.fromMatrix(dynamic json) {
     try {

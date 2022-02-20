@@ -32,19 +32,18 @@ void _printJson(Map? jsonMap) {
   debugPrint(prettyEvent, wrapWidth: 2048);
 }
 
-// TODO: convert with better tab completion
-class Print {
+PrintJson printJson = _printJson;
+PrintDebug printInfo = _printInfo;
+PrintDebug printDebug = _printDebug;
+PrintError printError = _printError;
+PrintError printWarning = _printWarning;
+
+// NOTE: start using this for better tab completion
+// ignore: camel_case_types
+class log {
   static info(String content, {String? title}) => _printInfo(content, title: title);
   static warn(String content, {String? title}) => _printWarning(content, title: title);
   static error(String content, {String? title}) => _printError(content, title: title);
   static debug(String content, {String? title}) => _printDebug(content, title: title);
   static json(Map? json) => _printJson(json);
 }
-
-final log = Print();
-
-PrintJson printJson = _printJson;
-PrintDebug printInfo = _printInfo;
-PrintDebug printDebug = _printDebug;
-PrintError printError = _printError;
-PrintError printWarning = _printWarning;

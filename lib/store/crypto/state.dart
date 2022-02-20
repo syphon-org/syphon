@@ -2,9 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:olm/olm.dart';
 
-import 'package:syphon/store/crypto/keys/model.dart';
-import 'package:syphon/store/crypto/model.dart';
-import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/crypto/keys/models.dart';
+import 'package:syphon/store/crypto/sessions/model.dart';
 
 part 'state.g.dart';
 
@@ -25,18 +24,18 @@ class CryptoStore extends Equatable {
   final Map<String, Map<String, String>> keySessions; // both olm inbound and outbound key sessions
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - index per chat
+  @Deprecated('switch to using "index" inside MessageSession within inboundMessageSessionsAll')
   final Map<String, Map<String, int>> messageSessionIndex;
+
+  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
+  @Deprecated('switch to inboundMessageSessionsAll to include old session for a device')
+  final Map<String, Map<String, String>> inboundMessageSessions;
 
   // Map<roomId, serializedSession> // megolm - messages
   final Map<String, String> outboundMessageSessions;
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
-  @Deprecated(
-      'Deprecated afte 0.2.8, switch to inboundMessageSessionsAll to include old session for a device')
-  final Map<String, Map<String, String>> inboundMessageSessions;
-
-  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
-  final Map<String, Map<String, List<String>>> inboundMessageSessionsAll;
+  final Map<String, Map<String, List<MessageSession>>> messageSessionsInbound;
 
   /// Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   final Map<String, Map<String, DeviceKey>> deviceKeys;
@@ -57,7 +56,7 @@ class CryptoStore extends Equatable {
     this.deviceKeyVerified = false,
     this.oneTimeKeysStable = true,
     this.inboundMessageSessions = const {}, // Megolm Sessions
-    this.inboundMessageSessionsAll = const {}, // Megolm Sessions
+    this.messageSessionsInbound = const {}, // Megolm Sessions
     this.outboundMessageSessions = const {}, // Megolm Sessions
     this.keySessions = const {}, // Olm sessions
     this.messageSessionIndex = const {},
@@ -76,6 +75,7 @@ class CryptoStore extends Equatable {
         oneTimeKeysStable,
         messageSessionIndex,
         inboundMessageSessions,
+        messageSessionsInbound,
         outboundMessageSessions,
         keySessions,
         deviceKeys,
@@ -92,7 +92,7 @@ class CryptoStore extends Equatable {
     bool? oneTimeKeysStable,
     Map<String, Map<String, int>>? messageSessionIndex,
     Map<String, Map<String, String>>? inboundMessageSessions,
-    Map<String, Map<String, List<String>>>? inboundMessageSessionsAll,
+    Map<String, Map<String, List<MessageSession>>>? messageSessionsInbound,
     Map<String, String>? outboundMessageSessions,
     Map<String, Map<String, String>>? keySessions,
     Map<String, DeviceKey>? deviceKeysOwned,
@@ -103,10 +103,10 @@ class CryptoStore extends Equatable {
       CryptoStore(
         olmAccount: olmAccount ?? this.olmAccount,
         olmAccountKey: olmAccountKey ?? this.olmAccountKey,
-        inboundMessageSessions: inboundMessageSessions ?? this.inboundMessageSessions,
-        inboundMessageSessionsAll: inboundMessageSessionsAll ?? this.inboundMessageSessionsAll,
-        outboundMessageSessions: outboundMessageSessions ?? this.outboundMessageSessions,
         messageSessionIndex: messageSessionIndex ?? this.messageSessionIndex,
+        inboundMessageSessions: inboundMessageSessions ?? this.inboundMessageSessions,
+        messageSessionsInbound: messageSessionsInbound ?? this.messageSessionsInbound,
+        outboundMessageSessions: outboundMessageSessions ?? this.outboundMessageSessions,
         keySessions: keySessions ?? this.keySessions,
         deviceKeys: deviceKeys ?? this.deviceKeys,
         deviceKeysOwned: deviceKeysOwned ?? this.deviceKeysOwned,
