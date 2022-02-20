@@ -36,4 +36,4 @@ When your PR is ready, switch the PR from a `Draft` to `Ready for Review`. Maint
 # Contributor License Agreement
 All contributions to this project are considered to be licensed under the [GNU Affero General Public License version 3](https://www.gnu.org/licenses/agpl-3.0.en.html) (AGPLv3).
 
-Syphon doesn't require a CLA (Contributor License Agreement). The copyright belongs to all the individual contributors. We recommend every contributor who wishes to do so adds their name to the [AUTHORS](./AUTHORS) file.
+Syphon doesn't require a CLA (Contributor License Agreement). The copyright belongs to all the individual contributors. We recommend every contributor who wishes to do so adds their name to the [authors](./authors.md) file.
