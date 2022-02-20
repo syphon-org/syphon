@@ -334,7 +334,10 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
 
       printInfo('[updateOneTimeKeys] successfully updated oneTimeKeys');
     } catch (error) {
-      store.dispatch(addAlert(error: error, origin: 'updateOneTimeKeys'));
+      store.dispatch(addAlert(
+          error: error,
+          message: 'Failed to updated one time keys, please let us know at https://syphon.org',
+          origin: 'updateOneTimeKeys'));
     }
   };
 }

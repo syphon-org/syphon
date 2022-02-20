@@ -73,8 +73,6 @@ class CryptoStore extends Equatable {
         deviceKeysExist,
         deviceKeyVerified,
         oneTimeKeysStable,
-        messageSessionIndex,
-        inboundMessageSessions,
         messageSessionsInbound,
         outboundMessageSessions,
         keySessions,
