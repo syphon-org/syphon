@@ -7,7 +7,7 @@ import './state.dart';
 
 SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dynamic action]) {
   switch (action.runtimeType) {
-    case SetLoading:
+    case SetLoadingSettings:
       return state.copyWith(
         loading: action.loading,
       );
@@ -123,7 +123,7 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
     case ToggleProxy:
-      final _state =  state.copyWith(
+      final _state = state.copyWith(
         proxySettings: state.proxySettings.copyWith(enabled: !state.proxySettings.enabled),
       );
 
@@ -131,7 +131,7 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
 
       return _state;
     case SetProxyHost:
-      final _state =  state.copyWith(
+      final _state = state.copyWith(
         proxySettings: state.proxySettings.copyWith(host: action.host),
       );
 
@@ -139,7 +139,7 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
 
       return _state;
     case SetProxyPort:
-      final _state =  state.copyWith(
+      final _state = state.copyWith(
         proxySettings: state.proxySettings.copyWith(port: action.port),
       );
 
@@ -148,14 +148,15 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       return _state;
     case ToggleProxyAuthentication:
       final _state = state.copyWith(
-          proxySettings: state.proxySettings.copyWith(authenticationEnabled: !state.proxySettings.authenticationEnabled),
+        proxySettings: state.proxySettings
+            .copyWith(authenticationEnabled: !state.proxySettings.authenticationEnabled),
       );
 
       httpClient = createClient(proxySettings: _state.proxySettings);
 
       return _state;
     case SetProxyUsername:
-      final _state =  state.copyWith(
+      final _state = state.copyWith(
         proxySettings: state.proxySettings.copyWith(username: action.username),
       );
 
@@ -163,7 +164,7 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
 
       return _state;
     case SetProxyPassword:
-      final _state =  state.copyWith(
+      final _state = state.copyWith(
         proxySettings: state.proxySettings.copyWith(password: action.password),
       );
 

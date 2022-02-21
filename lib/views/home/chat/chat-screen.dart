@@ -18,6 +18,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -150,17 +151,15 @@ class ChatScreenState extends State<ChatScreen> {
   onCheatCode(_Props props) async {
     final store = StoreProvider.of<AppState>(context);
 
-    setState(() {
-      sending = false;
-    });
-
-    // try {
-    //   await store.dispatch(mutateMessagesRoom(
-    //     room: props.room,
-    //   ));
-    // } catch (error) {
-    //   printError(error.toString());
-    // }
+    try {
+      printInfo('TESTING');
+      await store.dispatch(backfillDecryptMessages(
+        props.room.id,
+      ));
+      printInfo('WHAT');
+    } catch (error) {
+      printError(error.toString());
+    }
   }
 
   onAttemptDecryption(_Props props) async {
@@ -291,10 +290,6 @@ class ChatScreenState extends State<ChatScreen> {
 
     File? encryptedFile;
     EncryptInfo? info;
-
-    printDebug('STUFFF');
-    printDebug(rawFile.path);
-    printDebug(rawFile.uri.toString());
 
     var file = await scrubMedia(localFile: rawFile);
 

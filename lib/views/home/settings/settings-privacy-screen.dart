@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/context/types.dart';
@@ -9,7 +11,9 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/crypto/keys/selectors.dart';
+import 'package:syphon/store/crypto/sessions/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
@@ -21,6 +25,7 @@ import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/show-lock-overlay.dart';
 
 class PrivacySettingsScreen extends StatelessWidget {
@@ -68,29 +73,74 @@ class PrivacySettingsScreen extends StatelessWidget {
     );
   }
 
-  onExportDeviceKey({
-    required _Props props,
-    required BuildContext context,
-  }) async {
+  onImportSessionKeys(BuildContext context) async {
     final store = StoreProvider.of<AppState>(context);
-    await showDialog(
+
+    final file = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt'],
+    );
+
+    if (file == null) {
+      return;
+    }
+
+    showDialog(
       context: context,
-      builder: (dialogContext) => DialogConfirm(
-        title: 'Confirm Exporting Keys',
-        content: Strings.contentKeyExportWarning,
-        loading: props.loading,
-        confirmText: 'Export Keys',
-        confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
-        onDismiss: () => Navigator.pop(dialogContext),
-        onConfirm: () async {
-          await store.dispatch(exportDeviceKeysOwned());
+      barrierDismissible: false,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Import Session Keys',
+        content:
+            'Enter the password for this session key import.\n\nPlease be aware the import may take a while to complete.',
+        label: Strings.labelPassword,
+        initialValue: '',
+        confirmText: 'import',
+        obscureText: true,
+        loading: store.state.settingsStore.loading,
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          await store.dispatch(importSessionKeys(file, password: password));
+
           Navigator.of(dialogContext).pop();
         },
       ),
     );
   }
 
-  onDeleteDeviceKey({
+  onExportSessionKeys({
+    required _Props props,
+    required BuildContext context,
+  }) async {
+    final store = StoreProvider.of<AppState>(context);
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Backup Session Keys',
+        content:
+            'Enter a password for this session key backup.\n\nPlease be aware the export may take a while to complete.',
+        obscureText: true,
+        loading: store.state.settingsStore.loading,
+        label: Strings.labelPassword,
+        initialValue: '',
+        confirmText: 'save',
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          await store.dispatch(exportSessionKeys(password));
+
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
+  }
+
+  onDeleteSessionKeys({
     required _Props props,
     required BuildContext context,
   }) async {
@@ -105,7 +155,8 @@ class PrivacySettingsScreen extends StatelessWidget {
         confirmStyle: TextStyle(color: Colors.red),
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
-          await store.dispatch(deleteDeviceKeys());
+          await store.dispatch(resetSessionKeys());
+
           Navigator.of(dialogContext).pop();
         },
       ),
@@ -373,37 +424,18 @@ class PrivacySettingsScreen extends StatelessWidget {
                               style: Theme.of(context).textTheme.subtitle2,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () => props.onDisabled(),
-                            child: ListTile(
-                              enabled: false,
-                              onTap: props.onImportDeviceKey as void Function()?,
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'Import Keys',
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => props.onDisabled(),
-                            child: ListTile(
-                              enabled: false,
-                              onTap: () => onExportDeviceKey(context: context, props: props),
-                              contentPadding: Dimensions.listPadding,
-                              title: Text(
-                                'Export Keys',
-                              ),
+                          ListTile(
+                            onTap: () => onImportSessionKeys(context),
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Import Keys',
                             ),
                           ),
                           ListTile(
-                            onTap: () => onDeleteDeviceKey(context: context, props: props),
+                            onTap: () => onExportSessionKeys(context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
-                              'Delete Keys',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                color: Colors.redAccent,
-                              ),
+                              'Backup Keys',
                             ),
                           ),
                         ],
@@ -419,6 +451,17 @@ class PrivacySettingsScreen extends StatelessWidget {
                               'Account Management',
                               textAlign: TextAlign.start,
                               style: Theme.of(context).textTheme.subtitle2,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () => onDeleteSessionKeys(context: context, props: props),
+                            contentPadding: Dimensions.listPadding,
+                            title: Text(
+                              'Delete Keys',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.redAccent,
+                              ),
                             ),
                           ),
                           ListTile(
@@ -457,7 +500,6 @@ class _Props extends Equatable {
 
   final Function onToggleTypingIndicators;
   final Function onIncrementReadReceipts;
-  final Function onImportDeviceKey;
   final Function onDisabled;
   final Function onDeactivateAccount;
   final Function onResetConfirmAuth;
@@ -475,7 +517,6 @@ class _Props extends Equatable {
     required this.onDisabled,
     required this.onToggleTypingIndicators,
     required this.onIncrementReadReceipts,
-    required this.onImportDeviceKey,
     required this.onDeactivateAccount,
     required this.onResetConfirmAuth,
     required this.onSetScreenLock,
@@ -509,7 +550,6 @@ class _Props extends Equatable {
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
-        onImportDeviceKey: () => store.dispatch(importDeviceKeysOwned()),
         onDeactivateAccount: (BuildContext context) async {
           // Attempt to deactivate account
           await store.dispatch(deactivateAccount());

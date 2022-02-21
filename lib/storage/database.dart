@@ -33,6 +33,7 @@ import 'package:syphon/store/media/schema.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/schema.dart';
 import 'package:syphon/store/settings/schema.dart';
+import 'package:syphon/store/sync/schema.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/schema.dart';
 
@@ -207,6 +208,7 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   Reactions,
   Receipts,
   Auths,
+  Syncs,
   Cryptos,
   Settings,
 ])
@@ -220,7 +222,7 @@ class StorageDatabase extends _$StorageDatabase {
   // you should bump this number whenever you change or add a table definition. Migrations
   // are covered later in this readme.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -229,6 +231,9 @@ class StorageDatabase extends _$StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
+          if (from == 6) {
+            await m.createTable(syncs);
+          }
           if (from == 5) {
             await m.createTable(auths);
             await m.createTable(cryptos);
