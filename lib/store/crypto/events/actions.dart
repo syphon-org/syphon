@@ -9,7 +9,6 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/crypto/keys/models.dart';
 import 'package:syphon/store/crypto/sessions/actions.dart';

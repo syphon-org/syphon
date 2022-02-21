@@ -7,6 +7,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/store/crypto/sessions/model.dart';
 
 const DEFAULT_ROUNDS = 500000;
 
@@ -226,4 +227,40 @@ Future<String> encryptSessionKeysThreaded(Map params) async {
     sessionJson: sessionJson,
     password: password,
   );
+}
+
+Map<String, Map<String, List<MessageSession>>> combineMessageSesssions(sessionNew, sessionOld) {
+  final messageSessionsNew = sessionNew as Map<String, Map<String, List<MessageSession>>>;
+
+  final messageSessionsOld = Map<String, Map<String, List<MessageSession>>>.from(
+    sessionOld,
+  );
+
+  // prepend session keys to an array per spec
+  for (final roomSessions in messageSessionsNew.entries) {
+    final roomId = roomSessions.key;
+    final sessions = roomSessions.value;
+
+    for (final messsageSessions in sessions.entries) {
+      final senderKey = messsageSessions.key;
+      final sessionsSerialized = messsageSessions.value;
+
+      for (final session in sessionsSerialized) {
+        messageSessionsOld.update(
+          roomId,
+          (identitySessions) => identitySessions
+            ..update(
+              senderKey,
+              (sessions) => sessions.toList()..insert(0, session),
+              ifAbsent: () => [session],
+            ),
+          ifAbsent: () => {
+            senderKey: [session],
+          },
+        );
+      }
+    }
+  }
+
+  return messageSessionsOld;
 }

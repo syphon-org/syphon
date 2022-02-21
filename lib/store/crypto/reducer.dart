@@ -111,6 +111,8 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       return state.copyWith(
         messageSessionsInbound: messageSessions,
       );
+
+    // TODO: make this work synchronously?? [combineMessageSesssions](./converters.dart)
     case AddMessageSessionsInbound:
       final _action = action as AddMessageSessionsInbound;
 
@@ -135,7 +137,7 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
               (identitySessions) => identitySessions
                 ..update(
                   senderKey,
-                  (sessions) => sessions..insert(0, session),
+                  (sessions) => sessions.toList()..insert(0, session),
                   ifAbsent: () => [session],
                 ),
               ifAbsent: () => {
@@ -148,6 +150,12 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
 
       return state.copyWith(
         messageSessionsInbound: messageSessionsExisting,
+      );
+    case SetMessageSessionsInbound:
+      final _action = action as SetMessageSessionsInbound;
+
+      return state.copyWith(
+        messageSessionsInbound: _action.sessions,
       );
     case ToggleDeviceKeysExist:
       return state.copyWith(

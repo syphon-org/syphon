@@ -176,7 +176,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
               child: Text(Strings.buttonCancel),
             ),
             TextButton(
-              onPressed: isEmpty
+              onPressed: loading || isEmpty
                   ? null
                   : () async {
                       if (widget.onConfirm != null && !isEmpty) {

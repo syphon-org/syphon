@@ -89,6 +89,12 @@ class AddMessageSessionsInbound {
   AddMessageSessionsInbound({required this.sessions});
 }
 
+class SetMessageSessionsInbound {
+  Map<String, Map<String, List<MessageSession>>> sessions;
+
+  SetMessageSessionsInbound({required this.sessions});
+}
+
 ThunkAction<AppState> saveMessageSessionOutbound({
   required String roomId,
   required String session,
@@ -426,6 +432,10 @@ ThunkAction<AppState> exportSessionKeys(String password) {
         confirmation += ' to Documents folder';
       }
 
+      if (Platform.isIOS) {
+        confirmation += ' to ${directory.path}';
+      }
+
       if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
         final directoryPath = await FilePicker.platform.saveFile(
           type: FileType.custom,
@@ -495,11 +505,11 @@ ThunkAction<AppState> exportSessionKeys(String password) {
       }
 
       // for debugging only
-      if (DEBUG_MODE) {
-        printJson({
-          'sessionData': sessionData,
-        });
-      }
+      // if (DEBUG_MODE) {
+      //   log.json({
+      //     'sessionData': sessionData,
+      //   });
+      // }
 
       // encrypt exported session keys
       final String encryptedExport = await compute(encryptSessionKeysThreaded, {
@@ -571,14 +581,14 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         final sessionIndexNew = inboundSession.first_known_index();
 
         // for debugging only
-        if (DEBUG_MODE) {
-          final sessionIdNew = inboundSession.session_id();
+        // if (DEBUG_MODE) {
+        //   final sessionIdNew = inboundSession.session_id();
 
-          printJson({
-            'sessionIdNew': sessionIdNew,
-            'sessionIndexNew': sessionIndexNew,
-          });
-        }
+        //   log.json({
+        //     'sessionIdNew': sessionIdNew,
+        //     'sessionIndexNew': sessionIndexNew,
+        //   });
+        // }
 
         final messageSession = MessageSession(
           index: sessionIndexNew,
@@ -602,8 +612,11 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         roomIdsEncrypted.add(roomId);
       }
 
-      store.dispatch(AddMessageSessionsInbound(
-        sessions: messageSessions,
+      await store.dispatch(SetMessageSessionsInbound(
+        sessions: combineMessageSesssions(
+          messageSessions,
+          store.state.cryptoStore.messageSessionsInbound,
+        ),
       ));
 
       for (final roomId in roomIdsEncrypted) {
