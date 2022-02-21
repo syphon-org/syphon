@@ -36,11 +36,6 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
       return state.copyWith(
         oneTimeKeysClaimed: action.oneTimeKeys,
       );
-    case SetMessageSessionsInbound:
-      final _action = action as SetMessageSessionsInbound;
-      return state.copyWith(
-        messageSessionsInbound: _action.sessions,
-      );
     case AddKeySession:
       final _action = action as AddKeySession;
 
@@ -115,6 +110,44 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
 
       return state.copyWith(
         messageSessionsInbound: messageSessions,
+      );
+    case AddMessageSessionsInbound:
+      final _action = action as AddMessageSessionsInbound;
+
+      final messageSessionsNew = _action.sessions;
+
+      final messageSessionsExisting = Map<String, Map<String, List<MessageSession>>>.from(
+        state.messageSessionsInbound,
+      );
+
+      // prepend session keys to an array per spec
+      for (final roomSessions in messageSessionsNew.entries) {
+        final roomId = roomSessions.key;
+        final sessions = roomSessions.value;
+
+        for (final messsageSessions in sessions.entries) {
+          final senderKey = messsageSessions.key;
+          final sessionsSerialized = messsageSessions.value;
+
+          for (final session in sessionsSerialized) {
+            messageSessionsExisting.update(
+              roomId,
+              (identitySessions) => identitySessions
+                ..update(
+                  senderKey,
+                  (sessions) => sessions..insert(0, session),
+                  ifAbsent: () => [session],
+                ),
+              ifAbsent: () => {
+                senderKey: [session],
+              },
+            );
+          }
+        }
+      }
+
+      return state.copyWith(
+        messageSessionsInbound: messageSessionsExisting,
       );
     case ToggleDeviceKeysExist:
       return state.copyWith(

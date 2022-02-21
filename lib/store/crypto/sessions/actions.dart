@@ -83,10 +83,10 @@ class AddMessageSessionInbound {
   });
 }
 
-class SetMessageSessionsInbound {
+class AddMessageSessionsInbound {
   Map<String, Map<String, List<MessageSession>>> sessions;
 
-  SetMessageSessionsInbound({required this.sessions});
+  AddMessageSessionsInbound({required this.sessions});
 }
 
 ThunkAction<AppState> saveMessageSessionOutbound({
@@ -281,7 +281,7 @@ ThunkAction<AppState> createMessageSessionInbound({
     inboundMessageSession.create(sessionKey);
     final messageIndex = inboundMessageSession.first_known_index();
 
-    store.dispatch(AddMessageSessionInbound(
+    await store.dispatch(AddMessageSessionInbound(
       roomId: roomId,
       senderKey: senderKey,
       messageIndex: messageIndex,
@@ -602,7 +602,7 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         roomIdsEncrypted.add(roomId);
       }
 
-      store.dispatch(SetMessageSessionsInbound(
+      store.dispatch(AddMessageSessionsInbound(
         sessions: messageSessions,
       ));
 

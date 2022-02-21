@@ -49,7 +49,7 @@ List<DeviceKey> filterDevicesWithoutMessageSessions(Store<AppState> store, Room 
   final roomUserIds = room.userIds;
   final currentUser = store.state.authStore.user;
   final deviceKeys = store.state.cryptoStore.deviceKeys;
-  final messageSessionsInbound = store.state.cryptoStore.inboundMessageSessions;
+  final messageSessionsInbound = store.state.cryptoStore.messageSessionsInbound;
   final messageSessionsOutbound = store.state.cryptoStore.outboundMessageSessions;
 
   // get deviceKeys for every user present in the chat

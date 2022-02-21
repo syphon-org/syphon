@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:olm/olm.dart';
+import 'package:syphon/global/print.dart';
 
 import 'package:syphon/store/crypto/keys/models.dart';
 import 'package:syphon/store/crypto/sessions/model.dart';
@@ -88,8 +89,8 @@ class CryptoStore extends Equatable {
     bool? deviceKeysExist,
     bool? deviceKeyVerified,
     bool? oneTimeKeysStable,
-    Map<String, Map<String, int>>? messageSessionIndex,
-    Map<String, Map<String, String>>? inboundMessageSessions,
+    @Deprecated('only for converting') Map<String, Map<String, int>>? messageSessionIndex,
+    @Deprecated('only for converting') Map<String, Map<String, String>>? inboundMessageSessions,
     Map<String, Map<String, List<MessageSession>>>? messageSessionsInbound,
     Map<String, String>? outboundMessageSessions,
     Map<String, Map<String, String>>? keySessions,
@@ -114,6 +115,59 @@ class CryptoStore extends Equatable {
         oneTimeKeysStable: oneTimeKeysStable ?? this.oneTimeKeysStable,
         oneTimeKeysCounts: oneTimeKeysCounts ?? this.oneTimeKeysCounts,
       );
+
+  // TODO: remove after 0.2.9 release
+  // @Deprecated('only use to migrate keys from < 0.2.8 to 0.2.9')
+  CryptoStore upgradeSessions_temp() {
+    if (inboundMessageSessions.isEmpty) {
+      return this;
+    }
+
+    log.warn('[upgradeSessions_temp] UPGRADING PREVIOUS KEY SESSIONS');
+
+    final messageSessionsUpdated = Map<String, Map<String, List<MessageSession>>>.from(
+      messageSessionsInbound,
+    );
+
+    for (final roomSessions in inboundMessageSessions.entries) {
+      final roomId = roomSessions.key;
+      final sessions = roomSessions.value;
+
+      for (final messsageSessions in sessions.entries) {
+        final senderKey = messsageSessions.key;
+        final messageIndex = ((messageSessionIndex[roomId] ?? {})[senderKey]) ?? 0;
+        final sessionsSerialized = messsageSessions.value;
+
+        final messageSessionNew = MessageSession(
+          index: messageIndex,
+          serialized: sessionsSerialized, // already pickled
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+        );
+
+        // new message session updates
+        messageSessionsUpdated.update(
+          roomId,
+          (identitySessions) => identitySessions
+            ..update(
+              senderKey,
+              (sessions) => sessions..insert(0, messageSessionNew),
+              ifAbsent: () => [messageSessionNew],
+            ),
+          ifAbsent: () => {
+            senderKey: [messageSessionNew],
+          },
+        );
+      }
+    }
+
+    log.warn('[upgradeSessions_temp] COMPLETED, WIPING PREVIOUS KEY SESSIONS');
+
+    return copyWith(
+      messageSessionIndex: const {},
+      inboundMessageSessions: const {},
+      messageSessionsInbound: messageSessionsUpdated,
+    );
+  }
 
   Map<String, dynamic> toJson() => _$CryptoStoreToJson(this);
   factory CryptoStore.fromJson(Map<String, dynamic> json) => _$CryptoStoreFromJson(json);
