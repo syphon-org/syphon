@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:syphon/global/libs/storage/secure-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/database.dart';
@@ -50,4 +51,16 @@ Future<SettingsStore?> loadSettings({required StorageDatabase storage}) async {
     printError(error.toString(), title: 'loadAuth');
     return null;
   }
+}
+
+const TERMS_OF_SERVICE_ACCEPTANCE_KEY = 'TERMS_OF_SERVICE_ACCEPTANCE_KEY';
+
+final _storage = SecureStorage();
+
+Future<dynamic> saveTermsAgreement({required int timestamp}) async {
+  return _storage.write(key: TERMS_OF_SERVICE_ACCEPTANCE_KEY, value: json.encode(timestamp));
+}
+
+Future<int> loadTermsAgreement() async {
+  return int.parse(await _storage.read(key: TERMS_OF_SERVICE_ACCEPTANCE_KEY) ?? '0');
 }
