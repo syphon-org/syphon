@@ -1,24 +1,27 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:swipeable/swipeable.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/views/home/chat/media-full-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:syphon/views/widgets/input/text-field-edit.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 const MESSAGE_MARGIN_VERTICAL_LARGE = 6.0;
 const MESSAGE_MARGIN_VERTICAL_NORMAL = 4.0;
@@ -216,15 +219,21 @@ class MessageWidget extends StatelessWidget {
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           Navigator.of(dialogContext).pop();
-
-          // TODO: confirm it can launch a URL with new Android 11 privacy settings
-          // if (await canLaunch(url)) {
-          try {
-            return launch(url, forceSafariVC: false);
-          } catch (error) {
-            throw 'Could not launch $url';
-          }
+          await launchUrl(url);
         },
+      ),
+    );
+  }
+
+  onViewFullscreen(
+    BuildContext context, {
+    required Uint8List bytes,
+    String filename = 'Matrix Image',
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MediaFullScreen(title: filename, bytes: bytes),
       ),
     );
   }
@@ -238,7 +247,8 @@ class MessageWidget extends StatelessWidget {
     final hasReactions = message.reactions.isNotEmpty || selected;
     final isRead = message.timestamp < lastRead;
     final showAvatar = !isLastSender && !isUserSent && !messageOnly;
-    final isMedia = message.url != null;
+    final body = selectEventBody(message);
+    final isMedia = selectIsMedia(message);
     final removePadding = isMedia || (isEditing && selected);
 
     var textColor = Colors.white;
@@ -362,11 +372,9 @@ class MessageWidget extends StatelessWidget {
     }
 
     if (message.edited) {
-      status += ' (Edited)';
+      status += Strings.messageEditedAppend;
       showInfoRow = true;
     }
-
-    final String body = selectEventBody(message);
 
     // Indicates special event text instead of the message body
     if (message.body != body) {
@@ -533,7 +541,8 @@ class MessageWidget extends StatelessWidget {
                                             .autoDownloadEnabled,
                                         fit: BoxFit.cover,
                                         rebuild: true,
-                                        fullScreenOnTab: true,
+                                        onPressImage: (Uint8List bytes) =>
+                                            onViewFullscreen(context, filename: body, bytes: bytes),
                                         width: Dimensions.mediaSizeMaxMessage,
                                         height: Dimensions.mediaSizeMaxMessage,
                                         fallbackColor: Colors.transparent,
