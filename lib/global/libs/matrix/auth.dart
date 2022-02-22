@@ -32,6 +32,14 @@ enum ThirdPartyIDMedium {
   msisn,
 }
 
+extension ThirdPartyIDMediumValue on ThirdPartyIDMedium {
+  static String _value(ThirdPartyIDMedium val) {
+    return val.toString().split('.')[1];
+  }
+
+  String get value => _value(this);
+}
+
 abstract class Auth {
   static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
 
@@ -102,7 +110,7 @@ abstract class Auth {
     required String protocol,
     required String homeserver,
     String type = 'm.login.password',
-    ThirdPartyIDMedium? medium,
+    String? medium,
     String? address,
     String? password,
     String? deviceId,
