@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
@@ -27,7 +26,6 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 class MatrixImage extends StatefulWidget {
   final String? mxcUri;
   final String? imageType;
-  final String fileName;
 
   final double width;
   final double height;
@@ -39,7 +37,6 @@ class MatrixImage extends StatefulWidget {
   final bool thumbnail;
   final bool autodownload;
   final bool forceLoading;
-  final bool fullScreenOnTab;
 
   final BoxFit fit;
   final Widget? fallback;
@@ -61,8 +58,6 @@ class MatrixImage extends StatefulWidget {
     this.forceLoading = false,
     this.fallbackColor = Colors.grey,
     this.fallback,
-    this.fullScreenOnTab = false,
-    this.fileName = '',
   }) : super(key: key);
 
   @override
@@ -109,8 +104,6 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
         builder: (context, props) {
-
-
           final failed =
               props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
           final loading = widget.forceLoading || !props.exists;
@@ -176,38 +169,6 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
                 ));
           }
 
-          if(widget.fullScreenOnTab){
-            return GestureDetector(onTap: () => {
-              Navigator.push(context, MaterialPageRoute(builder: (_){
-                return Scaffold(
-                  appBar: AppBar(title: Text(widget.fileName),
-                    leading: IconButton(
-                      onPressed: () => {
-                        Navigator.of(context).pop(),
-                      },
-                      icon: Icon(
-                        Icons.arrow_back_outlined,
-                      ),
-                  ),),
-                  body: PhotoView(
-                      imageProvider:MemoryImage(
-                          props.mediaCache ?? finalUriData!
-                      )
-                  ),
-                );
-              }
-              ))},
-                child: Image(
-                  width: widget.width,
-                  height: widget.height,
-                  fit: widget.fit,
-                  image: MemoryImage(
-                    props.mediaCache ?? finalUriData!,
-                  ),
-                )
-            );
-          }
-
           return Image(
             width: widget.width,
             height: widget.height,
@@ -216,7 +177,8 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
               props.mediaCache ?? finalUriData!,
             ),
           );
-  });
+        },
+      );
 }
 
 class _Props extends Equatable {

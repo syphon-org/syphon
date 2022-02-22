@@ -516,7 +516,6 @@ class MessageWidget extends StatelessWidget {
                                               topRight: bubbleBorder.topRight,
                                             ),
                                       child: MatrixImage(
-                                        fileName: body,
                                         mxcUri: message.url,
                                         thumbnail: false,
                                         autodownload: StoreProvider.of<AppState>(context)
@@ -525,7 +524,6 @@ class MessageWidget extends StatelessWidget {
                                             .autoDownloadEnabled,
                                         fit: BoxFit.cover,
                                         rebuild: true,
-                                        fullScreenOnTab: true,
                                         width: Dimensions.mediaSizeMaxMessage,
                                         height: Dimensions.mediaSizeMaxMessage,
                                         fallbackColor: Colors.transparent,
