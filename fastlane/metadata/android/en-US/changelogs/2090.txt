@@ -1,0 +1,21 @@
+0.2.9
+
+🔮 New Features
+- Session Key Imports / Exports
+- Email and other 3pid auth support
+- Fullscreen Image View
+- Incoming Read Receipt Support
+- Toggle autocorrect setting
+ 
+🐛 Bug Fixes
+- fixed missing several translations
+- fixed various notification issues
+- fixed issues with deleting devices
+- fixed issues deactivating accounts
+- fixed showing TOS more than once
+
+💡 Improvements
+- Hide Send Button 
+
+📐 Refactoring
+- Lots!
