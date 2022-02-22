@@ -1,7 +1,9 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:swipeable/swipeable.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
@@ -14,6 +16,7 @@ import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/views/home/chat/media-full-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
@@ -218,6 +221,19 @@ class MessageWidget extends StatelessWidget {
           Navigator.of(dialogContext).pop();
           await launchUrl(url);
         },
+      ),
+    );
+  }
+
+  onViewFullscreen(
+    BuildContext context, {
+    required Uint8List bytes,
+    String filename = 'Matrix Image',
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MediaFullScreen(title: filename, bytes: bytes),
       ),
     );
   }
@@ -516,6 +532,7 @@ class MessageWidget extends StatelessWidget {
                                               topRight: bubbleBorder.topRight,
                                             ),
                                       child: MatrixImage(
+                                        fileName: body,
                                         mxcUri: message.url,
                                         thumbnail: false,
                                         autodownload: StoreProvider.of<AppState>(context)
@@ -524,6 +541,8 @@ class MessageWidget extends StatelessWidget {
                                             .autoDownloadEnabled,
                                         fit: BoxFit.cover,
                                         rebuild: true,
+                                        onPressImage: (Uint8List bytes) =>
+                                            onViewFullscreen(context, filename: body, bytes: bytes),
                                         width: Dimensions.mediaSizeMaxMessage,
                                         height: Dimensions.mediaSizeMaxMessage,
                                         fallbackColor: Colors.transparent,
