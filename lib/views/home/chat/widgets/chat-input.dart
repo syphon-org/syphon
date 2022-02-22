@@ -283,7 +283,7 @@ class ChatInputState extends State<ChatInput> {
           }
 
           // if the button is disabled, make it more transparent to indicate that
-          if (widget.sending || !isSendable) {
+          if (widget.sending) {
             sendButtonColor = Color(Colours.greyDisabled);
           }
 
@@ -503,16 +503,17 @@ class ChatInputState extends State<ChatInput> {
                             decoration: InputDecoration(
                               filled: true,
                               hintText: hintText,
-                              suffixIcon: !isSendable
-                                  ? null
-                                  : IconButton(
-                                      color: Theme.of(context).iconTheme.color,
-                                      onPressed: () => onToggleMediaOptions(),
-                                      icon: Icon(
-                                        Icons.add,
-                                        size: Dimensions.iconSizeLarge,
-                                      ),
-                                    ),
+                              suffixIcon: Visibility(
+                                visible: isSendable,
+                                child: IconButton(
+                                  color: Theme.of(context).iconTheme.color,
+                                  onPressed: () => onToggleMediaOptions(),
+                                  icon: Icon(
+                                    Icons.add,
+                                    size: Dimensions.iconSizeLarge,
+                                  ),
+                                ),
+                              ),
                               fillColor: props.inputColorBackground,
                               contentPadding: Dimensions.inputContentPadding,
                               focusedBorder: OutlineInputBorder(
