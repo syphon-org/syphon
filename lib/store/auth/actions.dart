@@ -10,6 +10,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
+import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
@@ -368,8 +369,8 @@ ThunkAction<AppState> loginUser() {
 
       var homeserver = store.state.authStore.homeserver;
       final username = store.state.authStore.username;
-      final email    = store.state.authStore.email;
-      final msisdn   = store.state.authStore.msisdn;
+      final email = store.state.authStore.email;
+      final msisdn = store.state.authStore.msisdn;
       final password = store.state.authStore.password;
       final protocol = store.state.authStore.protocol;
 
@@ -379,8 +380,7 @@ ThunkAction<AppState> loginUser() {
         device = await store.dispatch(
           generateDeviceId(salt: msisdn.toString()),
         );
-      }
-      else {
+      } else {
         device = await store.dispatch(
           generateDeviceId(salt: username + email),
         );
@@ -397,26 +397,24 @@ ThunkAction<AppState> loginUser() {
           protocol: protocol,
           type: MatrixAuthTypes.PASSWORD,
           homeserver: homeserver.baseUrl!,
-          medium: ThirdPartyIDMedium.email,
+          medium: ThirdPartyIDMedium.email.value,
           address: email,
           password: password,
           deviceId: device.deviceId,
           deviceName: device.displayName,
         );
-      }
-      else if (store.state.authStore.isMsisdnValid) {
+      } else if (store.state.authStore.isMsisdnValid) {
         data = await MatrixApi.loginUser3pid(
-            protocol: protocol,
-            type: MatrixAuthTypes.PASSWORD,
-            homeserver: homeserver.baseUrl!,
-            medium: ThirdPartyIDMedium.msisn,
-            address: msisdn.toString(),
-            password: password,
-            deviceId: device.deviceId,
-            deviceName: device.displayName,
+          protocol: protocol,
+          type: MatrixAuthTypes.PASSWORD,
+          homeserver: homeserver.baseUrl!,
+          medium: ThirdPartyIDMedium.msisn.value,
+          address: msisdn.toString(),
+          password: password,
+          deviceId: device.deviceId,
+          deviceName: device.displayName,
         );
-      }
-      else {
+      } else {
         data = await MatrixApi.loginUser(
           protocol: protocol,
           type: MatrixAuthTypes.PASSWORD,
@@ -1304,22 +1302,23 @@ ThunkAction<AppState> resolveUsername({String? username}) {
     final homeserver = store.state.authStore.homeserver;
 
     var localpart = username!.trim().split(':')[0];
-    final hostname = username.contains(':')
-          ? username.trim().split(':')[1]
-          : '';
+    final hostname = username.contains(':') ? username.trim().split(':')[1] : '';
 
-    if (localpart.isEmpty) { return; }
+    if (localpart.isEmpty) {
+      return;
+    }
 
     if (localpart.contains('@')) {
-      if (localpart.indexOf('@') == 0) { // matrix
+      if (localpart.indexOf('@') == 0) {
+        // matrix
         localpart = localpart.replaceFirst('@', '');
         store.dispatch(setUsername(username: localpart));
-      }
-      else { // email 3pid
+      } else {
+        // email 3pid
         store.dispatch(setEmail(email: localpart));
       }
-    }
-    else if (int.tryParse(localpart) != null) { //msisdn 3pid
+    } else if (int.tryParse(localpart) != null) {
+      //msisdn 3pid
       store.dispatch(setMsisdn(msisdn: int.parse(localpart)));
     }
 

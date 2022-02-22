@@ -31,10 +31,10 @@ class AuthStore extends Equatable {
   @JsonKey()
   final bool verified; // a.k.a sid or session id
 
-  User get currentUser => user;
-
   final StreamController<User?>? authObserver;
   final StreamController<User?>? contextObserver;
+
+  User get currentUser => user;
 
   Stream<User?> get onAuthStateChanged => authObserver!.stream;
 
