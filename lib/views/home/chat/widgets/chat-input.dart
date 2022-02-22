@@ -357,6 +357,26 @@ class ChatInputState extends State<ChatInput> {
             );
           }
 
+          if (!isSendable) {
+            sendButton = Semantics(
+              button: true,
+              enabled: true,
+              label: Strings.labelShowAttachmentOptions,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(48),
+                onTap: widget.sending ? null : onToggleMediaOptions,
+                child: CircleAvatar(
+                  backgroundColor: sendButtonColor,
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: Dimensions.iconSizeLarge,
+                  ),
+                ),
+              ),
+            );
+          }
+
           return Column(
             children: [
               Visibility(
@@ -483,14 +503,16 @@ class ChatInputState extends State<ChatInput> {
                             decoration: InputDecoration(
                               filled: true,
                               hintText: hintText,
-                              suffixIcon: IconButton(
-                                color: Theme.of(context).iconTheme.color,
-                                onPressed: () => onToggleMediaOptions(),
-                                icon: Icon(
-                                  Icons.add,
-                                  size: Dimensions.iconSizeLarge,
-                                ),
-                              ),
+                              suffixIcon: !isSendable
+                                  ? null
+                                  : IconButton(
+                                      color: Theme.of(context).iconTheme.color,
+                                      onPressed: () => onToggleMediaOptions(),
+                                      icon: Icon(
+                                        Icons.add,
+                                        size: Dimensions.iconSizeLarge,
+                                      ),
+                                    ),
                               fillColor: props.inputColorBackground,
                               contentPadding: Dimensions.inputContentPadding,
                               focusedBorder: OutlineInputBorder(

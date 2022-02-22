@@ -248,6 +248,7 @@
     "warning-deactivate-account-final": "There is no way to recover this account after it's deleted. You will immediately be logged out of your account and it will become unavailable.\n\nThis is your final warning regarding deactivation. If you are sure, press deactivate below.",
     "label-send-unencrypted": "Send unencrypted message",
     "label-send-encrypted": "Send encrypted message",
+    "label-show-attachment-options": "Open attachment options",
     "label-default": "Default",
     "semantics-image-intro": "Relaxed, lounging User",
     "semantics-image-private-message": "A person holding up a private message bubble",

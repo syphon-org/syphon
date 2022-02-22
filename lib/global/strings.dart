@@ -50,7 +50,6 @@ class Strings {
   static final titleToggleAutocorrect = tr('title-toggle-autocorrect');
   static final titleToggleSuggestions = tr('title-toggle-suggestions');
 
-
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
   static final titleDialogEncryption = tr('title-dialog-encryption');
@@ -98,6 +97,7 @@ class Strings {
   static final labelMessagesEmpty = tr('label-messages-empty');
   static final labelSendEncrypted = tr('label-send-encrypted');
   static final labelDownloadImage = tr('label-download-image');
+  static final labelShowAttachmentOptions = tr('label-show-attachment-options');
   static final labelSendUnencrypted = tr('label-send-unencrypted');
   static final labelSearchHomeservers = tr('label-search-homeservers');
   static final labelSearchResults = tr('label-search-results'); // 'Search Results'
@@ -280,7 +280,8 @@ class Strings {
 
   static final contentNotificationStyleTypeInbox = tr('content-notification-style-type-inbox');
   static final contentNotificationStyleTypeLatest = tr('content-notification-style-type-latest');
-  static final contentNotificationStyleTypeItemized = tr('content-notification-style-type-itemized');
+  static final contentNotificationStyleTypeItemized =
+      tr('content-notification-style-type-itemized');
 
   static final messageEditedAppend = tr('message-edited-append');
 
