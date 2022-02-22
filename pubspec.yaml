@@ -54,7 +54,7 @@ dependencies:
   flutter_redux: ^0.8.2
   mime: ^1.0.0
   path: ^1.8.0
-  path_provider: ^2.0.1
+  path_provider: 2.0.9
   package_info: ^2.0.0
 
   ### encryption
