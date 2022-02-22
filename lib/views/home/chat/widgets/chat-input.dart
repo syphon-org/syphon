@@ -231,7 +231,10 @@ class ChatInputState extends State<ChatInput> {
     if (pickerResult == null) return;
 
     final file = File(pickerResult.path);
+
     widget.onAddMedia(file: file, type: MessageType.image);
+
+    onToggleMediaOptions();
   }
 
   onAddFile() async {
@@ -552,10 +555,14 @@ class ChatInputState extends State<ChatInput> {
                         ),
                         child: ListLocalImages(
                           imageSize: imageWidth,
-                          onSelectImage: (file) => widget.onAddMedia(
-                            file: file,
-                            type: MessageType.image,
-                          ),
+                          onSelectImage: (file) {
+                            widget.onAddMedia(
+                              file: file,
+                              type: MessageType.image,
+                            );
+
+                            onToggleMediaOptions();
+                          },
                         ),
                       ),
                       Row(children: [

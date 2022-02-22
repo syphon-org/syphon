@@ -19,6 +19,7 @@ bool cacheMiddleware(Store<AppState> store, dynamic action) {
   switch (action.runtimeType) {
     case AddAvailableUser:
     case RemoveAvailableUser:
+    case UpdateRoom:
     case SetRoom:
     case RemoveRoom:
     case SetOlmAccount:
