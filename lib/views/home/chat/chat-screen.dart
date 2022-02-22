@@ -291,7 +291,10 @@ class ChatScreenState extends State<ChatScreen> {
     File? encryptedFile;
     EncryptInfo? info;
 
-    var file = await scrubMedia(localFile: rawFile);
+    var file = await scrubMedia(
+      localFile: rawFile,
+      mediaNameFull: path.basename(rawFile.path),
+    );
 
     if (file == null) {
       file = rawFile;

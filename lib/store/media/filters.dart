@@ -20,7 +20,7 @@ import 'package:syphon/store/media/converters.dart';
 ///
 Future<File?> scrubMedia({
   required File localFile,
-  String? mediaName = 'media-default',
+  String mediaNameFull = 'media-default',
 }) async {
   try {
     // Extension handling
@@ -30,6 +30,7 @@ Future<File?> scrubMedia({
     // Image file info
     final String fileType = mimeType;
     final String fileExtension = fileType.split('/')[1];
+    final String mediaName = mediaNameFull.split('.')[0];
     final String fileName = '$mediaName-scrubbed.$fileExtension';
     final fileImage = await decodeImageFromList(
       localFile.readAsBytesSync(),
