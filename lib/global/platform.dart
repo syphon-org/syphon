@@ -38,7 +38,7 @@ Future<void> initPlatformDependencies() async {
   }
 
   if (Platform.isLinux) {
-    PathProviderLinux.registerWith();
+    PathProviderLinux.register();
 
     final appDir = File(Platform.script.toFilePath()).parent;
     final libolmDir = File(path.join(appDir.path, 'lib/libolm.so'));
