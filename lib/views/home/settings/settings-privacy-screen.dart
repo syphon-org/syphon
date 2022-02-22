@@ -11,7 +11,6 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
-import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/crypto/keys/selectors.dart';
 import 'package:syphon/store/crypto/sessions/actions.dart';
 import 'package:syphon/store/index.dart';
@@ -31,10 +30,7 @@ import 'package:syphon/views/widgets/modals/modal-lock-overlay/show-lock-overlay
 class PrivacySettingsScreen extends StatelessWidget {
   const PrivacySettingsScreen({Key? key}) : super(key: key);
 
-  onConfirmDeactivateAccount({
-    required _Props props,
-    required BuildContext context,
-  }) async {
+  onConfirmDeactivateAccount(BuildContext context, _Props props) async {
     await showDialog(
       context: context,
       builder: (dialogContext) => DialogConfirm(
@@ -46,16 +42,13 @@ class PrivacySettingsScreen extends StatelessWidget {
         onConfirm: () async {
           Navigator.of(dialogContext).pop();
           props.onResetConfirmAuth();
-          onConfirmDeactivateAccountFinal(props: props, context: context);
+          onConfirmDeactivateAccountFinal(context, props);
         },
       ),
     );
   }
 
-  onConfirmDeactivateAccountFinal({
-    required _Props props,
-    required BuildContext context,
-  }) async {
+  onConfirmDeactivateAccountFinal(BuildContext context, _Props props) async {
     await showDialog(
       context: context,
       builder: (dialogContext) => DialogConfirm(
@@ -67,10 +60,43 @@ class PrivacySettingsScreen extends StatelessWidget {
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           Navigator.of(dialogContext).pop();
-          await props.onDeactivateAccount(context);
+          await onDeactivateAccount(context, props);
         },
       ),
     );
+  }
+
+  onDeactivateAccount(BuildContext context, _Props props) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    // Attempt to deactivate account
+    await store.dispatch(deactivateAccount());
+
+    // Prompt for password if an Interactive Auth sessions was started
+    final authSession = store.state.authStore.authSession;
+    if (authSession != null) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => DialogConfirmPassword(
+          title: Strings.titleConfirmPassword,
+          content: Strings.confirmDeactivate,
+          valid: props.valid,
+          loading: props.loading,
+          checkLoading: () => store.state.settingsStore.loading,
+          checkValid: () =>
+              store.state.authStore.credential != null &&
+              store.state.authStore.credential!.value != null &&
+              store.state.authStore.credential!.value!.isNotEmpty,
+          onConfirm: () async {
+            await store.dispatch(deactivateAccount());
+            Navigator.of(dialogContext).pop();
+          },
+          onCancel: () async {
+            Navigator.of(dialogContext).pop();
+          },
+        ),
+      );
+    }
   }
 
   onImportSessionKeys(BuildContext context) async {
@@ -465,10 +491,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onConfirmDeactivateAccount(
-                              props: props,
-                              context: context,
-                            ),
+                            onTap: () => onConfirmDeactivateAccount(context, props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Deactivate Account',
@@ -490,6 +513,7 @@ class PrivacySettingsScreen extends StatelessWidget {
 
 class _Props extends Equatable {
   final bool loading;
+  final bool valid;
   final bool? typingIndicators;
   final bool screenLockEnabled;
 
@@ -501,12 +525,12 @@ class _Props extends Equatable {
   final Function onToggleTypingIndicators;
   final Function onIncrementReadReceipts;
   final Function onDisabled;
-  final Function onDeactivateAccount;
   final Function onResetConfirmAuth;
   final Function onSetScreenLock;
   final Function onRemoveScreenLock;
 
   const _Props({
+    required this.valid,
     required this.loading,
     required this.readReceipts,
     required this.screenLockEnabled,
@@ -517,7 +541,6 @@ class _Props extends Equatable {
     required this.onDisabled,
     required this.onToggleTypingIndicators,
     required this.onIncrementReadReceipts,
-    required this.onDeactivateAccount,
     required this.onResetConfirmAuth,
     required this.onSetScreenLock,
     required this.onRemoveScreenLock,
@@ -525,6 +548,7 @@ class _Props extends Equatable {
 
   @override
   List<Object?> get props => [
+        valid,
         loading,
         typingIndicators,
         readReceipts,
@@ -535,6 +559,9 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
+        valid: store.state.authStore.credential != null &&
+            store.state.authStore.credential!.value != null &&
+            store.state.authStore.credential!.value!.isNotEmpty,
         loading: store.state.authStore.loading,
         screenLockEnabled: selectScreenLockEnabled(context),
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
@@ -550,29 +577,5 @@ class _Props extends Equatable {
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
-        onDeactivateAccount: (BuildContext context) async {
-          // Attempt to deactivate account
-          await store.dispatch(deactivateAccount());
-
-          // Prompt for password if an Interactive Auth sessions was started
-          final authSession = store.state.authStore.authSession;
-          if (authSession != null) {
-            showDialog(
-              context: context,
-              builder: (dialogContext) => DialogConfirmPassword(
-                key: Key(authSession),
-                title: Strings.titleConfirmPassword,
-                content: Strings.confirmDeactivate,
-                onConfirm: () async {
-                  await store.dispatch(deactivateAccount());
-                  Navigator.of(dialogContext).pop();
-                },
-                onCancel: () async {
-                  Navigator.of(dialogContext).pop();
-                },
-              ),
-            );
-          }
-        },
       );
 }
