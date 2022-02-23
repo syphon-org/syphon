@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:syphon/cache/index.dart';
-import 'package:syphon/context/index.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/libs/storage/secure-storage.dart';
 import 'package:syphon/global/print.dart';
@@ -129,17 +128,4 @@ resetContextsAll() async {
   } catch (error) {
     printError('[resetAllContexts] ERROR RESETTING CONTEXT STORAGE ${error.toString()}');
   }
-}
-
-// TODO: remove after 0.2.3
-// ignore: non_constant_identifier_names
-migrateContexts_MIGRATION() async {
-  final oldContexts = await loadContexts_DEPRECATED();
-
-  if (oldContexts.isEmpty) return;
-
-  await saveContextsAll(oldContexts);
-
-  await SecureStorage().delete(key: AppContext.ALL_CONTEXT_KEY);
-  await SecureStorage().delete(key: AppContext.CURRENT_CONTEXT_KEY);
 }

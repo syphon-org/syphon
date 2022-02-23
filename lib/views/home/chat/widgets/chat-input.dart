@@ -231,7 +231,10 @@ class ChatInputState extends State<ChatInput> {
     if (pickerResult == null) return;
 
     final file = File(pickerResult.path);
+
     widget.onAddMedia(file: file, type: MessageType.image);
+
+    onToggleMediaOptions();
   }
 
   onAddFile() async {
@@ -283,7 +286,7 @@ class ChatInputState extends State<ChatInput> {
           }
 
           // if the button is disabled, make it more transparent to indicate that
-          if (widget.sending || !isSendable) {
+          if (widget.sending) {
             sendButtonColor = Color(Colours.greyDisabled);
           }
 
@@ -351,6 +354,26 @@ class ChatInputState extends State<ChatInput> {
                       color: Colors.white,
                       semanticsLabel: Strings.labelSendEncrypted,
                     ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          if (!isSendable) {
+            sendButton = Semantics(
+              button: true,
+              enabled: true,
+              label: Strings.labelShowAttachmentOptions,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(48),
+                onTap: widget.sending ? null : onToggleMediaOptions,
+                child: CircleAvatar(
+                  backgroundColor: sendButtonColor,
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: Dimensions.iconSizeLarge,
                   ),
                 ),
               ),
@@ -483,12 +506,15 @@ class ChatInputState extends State<ChatInput> {
                             decoration: InputDecoration(
                               filled: true,
                               hintText: hintText,
-                              suffixIcon: IconButton(
-                                color: Theme.of(context).iconTheme.color,
-                                onPressed: () => onToggleMediaOptions(),
-                                icon: Icon(
-                                  Icons.add,
-                                  size: Dimensions.iconSizeLarge,
+                              suffixIcon: Visibility(
+                                visible: isSendable,
+                                child: IconButton(
+                                  color: Theme.of(context).iconTheme.color,
+                                  onPressed: () => onToggleMediaOptions(),
+                                  icon: Icon(
+                                    Icons.add,
+                                    size: Dimensions.iconSizeLarge,
+                                  ),
                                 ),
                               ),
                               fillColor: props.inputColorBackground,
@@ -552,10 +578,14 @@ class ChatInputState extends State<ChatInput> {
                         ),
                         child: ListLocalImages(
                           imageSize: imageWidth,
-                          onSelectImage: (file) => widget.onAddMedia(
-                            file: file,
-                            type: MessageType.image,
-                          ),
+                          onSelectImage: (file) {
+                            widget.onAddMedia(
+                              file: file,
+                              type: MessageType.image,
+                            );
+
+                            onToggleMediaOptions();
+                          },
                         ),
                       ),
                       Row(children: [
@@ -639,8 +669,8 @@ class _Props extends Equatable {
         inputColorBackground:
             selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
-        autocorrectEnabled: Platform.isIOS, // TODO: toggle-able setting
-        suggestionsEnabled: Platform.isIOS, // TODO: toggle-able setting
+        autocorrectEnabled: store.state.settingsStore.autocorrectEnabled,
+        suggestionsEnabled: store.state.settingsStore.suggestionsEnabled,
         textCapitalization: Platform.isIOS ? TextCapitalization.sentences : TextCapitalization.none,
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),

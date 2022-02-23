@@ -27,6 +27,19 @@ enum AuthTypes {
   SSO,
 }
 
+enum ThirdPartyIDMedium {
+  email,
+  msisn,
+}
+
+extension ThirdPartyIDMediumValue on ThirdPartyIDMedium {
+  static String _value(ThirdPartyIDMedium val) {
+    return val.toString().split('.')[1];
+  }
+
+  String get value => _value(this);
+}
+
 abstract class Auth {
   static const NEEDS_INTERACTIVE_AUTH = 'needs_interactive_auth';
 
@@ -64,6 +77,50 @@ abstract class Auth {
     final Map body = {
       'type': type,
       'identifier': {'type': 'm.id.user', 'user': username},
+      'password': password,
+    };
+
+    if (deviceId != null) {
+      body['device_id'] = deviceId;
+    }
+
+    if (deviceName != null) {
+      body['initial_device_display_name'] = deviceName;
+    }
+
+    final response = await httpClient.post(
+      Uri.parse(url),
+      headers: {...Values.defaultHeaders},
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  ///
+  /// Login User
+  ///
+  /// A client can identify a user using a 3PID associated with the user’s
+  /// account on the homeserver, where the 3PID was previously associated
+  /// using the /account/3pid_ API.
+  ///
+  /// https://spec.matrix.org/latest/client-server-api/#third-party-id
+  ///
+  static Future<dynamic> loginUser3pid({
+    required String protocol,
+    required String homeserver,
+    String type = 'm.login.password',
+    String? medium,
+    String? address,
+    String? password,
+    String? deviceId,
+    String? deviceName,
+  }) async {
+    final String url = '$protocol$homeserver/_matrix/client/r0/login';
+
+    final Map body = {
+      'type': type,
+      'identifier': {'type': 'm.id.thirdparty', 'medium': medium, 'address': address},
       'password': password,
     };
 

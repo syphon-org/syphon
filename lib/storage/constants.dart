@@ -6,6 +6,7 @@
 /// from cold storage
 class StorageKeys {
   static const String AUTH = 'auth';
+  static const String SYNC = 'sync';
   static const String ROOMS = 'rooms';
   static const String USERS = 'users';
   static const String MEDIA = 'media';

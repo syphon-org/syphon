@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - fixed sending images from the quick select menu
 - fixed inviting users to chats
-- 
+- fixed removing deleted images correctly from UI 
 
 
 ## [0.2.6](https://github.com/syphon-org/syphon/releases/tag/0.2.6) - 2021-12-27

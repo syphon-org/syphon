@@ -5,6 +5,8 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
+import 'package:syphon/store/crypto/sessions/actions.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/storage.dart';
@@ -23,7 +25,9 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
+import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/storage.dart';
+import 'package:syphon/store/sync/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 
@@ -133,13 +137,14 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetDevices:
       case SetLanguage:
       case ToggleEnterSend:
+      case ToggleAutocorrect:
+      case ToggleSuggestions:
       case ToggleRoomTypeBadges:
       case ToggleMembershipEvents:
       case ToggleNotifications:
       case ToggleTypingIndicators:
       case ToggleTimeFormat:
       case SetReadReceipts:
-      case LogAppAgreement:
       case SetSyncInterval:
       case SetMainFabLocation:
       case SetMainFabType:
@@ -152,16 +157,19 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetProxyPassword:
         saveSettings(store.state.settingsStore, storage: storage);
         break;
+      case LogAppAgreement:
+        saveTermsAgreement(timestamp: int.parse(store.state.settingsStore.alphaAgreement ?? '0'));
+        break;
       case SetOlmAccountBackup:
       case SetDeviceKeysOwned:
       case ToggleDeviceKeysExist:
       case SetDeviceKeys:
       case SetOneTimeKeysCounts:
       case SetOneTimeKeysClaimed:
-      case AddInboundMessageSession:
-      case AddOutboundMessageSession:
+      case AddMessageSessionInbound:
+      case AddMessageSessionOutbound:
       case UpdateMessageSessionOutbound:
-      case SaveKeySession:
+      case AddKeySession:
       case ResetCrypto:
         saveCrypto(store.state.cryptoStore, storage: storage);
         break;

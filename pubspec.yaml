@@ -1,6 +1,6 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.8+2010
+version: 0.2.9+2090
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -54,7 +54,7 @@ dependencies:
   flutter_redux: ^0.8.2
   mime: ^1.0.0
   path: ^1.8.0
-  path_provider: ^2.0.1
+  path_provider: 2.0.9
   package_info: ^2.0.0
 
   ### encryption
@@ -71,7 +71,7 @@ dependencies:
   sqflite_common_ffi: ^2.0.0
   sqlcipher_flutter_libs: ^0.5.0
   sqlcipher_library_windows: ^1.0.1
-  flutter_secure_storage: ^4.1.0
+  flutter_secure_storage: ^5.0.2
   drift: ^1.0.0
 
   ### services
@@ -103,11 +103,13 @@ dependencies:
   flutter_speed_dial: ^4.2.0
   fab_circular_menu: ^1.0.2
   flutter_screen_lock: ^4.0.0
+  photo_view: 0.13.0
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ## media
   file_picker: ^4.1.1
   image_picker: ^0.8.4
+  permission_handler: ^8.3.0
   local_image_provider: ^4.0.1
   flutter_image_compress: 1.1.0
 

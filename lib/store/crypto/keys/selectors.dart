@@ -1,7 +1,7 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/crypto/model.dart';
+import 'package:syphon/store/crypto/keys/models.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
@@ -29,8 +29,7 @@ String selectCurrentUserSessionKey(Store<AppState> store) {
     final currentDeviceKey = deviceKeysOwned[currentDeviceId];
     final fingerprintId = Keys.fingerprintId(deviceId: currentDeviceId);
 
-    final String fingerprint =
-        currentDeviceKey?.keys?[fingerprintId] ?? Values.UNKNOWN;
+    final String fingerprint = currentDeviceKey?.keys?[fingerprintId] ?? Values.UNKNOWN;
 
     return fingerprint.chunk(4);
   }
@@ -46,20 +45,16 @@ List<String> selectKeySessions(Store<AppState> store, String identityKey) {
   return keySessionsIdentity.values.toList();
 }
 
-List<DeviceKey> filterDevicesWithoutMessageSessions(
-    Store<AppState> store, Room room) {
+List<DeviceKey> filterDevicesWithoutMessageSessions(Store<AppState> store, Room room) {
   final roomUserIds = room.userIds;
   final currentUser = store.state.authStore.user;
   final deviceKeys = store.state.cryptoStore.deviceKeys;
-  final messageSessionsInbound = store.state.cryptoStore.inboundMessageSessions;
-  final messageSessionsOutbound =
-      store.state.cryptoStore.outboundMessageSessions;
+  final messageSessionsInbound = store.state.cryptoStore.messageSessionsInbound;
+  final messageSessionsOutbound = store.state.cryptoStore.outboundMessageSessions;
 
   // get deviceKeys for every user present in the chat
   final List<DeviceKey> roomDeviceKeys = List.from(
-    roomUserIds
-        .map((userId) => (deviceKeys[userId] ?? {}).values)
-        .expand((x) => x),
+    roomUserIds.map((userId) => (deviceKeys[userId] ?? {}).values).expand((x) => x),
   );
 
   final devieKeysWithMessageSession = roomDeviceKeys.where(
@@ -73,8 +68,7 @@ List<DeviceKey> filterDevicesWithoutMessageSessions(
       // find the identityKey for the device
       final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
       final identityKey = deviceKey.keys![identityKeyId];
-      final hasMessageSession =
-          !messageSessionsInbound.containsKey(identityKey);
+      final hasMessageSession = !messageSessionsInbound.containsKey(identityKey);
 
       // key Session / Olm session already established
       if (!hasMessageSession) return true;
@@ -94,9 +88,7 @@ List<DeviceKey> filterDevicesWithKeySessions(Store<AppState> store, Room room) {
 
   // get deviceKeys for every user present in the chat
   final List<DeviceKey> roomDeviceKeys = List.from(
-    roomUserIds
-        .map((userId) => (deviceKeys[userId] ?? {}).values)
-        .expand((x) => x),
+    roomUserIds.map((userId) => (deviceKeys[userId] ?? {}).values).expand((x) => x),
   );
 
   final devieKeysWithSession = roomDeviceKeys.where(
@@ -118,8 +110,7 @@ List<DeviceKey> filterDevicesWithKeySessions(Store<AppState> store, Room room) {
   return devieKeysWithSession.toList();
 }
 
-List<DeviceKey> filterDevicesWithoutKeySessions(
-    Store<AppState> store, Room room) {
+List<DeviceKey> filterDevicesWithoutKeySessions(Store<AppState> store, Room room) {
   final roomUserIds = room.userIds;
   final currentUser = store.state.authStore.user;
   final deviceKeys = store.state.cryptoStore.deviceKeys;
@@ -127,9 +118,7 @@ List<DeviceKey> filterDevicesWithoutKeySessions(
 
   // get deviceKeys for every user present in the chat
   final List<DeviceKey> roomDeviceKeys = List.from(
-    roomUserIds
-        .map((userId) => (deviceKeys[userId] ?? {}).values)
-        .expand((x) => x),
+    roomUserIds.map((userId) => (deviceKeys[userId] ?? {}).values).expand((x) => x),
   );
 
   final devieKeysWithSession = roomDeviceKeys.where(

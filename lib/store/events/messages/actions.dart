@@ -405,7 +405,7 @@ Future<bool> isMessageDeletable({required Message message, User? user, Room? roo
 
     return false;
   } catch (error) {
-    debugPrint('[isMessageDeletable] $error');
+    printDebug('[isMessageDeletable] $error');
     return false;
   }
 }

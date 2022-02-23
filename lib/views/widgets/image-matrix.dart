@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
@@ -26,6 +25,7 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 class MatrixImage extends StatefulWidget {
   final String? mxcUri;
   final String? imageType;
+  final String fileName;
 
   final double width;
   final double height;
@@ -41,6 +41,8 @@ class MatrixImage extends StatefulWidget {
   final BoxFit fit;
   final Widget? fallback;
   final Color fallbackColor;
+
+  final Function(Uint8List bytes)? onPressImage;
 
   const MatrixImage({
     Key? key,
@@ -58,6 +60,8 @@ class MatrixImage extends StatefulWidget {
     this.forceLoading = false,
     this.fallbackColor = Colors.grey,
     this.fallback,
+    this.fileName = '',
+    this.onPressImage,
   }) : super(key: key);
 
   @override
@@ -101,84 +105,93 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
-        distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
-        builder: (context, props) {
-          final failed =
-              props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
-          final loading = widget.forceLoading || !props.exists;
+      distinct: true,
+      converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
+      builder: (context, props) {
+        final failed = props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
+        final loading = widget.forceLoading || !props.exists;
 
-          // allows user option to manually load images on tap
-          if (!widget.autodownload && !props.exists && !localLoading) {
-            return TouchableOpacity(
-              onTap: () => onManualLoad(),
-              child: Container(
-                width: widget.size ?? widget.width,
-                height: widget.size ?? widget.height,
-                child: Padding(
-                  padding: EdgeInsets.all(widget.loadingPadding),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.photo,
-                        size: Dimensions.avatarSizeLarge,
-                        color: Colors.white,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 8),
-                        child: Text(
-                          Strings.labelDownloadImage,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
+        // allows user option to manually load images on tap
+        if (!widget.autodownload && !props.exists && !localLoading) {
+          return TouchableOpacity(
+            onTap: () => onManualLoad(),
+            child: Container(
+              width: widget.size ?? widget.width,
+              height: widget.size ?? widget.height,
+              child: Padding(
+                padding: EdgeInsets.all(widget.loadingPadding),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.photo,
+                      size: Dimensions.avatarSizeLarge,
+                      color: Colors.white,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: Text(
+                        Strings.labelDownloadImage,
+                        style: TextStyle(
+                          color: Colors.white,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          }
-
-          if (failed) {
-            return CircleAvatar(
-              radius: 24,
-              backgroundColor: widget.fallbackColor,
-              child: widget.fallback ??
-                  Icon(
-                    Icons.photo,
-                    color: Colors.white,
-                  ),
-            );
-          }
-
-          if (loading) {
-            return Container(
-                width: widget.size ?? widget.width,
-                height: widget.size ?? widget.height,
-                child: Padding(
-                  padding: EdgeInsets.all(widget.loadingPadding),
-                  child: CircularProgressIndicator(
-                    strokeWidth: widget.strokeWidth * 1.5,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).colorScheme.secondary,
-                    ),
-                    value: null,
-                  ),
-                ));
-          }
-
-          return Image(
-            width: widget.width,
-            height: widget.height,
-            fit: widget.fit,
-            image: MemoryImage(
-              props.mediaCache ?? finalUriData!,
             ),
           );
-        },
-      );
+        }
+
+        if (failed) {
+          return CircleAvatar(
+            radius: 24,
+            backgroundColor: widget.fallbackColor,
+            child: widget.fallback ??
+                Icon(
+                  Icons.photo,
+                  color: Colors.white,
+                ),
+          );
+        }
+
+        if (loading) {
+          return Container(
+              width: widget.size ?? widget.width,
+              height: widget.size ?? widget.height,
+              child: Padding(
+                padding: EdgeInsets.all(widget.loadingPadding),
+                child: CircularProgressIndicator(
+                  strokeWidth: widget.strokeWidth * 1.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.secondary,
+                  ),
+                  value: null,
+                ),
+              ));
+        }
+
+        final imageBytes = props.mediaCache ?? finalUriData!;
+
+        if (widget.onPressImage != null) {
+          return GestureDetector(
+              onTap: () => widget.onPressImage!(imageBytes),
+              child: Image(
+                width: widget.width,
+                height: widget.height,
+                fit: widget.fit,
+                image: MemoryImage(imageBytes),
+              ));
+        }
+
+        return Image(
+          width: widget.width,
+          height: widget.height,
+          fit: widget.fit,
+          image: MemoryImage(imageBytes),
+        );
+      });
 }
 
 class _Props extends Equatable {

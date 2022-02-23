@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:syphon/cache/index.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
@@ -18,16 +17,26 @@ import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
+printThreaded(String? content) {
+  if (DEBUG_MODE) {
+    // ignore: avoid_print
+    print(content);
+  }
+}
+
 /// Background Sync Service (Android Only)
 /// static class for managing service through app lifecycle
 class BackgroundSync {
   static const service_id = 255;
   static const serviceTimeout = 55; // seconds
 
-  static Isolate? backgroundIsolate;
-
-  static const notificationSettings = 'notificationSettings';
-  static const notificationsUnchecked = 'notificationsUnchecked';
+  // background data identifiers
+  static const protocolKey = 'protocol';
+  static const lastSinceKey = 'lastSince';
+  static const roomNamesKey = 'roomNamesKey';
+  static const currentUserKey = 'currentUserKey';
+  static const notificationSettingsKey = 'notificationSettings';
+  static const notificationsUncheckedKey = 'notificationsUnchecked';
 
   static Future<bool> init() async {
     try {
@@ -40,10 +49,8 @@ class BackgroundSync {
 
   static Future start({
     String? protocol,
-    String? homeserver,
-    String? accessToken,
     String? lastSince,
-    String? currentUser,
+    User? currentUser,
     Map<String, String?>? roomNames,
     NotificationSettings? settings,
   }) async {
@@ -52,23 +59,30 @@ class BackgroundSync {
 
     final secureStorage = FlutterSecureStorage();
 
+    printThreaded('[BackgroundSync] starting');
+
     await Future.wait([
-      secureStorage.write(key: Cache.protocolKey, value: protocol),
-      secureStorage.write(key: Cache.homeserverKey, value: homeserver),
-      secureStorage.write(key: Cache.accessTokenKey, value: accessToken),
-      secureStorage.write(key: Cache.lastSinceKey, value: lastSince),
-      secureStorage.write(key: Cache.userIdKey, value: currentUser),
-      secureStorage.write(key: Cache.roomNamesKey, value: jsonEncode(roomNames)),
-      secureStorage.write(key: notificationSettings, value: jsonEncode(settings))
+      secureStorage.write(key: BackgroundSync.protocolKey, value: protocol),
+      secureStorage.write(key: BackgroundSync.lastSinceKey, value: lastSince),
+      secureStorage.write(key: BackgroundSync.roomNamesKey, value: jsonEncode(roomNames)),
+      secureStorage.write(key: BackgroundSync.notificationSettingsKey, value: jsonEncode(settings)),
+      secureStorage.write(key: BackgroundSync.currentUserKey, value: jsonEncode(currentUser)),
     ]);
 
     await AndroidAlarmManager.periodic(
       Duration(seconds: serviceTimeout),
       service_id,
-      notificationSyncIsolate,
+      notificationJob,
       exact: true,
       wakeup: true,
+      allowWhileIdle: true,
       rescheduleOnReboot: true,
+    );
+
+    // immediately begin checking for notifications
+    compute(
+      notificationJobThreaded,
+      {},
     );
   }
 
@@ -76,90 +90,44 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      printError('[BackgroundSync] $error');
+      printThreaded('[BackgroundSync] $error');
     }
   }
 }
 
 ///
-/// Foreground Sync Job (TESTING ONLY)
+/// Notification Job Threaded (Android Only)
+///
+/// Same as below, but works in compute / isolates outside alarm_services
+///
+Future notificationJobThreaded(Map params) async {
+  notificationJob();
+}
+
+///
+/// Notification Job (Android Only)
 ///
 /// Fetches data from matrix in background and displays
 /// notifications without needing google play services
 ///
 /// NOTE: https://github.com/flutter/flutter/issues/32164
 ///
-Future notificationSyncTEST() async {
+Future notificationJob() async {
   try {
-    // Init notifiations for background service and new messages/events
-    final pluginInstance = await initNotifications(
-      onSelectNotification: (String? payload) {
-        print(
-          '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
-        );
-        return Future.value(true);
-      },
-    );
+    User currentUser;
     String? protocol;
-    String? homeserver;
-    String? accessToken;
     String? lastSince;
-    String? userId;
 
     try {
       final secureStorage = FlutterSecureStorage();
-      userId = await secureStorage.read(key: Cache.userIdKey);
-      protocol = await secureStorage.read(key: Cache.protocolKey);
-      lastSince = await secureStorage.read(key: Cache.lastSinceKey);
-      homeserver = await secureStorage.read(key: Cache.homeserverKey);
-      accessToken = await secureStorage.read(key: Cache.accessTokenKey);
+      // TODO: figure out why this throws a null check error on non-service / compute starts
+      protocol = await secureStorage.read(key: BackgroundSync.protocolKey);
+      lastSince = await secureStorage.read(key: BackgroundSync.lastSinceKey);
+
+      final _userString = await secureStorage.read(key: BackgroundSync.currentUserKey);
+      currentUser = User.fromJson(jsonDecode(_userString ?? '{}'));
     } catch (error) {
-      print('[notificationSyncIsolate] $error');
-    }
-
-    final Map<String, String> roomNames = await loadRoomNames();
-
-    await backgroundSyncLoop(
-      pluginInstance: pluginInstance!,
-      params: {
-        'protocol': protocol,
-        'homeserver': homeserver,
-        'accessToken': accessToken,
-        'lastSince': lastSince,
-        'userId': userId,
-        'roomNames': roomNames,
-      },
-    );
-  } catch (error) {
-    printError('[notificationSyncTEST] $error');
-  }
-}
-
-///
-/// Background Sync Job (Android Only)
-///
-/// Fetches data from matrix in background and displays
-/// notifications without needing google play services
-///
-/// NOTE: https://github.com/flutter/flutter/issues/32164
-///
-Future notificationSyncIsolate() async {
-  try {
-    String? protocol;
-    String? homeserver;
-    String? accessToken;
-    String? lastSince;
-    String? userId;
-
-    try {
-      final secureStorage = FlutterSecureStorage();
-      userId = await secureStorage.read(key: Cache.userIdKey);
-      protocol = await secureStorage.read(key: Cache.protocolKey);
-      lastSince = await secureStorage.read(key: Cache.lastSinceKey);
-      homeserver = await secureStorage.read(key: Cache.homeserverKey);
-      accessToken = await secureStorage.read(key: Cache.accessTokenKey);
-    } catch (error) {
-      print('[notificationSyncIsolate] $error');
+      return printThreaded('[notificationSync] decode error $error');
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -167,7 +135,7 @@ Future notificationSyncIsolate() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        print(
+        printThreaded(
           '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
         );
         return Future.value(true);
@@ -175,7 +143,7 @@ Future notificationSyncIsolate() async {
     );
 
     if (pluginInstance == null) {
-      throw '[notificationSyncIsolate] failed to initialize plugin instance';
+      throw '[notificationSync] failed to initialize plugin instance';
     }
 
     showBackgroundServiceNotification(
@@ -191,30 +159,36 @@ Future notificationSyncIsolate() async {
       await Future.delayed(Duration(seconds: 2));
 
       // TODO: check for on the fly disabled notification services
-
-      await backgroundSyncLoop(
+      await backgroundSync(
         pluginInstance: pluginInstance,
         params: {
           'protocol': protocol,
-          'homeserver': homeserver,
-          'accessToken': accessToken,
+          'userId': currentUser.userId,
+          'homeserver': currentUser.homeserver,
+          'accessToken': currentUser.accessToken,
           'lastSince': lastSince,
-          'userId': userId,
           'roomNames': roomNames,
         },
       );
     }
   } catch (error) {
-    print('[notificationSyncIsolate] $error');
+    printThreaded('[notificationSync] $error');
   }
 }
 
-///  Save Full Sync
-Future backgroundSyncLoop({
+///
+/// Background Sync (Android Only)
+///
+/// Fetches data from matrix in background and displays
+/// notifications without needing google play services
+///
+Future backgroundSync({
   required Map params,
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   try {
+    printThreaded('[backgroundSync] starting sync loop');
+
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
     final accessToken = params['accessToken'];
@@ -230,8 +204,8 @@ Future backgroundSyncLoop({
     }
 
     // Try to pull new lastSince if available
-    final currentLastSince = await loadLastSince(fallback: lastSince);
     final settings = await loadNotificationSettings();
+    final currentLastSince = await loadLastSince(fallback: lastSince);
 
     // Prevents further updates within background service if
     // disabled mid AlarmManager cycle
@@ -239,11 +213,11 @@ Future backgroundSyncLoop({
       return;
     }
 
-    /**
-     * Check last since and see if any new messages arrived in the payload
-     * do not save the lastSince to the store and 
-     * the next foreground fetchSync will update the state
-     */
+    ///
+    /// Check last since and see if any new messages arrived in the payload
+    /// do not save the lastSince to the store and
+    /// the next foreground fetchSync will update the state
+    ///
     final data = await MatrixApi.sync(
       protocol: protocol,
       homeserver: homeserver,
@@ -275,17 +249,13 @@ Future backgroundSyncLoop({
       final roomJson = roomsJson[roomId];
 
       // Don't parse room if there are no message events found
-      final events = parseEvents(
-        roomJson,
-      );
+      final events = parseEvents(roomJson);
 
       if (events.messages.isEmpty) {
         return;
       }
 
-      final details = parseDetails(
-        roomJson,
-      );
+      final details = parseDetails(roomJson);
 
       final room = Room(id: roomId).fromEvents(
         events: events,
@@ -419,6 +389,58 @@ Future backgroundSyncLoop({
       }));
     });
   } catch (error) {
-    print('[backgroundSyncLoop] $error');
+    printThreaded('[backgroundSync] $error');
+  }
+}
+
+///
+/// Foreground Sync Test (TESTING ONLY)
+///
+/// Fetches data from matrix in background and displays
+/// notifications without needing google play services
+///
+/// NOTE: https://github.com/flutter/flutter/issues/32164
+///
+Future notificationSyncTEST() async {
+  try {
+    // Init notifiations for background service and new messages/events
+    final pluginInstance = await initNotifications(
+      onSelectNotification: (String? payload) {
+        printThreaded(
+          '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
+        );
+        return Future.value(true);
+      },
+    );
+    User currentUser;
+    String? protocol;
+    String? lastSince;
+
+    try {
+      final secureStorage = FlutterSecureStorage();
+      protocol = await secureStorage.read(key: BackgroundSync.protocolKey);
+      lastSince = await secureStorage.read(key: BackgroundSync.lastSinceKey);
+      currentUser = User.fromJson(
+        jsonDecode(await secureStorage.read(key: BackgroundSync.currentUserKey) ?? '{}'),
+      );
+    } catch (error) {
+      return printThreaded('[notificationSyncIsolate] $error');
+    }
+
+    final Map<String, String> roomNames = await loadRoomNames();
+
+    await backgroundSync(
+      pluginInstance: pluginInstance!,
+      params: {
+        'protocol': protocol,
+        'userId': currentUser.userId,
+        'homeserver': currentUser.homeserver,
+        'accessToken': currentUser.accessToken,
+        'lastSince': lastSince,
+        'roomNames': roomNames,
+      },
+    );
+  } catch (error) {
+    printError('[notificationSyncTEST] $error');
   }
 }

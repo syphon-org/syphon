@@ -18,7 +18,7 @@ int selectAvailableAccounts(AppState state) {
 
 bool selectPasswordLoginAttemptable(AppState state) {
   return state.authStore.isPasswordValid &&
-      state.authStore.isUsernameValid &&
+      (state.authStore.isUsernameValid || state.authStore.isEmailValid) &&
       !state.authStore.loading &&
       !state.authStore.stopgap;
 }

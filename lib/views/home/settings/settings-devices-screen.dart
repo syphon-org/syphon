@@ -5,7 +5,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -13,6 +15,7 @@ import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
+import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class DevicesScreen extends StatefulWidget {
@@ -20,23 +23,23 @@ class DevicesScreen extends StatefulWidget {
   DeviceViewState createState() => DeviceViewState();
 }
 
-class DeviceViewState extends State<DevicesScreen> {
-  List<Device?>? selectedDevices;
+class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen> {
+  bool deleting = false;
+  List<Device>? selectedDevices;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted();
+  onMounted() {
+    final store = StoreProvider.of<AppState>(context);
+
+    store.dispatch(fetchDevices());
   }
 
-  @protected
   onDismissDeviceOptions() {
     setState(() {
       selectedDevices = null;
     });
   }
 
-  @protected
   onToggleAllDevices({required List<Device> devices}) {
     var newSelectedDevices = selectedDevices ?? <Device>[];
 
@@ -51,8 +54,7 @@ class DeviceViewState extends State<DevicesScreen> {
     });
   }
 
-  @protected
-  onToggleModifyDevice({Device? device}) {
+  onToggleModifyDevice({required Device device}) {
     final newSelectedDevices = selectedDevices ?? <Device>[];
 
     if (newSelectedDevices.contains(device)) {
@@ -66,20 +68,55 @@ class DeviceViewState extends State<DevicesScreen> {
     });
   }
 
-  @protected
-  void onMounted() {
+  onDeleteDevices(BuildContext context, List<Device> devices, _Props props) async {
     final store = StoreProvider.of<AppState>(context);
 
-    store.dispatch(fetchDevices());
+    if (devices.isEmpty) return;
+
+    final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
+
+    await store.dispatch(deleteDevices(deviceIds: deviceIds));
+
+    final authSession = store.state.authStore.authSession;
+    if (authSession != null) {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => DialogConfirmPassword(
+          title: Strings.titleConfirmPassword,
+          content: Strings.contentDeleteDevices,
+          valid: props.valid,
+          loading: props.loading,
+          checkLoading: () => store.state.settingsStore.loading,
+          checkValid: () =>
+              store.state.authStore.credential != null &&
+              store.state.authStore.credential!.value != null &&
+              store.state.authStore.credential!.value!.isNotEmpty,
+          onChangePassword: (password) {
+            store.dispatch(updateCredential(value: password));
+          },
+          onConfirm: () async {
+            final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
+
+            await store.dispatch(deleteDevices(deviceIds: deviceIds));
+
+            store.dispatch(resetInteractiveAuth());
+            Navigator.of(dialogContext).pop();
+          },
+          onCancel: () async {
+            store.dispatch(resetInteractiveAuth());
+            Navigator.of(dialogContext).pop();
+          },
+        ),
+      );
+    }
   }
 
-  @protected
-  Widget buildDeviceOptionsBar(BuildContext context, {_Props? props}) {
+  Widget buildDeviceOptionsBar(BuildContext context, _Props props) {
     var selfSelectedDevice;
 
     if (selectedDevices != null) {
       selfSelectedDevice = selectedDevices!.indexWhere(
-        (device) => device!.deviceId == props!.currentDeviceId,
+        (device) => device.deviceId == props.currentDeviceId,
       );
     }
 
@@ -110,7 +147,7 @@ class DeviceViewState extends State<DevicesScreen> {
           color: Colors.white,
           onPressed: selectedDevices!.length != 1
               ? null
-              : () => props!.onRenameDevice(context, selectedDevices![0]),
+              : () => props.onRenameDevice(context, selectedDevices![0]),
         ),
         IconButton(
           icon: Icon(Icons.delete),
@@ -119,23 +156,19 @@ class DeviceViewState extends State<DevicesScreen> {
           color: Colors.white,
           onPressed: selfSelectedDevice != -1
               ? null
-              : () => props!.onDeleteDevices(
-                    context,
-                    selectedDevices,
-                  ),
+              : () => onDeleteDevices(context, selectedDevices ?? [], props),
         ),
         IconButton(
           icon: Icon(Icons.select_all),
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Select All',
           color: Colors.white,
-          onPressed: () => onToggleAllDevices(devices: props!.devices),
+          onPressed: () => onToggleAllDevices(devices: props.devices),
         ),
       ],
     );
   }
 
-  @protected
   Widget buildAppBar({BuildContext? context, _Props? props}) {
     return AppBar(
       leading: IconButton(
@@ -153,7 +186,7 @@ class DeviceViewState extends State<DevicesScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
+  Widget build(BuildContext original) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
@@ -164,10 +197,7 @@ class DeviceViewState extends State<DevicesScreen> {
           Widget currentAppBar = AppBarNormal(title: Strings.titleDevices);
 
           if (selectedDevices != null) {
-            currentAppBar = buildDeviceOptionsBar(
-              context,
-              props: props,
-            );
+            currentAppBar = buildDeviceOptionsBar(context, props);
           }
 
           return Scaffold(
@@ -275,67 +305,38 @@ class DeviceViewState extends State<DevicesScreen> {
 }
 
 class _Props extends Equatable {
+  final bool valid;
   final bool loading;
   final List<Device> devices;
   final String? currentDeviceId;
 
   final Function onFetchDevices;
-  final Function onDeleteDevices;
   final Function onRenameDevice;
 
   const _Props({
+    required this.valid,
     required this.loading,
     required this.devices,
     required this.currentDeviceId,
     required this.onFetchDevices,
-    required this.onDeleteDevices,
     required this.onRenameDevice,
   });
 
   @override
   List<Object> get props => [
+        valid,
         loading,
         devices,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
+        valid: store.state.authStore.credential != null &&
+            store.state.authStore.credential!.value != null &&
+            store.state.authStore.credential!.value!.isNotEmpty,
         loading: store.state.settingsStore.loading,
         devices: store.state.settingsStore.devices,
         currentDeviceId: store.state.authStore.user.deviceId,
-        onDeleteDevices: (BuildContext context, List<Device> devices) async {
-          if (devices.isEmpty) return;
-
-          final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
-
-          await store.dispatch(deleteDevices(deviceIds: deviceIds));
-
-          final authSession = store.state.authStore.authSession;
-          if (authSession != null) {
-            showDialog(
-              context: context,
-              builder: (dialogContext) => DialogConfirmPassword(
-                key: Key(authSession),
-                title: Strings.titleConfirmPassword,
-                content: Strings.contentDeleteDevices,
-                onConfirm: () async {
-                  final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
-
-                  await store.dispatch(deleteDevices(deviceIds: deviceIds));
-
-                  store.dispatch(resetInteractiveAuth());
-                  Navigator.of(dialogContext).pop();
-                },
-                onCancel: () async {
-                  store.dispatch(resetInteractiveAuth());
-                  Navigator.of(dialogContext).pop();
-                },
-              ),
-            );
-          }
-        },
-        onFetchDevices: () {
-          store.dispatch(fetchDevices());
-        },
+        onFetchDevices: () => store.dispatch(fetchDevices()),
         onRenameDevice: (BuildContext context, Device device) async {
           showDialog(
             context: context,

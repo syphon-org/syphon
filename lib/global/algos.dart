@@ -36,7 +36,7 @@ Future timeWrapper(
 
   final stoptime = stopwatch.elapsed;
 
-  printDebug('[$name TIMER] ${function.runtimeType} $stoptime');
+  printInfo('[$name TIMER] ${function.runtimeType} $stoptime');
 
   return result;
 }
@@ -45,8 +45,7 @@ String enumToString(dynamic enumItem) {
   return enumItem.toString().split('.')[1];
 }
 
-Future onFocusSafe(
-    {FocusNode? focusNode, required Future<void> Function() onFunction}) async {
+Future onFocusSafe({FocusNode? focusNode, required Future<void> Function() onFunction}) async {
   if (focusNode == null) return Future.value();
 
   if (!focusNode.hasFocus) {

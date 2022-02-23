@@ -3,8 +3,11 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/auth/context/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/keys/actions.dart';
+import 'package:syphon/store/crypto/sessions/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/sync/actions.dart';
 
 ///
 /// Cache Middleware
@@ -16,17 +19,22 @@ bool cacheMiddleware(Store<AppState> store, dynamic action) {
   switch (action.runtimeType) {
     case AddAvailableUser:
     case RemoveAvailableUser:
+    case UpdateRoom:
     case SetRoom:
     case RemoveRoom:
     case SetOlmAccount:
     case SetOlmAccountBackup:
     case SetDeviceKeysOwned:
-    case SaveKeySession:
+    case AddKeySession:
+    case AddMessageSessionInbound:
+    case AddMessageSessionOutbound:
     case SetUser:
     case ResetCrypto:
     case ResetUser:
       printInfo('[initStore] persistor saving from ${action.runtimeType}');
       return true;
+    case SetSynced:
+      return (action as SetSynced).synced ?? false;
     default:
       return false;
   }

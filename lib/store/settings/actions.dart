@@ -13,6 +13,7 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/models.dart';
+import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
@@ -81,9 +82,9 @@ class SetPusherToken {
   SetPusherToken({this.token});
 }
 
-class SetLoading {
+class SetLoadingSettings {
   final bool? loading;
-  SetLoading({this.loading});
+  SetLoadingSettings({this.loading});
 }
 
 class SetDevices {
@@ -112,6 +113,10 @@ class SetPollTimeout {
 
 class ToggleEnterSend {}
 
+class ToggleAutocorrect {}
+
+class ToggleSuggestions {}
+
 class ToggleAutoDownload {}
 
 class ToggleDismissKeyboard {}
@@ -137,7 +142,7 @@ class LogAppAgreement {}
 ThunkAction<AppState> fetchDevices() {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
 
       final data = await MatrixApi.fetchDevices(
         protocol: store.state.authStore.protocol,
@@ -157,7 +162,7 @@ ThunkAction<AppState> fetchDevices() {
     } catch (error) {
       printError('[fetchRooms] error: $error');
     } finally {
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -166,7 +171,7 @@ ThunkAction<AppState> fetchDevices() {
 ThunkAction<AppState> updateDevice({String? deviceId}) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
 
       final data = await MatrixApi.updateDevice(
         protocol: store.state.authStore.protocol,
@@ -185,7 +190,7 @@ ThunkAction<AppState> updateDevice({String? deviceId}) {
       ));
     } finally {
       store.dispatch(fetchDevices());
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -194,7 +199,7 @@ ThunkAction<AppState> updateDevice({String? deviceId}) {
 ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
 
       final currentCredential = store.state.authStore.credential ?? Credential();
 
@@ -226,7 +231,7 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
         origin: 'deleteDevice(s)',
       ));
     } finally {
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -235,7 +240,7 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
 ThunkAction<AppState> renameDevice({String? deviceId, String? displayName, bool? disableLoading}) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
 
       final data = await MatrixApi.renameDevice(
         protocol: store.state.authStore.protocol,
@@ -264,7 +269,7 @@ ThunkAction<AppState> renameDevice({String? deviceId, String? displayName, bool?
         origin: 'renameDevice',
       ));
     } finally {
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -447,6 +452,18 @@ ThunkAction<AppState> toggleEnterSend() {
   };
 }
 
+ThunkAction<AppState> toggleAutocorrect() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleAutocorrect());
+  };
+}
+
+ThunkAction<AppState> toggleSuggestions() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleSuggestions());
+  };
+}
+
 ThunkAction<AppState> toggleRoomTypeBadges() {
   return (Store<AppState> store) async {
     store.dispatch(ToggleRoomTypeBadges());
@@ -494,12 +511,10 @@ ThunkAction<AppState> startNotifications() {
     );
 
     await BackgroundSync.start(
-      protocol: store.state.authStore.protocol,
-      homeserver: store.state.authStore.user.homeserver,
-      accessToken: store.state.authStore.user.accessToken,
-      lastSince: store.state.syncStore.lastSince,
-      currentUser: store.state.authStore.user.userId,
       roomNames: roomNames,
+      protocol: store.state.authStore.protocol,
+      lastSince: store.state.syncStore.lastSince,
+      currentUser: store.state.authStore.currentUser,
       settings: store.state.settingsStore.notificationSettings,
     );
 

@@ -1,8 +1,11 @@
+import 'package:syphon/store/crypto/keys/actions.dart';
+import 'package:syphon/store/crypto/sessions/actions.dart';
+import 'package:syphon/store/crypto/sessions/model.dart';
+
 import './actions.dart';
 import './state.dart';
 
-CryptoStore cryptoReducer(
-    [CryptoStore state = const CryptoStore(), dynamic action]) {
+CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetOlmAccount:
       return state.copyWith(
@@ -33,8 +36,8 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         oneTimeKeysClaimed: action.oneTimeKeys,
       );
-    case SaveKeySession:
-      final _action = action as SaveKeySession;
+    case AddKeySession:
+      final _action = action as AddKeySession;
 
       final keySessions = Map<String, Map<String, String>>.from(
         state.keySessions,
@@ -58,8 +61,8 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         keySessions: keySessions,
       );
-    case AddOutboundMessageSession:
-      final _action = action as AddOutboundMessageSession;
+    case AddMessageSessionOutbound:
+      final _action = action as AddMessageSessionOutbound;
       final outboundMessageSessions = Map<String, String>.from(
         state.outboundMessageSessions,
       );
@@ -73,37 +76,86 @@ CryptoStore cryptoReducer(
       return state.copyWith(
         outboundMessageSessions: outboundMessageSessions,
       );
-    case AddInboundMessageSession:
-      final _action = action as AddInboundMessageSession;
+    case AddMessageSessionInbound:
+      final _action = action as AddMessageSessionInbound;
 
-      final messageSessionIndex = Map<String, Map<String, int>>.from(
-        state.messageSessionIndex,
+      final roomId = _action.roomId;
+      final senderKey = _action.senderKey;
+      final sessionNew = _action.session;
+      final messageIndex = _action.messageIndex;
+
+      final messageSessions = Map<String, Map<String, List<MessageSession>>>.from(
+        state.messageSessionsInbound,
       );
 
-      final messageSessionsInbound = Map<String, Map<String, String>>.from(
-        state.inboundMessageSessions,
+      final messageSessionNew = MessageSession(
+        index: messageIndex,
+        serialized: sessionNew, // already pickled
+        createdAt: DateTime.now().millisecondsSinceEpoch,
       );
 
-      // safety functions to catch newly cached store
-      messageSessionIndex.putIfAbsent(_action.roomId, () => <String, int>{});
-      messageSessionsInbound.putIfAbsent(
-          action.roomId, () => <String, String>{});
-
-      // add or update inbound message session by roomId + identity
-      final messageSessionInboundNew = {_action.identityKey: _action.session};
-
-      messageSessionsInbound[_action.roomId]!.addAll(messageSessionInboundNew);
-
-      // add or update inbound message index by roomId + identity
-      final messageSessionIndexUpdated = {
-        _action.identityKey: _action.messageIndex
-      };
-
-      messageSessionIndex[action.roomId]!.addAll(messageSessionIndexUpdated);
+      // new message session updates
+      messageSessions.update(
+        roomId,
+        (identitySessions) => identitySessions
+          ..update(
+            senderKey,
+            (sessions) => sessions..insert(0, messageSessionNew),
+            ifAbsent: () => [messageSessionNew],
+          ),
+        ifAbsent: () => {
+          senderKey: [messageSessionNew],
+        },
+      );
 
       return state.copyWith(
-        messageSessionIndex: messageSessionIndex,
-        inboundMessageSessions: messageSessionsInbound,
+        messageSessionsInbound: messageSessions,
+      );
+
+    // TODO: make this work synchronously?? [combineMessageSesssions](./converters.dart)
+    case AddMessageSessionsInbound:
+      final _action = action as AddMessageSessionsInbound;
+
+      final messageSessionsNew = _action.sessions;
+
+      final messageSessionsExisting = Map<String, Map<String, List<MessageSession>>>.from(
+        state.messageSessionsInbound,
+      );
+
+      // prepend session keys to an array per spec
+      for (final roomSessions in messageSessionsNew.entries) {
+        final roomId = roomSessions.key;
+        final sessions = roomSessions.value;
+
+        for (final messsageSessions in sessions.entries) {
+          final senderKey = messsageSessions.key;
+          final sessionsSerialized = messsageSessions.value;
+
+          for (final session in sessionsSerialized) {
+            messageSessionsExisting.update(
+              roomId,
+              (identitySessions) => identitySessions
+                ..update(
+                  senderKey,
+                  (sessions) => sessions.toList()..insert(0, session),
+                  ifAbsent: () => [session],
+                ),
+              ifAbsent: () => {
+                senderKey: [session],
+              },
+            );
+          }
+        }
+      }
+
+      return state.copyWith(
+        messageSessionsInbound: messageSessionsExisting,
+      );
+    case SetMessageSessionsInbound:
+      final _action = action as SetMessageSessionsInbound;
+
+      return state.copyWith(
+        messageSessionsInbound: _action.sessions,
       );
     case ToggleDeviceKeysExist:
       return state.copyWith(

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
@@ -13,7 +11,7 @@ import 'package:syphon/store/settings/actions.dart';
 ThunkAction<AppState> fetchNotifications() {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
 
       final data = await MatrixApi.fetchNotifications(
         protocol: store.state.authStore.protocol,
@@ -27,7 +25,7 @@ ThunkAction<AppState> fetchNotifications() {
     } catch (error) {
       printError('[fetchNotificationPushers] $error');
     } finally {
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -36,7 +34,7 @@ ThunkAction<AppState> fetchNotifications() {
 ThunkAction<AppState> fetchNotificationPushers() {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
 
       final data = await MatrixApi.fetchNotificationPushers(
         protocol: store.state.authStore.protocol,
@@ -50,7 +48,7 @@ ThunkAction<AppState> fetchNotificationPushers() {
     } catch (error) {
       printError('[fetchNotificationPushers] $error');
     } finally {
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -59,7 +57,7 @@ ThunkAction<AppState> fetchNotificationPushers() {
 ThunkAction<AppState> fetchNotificationPusherRules() {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
 
       final data = {'errcode': 'Not Implemented'};
 
@@ -69,7 +67,7 @@ ThunkAction<AppState> fetchNotificationPusherRules() {
     } catch (error) {
       printError('[fetchNotificationPusherRules] $error');
     } finally {
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -83,12 +81,12 @@ ThunkAction<AppState> fetchNotificationPusherRules() {
 ThunkAction<AppState> setPusherDeviceToken(String token) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
       store.dispatch(SetPusherToken(token: token));
     } catch (error) {
       printError('[setPusherDeviceToken] $error');
     } finally {
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }
@@ -100,7 +98,7 @@ ThunkAction<AppState> saveNotificationPusher({
 }) {
   return (Store<AppState> store) async {
     try {
-      store.dispatch(SetLoading(loading: true));
+      store.dispatch(SetLoadingSettings(loading: true));
 
       final deviceId = store.state.authStore.user.deviceId;
       final devices = store.state.settingsStore.devices;
@@ -127,7 +125,7 @@ ThunkAction<AppState> saveNotificationPusher({
     } catch (error) {
       printError('[saveNotificationPusher] $error');
     } finally {
-      store.dispatch(SetLoading(loading: false));
+      store.dispatch(SetLoadingSettings(loading: false));
     }
   };
 }

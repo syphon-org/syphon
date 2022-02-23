@@ -95,6 +95,32 @@ class ChatsSettingsScreen extends StatelessWidget {
                               ),
                             ),
                             ListTile(
+                              onTap: () => props.onToggleAutocorrect(),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(Strings.titleToggleAutocorrect),
+                              subtitle: Text(
+                                Strings.subtitleToggleAutocorrect,
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: props.autocorrect,
+                                onChanged: (autocorrect) => props.onToggleAutocorrect(),
+                              ),
+                            ),
+                            ListTile(
+                              onTap: () => props.onToggleSuggestions(),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(Strings.titleToggleSuggestions),
+                              subtitle: Text(
+                                Strings.subtitleToggleSuggestions,
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Switch(
+                                value: props.suggestions,
+                                onChanged: (suggestions) => props.onToggleSuggestions(),
+                              ),
+                            ),
+                            ListTile(
                               onTap: () => props.onToggleTimeFormat(),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
@@ -281,6 +307,8 @@ class Props extends Equatable {
   final String? language;
 
   final bool enterSend;
+  final bool autocorrect;
+  final bool suggestions;
   final bool timeFormat24;
   final bool dismissKeyboard;
   final bool autoDownload;
@@ -288,6 +316,8 @@ class Props extends Equatable {
   final Function onDisabled;
   final Function onIncrementLanguage;
   final Function onToggleEnterSend;
+  final Function onToggleAutocorrect;
+  final Function onToggleSuggestions;
   final Function onToggleTimeFormat;
   final Function onToggleAutoDownload;
   final Function onToggleDismissKeyboard;
@@ -295,12 +325,16 @@ class Props extends Equatable {
   const Props({
     required this.language,
     required this.enterSend,
+    required this.autocorrect,
+    required this.suggestions,
     required this.timeFormat24,
     required this.dismissKeyboard,
     required this.autoDownload,
     required this.onDisabled,
     required this.onIncrementLanguage,
     required this.onToggleEnterSend,
+    required this.onToggleAutocorrect,
+    required this.onToggleSuggestions,
     required this.onToggleTimeFormat,
     required this.onToggleDismissKeyboard,
     required this.onToggleAutoDownload,
@@ -310,6 +344,8 @@ class Props extends Equatable {
   List<Object?> get props => [
         language,
         enterSend,
+        autocorrect,
+        suggestions,
         autoDownload,
         timeFormat24,
         dismissKeyboard,
@@ -318,6 +354,8 @@ class Props extends Equatable {
   static Props mapStateToProps(Store<AppState> store) => Props(
         language: DisplayName(Locale(store.state.settingsStore.language)).toDisplayName(),
         enterSend: store.state.settingsStore.enterSendEnabled,
+        autocorrect: store.state.settingsStore.autocorrectEnabled,
+        suggestions: store.state.settingsStore.suggestionsEnabled,
         timeFormat24: store.state.settingsStore.timeFormat24Enabled,
         dismissKeyboard: store.state.settingsStore.dismissKeyboardEnabled,
         autoDownload: store.state.settingsStore.autoDownloadEnabled,
@@ -330,6 +368,8 @@ class Props extends Equatable {
         },
         onDisabled: () => store.dispatch(addInProgress()),
         onToggleEnterSend: () => store.dispatch(toggleEnterSend()),
+        onToggleAutocorrect: () => store.dispatch(toggleAutocorrect()),
+        onToggleSuggestions: () => store.dispatch(toggleSuggestions()),
         onToggleTimeFormat: () => store.dispatch(toggleTimeFormat()),
         onToggleAutoDownload: () => store.dispatch(toggleAutoDownload()),
         onToggleDismissKeyboard: () => store.dispatch(toggleDismissKeyboard()),
