@@ -267,5 +267,6 @@
     "content-notification-style-type-itemized": "سيظهر إشعار جديد لكل رسالة جديدة",
     "content-notification-style-type-inbox": "تجميع الرسائل الجديدة في إخطار واحد",
     "list-item-chat-detail-vibrate": "اهتزاز",
-    "content-notification-style-type-latest": "إظهار إشعار واحد مع أحدث رسالة"
+    "content-notification-style-type-latest": "إظهار إشعار واحد مع أحدث رسالة",
+    "label-show-attachment-options": "فتح خيارات المرفقات"
 }
