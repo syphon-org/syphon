@@ -21,12 +21,16 @@ extension SessionQueries on StorageDatabase {
 
   Future<List<MessageSession>> selectMessageSessionsInbound(List<String> roomIds) {
     return (select(messageSessions)
-          ..where((tbl) => tbl.roomId.isIn(roomIds) & tbl.inbound.equals(true)))
+          ..where((tbl) => tbl.roomId.isIn(roomIds) & tbl.inbound.equals(true))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc)]))
         .get();
   }
 
   Future<List<MessageSession>> selectMessageSessionsInboundAll() {
-    return (select(messageSessions)..where((tbl) => tbl.inbound.equals(true))).get();
+    return (select(messageSessions)
+          ..where((tbl) => tbl.inbound.equals(true))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc)]))
+        .get();
   }
 }
 
