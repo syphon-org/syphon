@@ -69,6 +69,7 @@ class Strings {
   static final titleDialogChatColor = tr('title-dialog-chat-color');
   static final titleDialogDraftPreview = tr('title-dialog-draft-preview');
   static final titleDialogLogout = tr('title-dialog-logout');
+  static final titleDialogSyncInterval = tr('title-dialog-sync-interval');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -87,6 +88,8 @@ class Strings {
       tr('subtitle-theme-settings', args: ['$theme', '$font']);
   static String subtitlePrivacySettings(String? screenLock, String? registrationLock) =>
       tr('subtitle-privacy-settings', args: ['$screenLock', '$registrationLock']);
+  static final subtitleManualSync = tr('subtitle-manual-sync');
+  static final subtitleForceFullSync = tr('subtitle-force-full-sync');
 
   // Headers
   static final headerIntro = tr('header-intro');
@@ -131,6 +134,10 @@ class Strings {
   static final labelColor = tr('label-color');
   static final labelTimestamp = tr('label-timestamp');
   static final labelNone = tr('label-none');
+  static final labelSyncing = tr('label-syncing');
+  static final labelStopped = tr('label-stopped');
+  static final labelVersion = tr('label-version');
+  static final labelSeconds = tr('label-seconds');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
