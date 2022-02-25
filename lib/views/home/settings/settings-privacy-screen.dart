@@ -34,7 +34,7 @@ class PrivacySettingsScreen extends StatelessWidget {
     await showDialog(
       context: context,
       builder: (dialogContext) => DialogConfirm(
-        title: 'Confirm Deactivate Account',
+        title: Strings.titleDialogConfirmDeactivateAccount,
         content: Strings.warningDeactivateAccount,
         confirmText: Strings.buttonDeactivate.capitalize(),
         confirmStyle: TextStyle(color: Colors.red),
@@ -52,7 +52,7 @@ class PrivacySettingsScreen extends StatelessWidget {
     await showDialog(
       context: context,
       builder: (dialogContext) => DialogConfirm(
-        title: 'Confirm Deactivate Account Final',
+        title: Strings.titleDialogConfirmDeactivateAccountFinal,
         content: Strings.warrningDeactivateAccountFinal,
         loading: props.loading,
         confirmText: Strings.buttonDeactivate.capitalize(),
@@ -115,12 +115,11 @@ class PrivacySettingsScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => DialogTextInput(
-        title: 'Import Session Keys',
-        content:
-            'Enter the password for this session key import.\n\nPlease be aware the import may take a while to complete.',
+        title: Strings.titleImportSessionKeys,
+        content: Strings.contentImportSessionKeys,
         label: Strings.labelPassword,
         initialValue: '',
-        confirmText: 'import',
+        confirmText: Strings.buttonTextImport,
         obscureText: true,
         loading: store.state.settingsStore.loading,
         inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
@@ -145,14 +144,13 @@ class PrivacySettingsScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => DialogTextInput(
-        title: 'Backup Session Keys',
-        content:
-            'Enter a password for this session key backup.\n\nPlease be aware the export may take a while to complete.',
+        title: Strings.titleDialogBackupSessionKeys,
+        content: Strings.contentExportSessionKeys,
         obscureText: true,
         loading: store.state.settingsStore.loading,
         label: Strings.labelPassword,
         initialValue: '',
-        confirmText: 'save',
+        confirmText: Strings.buttonSave,
         inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
         onCancel: () async {
           Navigator.of(dialogContext).pop();
@@ -177,7 +175,7 @@ class PrivacySettingsScreen extends StatelessWidget {
         title: Strings.titleConfirmDeleteKeys,
         content: Strings.confirmDeleteKeys,
         loading: props.loading,
-        confirmText: 'Delete Keys',
+        confirmText: Strings.buttonTextConfirmDeleteKeys,
         confirmStyle: TextStyle(color: Colors.red),
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
@@ -197,11 +195,10 @@ class PrivacySettingsScreen extends StatelessWidget {
       return showDialog(
         context: context,
         builder: (dialogContext) => DialogConfirm(
-          title: 'Remove Screen Lock',
-          content:
-              'Are you sure you want to remove the screen lock? This will also remove the pin protection of the cache',
+          title: Strings.titleDialogRemoveScreenLock,
+          content: Strings.contentRemoveScreenLock,
           loading: props.loading,
-          confirmText: 'Remove',
+          confirmText: Strings.buttonTextRemove,
           confirmStyle: TextStyle(color: Colors.red),
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
@@ -218,7 +215,7 @@ class PrivacySettingsScreen extends StatelessWidget {
                 Navigator.of(context).pop();
                 return Future.value();
               },
-              title: Text('Enter your current screen lock pin'),
+              title: Text(Strings.titleDialogEnterScreenLockPin),
               onVerify: (String answer) async {
                 return Future.value(true);
               },
@@ -240,8 +237,8 @@ class PrivacySettingsScreen extends StatelessWidget {
         Navigator.of(context).pop();
         return Future.value();
       },
-      title: Text('Enter your new screen lock pin'),
-      confirmTitle: Text('Enter your pin again to verify'),
+      title: Text(Strings.titleDialogEnterNewScreenLockPin),
+      confirmTitle: Text(Strings.titleDialogVerifyNewScreenLockPin),
       onVerify: (String answer) async {
         return Future.value(true);
       },

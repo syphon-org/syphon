@@ -72,6 +72,13 @@ class Strings {
   static final titleDialogSyncInterval = tr('title-dialog-sync-interval');
   static String titleDialogChatWithUser(String? username) => tr('title-dialog-chat-with-user', args: ['$username']);
   static String titleDialogAttemptChatWithUser(String? username) => tr('title-dialog-attempt-chat-with-user', args: ['$username']);
+  static final titleDialogConfirmDeactivateAccount = tr('title-dialog-confirm-deactivate-account');
+  static final titleDialogConfirmDeactivateAccountFinal = tr('title-dialog-confirm-deactivate-account-final');
+  static final titleDialogBackupSessionKeys = tr('title-dialog-backup-session-keys');
+  static final titleDialogRemoveScreenLock = tr('title-dialog-remove-screen-lock');
+  static final titleDialogEnterScreenLockPin = tr('title-dialog-enter-screen-lock-pin');
+  static final titleDialogEnterNewScreenLockPin = tr('title-dialog-enter-new-screen-lock-pin');
+  static final titleDialogVerifyNewScreenLockPin = tr('title-dialog-verify-new-screen-lock-pin');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -264,6 +271,9 @@ class Strings {
   static final buttonTextGoBack = tr('button-text-go-back');
   static final buttonTextReject = tr('button-text-reject');
   static final buttonTextAccept = tr('button-text-accept');
+  static final buttonTextImport = tr('button-text-import');
+  static final buttonTextConfirmDeleteKeys = tr('button-text-confirm-delete-keys');
+  static final buttonTextRemove = tr('button-text-remove');
 
   // Buttons (Options)
   static final buttonTextCreateGroup = tr('button-text-create-group');
@@ -337,11 +347,15 @@ class Strings {
   static final contentNotificationStyleTypeItemized =
       tr('content-notification-style-type-itemized');
 
+  static final contentImportSessionKeysEnterPassword = tr('content-import-session-keys-enter-password');
+  static final contentExportSessionKeysEnterPassword = tr('content-export-session-keys-enter-password');
   static final contentImportSessionKeys = tr('content-import-session-keys');
   static final contentExportSessionKeys = tr('content-export-session-keys');
 
   static final contentLogoutConfirm = tr('content-logout-confirm');
   static final contentLogoutMultiaccountConfirm = tr('content-logout-multiaccount-confirm');
+
+  static final contentRemoveScreenLock = tr('content-remove-screen-lock');
 
   static final messageEditedAppend = tr('message-edited-append');
 

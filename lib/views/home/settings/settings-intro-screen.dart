@@ -44,7 +44,7 @@ class IntroSettingsScreen extends StatelessWidget {
       barrierDismissible: true,
       builder: (dialogContext) => DialogTextInput(
         title: Strings.titleImportSessionKeys,
-        content: Strings.contentImportSessionKeys,
+        content: Strings.contentImportSessionKeysEnterPassword,
         label: Strings.labelPassword,
         initialValue: '',
         obscureText: true,
@@ -88,7 +88,7 @@ class IntroSettingsScreen extends StatelessWidget {
       barrierDismissible: true,
       builder: (dialogContext) => DialogTextInput(
         title: Strings.titleExportSessionKeys,
-        content: Strings.contentExportSessionKeys,
+        content: Strings.contentExportSessionKeysEnterPassword,
         obscureText: true,
         loading: store.state.settingsStore.loading,
         label: Strings.labelPassword,
