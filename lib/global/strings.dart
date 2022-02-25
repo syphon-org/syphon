@@ -70,6 +70,8 @@ class Strings {
   static final titleDialogDraftPreview = tr('title-dialog-draft-preview');
   static final titleDialogLogout = tr('title-dialog-logout');
   static final titleDialogSyncInterval = tr('title-dialog-sync-interval');
+  static String titleDialogChatWithUser(String? username) => tr('title-dialog-chat-with-user', args: ['$username']);
+  static String titleDialogAttemptChatWithUser(String? username) => tr('title-dialog-attempt-chat-with-user', args: ['$username']);
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -138,6 +140,7 @@ class Strings {
   static final labelStopped = tr('label-stopped');
   static final labelVersion = tr('label-version');
   static final labelSeconds = tr('label-seconds');
+  static final labelSearchForUser = tr('label-search-for-user');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
@@ -164,6 +167,10 @@ class Strings {
   static final listItemSettingsWhenUsingMobileData = tr('list-item-settings-when-using-mobile-data');
   static final listItemSettingsWhenUsingWiFi = tr('list-item-settings-when-using-wi-fi');
   static final listItemSettingsWhenRoaming = tr('list-item-settings-when-roaming');
+
+
+  static final listItemSettingsManualSync = tr('list-item-settings-manual-sync');
+  static final listItemSettingsForceFullSync = tr('list-item-settings-force-full-sync');
 
   static String listItemUserDetailsStartChat(String? name) =>
       tr('list-item-user-details-start-chat', args: ['$name']);
