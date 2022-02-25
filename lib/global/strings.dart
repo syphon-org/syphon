@@ -101,6 +101,7 @@ class Strings {
   static final headerOrdering = tr('header-ordering');
   static final headerMedia = tr('header-media');
   static final headerMediaAutoDownload = tr('header-media-auto-download');
+  static final headerUpdatePassword = tr('header-update-password');
 
   // Labels
   static final labelBack = tr('label-back');
@@ -141,6 +142,9 @@ class Strings {
   static final labelVersion = tr('label-version');
   static final labelSeconds = tr('label-seconds');
   static final labelSearchForUser = tr('label-search-for-user');
+  static final labelCurrentPassword = tr('label-current-password');
+  static final labelNewPassword = tr('label-new-password');
+  static final labelConfirmNewPassword = tr('label-confirm-new-password');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
@@ -400,6 +404,7 @@ class Strings {
   static final semanticsImageSignupUsername = tr('semantics-image-signup-username');
   static final semanticsImagePasswordReset = tr('semantics-image-password-reset');
   static final semanticsCreatePublicRoom = tr('semantics-create-public-room');
+  static final semanticsImagePasswordUpdate = tr('semantics-image-password-update');
 
   // Labels
   static final labelProxyHost = tr('label-proxy-host');
