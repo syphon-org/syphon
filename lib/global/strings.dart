@@ -50,6 +50,8 @@ class Strings {
   static final titleToggleAutocorrect = tr('title-toggle-autocorrect');
   static final titleToggleSuggestions = tr('title-toggle-suggestions');
   static final titleBlockedUsers = tr('title-blocked-users');
+  static final titleImportSessionKeys = tr('title-import-session-keys');
+  static final titleExportSessionKeys = tr('title-export-session-keys');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -275,6 +277,7 @@ class Strings {
   static String alertCouldNotLaunchURL(String? url) =>
       tr('alert-could-not-launch-url', args: ['$url']);
   static final alertNoImagesFound = tr('alert-no-images-found');
+  static final alertStorageAccessRequiredForKeys = tr('alert-storage-access-required-for-keys');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
   static const alertBackgroundService = 'Background connection enabled';
@@ -308,6 +311,9 @@ class Strings {
   static final contentNotificationStyleTypeLatest = tr('content-notification-style-type-latest');
   static final contentNotificationStyleTypeItemized =
       tr('content-notification-style-type-itemized');
+
+  static final contentImportSessionKeys = tr('content-import-session-keys');
+  static final contentExportSessionKeys = tr('content-export-session-keys');
 
   static final messageEditedAppend = tr('message-edited-append');
 
