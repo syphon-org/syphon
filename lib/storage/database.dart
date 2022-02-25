@@ -21,6 +21,7 @@ import 'package:syphon/storage/migrations/5.update.messages.dart';
 import 'package:syphon/storage/models.dart';
 import 'package:syphon/store/auth/schema.dart';
 import 'package:syphon/store/crypto/schema.dart';
+import 'package:syphon/store/crypto/sessions/schema.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -210,19 +211,18 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   Auths,
   Syncs,
   Cryptos,
+  MessageSessions,
+  KeySessions,
   Settings,
 ])
 class StorageDatabase extends _$StorageDatabase {
-  // we tell the database where to store the data with this constructor
   StorageDatabase(AppContext context, {String pin = ''}) : super(openDatabase(context, pin: pin));
 
-  // this is the new constructor
   StorageDatabase.connect(DatabaseConnection connection) : super.connect(connection);
 
-  // you should bump this number whenever you change or add a table definition. Migrations
-  // are covered later in this readme.
+  // you should bump this number whenever you change or add a table definition.
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -231,6 +231,10 @@ class StorageDatabase extends _$StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
+          if (from == 7) {
+            await m.createTable(keySessions);
+            await m.createTable(messageSessions);
+          }
           if (from == 6) {
             await m.createTable(syncs);
           }

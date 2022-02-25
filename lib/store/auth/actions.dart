@@ -1320,6 +1320,9 @@ ThunkAction<AppState> resolveUsername({String? username}) {
     } else if (int.tryParse(localpart) != null) {
       //msisdn 3pid
       store.dispatch(setMsisdn(msisdn: int.parse(localpart)));
+    } else {
+      // raw username
+      store.dispatch(setUsername(username: localpart));
     }
 
     // If user enters full username, make sure to set homeserver

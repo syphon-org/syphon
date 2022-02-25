@@ -564,6 +564,7 @@ class MessageWidget extends StatelessWidget {
                                           : CrossFadeState.showFirst,
                                       firstChild: MarkdownBody(
                                         data: body.trim(),
+                                        softLineBreak: true,
                                         onTapLink: (text, href, title) =>
                                             onConfirmLink(context, href),
                                         styleSheet: MarkdownStyleSheet(

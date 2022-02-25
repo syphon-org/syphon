@@ -9,7 +9,7 @@
     "title-view-create-group": "Buat Sebuah Grup Obrolan",
     "title-view-invite": "Undang",
     "title-view-settings-chat": "Obrolan",
-    "title-view-privacy": "Privasi",
+    "title-view-privacy": "Privasi & Keamanan",
     "title-view-homeserver-search": "Temukan Homeserver Anda",
     "title-view-profile": "Siapkan Profil Anda",
     "title-proxy-host": "Modifikasi Host Proksi",
@@ -226,12 +226,12 @@
     "list-item-advanced-settings-force-function": "Paksakan Fungsi",
     "list-item-sent": "Terkirim",
     "list-item-received": "Diterima",
-    "list-item-via": "Via",
+    "list-item-via": "Platform",
     "alert-offline": "Sepertinya Anda mungkin offline. Periksa koneksi Anda dan coba lagi.",
     "alert-unknown": "Terjadi Kesalahan Yang Tidak Diketahui",
     "alert-could-not-launch-url": "Tidak dapat membuka {}",
     "alert-no-images-found": "Tidak Ada Gambar Yang Ditemukan.",
-    "message-edited-append": " (Diedit)",
+    "message-edited-append": " (diedit)",
     "label-default": "Default",
     "semantics-image-intro": "Pengguna menyantai",
     "semantics-image-private-message": "Seseorang membawa sebuah gelembung pesan privat",
@@ -267,5 +267,6 @@
     "content-notification-style-type-inbox": "Kelompokkan pesan baru dalam satu notifikasi",
     "content-notification-style-type-itemized": "Sebuah notifikasi baru akan muncul untuk setiap pesan baru",
     "list-item-chat-detail-vibrate": "Getaran",
-    "content-notification-style-type-latest": "Tampilkan satu notifikasi dengan pesan terbaru"
+    "content-notification-style-type-latest": "Tampilkan satu notifikasi dengan pesan terbaru",
+    "label-show-attachment-options": "Buka opsi lampiran"
 }

@@ -9,6 +9,7 @@ import 'package:syphon/cache/threadables.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/auth/state.dart';
+import 'package:syphon/store/crypto/sessions/model.dart';
 import 'package:syphon/store/crypto/state.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -141,10 +142,17 @@ class CacheSerializer implements StateSerializer<AppState> {
     final cryptoState =
         cryptoStore ?? preloaded[StorageKeys.CRYPTO] as CryptoStore? ?? CryptoStore();
 
+    final messageSessionsLoaded =
+        preloaded[StorageKeys.MESSAGE_SESSIONS] as Map<String, Map<String, List<MessageSession>>>;
+
     return AppState(
       loading: false,
       authStore: authStore ?? preloaded[StorageKeys.AUTH] ?? AuthStore(),
-      cryptoStore: cryptoState.upgradeSessions_temp(),
+      cryptoStore: messageSessionsLoaded.isEmpty
+          ? cryptoState.upgradeSessions_temp()
+          : cryptoState.upgradeSessions_temp().copyWith(
+                messageSessionsInbound: preloaded[StorageKeys.MESSAGE_SESSIONS],
+              ),
       settingsStore: preloaded[StorageKeys.SETTINGS] ?? settingsStore ?? SettingsStore(),
       syncStore: syncStore ?? SyncStore(),
       mediaStore: mediaStore ?? MediaStore().copyWith(mediaCache: preloaded[StorageKeys.MEDIA]),

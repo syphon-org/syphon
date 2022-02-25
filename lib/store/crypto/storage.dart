@@ -41,13 +41,13 @@ Future<int> saveCrypto(
 }
 
 ///
-/// Load Auth Store (Cold Storage)
+/// Load Crypto Store (Cold Storage)
 ///
 Future<CryptoStore?> loadCrypto({required StorageDatabase storage}) async {
   try {
     return storage.selectCryptoStore();
   } catch (error) {
-    printError(error.toString(), title: 'loadAuth');
+    printError(error.toString(), title: 'loadCrypto');
     return null;
   }
 }

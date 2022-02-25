@@ -21,8 +21,15 @@ class CryptoStore extends Equatable {
   final bool deviceKeyVerified;
   final bool oneTimeKeysStable;
 
-  // TODO: Map<identityKey, Map<SessionId, serializedSession>
+  // Map<identityKey, Map<SessionId, serializedSession> 
   final Map<String, Map<String, String>> keySessions; // both olm inbound and outbound key sessions
+
+  // Map<roomId, serializedSession> // megolm - messages
+  final Map<String, String> outboundMessageSessions;
+
+  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
+  @JsonKey(ignore: true)
+  final Map<String, Map<String, List<MessageSession>>> messageSessionsInbound;
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - index per chat
   @Deprecated('switch to using "index" inside MessageSession within inboundMessageSessionsAll')
@@ -31,12 +38,6 @@ class CryptoStore extends Equatable {
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
   @Deprecated('switch to inboundMessageSessionsAll to include old session for a device')
   final Map<String, Map<String, String>> inboundMessageSessions;
-
-  // Map<roomId, serializedSession> // megolm - messages
-  final Map<String, String> outboundMessageSessions;
-
-  // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
-  final Map<String, Map<String, List<MessageSession>>> messageSessionsInbound;
 
   /// Map<UserId, Map<DeviceId, DeviceKey> deviceKeys
   final Map<String, Map<String, DeviceKey>> deviceKeys;

@@ -1,5 +1,6 @@
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -104,7 +105,7 @@ Sync parseSync(Map params) {
     prevBatch: details.prevBatch,
   );
 
-  if (details.limited != null) {
+  if (details.limited != null  && DEBUG_MODE) {
     printInfo(
       '[parseSync] ${roomExisting.id} limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
     );
@@ -133,7 +134,7 @@ Sync parseSync(Map params) {
 
   ephemerals.readReceipts.forEach((key, value) {
     if (value.userReadsMapped!.containsKey(currentUser.userId)) {
-      int rr = value.userReadsMapped![currentUser.userId];
+      final int rr = value.userReadsMapped![currentUser.userId];
 
       if (rr > lastRead) {
         lastRead = rr;

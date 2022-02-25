@@ -18,6 +18,9 @@ class StorageKeys {
   static const String RECEIPTS = 'receipts';
   static const String REACTIONS = 'reactions';
   static const String REDACTIONS = 'redactions';
+
+  // crypto
+  static const String MESSAGE_SESSIONS = 'message_sessions';
 }
 
 enum StorageKey {
@@ -33,7 +36,8 @@ enum StorageKey {
   decrypted,
   receipts,
   reactions,
-  redactions
+  redactions,
+  messageSessions,
 }
 
 const int DEFAULT_LOAD_LIMIT = 25;
