@@ -73,11 +73,21 @@ class Strings {
   static final subtitleSettingsSyncToggle = tr('subtitle-settings-sync-toggle');
   static final subtitleToggleAutocorrect = tr('subtitle-toggle-autocorrect');
   static final subtitleToggleSuggestions = tr('subtitle-toggle-suggestions');
+  static final subtitleShowMembershipEvents = tr('subtitle-settings-show-membership-events');
+  static final subtitleEnterSends = tr('subtitle-settings-enter-sends');
+  static final subtitle24hFormat = tr('subtitle-settings-24h-format');
+  static final subtitleDismissKeyboard = tr('subtitle-settings-dismiss-keyboard');
+  static final subtitleViewUploadedMedia = tr('subtitle-settings-view-uploaded-media');
+  static final subtitleImagesAudioVideoFiles = tr('subtitle-images-audio-video-files');
 
   // Headers
   static final headerIntro = tr('header-intro');
   static final headerLogin = tr('header-login');
   static final headerSignupUsername = tr('header-signup-username');
+  static final headerGeneral = tr('header-general');
+  static final headerOrdering = tr('header-ordering');
+  static final headerMedia = tr('header-media');
+  static final headerMediaAutoDownload = tr('header-media-auto-download');
 
   // Labels
   static final labelBack = tr('label-back');
@@ -111,6 +121,8 @@ class Strings {
   static final labelAbout = tr('label-about');
   static final labelChatSettings = tr('label-chat-settings');
   static final labelColor = tr('label-color');
+  static final labelTimestamp = tr('label-timestamp');
+  static final labelNone = tr('label-none');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
@@ -124,6 +136,19 @@ class Strings {
   static final listItemSettingsProxyPassword = tr('list-item-settings-proxy-password');
   static final listItemSettingsSyncInterval = tr('list-item-settings-sync-interval');
   static final listItemSettingsSyncToggle = tr('list-item-settings-sync-toggle');
+
+  static final listItemSettingsLanguage = tr('list-item-settings-language');
+  static final listItemSettingsShowMembershipEvents = tr('list-item-settings-show-membership-events');
+  static final listItemSettingsEnterSends = tr('list-item-settings-enter-sends');
+  static final listItemSettings24hFormat = tr('list-item-settings-24h-format');
+  static final listItemSettingsDismissKeyboard = tr('list-item-settings-dismiss-keyboard');
+  static final listItemSettingsSortBy = tr('list-item-settings-sort-by');
+  static final listItemSettingsGroupBy = tr('list-item-settings-group-by');
+  static final listItemSettingsViewUploadedMedia = tr('list-item-settings-view-uploaded-media');
+  static final listItemSettingsAutoDownload = tr('list-item-settings-auto-download');
+  static final listItemSettingsWhenUsingMobileData = tr('list-item-settings-when-using-mobile-data');
+  static final listItemSettingsWhenUsingWiFi = tr('list-item-settings-when-using-wi-fi');
+  static final listItemSettingsWhenRoaming = tr('list-item-settings-when-roaming');
 
   static String listItemUserDetailsStartChat(String? name) =>
       tr('list-item-user-details-start-chat', args: ['$name']);
