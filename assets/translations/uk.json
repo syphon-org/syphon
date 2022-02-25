@@ -267,5 +267,6 @@
     "semantics-image-empty-chat-list": "Кілька крихітних, милих монстрів, що виглядають з-за листя.",
     "semantics-image-terms-of-service": "Рука тримає телефон з прапорцем умов про надання послуг",
     "semantics-image-signup-username": "Людина, що спирається ліктем на ID-картку",
-    "semantics-image-password-reset": "Людина, що поклала розслаблену руку на лист із прапорцем всередині"
+    "semantics-image-password-reset": "Людина, що поклала розслаблену руку на лист із прапорцем всередині",
+    "label-show-attachment-options": "Відкрити параметри вкладення"
 }

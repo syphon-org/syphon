@@ -237,10 +237,10 @@
     "list-item-advanced-settings-start-background": "Démarrer le service en arrière-plan",
     "list-item-advanced-settings-force-function": "Forcer la fonction",
     "list-item-advanced-settings-test-notifications": "Tester les notifications",
-    "list-item-via": "Via",
+    "list-item-via": "Plateforme",
     "list-item-sent": "Envoyé",
     "content-dialog-confirm-password": "Veuillez confirmer votre mot de passe (Par défaut)",
-    "message-edited-append": " (Modifié)",
+    "message-edited-append": " (modifié)",
     "label-default": "Par défaut",
     "semantics-image-intro": "Utilisateur détendu, allongé",
     "title-send-media-message-unencrypted": "Envoyer un média (non chiffré)",
@@ -267,5 +267,6 @@
     "list-item-chat-detail-vibrate": "Vibration",
     "content-notification-style-type-inbox": "Regrouper les nouveaux messages dans une même notification",
     "content-notification-style-type-latest": "Afficher une notification avec le message le plus récent",
-    "content-notification-style-type-itemized": "Une nouvelle notification apparaîtra pour chaque nouveau message"
+    "content-notification-style-type-itemized": "Une nouvelle notification apparaîtra pour chaque nouveau message",
+    "label-show-attachment-options": "Ouvrir les options de pièce jointe"
 }
