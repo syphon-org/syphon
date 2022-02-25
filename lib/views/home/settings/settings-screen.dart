@@ -24,11 +24,11 @@ class SettingsScreen extends StatelessWidget {
 
   onToggleAccountBottomSheet(BuildContext context, _Props props) {
     if (props.accountLoading) {
-      return props.onAddInfo('Wait for full sync to finish before switching accounts');
+      return props.onAddInfo(Strings.alertWaitForFullSync);
     }
 
     if (props.accountsAvailable == 0) {
-      return props.onAddInfo('You must logout of your\ncurrent session to enable multiaccounts');
+      return props.onAddInfo(Strings.alertLogOutToEnableMultiaccounts);
     }
 
     // NOTE: example of setting modal backgroound w/ inkwell working
@@ -44,18 +44,17 @@ class SettingsScreen extends StatelessWidget {
   }
 
   onLogout(BuildContext context, _Props props) {
-    var content = 'Are you sure you want to log out?';
+    var content = Strings.contentLogoutConfirm;
 
     if (props.accountsAvailable > 1) {
-      content +=
-          '\n\nSince you have other accounts, logging out will switch you to another account session.';
+      content += Strings.contentLogoutMultiaccountConfirm;
     }
 
     return showDialog(
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
-        title: 'Logout',
+        title: Strings.titleDialogLogout,
         content: content,
         onConfirm: () async {
           await props.onLogoutUser();
@@ -178,7 +177,10 @@ class SettingsScreen extends StatelessWidget {
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                             subtitle: Text(
-                              'Screen Lock ${props.screenLockEnabled ?? false ? "On" : "Off"}, Registration Lock Off',
+                              Strings.subtitlePrivacySettings(
+                                  props.screenLockEnabled ?? false ? Strings.labelOn : Strings.labelOff,
+                                  Strings.labelOff //TODO
+                              ),
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ),
@@ -200,7 +202,7 @@ class SettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           subtitle: Text(
-                            'Theme ${props.themeTypeName}, Font ${props.fontName}',
+                            Strings.subtitleThemeSettings(props.themeTypeName, props.fontName),
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ),

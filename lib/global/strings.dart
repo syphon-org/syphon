@@ -68,6 +68,7 @@ class Strings {
   static final titleDialogAcceptInvite = tr('title-dialog-accept-invite');
   static final titleDialogChatColor = tr('title-dialog-chat-color');
   static final titleDialogDraftPreview = tr('title-dialog-draft-preview');
+  static final titleDialogLogout = tr('title-dialog-logout');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -82,6 +83,10 @@ class Strings {
   static final subtitleDismissKeyboard = tr('subtitle-settings-dismiss-keyboard');
   static final subtitleViewUploadedMedia = tr('subtitle-settings-view-uploaded-media');
   static final subtitleImagesAudioVideoFiles = tr('subtitle-images-audio-video-files');
+  static String subtitleThemeSettings(String? theme, String? font) =>
+      tr('subtitle-theme-settings', args: ['$theme', '$font']);
+  static String subtitlePrivacySettings(String? screenLock, String? registrationLock) =>
+      tr('subtitle-privacy-settings', args: ['$screenLock', '$registrationLock']);
 
   // Headers
   static final headerIntro = tr('header-intro');
@@ -278,6 +283,8 @@ class Strings {
       tr('alert-could-not-launch-url', args: ['$url']);
   static final alertNoImagesFound = tr('alert-no-images-found');
   static final alertStorageAccessRequiredForKeys = tr('alert-storage-access-required-for-keys');
+  static final alertWaitForFullSync = tr('alert-wait-for-full-sync-before-switching');
+  static final alertLogOutToEnableMultiaccounts = tr('alert-log-out-enable-multiaccount');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
   static const alertBackgroundService = 'Background connection enabled';
@@ -314,6 +321,9 @@ class Strings {
 
   static final contentImportSessionKeys = tr('content-import-session-keys');
   static final contentExportSessionKeys = tr('content-export-session-keys');
+
+  static final contentLogoutConfirm = tr('content-logout-confirm');
+  static final contentLogoutMultiaccountConfirm = tr('content-logout-multiaccount-confirm');
 
   static final messageEditedAppend = tr('message-edited-append');
 
