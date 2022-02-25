@@ -28,6 +28,11 @@ void _printError(String content, {String? title}) {
   }
 }
 
+void _printRelease(String content, {String? title}) {
+  final output = title != null ? '[$title] $content' : content;
+  print(output);
+}
+
 void _printDebug(String content, {String? title}) {
   final output = title != null ? '[$title] $content' : content;
   if (DEBUG_MODE) {
@@ -56,5 +61,6 @@ class log {
   static warn(String content, {String? title}) => _printWarning(content, title: title);
   static error(String content, {String? title}) => _printError(content, title: title);
   static debug(String content, {String? title}) => _printDebug(content, title: title);
+  static release(String content, {String? title}) => _printRelease(content, title: title);
   static json(Map? json) => _printJson(json);
 }

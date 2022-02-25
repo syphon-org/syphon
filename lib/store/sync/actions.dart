@@ -388,7 +388,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         // fetch previous messages since last /sync (a messages gap)
         // room will be marked limited to indicate this
-        if (roomSynced.limited) {
+        if (roomSynced.limited && synced) {
           printWarning(
             '[syncRooms] ${roomSynced.name} LIMITED TRUE - Fetching more messages',
           );
