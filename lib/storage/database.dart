@@ -21,6 +21,7 @@ import 'package:syphon/storage/migrations/5.update.messages.dart';
 import 'package:syphon/storage/models.dart';
 import 'package:syphon/store/auth/schema.dart';
 import 'package:syphon/store/crypto/schema.dart';
+import 'package:syphon/store/crypto/sessions/schema.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/schema.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -210,6 +211,8 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   Auths,
   Syncs,
   Cryptos,
+  MessageSessions,
+  KeySessions,
   Settings,
 ])
 class StorageDatabase extends _$StorageDatabase {
@@ -231,6 +234,10 @@ class StorageDatabase extends _$StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
+          if (from == 7) {
+            await m.createTable(keySessions);
+            await m.createTable(messageSessions);
+          }
           if (from == 6) {
             await m.createTable(syncs);
           }

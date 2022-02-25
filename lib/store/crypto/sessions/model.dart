@@ -29,24 +29,3 @@ class MessageSession extends Equatable {
   Map<String, dynamic> toJson() => _$MessageSessionToJson(this);
   factory MessageSession.fromJson(Map<String, dynamic> json) => _$MessageSessionFromJson(json);
 }
-
-///
-/// Message Session model
-///
-/// allows for multiple identitykey sessions and sorting
-/// based on last used or created
-///
-@JsonSerializable()
-class MessageSessionMapper extends Equatable {
-  //    Map<session_id, session>
-  final Map<String, MessageSession> sessions;
-
-  const MessageSessionMapper({this.sessions = const {}});
-
-  @override
-  List<Object?> get props => [sessions];
-
-  Map<String, dynamic> toJson() => _$MessageSessionMapperToJson(this);
-  factory MessageSessionMapper.fromJson(Map<String, dynamic> json) =>
-      _$MessageSessionMapperFromJson(json);
-}

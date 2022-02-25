@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:syphon/global/values.dart';
 
 typedef PrintJson = void Function(Map? jsonMap);
 typedef PrintDebug = void Function(String message, {String title});
@@ -8,28 +9,43 @@ typedef PrintError = void Function(String message, {String? title});
 
 void _printInfo(String content, {String? title}) {
   final output = title != null ? '[$title] $content' : content;
-  print(output);
+  if (DEBUG_MODE) {
+    print(output);
+  }
 }
 
 void _printWarning(String content, {String? title}) {
   final output = title != null ? '[$title] $content' : content;
-  print(output);
+  if (DEBUG_MODE) {
+    print(output);
+  }
 }
 
 void _printError(String content, {String? title}) {
+  final output = title != null ? '[$title] $content' : content;
+  if (DEBUG_MODE) {
+    print(output);
+  }
+}
+
+void _printRelease(String content, {String? title}) {
   final output = title != null ? '[$title] $content' : content;
   print(output);
 }
 
 void _printDebug(String content, {String? title}) {
   final output = title != null ? '[$title] $content' : content;
-  debugPrint(output);
+  if (DEBUG_MODE) {
+    debugPrint(output);
+  }
 }
 
 void _printJson(Map? jsonMap) {
   final JsonEncoder encoder = JsonEncoder.withIndent('  ');
   final String prettyEvent = encoder.convert(jsonMap);
-  debugPrint(prettyEvent, wrapWidth: 2048);
+  if (DEBUG_MODE) {
+    debugPrint(prettyEvent, wrapWidth: 2048);
+  }
 }
 
 PrintJson printJson = _printJson;
@@ -45,5 +61,6 @@ class log {
   static warn(String content, {String? title}) => _printWarning(content, title: title);
   static error(String content, {String? title}) => _printError(content, title: title);
   static debug(String content, {String? title}) => _printDebug(content, title: title);
+  static release(String content, {String? title}) => _printRelease(content, title: title);
   static json(Map? json) => _printJson(json);
 }
