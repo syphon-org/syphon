@@ -216,14 +216,11 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   Settings,
 ])
 class StorageDatabase extends _$StorageDatabase {
-  // we tell the database where to store the data with this constructor
   StorageDatabase(AppContext context, {String pin = ''}) : super(openDatabase(context, pin: pin));
 
-  // this is the new constructor
   StorageDatabase.connect(DatabaseConnection connection) : super.connect(connection);
 
-  // you should bump this number whenever you change or add a table definition. Migrations
-  // are covered later in this readme.
+  // you should bump this number whenever you change or add a table definition.
   @override
   int get schemaVersion => 8;
 

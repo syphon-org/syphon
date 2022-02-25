@@ -11,7 +11,6 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/auth/storage.dart';
-import 'package:syphon/store/crypto/sessions/actions.dart';
 import 'package:syphon/store/crypto/sessions/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/messages/actions.dart';
