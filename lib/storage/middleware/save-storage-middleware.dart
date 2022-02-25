@@ -25,9 +25,7 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
-import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/store/sync/background/storage.dart';
-import 'package:syphon/store/sync/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 
@@ -166,12 +164,26 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetDeviceKeys:
       case SetOneTimeKeysCounts:
       case SetOneTimeKeysClaimed:
-      case AddMessageSessionInbound:
       case AddMessageSessionOutbound:
       case UpdateMessageSessionOutbound:
       case AddKeySession:
       case ResetCrypto:
         saveCrypto(store.state.cryptoStore, storage: storage);
+        break;
+      case AddMessageSessionInbound:
+        final _action = action as AddMessageSessionInbound;
+        saveMessageSessionInbound(
+          roomId: _action.roomId,
+          identityKey: _action.senderKey,
+          session: _action.session,
+          storage: storage,
+        );
+        break;
+      case SaveMessageSessionsInbound:
+        saveMessageSessionsInbound(
+          store.state.cryptoStore.messageSessionsInbound,
+          storage: storage,
+        );
         break;
       case SetNotificationSettings:
         // handles updating the background sync thread with new chat settings

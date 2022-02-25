@@ -117,6 +117,11 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
       rooms: rooms.values.toList(),
     );
 
+    final messageSessions = await loadMessageSessionsInbound(
+      roomIds: rooms.keys.toList(),
+      storage: storage,
+    );
+
     return {
       StorageKeys.AUTH: auth,
       StorageKeys.CRYPTO: crypto,
@@ -127,6 +132,7 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
       StorageKeys.MESSAGES: messages,
       StorageKeys.REACTIONS: reactions,
       StorageKeys.DECRYPTED: decrypted,
+      StorageKeys.MESSAGE_SESSIONS: messageSessions,
     };
   } catch (error) {
     printError('[loadStorage]  ${error.toString()}');

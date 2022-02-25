@@ -50,7 +50,7 @@ ThunkAction<AppState> encryptMessageContent({
     final encryptedPayload = outboundMessageSession.encrypt(serializedPayload);
 
     // save the outbound session after processing content
-    await store.dispatch(saveMessageSessionOutbound(
+    await store.dispatch(AddMessageSessionOutbound(
       roomId: roomId,
       session: outboundMessageSession.pickle(roomId),
     ));
@@ -258,7 +258,7 @@ ThunkAction<AppState> decryptMessage({
       );
     }
 
-    await store.dispatch(saveMessageSessionInbound(
+    await store.dispatch(addMessageSessionInbound(
       roomId: roomId,
       identityKey: identityKey,
       session: session,

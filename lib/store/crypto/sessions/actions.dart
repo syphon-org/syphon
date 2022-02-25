@@ -96,7 +96,13 @@ class SetMessageSessionsInbound {
   SetMessageSessionsInbound({required this.sessions});
 }
 
-ThunkAction<AppState> saveMessageSessionOutbound({
+class SaveMessageSessionsInbound {
+  Map<String, Map<String, List<MessageSession>>> sessions;
+
+  SaveMessageSessionsInbound({required this.sessions});
+}
+
+ThunkAction<AppState> addMessageSessionOutbound({
   required String roomId,
   required String session,
 }) {
@@ -333,7 +339,7 @@ ThunkAction<AppState> loadMessageSessionInbound({
 /// Save Message Session Inbound
 ///
 /// Saves the message session and index after encrypting and sending an event
-ThunkAction<AppState> saveMessageSessionInbound({
+ThunkAction<AppState> addMessageSessionInbound({
   required String roomId,
   required String identityKey,
   required olm.InboundGroupSession session,
@@ -557,6 +563,7 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
 
       final keyFile = File(file.paths[0]!);
       final fileData = await keyFile.readAsString();
+      final roomsEncrypted = store.state.roomStore.roomList.where((room) => room.encryptionEnabled);
 
       var sessionJson;
 
@@ -569,7 +576,6 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         );
       }
 
-      final roomIdsEncrypted = [];
       final messageSessions = Map<String, Map<String, List<MessageSession>>>.from(
         store.state.cryptoStore.messageSessionsInbound,
       );
@@ -610,20 +616,38 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
             senderKey: [messageSession],
           },
         );
-
-        roomIdsEncrypted.add(roomId);
       }
 
-      await store.dispatch(SetMessageSessionsInbound(
-        sessions: combineMessageSesssions(
-          messageSessions,
-          store.state.cryptoStore.messageSessionsInbound,
-        ),
+      // save _all_ keys to cold storage
+      await store.dispatch(SaveMessageSessionsInbound(
+        sessions: messageSessions,
       ));
 
-      for (final roomId in roomIdsEncrypted) {
-        store.dispatch(backfillDecryptMessages(roomId));
-      }
+      // Only set local message sessions where rooms are actively being synced
+      final roomIdsEncrypted = roomsEncrypted.map((room) => room.id);
+      final messageSessionsActive = Map<String, Map<String, List<MessageSession>>>.from(
+        messageSessions,
+      );
+      messageSessionsActive.removeWhere(
+        (key, value) => !roomIdsEncrypted.contains(key),
+      );
+
+      // set active keys to state
+      await store.dispatch(SetMessageSessionsInbound(
+        sessions: messageSessionsActive,
+      ));
+
+      // TODO: needs work for on combining them efficiently
+      // await store.dispatch(SetMessageSessionsInbound(
+      //   sessions: combineMessageSesssions(
+      //     messageSessions,
+      //     store.state.cryptoStore.messageSessionsInbound,
+      //   ),
+      // ));
+
+      await Future.forEach(roomIdsEncrypted, (String roomId) {
+        return store.dispatch(backfillDecryptMessages(roomId));
+      });
 
       store.dispatch(addConfirmation(
         origin: 'importSessionKeys',
@@ -635,8 +659,7 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
       store.dispatch(addAlert(
         error: error,
         origin: 'importSessionKeys',
-        message:
-            'Failed to import your session key backup, contact us at https://syphon.org/support',
+        message: 'Failed to import your session key backup, check your password and try again.',
       ));
     } finally {
       store.dispatch(SetLoadingSettings(loading: false));
