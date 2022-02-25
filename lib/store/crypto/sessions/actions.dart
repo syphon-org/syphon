@@ -20,6 +20,7 @@ import 'package:syphon/store/crypto/sessions/converters.dart';
 import 'package:syphon/store/crypto/sessions/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/sync/actions.dart';
 
 ///
 ///
@@ -552,6 +553,7 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoadingSettings(loading: true));
+      await store.dispatch(stopSyncObserver());
 
       final keyFile = File(file.paths[0]!);
       final fileData = await keyFile.readAsString();
@@ -627,6 +629,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         origin: 'importSessionKeys',
         message: 'Successfully imported keys, your previous messages should be decrypting.',
       ));
+
+      await store.dispatch(startSyncObserver());
     } catch (error) {
       store.dispatch(addAlert(
         error: error,

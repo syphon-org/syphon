@@ -55,12 +55,12 @@ abstract class Devices {
     return await json.decode(response.body);
   }
 
-  /**
- * https://matrix.org/docs/spec/client_server/latest#id414
- *  
- * HTTP:DELETE
- * Gets all currently active pushers for the authenticated user.
- */
+  ///
+  /// https://matrix.org/docs/spec/client_server/latest#id414
+  ///
+  /// HTTP:DELETE
+  /// Gets all currently active pushers for the authenticated user.
+  ///
   static Future<dynamic> deleteDevices({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
@@ -100,12 +100,10 @@ abstract class Devices {
     return await json.decode(response.body);
   }
 
-  /**
-   * https://spec.matrix.org/unstable/client-server-api/#put_matrixclientv3devicesdeviceid
-   *
-   * HTTP:PUT
-   * Change a given Device's public display name.
-   */
+  /// https://spec.matrix.org/unstable/client-server-api/#put_matrixclientv3devicesdeviceid
+  ///
+  /// HTTP:PUT
+  /// Change a given Device's public display name.
   static Future<dynamic> renameDevice({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
@@ -132,5 +130,4 @@ abstract class Devices {
 
     return await json.decode(response.body);
   }
-
 }
