@@ -383,7 +383,7 @@ class HomeState extends State<HomeScreen> {
   Widget buildChatList(BuildContext context, _Props props) {
     final store = StoreProvider.of<AppState>(context);
     final rooms = props.rooms;
-    final label = props.syncing ? Strings.labelSyncing : Strings.labelMessagesEmpty;
+    final label = props.syncing ? Strings.labelSyncingChats : Strings.labelMessagesEmpty;
     final noSearchResults = searching && props.searchMessages.isEmpty && searchText.isNotEmpty;
 
     if (rooms.isEmpty) {

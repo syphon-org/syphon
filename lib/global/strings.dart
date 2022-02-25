@@ -103,7 +103,7 @@ class Strings {
   static final labelUsers = tr('label-users');
   static final labelEmail = tr('label-email');
   static final labelClose = tr('label-close');
-  static final labelSyncing = tr('label-syncing');
+  static final labelSyncingChats = tr('label-syncing-chats');
   static final labelSearchUser = tr('label-search-user');
   static final labelUsersRecent = tr('label-users-recent');
   static final labelSearching = tr('label-searching');
