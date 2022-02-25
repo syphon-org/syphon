@@ -7,6 +7,7 @@ import 'package:syphon/store/auth/storage.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/crypto/sessions/actions.dart';
+import 'package:syphon/store/crypto/sessions/storage.dart';
 import 'package:syphon/store/crypto/storage.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/storage.dart';
@@ -176,6 +177,7 @@ saveStorageMiddleware(StorageDatabase? storage) {
           roomId: _action.roomId,
           identityKey: _action.senderKey,
           session: _action.session,
+          messageIndex: _action.messageIndex,
           storage: storage,
         );
         break;

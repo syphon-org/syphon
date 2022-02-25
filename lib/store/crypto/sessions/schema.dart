@@ -11,7 +11,7 @@ class MessageSessions extends Table {
   TextColumn get id => text().customConstraint('UNIQUE')();
 
   TextColumn get roomId => text()();
-  IntColumn get sessionIndex => integer()();
+  IntColumn get index => integer()();
   TextColumn get identityKey => text().nullable()(); // outbound keys have no identity
   TextColumn get session => text()();
   BoolColumn get inbound => boolean()();
