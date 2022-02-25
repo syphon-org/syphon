@@ -53,6 +53,7 @@
     "title-confirm-password": "Confirm Password",
     "title-confirm-email": "Confirm Email",
     "title-device-rename": "Rename a device",
+    "title-blocked-users": "Blocked Users",
     "subtitle-proxy-use-proxy": "This will force all traffic leaving Syphon to do so via a proxy",
     "subtitle-proxy-use-basic-authentication": "Provide username and password to authenticate with a proxy",
     "subtitle-settings-sync-interval": "Amount of time in seconds the app wait\nbetween syncing",

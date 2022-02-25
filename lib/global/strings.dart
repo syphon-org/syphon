@@ -49,6 +49,7 @@ class Strings {
   static final titleSendMediaMessageUnencrypted = tr('title-send-media-message-unencrypted');
   static final titleToggleAutocorrect = tr('title-toggle-autocorrect');
   static final titleToggleSuggestions = tr('title-toggle-suggestions');
+  static final titleBlockedUsers = tr('title-blocked-users');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
