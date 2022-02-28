@@ -19,7 +19,7 @@ void setSystemTheme(ThemeType themeType) {
 // Set the theme
 // Applies a system theme and returns a ThemeData instance which should be
 // applied immediately to match the system UI
-ThemeData? setupTheme(ThemeSettings appTheme, BuildContext context, {bool generateThemeData = false}) {
+ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) {
   final computedThemeType = (appTheme.themeType == ThemeType.System)
                               ? (SchedulerBinding.instance?.window.platformBrightness == Brightness.dark)
                                 ? ThemeType.Dark
