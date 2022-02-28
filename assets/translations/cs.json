@@ -121,7 +121,7 @@
     "title-dialog-delete-keys": "Potvrďte vymazání Klíčů",
     "title-view-profile": "Nastavte si svůj profil",
     "title-view-homeserver-search": "Najděte Svůj Home-server",
-    "title-view-privacy": "Soukromí",
+    "title-view-privacy": "Soukromí & Bezpečnost",
     "title-view-settings-chat": "Konverzace",
     "title-view-invite": "Pozvat",
     "title-view-advanced": "Pokročilý",
@@ -224,7 +224,7 @@
     "tooltip-search-chats": "Vyhledat konverzace",
     "tooltip-search-unencrypted": "Prohledávat nešifrovaně",
     "label-default": "Výchozí",
-    "title-toggle-autocorrect": "Přepnout kontrolu pravopisu",
+    "title-toggle-autocorrect": "Kontrola pravopisu",
     "label-search-unencrypted": "Prohledávat nešifrovaně",
     "label-default-room-notification": "Výchozí (Argon)",
     "button-text-reject": "odmítnout",
@@ -238,7 +238,7 @@
     "list-item-chat-detail-privacy-status": "Soukromí a Stav",
     "list-item-user-details-view-profile": "Zobrazit profil",
     "list-item-settings-sync-toggle": "Přepnout synchronizaci",
-    "title-toggle-suggestions": "Přepnout návrhy slov na klávesnici",
+    "title-toggle-suggestions": "Textové návrhy slov",
     "title-dialog-draft-preview": "Náhled konceptu",
     "subtitle-proxy-use-basic-authentication": "Poskytněte uživatelské jméno a heslo pro ověření pomocí proxy serveru",
     "subtitle-settings-sync-toggle": "Přepnout synchronizaci s matrix serverem",
@@ -255,5 +255,10 @@
     "content-proxy-username": "Uživatelské jméno pro ověření pomocí proxy serveru",
     "content-proxy-password": "Heslo pro ověření pomocí proxy serveru",
     "content-notification-style-type-inbox": "Zoskupit nové zprávy v rámci jedného oznámení",
-    "content-notification-style-type-latest": "Zobrazit jedno upozornění s nejnovější zprávou"
+    "content-notification-style-type-latest": "Zobrazit jedno upozornění s nejnovější zprávou",
+    "semantics-create-public-room": "Vytvořit veřejnou místnost",
+    "label-proxy-port": "Port",
+    "label-proxy-host": "Hostname",
+    "label-proxy-username": "Uživatelské jméno",
+    "label-proxy-password": "Heslo"
 }
