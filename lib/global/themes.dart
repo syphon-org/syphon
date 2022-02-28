@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import 'package:syphon/store/settings/theme-settings/model.dart';
@@ -19,22 +20,27 @@ void setSystemTheme(ThemeType themeType) {
 // Applies a system theme and returns a ThemeData instance which should be
 // applied immediately to match the system UI
 ThemeData? setupTheme(ThemeSettings appTheme, BuildContext context, {bool generateThemeData = false}) {
+  final computedThemeType = (appTheme.themeType == ThemeType.System)
+                              ? (SchedulerBinding.instance?.window.platformBrightness == Brightness.dark)
+                                ? ThemeType.Dark
+                                : ThemeType.Light
+                              : appTheme.themeType;
   // Set system UI theme
-  setSystemTheme(appTheme.themeType);
+  setSystemTheme(computedThemeType);
 
   // Generate the ThemeData to return if requested
   if (generateThemeData) {
     final primaryColor = Color(appTheme.primaryColor).withOpacity(1);
     final secondaryColor = Color(appTheme.accentColor);
-    final brightness = selectThemeBrightness(appTheme.themeType);
+    final brightness = selectThemeBrightness(computedThemeType);
     final invertedPrimaryColor = brightness == Brightness.light ? primaryColor : secondaryColor;
 
-    final appBarElevation = selectAppBarElevation(appTheme.themeType);
-    final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
-    final dialogBackgroundColor = selectModalColor(appTheme.themeType);
-    final iconColor = selectIconColor(appTheme.themeType);
+    final appBarElevation = selectAppBarElevation(computedThemeType);
+    final scaffoldBackgroundColor = selectScaffoldBackgroundColor(computedThemeType);
+    final dialogBackgroundColor = selectModalColor(computedThemeType);
+    final iconColor = selectIconColor(computedThemeType);
 
-    final selectedRowColor = selectRowHighlightColor(appTheme.themeType);
+    final selectedRowColor = selectRowHighlightColor(computedThemeType);
 
     final fontFamily = selectFontNameString(appTheme.fontName);
     final titleWeight = selectFontTitleWeight(appTheme.fontName);
