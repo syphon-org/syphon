@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/algos.dart';
 
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'model.dart';
+
+bool isSystemDarkMode() {
+  return SchedulerBinding.instance?.window.platformBrightness == Brightness.dark;
+}
+
+ThemeType themeTypeFromSystem() {
+  if (isSystemDarkMode()) {
+    return ThemeType.Dark;
+  }
+
+  return ThemeType.Light;
+}
 
 String selectMainFabType(ThemeSettings themeSettings) {
   return enumToString(themeSettings.mainFabType);
@@ -37,6 +50,10 @@ SystemUiOverlayStyle computeSystemUIColor(BuildContext context, {double ratio = 
 }
 
 int selectRowHighlightColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Colours.greyLightest;
@@ -48,6 +65,10 @@ int selectRowHighlightColor(ThemeType themeType) {
 }
 
 int selectSystemUiColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Colours.whiteDefault;
@@ -59,6 +80,10 @@ int selectSystemUiColor(ThemeType themeType) {
 }
 
 Brightness selectSystemUiIconColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Brightness.dark;
@@ -68,6 +93,10 @@ Brightness selectSystemUiIconColor(ThemeType themeType) {
 }
 
 Color selectIconBackground(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Color(Colours.greyDefault);
@@ -79,6 +108,10 @@ Color selectIconBackground(ThemeType themeType) {
 }
 
 Color selectAvatarBackground(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Color(Colours.greyLightest);
@@ -90,6 +123,10 @@ Color selectAvatarBackground(ThemeType themeType) {
 }
 
 Brightness selectThemeBrightness(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Brightness.light;
@@ -99,6 +136,10 @@ Brightness selectThemeBrightness(ThemeType themeType) {
 }
 
 Color selectIconColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Colors.grey[500]!;
@@ -108,6 +149,10 @@ Color selectIconColor(ThemeType themeType) {
 }
 
 Color? selectModalColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Night:
       return Colors.grey[900];
@@ -117,6 +162,10 @@ Color? selectModalColor(ThemeType themeType) {
 }
 
 int? selectScaffoldBackgroundColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Colours.whiteDefault;
@@ -130,6 +179,10 @@ int? selectScaffoldBackgroundColor(ThemeType themeType) {
 }
 
 Color selectInputTextColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Color(Colours.blackDefault);
@@ -139,6 +192,10 @@ Color selectInputTextColor(ThemeType themeType) {
 }
 
 Color selectCursorColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Colors.blueGrey;
@@ -148,6 +205,10 @@ Color selectCursorColor(ThemeType themeType) {
 }
 
 Color selectInputBackgroundColor(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Light:
       return Color(Colours.greyEnabled);
@@ -159,6 +220,10 @@ Color selectInputBackgroundColor(ThemeType themeType) {
 }
 
 double? selectAppBarElevation(ThemeType themeType) {
+  if (themeType == ThemeType.System) {
+    themeType = themeTypeFromSystem();
+  }
+
   switch (themeType) {
     case ThemeType.Darker:
       return 0.0;
