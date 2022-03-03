@@ -434,4 +434,14 @@ class Strings {
   static final tooltipSearchUnencrypted = tr('tooltip-search-unencrypted');
   static final tooltipCancelReply = tr('tooltip-cancel-reply');
   static final tooltipSearchUsers = tr('tooltip-search-users');
+
+  //Notifications
+  static String notificationSentNewMessage(String? name)
+    => tr('notification-sent-message', args: ['$name']);
+  static String notificationInvitedToChat(String? name)
+    => tr('notification-invited-to-chat', args: ['$name']);
+  static String notificationSentNewMessageInRoom(String? name, String? room)
+    => tr('notification-sent-message-to-room', args: ['$name', '$room']);
+  static final notificationNewMessage = tr('notification-new-message');
+  static final notificationNewInvite = tr('notification-new-invite');
 }
