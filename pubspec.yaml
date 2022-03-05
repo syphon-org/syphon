@@ -70,7 +70,7 @@ dependencies:
   sqflite: ^2.0.0+3
   sembast_sqflite: ^2.0.0+1
   sqflite_common_ffi: ^2.0.0
-  sqlcipher_flutter_libs: ^0.5.0
+  sqlcipher_flutter_libs: ^0.5.1
   sqlcipher_library_windows: ^1.0.1
   flutter_secure_storage: ^5.0.2
   drift: ^1.0.0
