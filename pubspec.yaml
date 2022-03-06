@@ -1,9 +1,10 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.10+2100
+version: 0.2.11+2110
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
+  flutter: 2.10.3
 
 scripts:
   start: flutter run # -d <device_id>
@@ -69,7 +70,7 @@ dependencies:
   sqflite: ^2.0.0+3
   sembast_sqflite: ^2.0.0+1
   sqflite_common_ffi: ^2.0.0
-  sqlcipher_flutter_libs: ^0.5.0
+  sqlcipher_flutter_libs: ^0.5.1
   sqlcipher_library_windows: ^1.0.1
   flutter_secure_storage: ^5.0.2
   drift: ^1.0.0
@@ -129,6 +130,7 @@ dev_dependencies:
 
 # TODO: remove when similar functionality is merged
 dependency_overrides:
+  platform: ^3.1.0
   swipeable: # TODO: null saftey version
     git:
       url: https://github.com/ereio/swipeable.git
