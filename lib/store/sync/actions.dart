@@ -21,6 +21,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/actions.dart';
 
@@ -140,9 +141,11 @@ ThunkAction<AppState> startSyncObserver() {
     }
 
     if (syncObserver == null || !syncObserver.isActive) {
-      store.dispatch(SetSyncObserver(
-        syncObserver: Timer.periodic(Duration(milliseconds: interval), onSync),
-      ));
+      store.dispatch(
+        SetSyncObserver(
+          syncObserver: Timer.periodic(Duration(milliseconds: interval), onSync),
+        ),
+      );
     }
   };
 }
@@ -192,6 +195,23 @@ ThunkAction<AppState> initialSync() {
 ThunkAction<AppState> setBackgrounded(bool backgrounded) {
   return (Store<AppState> store) async {
     store.dispatch(SetBackgrounded(backgrounded: backgrounded));
+  };
+}
+
+///
+/// Updaet Last Since
+///
+/// Update the latest known lastSince for the background thread
+/// to not notify for messages read in the app
+///
+ThunkAction<AppState> updateLatestLastSince() {
+  return (Store<AppState> store) async {
+    final lastSince = store.state.syncStore.lastSince;
+
+    if (lastSince != null) {
+      log.info('[updateLatestLastSince] updating $lastSince');
+      await saveLastSince(lastSince: lastSince);
+    }
   };
 }
 
@@ -259,16 +279,20 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       }
 
       // Update encryption one time key count
-      store.dispatch(updateOneTimeKeyCounts(
-        Map<String, int>.from(oneTimeKeyCount),
-      ));
+      store.dispatch(
+        updateOneTimeKeyCounts(
+          Map<String, int>.from(oneTimeKeyCount),
+        ),
+      );
 
       // Update synced to indicate init sync and next batch id (lastSince)
-      store.dispatch(SetSynced(
-        synced: true,
-        syncing: false,
-        lastSince: nextBatch,
-      ));
+      store.dispatch(
+        SetSynced(
+          synced: true,
+          syncing: false,
+          lastSince: nextBatch,
+        ),
+      );
 
       if (isFullSync) {
         printInfo('[fetchSync] *** full sync completed ***');
@@ -342,48 +366,60 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         await store.dispatch(redactEvents(room: roomSynced, redactions: sync.redactions));
 
         // handles editing newly fetched messages
-        final messages = await store.dispatch(mutateMessages(
-          messages: sync.messages,
-          existing: messagesOld,
-        )) as List<Message>;
+        final messages = await store.dispatch(
+          mutateMessages(
+            messages: sync.messages,
+            existing: messagesOld,
+          ),
+        ) as List<Message>;
 
         // update encrypted messages (updating before normal messages prevents flicker)
         if (roomSynced.encryptionEnabled) {
           final decryptedOld = store.state.eventStore.messagesDecrypted[roomId];
 
-          final decrypted = await store.dispatch(decryptMessages(
-            roomSynced,
-            messages,
-          )) as List<Message>;
+          final decrypted = await store.dispatch(
+            decryptMessages(
+              roomSynced,
+              messages,
+            ),
+          ) as List<Message>;
 
           // handles editing newly fetched decrypted messages
-          final decryptedMutated = await store.dispatch(mutateMessages(
-            messages: decrypted,
-            existing: decryptedOld,
-          )) as List<Message>;
+          final decryptedMutated = await store.dispatch(
+            mutateMessages(
+              messages: decrypted,
+              existing: decryptedOld,
+            ),
+          ) as List<Message>;
 
-          await store.dispatch(addMessagesDecrypted(
-            roomId: roomSynced.id,
-            messages: decryptedMutated,
-          ));
+          await store.dispatch(
+            addMessagesDecrypted(
+              roomId: roomSynced.id,
+              messages: decryptedMutated,
+            ),
+          );
         }
 
         // save normal or encrypted messages
-        await store.dispatch(addMessages(
-          roomId: roomSynced.id,
-          messages: messages,
-          clear: sync.override ?? false,
-        ));
+        await store.dispatch(
+          addMessages(
+            roomId: roomSynced.id,
+            messages: messages,
+            clear: sync.override ?? false,
+          ),
+        );
 
         // update room
         store.dispatch(SetRoom(room: roomSynced));
 
         // fetch avatar if a uri was found
         if (roomSynced.avatarUri != null) {
-          store.dispatch(fetchMedia(
-            mxcUri: roomSynced.avatarUri,
-            thumbnail: true,
-          ));
+          store.dispatch(
+            fetchMedia(
+              mxcUri: roomSynced.avatarUri,
+              thumbnail: true,
+            ),
+          );
         }
 
         // fetch previous messages since last /sync (a messages gap)
@@ -393,11 +429,13 @@ ThunkAction<AppState> syncRooms(Map roomData) {
             '[syncRooms] ${roomSynced.name} LIMITED TRUE - Fetching more messages',
           );
 
-          store.dispatch(fetchMessageEvents(
-            room: roomSynced,
-            from: roomSynced.prevBatch,
-            override: true,
-          ));
+          store.dispatch(
+            fetchMessageEvents(
+              room: roomSynced,
+              from: roomSynced.prevBatch,
+              override: true,
+            ),
+          );
         }
         // TODO: this should happen immediately and backfill should happen in background
         // a recursive sync for the messages gap has now finished
