@@ -320,10 +320,10 @@ class _Props extends Equatable {
           await store.dispatch(toggleBlockUser(user: user));
         },
         onCreateChatDirect: ({required User user}) async => store.dispatch(
-            createRoom(
-              isDirect: true,
-              invites: <User>[user],
-            ),
+          createRoom(
+            isDirect: true,
+            invites: <User>[user],
           ),
+        ),
       );
 }
