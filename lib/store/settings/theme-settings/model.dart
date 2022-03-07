@@ -11,6 +11,7 @@ enum ThemeType {
   Dark,
   Darker,
   Night,
+  System,
 }
 enum FontName {
   Rubik,
