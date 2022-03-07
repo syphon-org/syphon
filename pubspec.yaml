@@ -88,7 +88,7 @@ dependencies:
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
   ### ui
-  swipeable: ^1.1.0
+  swipe_to: ^1.0.2
   cupertino_icons: ^1.0.2
   url_launcher: ^6.0.3
   flutter_svg: ^0.22.0
@@ -131,10 +131,6 @@ dev_dependencies:
 # TODO: remove when similar functionality is merged
 dependency_overrides:
   platform: ^3.1.0
-  swipeable: # TODO: null saftey version
-    git:
-      url: https://github.com/ereio/swipeable.git
-      ref: 867b117f15f51404e31597d8ab9d5325f6b52938
   fab_circular_menu: # TODO: accesibility and color theme issues
     git:
       url: https://github.com/ereio/fab-circular-menu.git

@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:swipeable/swipeable.dart';
+import 'package:swipe_to/swipe_to.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
@@ -387,33 +387,12 @@ class MessageWidget extends StatelessWidget {
       replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
     }
 
-    return Swipeable(
-      onSwipeLeft: isUserSent ? () => onSwipeMessage(message) : () => {},
-      onSwipeRight: !isUserSent ? () => onSwipeMessage(message) : () => {},
-      background: Positioned(
-        top: 0,
-        bottom: 0,
-        left: !isUserSent ? 0 : null,
-        right: isUserSent ? 0 : null,
-        child: Opacity(
-          // HACK: hide the reply icon under the message
-          opacity: opacity == 0.5 ? 0 : 1,
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isUserSent ? 24 : 50,
-            ),
-            child: Flex(
-              direction: Axis.horizontal,
-              mainAxisAlignment: alignmentMessage,
-              // ignore: avoid_redundant_argument_values
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const <Widget>[
-                Icon(Icons.reply, size: Dimensions.iconSizeLarge),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return SwipeTo(
+      onLeftSwipe: isUserSent ? () => onSwipeMessage(message) : null,
+      onRightSwipe: !isUserSent ? () => onSwipeMessage(message) : null,
+      iconOnLeftSwipe: Icons.reply,
+      iconOnRightSwipe: Icons.reply,
+      iconSize: Dimensions.iconSizeLarge,
       child: GestureDetector(
         onLongPress: () {
           if (onLongPress != null) {
