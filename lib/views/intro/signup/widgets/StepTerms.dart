@@ -22,161 +22,159 @@ class TermsStep extends StatelessWidget {
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
         final double width = MediaQuery.of(context).size.width;
-        return Container(
-          child: Flex(
-            direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Flexible(
-                flex: 6,
-                child: Container(
-                  width: width * 0.75,
-                  constraints: BoxConstraints(
-                    maxHeight: Dimensions.mediaSize,
-                    maxWidth: Dimensions.mediaSize,
-                  ),
-                  padding: EdgeInsets.only(
-                    bottom: 24,
-                  ),
-                  child: Stack(
-                    children: [
-                      SvgPicture.asset(
-                        Assets.heroSyncFiles,
-                        semanticsLabel: 'A couple of documents with a checked circle on the bottom',
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 24,
+        return Flex(
+          direction: Axis.vertical,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Flexible(
+              flex: 6,
+              child: Container(
+                width: width * 0.75,
+                constraints: BoxConstraints(
+                  maxHeight: Dimensions.mediaSize,
+                  maxWidth: Dimensions.mediaSize,
+                ),
+                padding: EdgeInsets.only(
+                  bottom: 24,
+                ),
+                child: Stack(
+                  children: [
+                    SvgPicture.asset(
+                      Assets.heroSyncFiles,
+                      semanticsLabel: 'A couple of documents with a checked circle on the bottom',
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 24,
+                      child: Container(
+                        height: 56,
+                        width: 56,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(40),
+                          color: const Color(Colours.cyanSyphon),
+                        ),
                         child: Container(
-                          height: 56,
-                          width: 56,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(40),
-                            color: const Color(Colours.cyanSyphon),
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 32,
                           ),
-                          child: Container(
-                            child: Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 32,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 2,
+              child: Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(bottom: 8, top: 8),
+                    child: Text(
+                      '${props.homeserver} requires you read\nand agree to a terms of service.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                  ),
+                  Container(
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 24,
+                          ),
+                          child: Text(
+                            'Agree to Terms of Service',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headline5,
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              // TODO: show terms of service explaination dialog
+                            },
+                            child: Container(
+                              height: 20,
+                              width: 20,
+                              child: Icon(
+                                Icons.info_outline,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
                           ),
                         ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
-              Flexible(
-                flex: 2,
-                child: Flex(
-                  direction: Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(bottom: 8, top: 8),
-                      child: Text(
-                        '${props.homeserver} requires you read\nand agree to a terms of service.',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                    ),
-                    Container(
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 24,
-                            ),
-                            child: Text(
-                              'Agree to Terms of Service',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headline5,
-                            ),
+            ),
+            Flexible(
+              flex: 1,
+              child: Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: width,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.only(
+                            top: 8,
+                            left: 8,
+                            right: 8,
+                            bottom: 8,
                           ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: () {
-                                // TODO: show terms of service explaination dialog
-                              },
-                              child: Container(
-                                height: 20,
-                                width: 20,
-                                child: Icon(
-                                  Icons.info_outline,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Flex(
-                  direction: Axis.vertical,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: width,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.only(
-                              top: 8,
-                              left: 8,
-                              right: 8,
-                              bottom: 8,
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                props.onToggleAgreement();
-                              },
-                              child: Icon(
-                                props.agreement ? Icons.check_box : Icons.check_box_outline_blank,
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
+                          child: GestureDetector(
                             onTap: () {
-                              props.onViewTermsOfService();
+                              props.onToggleAgreement();
                             },
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                text: 'Agree to ${props.homeserver} ',
-                                style: Theme.of(context).textTheme.subtitle1,
-                                children: <TextSpan>[
-                                  TextSpan(
-                                    text: 'terms of service',
-                                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                                          fontWeight: FontWeight.w400,
-                                          decorationStyle: TextDecorationStyle.solid,
-                                        ),
-                                  ),
-                                ],
-                              ),
+                            child: Icon(
+                              props.agreement ? Icons.check_box : Icons.check_box_outline_blank,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            props.onViewTermsOfService();
+                          },
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              text: 'Agree to ${props.homeserver} ',
+                              style: Theme.of(context).textTheme.subtitle1,
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: 'terms of service',
+                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                        fontWeight: FontWeight.w400,
+                                        decorationStyle: TextDecorationStyle.solid,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         );
       });
 }

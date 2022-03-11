@@ -28,6 +28,8 @@ class Values {
   static const channel_description = '$appName messaging client message and status notifications';
 
   // syphon related
+  static const supportChatId = '!VOjfyYgIaAYZIVpxkl:matrix.org';
+  static const supportChatAlias = '#syphon-support:matrix.org';
   static const supportEmail = 'hello@syphon.org';
   static const openHelpUrl =
       'mailto:$supportEmail?subject=Syphon%20Support%20-%20App&body=Hey%20Syphon%20Team%2C%0D%0A%0D%0A%3CLeave%20your%20feedback%2C%20questions%20or%20concerns%20here%3E%0D%0A%0D%0AThanks!';
@@ -43,7 +45,7 @@ class Values {
   static const emailRegex = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
   static const urlRegex =
       r'[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)';
-  static const msisdnRegex = r'[0-9]{1-3}[0-9]{1-12}';
+  static const msisdnRegex = '[0-9]{1-3}[0-9]{1-12}';
 
   // Animations
   static const animationDurationDefault = 350; // millis
@@ -60,7 +62,7 @@ class Values {
 }
 
 // ignore: non_constant_identifier_names
-final bool DEBUG_MODE = !kReleaseMode;
+const bool DEBUG_MODE = !kReleaseMode;
 
 class SupportedLanguages {
   static const defaultLang = 'en';

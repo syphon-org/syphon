@@ -67,8 +67,9 @@ extension MatrixMessageType on MessageType {
         return MatrixMessageTypes.image;
       case MessageType.file:
         return MatrixMessageTypes.file;
+      default:
+        return '';
     }
-    return '';
   }
 
   String get value => _value(this);

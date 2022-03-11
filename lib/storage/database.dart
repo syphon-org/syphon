@@ -139,13 +139,15 @@ void _openDatabaseBackground(DatabaseInfo info) {
   initDatabase();
 
   final driftIsolate = DriftIsolate.inCurrent(
-    () => DatabaseConnection.fromExecutor(NativeDatabase(
-      File(info.path),
-      logStatements: false, // DEBUG_MODE,
-      setup: (rawDb) {
-        rawDb.execute("PRAGMA key = '${info.key}';");
-      },
-    )),
+    () => DatabaseConnection.fromExecutor(
+      NativeDatabase(
+        File(info.path),
+        logStatements: false, // DEBUG_MODE,
+        setup: (rawDb) {
+          rawDb.execute("PRAGMA key = '${info.key}';");
+        },
+      ),
+    ),
   );
 
   if (info.port == null) {
@@ -175,11 +177,13 @@ Future<DriftIsolate> spawnDatabaseIsolate(AppContext context, {String pin = Valu
 /// https://drift.simonbinder.eu/docs/advanced-features/isolates/
 ///
 StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.empty}) {
-  final connection = DatabaseConnection.delayed(() async {
-    final isolate = await spawnDatabaseIsolate(context, pin: pin);
-    // ignore: unnecessary_await_in_return
-    return await isolate.connect();
-  }());
+  final connection = DatabaseConnection.delayed(
+    () async {
+      final isolate = await spawnDatabaseIsolate(context, pin: pin);
+      // ignore: unnecessary_await_in_return
+      return await isolate.connect();
+    }(),
+  );
 
   return StorageDatabase.connect(connection);
 }
@@ -200,21 +204,23 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   });
 }
 
-@DriftDatabase(tables: [
-  Messages,
-  Decrypted,
-  Rooms,
-  Users,
-  Medias,
-  Reactions,
-  Receipts,
-  Auths,
-  Syncs,
-  Cryptos,
-  MessageSessions,
-  KeySessions,
-  Settings,
-])
+@DriftDatabase(
+  tables: [
+    Messages,
+    Decrypted,
+    Rooms,
+    Users,
+    Medias,
+    Reactions,
+    Receipts,
+    Auths,
+    Syncs,
+    Cryptos,
+    MessageSessions,
+    KeySessions,
+    Settings,
+  ],
+)
 class StorageDatabase extends _$StorageDatabase {
   StorageDatabase(AppContext context, {String pin = ''}) : super(openDatabase(context, pin: pin));
 

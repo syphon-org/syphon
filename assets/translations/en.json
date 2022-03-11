@@ -190,6 +190,7 @@
     "prompt-confirm-deactivate": "Enter your password below to confirm deactivation",
     "placeholder-topic": "No Topic Description",
     "content-thanks": "Thanks for trying out {}!\n\n",
+    "content-support-dialog": "The Syphon community is here to help you however we can.\n\nFeel free to join our Support chat or send us an email. Please be aware email can take anywhere from 1-5+ business days for a reply!",
     "content-password-recommendation": "Try thinking up 3 or more random\nwords you'll easily remember",
     "content-intro-section-one": "{} works by using an encrypted \nand decentralized network \ncalled ",
     "content-intro-section-two": "Matrix enables you to message others",
