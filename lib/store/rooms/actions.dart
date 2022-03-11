@@ -181,16 +181,18 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
       final joinedRooms = data['joined_rooms'] as List<dynamic>;
       final joinedRoomsList = joinedRooms.map((id) => Room(id: id)).toList();
 
-      await Future.wait(joinedRoomsList.map((room) async {
-        try {
-          await store.dispatch(fetchRoom(room.id, fetchState: syncState));
-          await store.dispatch(fetchRoomMembers(room: room));
-        } catch (error) {
-          printError('[fetchRoom(s)] ${room.id} $error');
-        } finally {
-          store.dispatch(UpdateRoom(id: room.id, syncing: false));
-        }
-      }));
+      await Future.wait(
+        joinedRoomsList.map((room) async {
+          try {
+            await store.dispatch(fetchRoom(room.id, fetchState: syncState));
+            await store.dispatch(fetchRoomMembers(room: room));
+          } catch (error) {
+            printError('[fetchRoom(s)] ${room.id} $error');
+          } finally {
+            store.dispatch(UpdateRoom(id: room.id, syncing: false));
+          }
+        }),
+      );
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
       printError('[fetchRoom(s)] $error');
@@ -229,13 +231,15 @@ ThunkAction<AppState> fetchDirectRooms() {
 
       // Wait for all room data to be pulled
       // Fetch room state and messages by userId/roomId
-      await Future.wait(directRoomList.map((roomId) async {
-        try {
-          await store.dispatch(fetchRoom(roomId, direct: true));
-        } catch (error) {
-          printError('[fetchDirectRooms] $error');
-        }
-      }));
+      await Future.wait(
+        directRoomList.map((roomId) async {
+          try {
+            await store.dispatch(fetchRoom(roomId, direct: true));
+          } catch (error) {
+            printError('[fetchDirectRooms] $error');
+          }
+        }),
+      );
     } catch (error) {
       printError('[fetchDirectRooms] $error');
     } finally {
@@ -267,20 +271,26 @@ ThunkAction<AppState> fetchRoomMembers({
 
       final members = data['joined'] as Map<String, dynamic>;
 
-      await store.dispatch(setUsers(Map.from(members).map(
-        (key, value) => MapEntry(
-          key,
-          User(
-            userId: key,
-            avatarUri: value['avatar_url'],
-            displayName: value['display_name'],
+      await store.dispatch(
+        setUsers(
+          Map.from(members).map(
+            (key, value) => MapEntry(
+              key,
+              User(
+                userId: key,
+                avatarUri: value['avatar_url'],
+                displayName: value['display_name'],
+              ),
+            ),
           ),
         ),
-      )));
+      );
 
-      store.dispatch(SetRoom(
-        room: _room.copyWith(userIds: members.keys.toList()),
-      ));
+      store.dispatch(
+        SetRoom(
+          room: _room.copyWith(userIds: members.keys.toList()),
+        ),
+      );
     } catch (error) {
       printError('[updateRoom] $error');
       return null;
@@ -410,10 +420,12 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
       }
 
       // mark read locally only
-      await store.dispatch(UpdateRoom(
-        id: roomId,
-        lastRead: DateTime.now().millisecondsSinceEpoch,
-      ));
+      await store.dispatch(
+        UpdateRoom(
+          id: roomId,
+          lastRead: DateTime.now().millisecondsSinceEpoch,
+        ),
+      );
 
       // send read receipt remotely to mark locally on /sync
       if (store.state.settingsStore.readReceipts != ReadReceiptTypes.Off) {
@@ -422,18 +434,22 @@ ThunkAction<AppState> markRoomRead({String? roomId}) {
         );
 
         if (messageLatest != null) {
-          store.dispatch(sendReadReceipts(
-            room: Room(id: roomId),
-            message: messageLatest,
-          ));
+          store.dispatch(
+            sendReadReceipts(
+              room: Room(id: roomId),
+              message: messageLatest,
+            ),
+          );
         }
       }
     } catch (error) {
-      store.dispatch(addAlert(
-        message: 'Failed to mark chat as read',
-        error: error,
-        origin: 'markRoomRead',
-      ));
+      store.dispatch(
+        addAlert(
+          message: 'Failed to mark chat as read',
+          error: error,
+          origin: 'markRoomRead',
+        ),
+      );
     }
   };
 }
@@ -454,11 +470,13 @@ ThunkAction<AppState> markRoomsReadAll() {
         store.dispatch(markRoomRead(roomId: room.id));
       }
     } catch (error) {
-      store.dispatch(addAlert(
-        message: 'Failed to mark all room as read',
-        error: error,
-        origin: 'markRoomRead',
-      ));
+      store.dispatch(
+        addAlert(
+          message: 'Failed to mark all room as read',
+          error: error,
+          origin: 'markRoomRead',
+        ),
+      );
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -569,10 +587,12 @@ ThunkAction<AppState> updateRoomAvatar({
 }) {
   return (Store<AppState> store) async {
     try {
-      final data = await store.dispatch(uploadMedia(
-        localFile: localFile!,
-        mediaName: roomId,
-      ));
+      final data = await store.dispatch(
+        uploadMedia(
+          localFile: localFile!,
+          mediaName: roomId,
+        ),
+      );
 
       final content = {
         'url': data['content_uri'],
@@ -744,11 +764,13 @@ ThunkAction<AppState> removeRoom({Room? room}) {
       store.dispatch(SetLoading(loading: true));
 
       if (room!.direct) {
-        await store.dispatch(toggleDirectRoom(
-          room: room,
-          enabled: false,
-          remove: false,
-        ));
+        await store.dispatch(
+          toggleDirectRoom(
+            room: room,
+            enabled: false,
+            remove: false,
+          ),
+        );
       }
 
       // submit a leave room request
@@ -806,11 +828,13 @@ ThunkAction<AppState> leaveRoom({Room? room}) {
       store.dispatch(SetLoading(loading: true));
 
       if (room!.direct) {
-        await store.dispatch(toggleDirectRoom(
-          room: room,
-          enabled: false,
-          remove: false,
-        ));
+        await store.dispatch(
+          toggleDirectRoom(
+            room: room,
+            enabled: false,
+            remove: false,
+          ),
+        );
       }
 
       final deleteData = await MatrixApi.leaveRoom(

@@ -17,6 +17,9 @@ linter:
     prefer_for_elements_to_map_fromIterable: false # that syntax is challenging, will change if becomes standard
     prefer_conditional_assignment: false
     sized_box_for_whitespace: false
+    always_use_package_imports: false
+
+    use_build_context_synchronously: false # powers most of the navigation...
 
     # Enabled
     prefer_single_quotes: true

@@ -254,6 +254,7 @@ class Strings {
   static const alertBackgroundService = 'Background connection enabled';
 
   // Content
+  static final contentSupportDialog = tr('content-support-dialog');
   static final contentCaptchaWarning = tr('content-captcha-warning');
   static final contentPasswordRecommendation = tr('content-password-recommendation');
   static final contentDeleteDevices = tr('content-dialog-devices-delete');
