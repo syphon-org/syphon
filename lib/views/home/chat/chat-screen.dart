@@ -15,7 +15,6 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/events/selectors.dart';
 import 'package:syphon/store/crypto/keys/actions.dart';
@@ -153,9 +152,11 @@ class ChatScreenState extends State<ChatScreen> {
 
     try {
       printInfo('TESTING');
-      await store.dispatch(backfillDecryptMessages(
-        props.room.id,
-      ));
+      await store.dispatch(
+        backfillDecryptMessages(
+          props.room.id,
+        ),
+      );
       printInfo('WHAT');
     } catch (error) {
       printError(error.toString());
@@ -188,10 +189,12 @@ class ChatScreenState extends State<ChatScreen> {
       decryptMessages(props.room, roomMessages),
     );
 
-    await store.dispatch(addMessagesDecrypted(
-      roomId: props.room.id,
-      messages: messagesDecrypted,
-    ));
+    await store.dispatch(
+      addMessagesDecrypted(
+        roomId: props.room.id,
+        messages: messagesDecrypted,
+      ),
+    );
   }
 
   onDidChange(_Props? propsOld, _Props props) {
@@ -333,10 +336,12 @@ class ChatScreenState extends State<ChatScreen> {
     /// doesn't fire onMounted or initState. Could potentially
     /// have something to do with the Visibility widget
     if (mxcUri != null) {
-      store.dispatch(fetchMedia(
-        mxcUri: mxcUri,
-        info: info,
-      ));
+      store.dispatch(
+        fetchMedia(
+          mxcUri: mxcUri,
+          info: info,
+        ),
+      );
     }
 
     final message = Message(
@@ -346,18 +351,22 @@ class ChatScreenState extends State<ChatScreen> {
     );
 
     if (props.room.encryptionEnabled) {
-      store.dispatch(sendMessageEncrypted(
-        roomId: props.room.id,
-        message: message,
-        file: file,
-        info: info,
-      ));
+      store.dispatch(
+        sendMessageEncrypted(
+          roomId: props.room.id,
+          message: message,
+          file: file,
+          info: info,
+        ),
+      );
     } else {
-      store.dispatch(sendMessage(
-        roomId: props.room.id,
-        message: message,
-        file: file,
-      ));
+      store.dispatch(
+        sendMessage(
+          roomId: props.room.id,
+          message: message,
+          file: file,
+        ),
+      );
     }
 
     inputController.clear();
@@ -455,27 +464,28 @@ class ChatScreenState extends State<ChatScreen> {
           ),
         ),
         child: EmojiPicker(
-            config: Config(
-              columns: 9,
-              indicatorColor: Theme.of(context).colorScheme.secondary,
-              bgColor: Theme.of(context).scaffoldBackgroundColor,
-              categoryIcons: CategoryIcons(
-                smileyIcon: Icons.tag_faces_rounded,
-                objectIcon: Icons.lightbulb,
-                travelIcon: Icons.flight,
-                activityIcon: Icons.sports_soccer,
-                symbolIcon: Icons.tag,
-              ),
+          config: Config(
+            columns: 9,
+            indicatorColor: Theme.of(context).colorScheme.secondary,
+            bgColor: Theme.of(context).scaffoldBackgroundColor,
+            categoryIcons: CategoryIcons(
+              smileyIcon: Icons.tag_faces_rounded,
+              objectIcon: Icons.lightbulb,
+              travelIcon: Icons.flight,
+              activityIcon: Icons.sports_soccer,
+              symbolIcon: Icons.tag,
             ),
-            onEmojiSelected: (category, emoji) {
-              props!.onToggleReaction(
-                emoji: emoji,
-                message: message,
-              );
+          ),
+          onEmojiSelected: (category, emoji) {
+            props!.onToggleReaction(
+              emoji: emoji,
+              message: message,
+            );
 
-              Navigator.pop(context, false);
-              onToggleSelectedMessage(null);
-            }),
+            Navigator.pop(context, false);
+            onToggleSelectedMessage(null);
+          },
+        ),
       ),
     );
   }
@@ -837,16 +847,20 @@ class _Props extends Equatable {
           store.dispatch(setDeviceKeys(usersDeviceKeys));
         },
         onSaveDraftMessage: ({String? body, String? type}) {
-          store.dispatch(saveDraft(
-            body: body,
-            type: type,
-            room: store.state.roomStore.rooms[roomId],
-          ));
+          store.dispatch(
+            saveDraft(
+              body: body,
+              type: type,
+              room: store.state.roomStore.rooms[roomId],
+            ),
+          );
         },
         onClearDraftMessage: ({String? body, String? type}) {
-          store.dispatch(clearDraft(
-            room: store.state.roomStore.rooms[roomId],
-          ));
+          store.dispatch(
+            clearDraft(
+              room: store.state.roomStore.rooms[roomId],
+            ),
+          );
         },
         onSendMessage: (
             {required String body, String? type, bool edit = false, Message? related}) async {
@@ -860,20 +874,24 @@ class _Props extends Equatable {
           );
 
           if (room.encryptionEnabled) {
-            return store.dispatch(sendMessageEncrypted(
+            return store.dispatch(
+              sendMessageEncrypted(
+                roomId: room.id,
+                message: message,
+                related: related,
+                edit: edit,
+              ),
+            );
+          }
+
+          return store.dispatch(
+            sendMessage(
               roomId: room.id,
               message: message,
               related: related,
               edit: edit,
-            ));
-          }
-
-          return store.dispatch(sendMessage(
-            roomId: room.id,
-            message: message,
-            related: related,
-            edit: edit,
-          ));
+            ),
+          );
         },
         onDeleteMessage: ({Message? message, Room? room}) {
           if (message != null && room != null) {
@@ -881,14 +899,18 @@ class _Props extends Equatable {
           }
         },
         onAcceptInvite: () {
-          store.dispatch(acceptRoom(
-            room: selectRoom(state: store.state, id: roomId),
-          ));
+          store.dispatch(
+            acceptRoom(
+              room: selectRoom(state: store.state, id: roomId),
+            ),
+          );
         },
         onRejectInvite: () {
-          store.dispatch(leaveRoom(
-            room: selectRoom(state: store.state, id: roomId),
-          ));
+          store.dispatch(
+            leaveRoom(
+              room: selectRoom(state: store.state, id: roomId),
+            ),
+          );
         },
         onMarkRead: () {
           store.dispatch(markRoomRead(roomId: roomId));
@@ -896,10 +918,12 @@ class _Props extends Equatable {
         onFetchNewest: () {
           final room = selectRoom(id: roomId, state: store.state);
 
-          store.dispatch(fetchMessageEvents(
-            room: room,
-            from: room.nextBatch,
-          ));
+          store.dispatch(
+            fetchMessageEvents(
+              room: room,
+              from: room.nextBatch,
+            ),
+          );
         },
         onToggleReaction: ({Message? message, String? emoji}) {
           final room = selectRoom(id: roomId, state: store.state);
@@ -923,11 +947,13 @@ class _Props extends Equatable {
               messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
 
           // fetch messages from the oldest cached batch
-          return store.dispatch(fetchMessageEvents(
-            room: room,
-            from: oldest.prevBatch,
-            timestamp: oldest.timestamp,
-          ));
+          return store.dispatch(
+            fetchMessageEvents(
+              room: room,
+              from: oldest.prevBatch,
+              timestamp: oldest.timestamp,
+            ),
+          );
         },
       );
 }

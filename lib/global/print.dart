@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -6,6 +8,12 @@ import 'package:syphon/global/values.dart';
 typedef PrintJson = void Function(Map? jsonMap);
 typedef PrintDebug = void Function(String message, {String title});
 typedef PrintError = void Function(String message, {String? title});
+
+void _printThreaded(String content, {String? title}) {
+  if (DEBUG_MODE) {
+    print(content);
+  }
+}
 
 void _printInfo(String content, {String? title}) {
   final output = title != null ? '[$title] $content' : content;
@@ -61,6 +69,7 @@ class log {
   static warn(String content, {String? title}) => _printWarning(content, title: title);
   static error(String content, {String? title}) => _printError(content, title: title);
   static debug(String content, {String? title}) => _printDebug(content, title: title);
+  static threaded(String content, {String? title}) => _printThreaded(content, title: title);
   static release(String content, {String? title}) => _printRelease(content, title: title);
   static json(Map? json) => _printJson(json);
 }

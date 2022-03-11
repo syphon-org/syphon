@@ -12,8 +12,8 @@ import 'package:syphon/views/widgets/buttons/button-text.dart';
 /// as they come with desired styling and generally
 /// what is needed for a confirmation layout
 ///
-class DialogConfirm extends StatelessWidget {
-  const DialogConfirm({
+class DialogOptions extends StatelessWidget {
+  const DialogOptions({
     Key? key,
     this.title = '',
     this.content = '',
@@ -51,8 +51,8 @@ class DialogConfirm extends StatelessWidget {
           Text(content),
           Container(
             padding: EdgeInsets.only(top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            child: Wrap(
+              alignment: WrapAlignment.center,
               children: [
                 ButtonText(
                   disabled: loading,

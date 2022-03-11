@@ -159,9 +159,11 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.paused:
+        store.dispatch(updateLatestLastSince());
         store.dispatch(setBackgrounded(true));
         break;
       case AppLifecycleState.detached:
+        store.dispatch(updateLatestLastSince());
         store.dispatch(setBackgrounded(true));
         break;
     }
@@ -356,24 +358,26 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     final alertMessage = alertOverride ?? alert.message ?? alert.error ?? Strings.alertUnknown;
 
-    globalScaffold.currentState?.showSnackBar(SnackBar(
-      backgroundColor: color,
-      content: Text(
-        alertMessage,
-        style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white),
+    globalScaffold.currentState?.showSnackBar(
+      SnackBar(
+        backgroundColor: color,
+        content: Text(
+          alertMessage,
+          style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.white),
+        ),
+        duration: alert.duration,
+        action: SnackBarAction(
+          label: alert.action ?? Strings.buttonDismiss,
+          textColor: Colors.white,
+          onPressed: () {
+            if (alert.onAction != null) {
+              alert.onAction!();
+            }
+            globalScaffold.currentState?.removeCurrentSnackBar();
+          },
+        ),
       ),
-      duration: alert.duration,
-      action: SnackBarAction(
-        label: alert.action ?? Strings.buttonDismiss,
-        textColor: Colors.white,
-        onPressed: () {
-          if (alert.onAction != null) {
-            alert.onAction!();
-          }
-          globalScaffold.currentState?.removeCurrentSnackBar();
-        },
-      ),
-    ));
+    );
   }
 
   onDestroyListeners() async {

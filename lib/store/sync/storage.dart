@@ -16,10 +16,12 @@ extension SyncQueries on StorageDatabase {
   Future<int> insertSyncStore(SyncStore store) async {
     final storeJson = json.decode(json.encode(store));
 
-    return into(syncs).insertOnConflictUpdate(SyncsCompanion(
-      id: Value(StorageKeys.SYNC),
-      store: Value(storeJson),
-    ));
+    return into(syncs).insertOnConflictUpdate(
+      SyncsCompanion(
+        id: Value(StorageKeys.SYNC),
+        store: Value(storeJson),
+      ),
+    );
   }
 
   Future<SyncStore?> selectSyncStore() async {
@@ -47,7 +49,7 @@ Future<SyncStore?> loadSync({required StorageDatabase storage}) async {
   try {
     return storage.selectSyncStore();
   } catch (error) {
-    printError(error.toString(), title: 'loadAuth');
+    log.error(error.toString(), title: 'loadAuth');
     return null;
   }
 }
