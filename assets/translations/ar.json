@@ -268,5 +268,6 @@
     "content-notification-style-type-inbox": "تجميع الرسائل الجديدة في إخطار واحد",
     "list-item-chat-detail-vibrate": "اهتزاز",
     "content-notification-style-type-latest": "إظهار إشعار واحد مع أحدث رسالة",
-    "label-show-attachment-options": "فتح خيارات المرفقات"
+    "label-show-attachment-options": "فتح خيارات المرفقات",
+    "content-support-dialog": "مجتمع Syphon هنا لمساعدتك قدر الإمكان.\n\nلا تتردد في الانضمام إلى دردشة الدعم الخاصة بنا أو إرسال بريد إلكتروني إلينا. يرجى الانتباه إلى أن البريد الإلكتروني يمكن أن يستغرق في أي مكان من 1-5 + أيام عمل للرد!"
 }
