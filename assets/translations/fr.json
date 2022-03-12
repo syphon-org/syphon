@@ -268,5 +268,6 @@
     "content-notification-style-type-inbox": "Regrouper les nouveaux messages dans une même notification",
     "content-notification-style-type-latest": "Afficher une notification avec le message le plus récent",
     "content-notification-style-type-itemized": "Une nouvelle notification apparaîtra pour chaque nouveau message",
-    "label-show-attachment-options": "Ouvrir les options de pièce jointe"
+    "label-show-attachment-options": "Ouvrir les options de pièce jointe",
+    "content-support-dialog": "La communauté Syphon est là pour vous aider dans la mesure de ses possibilités.\n\nN'hésitez pas à rejoindre notre discussion d'assistance ou à nous envoyer un courriel. Veuillez noter que la réponse à un courriel peut prendre de 1 à 5 jours ouvrables !"
 }
