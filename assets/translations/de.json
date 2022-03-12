@@ -268,5 +268,6 @@
     "content-notification-style-type-inbox": "Neue Nachrichten in einer Benachrichtigung gruppieren",
     "content-notification-style-type-latest": "Eine Benachrichtigung mit der aktuellsten Nachricht anzeigen",
     "content-notification-style-type-itemized": "Für jede neue Nachricht wird eine neue Benachrichtigung angezeigt",
-    "label-show-attachment-options": "Optionen für Anhänge öffnen"
+    "label-show-attachment-options": "Optionen für Anhänge öffnen",
+    "content-support-dialog": "Die Syphon-Gemeinschaft ist hier, um Ihnen zu helfen, wo immer wir können.\n\nNehmen Sie einfach an unserem Support-Chat teil oder schicken Sie uns eine E-Mail. Bitte beachten Sie, dass die Beantwortung einer E-Mail zwischen 1-5+ Werktagen dauern kann!"
 }
