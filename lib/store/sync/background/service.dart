@@ -338,6 +338,8 @@ Future backgroundSync({
       /// Inbox Style Notifications Only
       ///
       if (settings.styleType == StyleType.Inbox) {
+        if (notifications.isEmpty) return;
+
         var body = 'You have a new unread message';
 
         if (uncheckedMessages.keys.length > 1) {
