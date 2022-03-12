@@ -268,5 +268,6 @@
     "content-notification-style-type-itemized": "Una nuova notifica apparirà per ogni nuovo messaggio",
     "list-item-chat-detail-vibrate": "Vibrazione",
     "content-notification-style-type-inbox": "Raggruppa i nuovi messaggi in una notifica",
-    "label-show-attachment-options": "Apri le opzioni degli allegati"
+    "label-show-attachment-options": "Apri le opzioni degli allegati",
+    "content-support-dialog": "La community di Syphon è qui per aiutarti come può.\n\nSentiti libero di unirti alla nostra chat di supporto o inviarci un'e-mail. Tieni presente che l'e-mail può richiedere da 1 a 5 giorni lavorativi per una risposta!"
 }
