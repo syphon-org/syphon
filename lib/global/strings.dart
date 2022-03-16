@@ -127,7 +127,7 @@ class Strings {
 
   static String listItemUserDetailsStartChat(String? name) =>
       tr('list-item-user-details-start-chat', args: ['$name']);
-  static final listItemUserDetailsRoomInvite = tr('list-item-user-details-room-invite');
+  static final listItemUserDetailsRoomInvite = tr('list-item-user-details-invite-to-room');
   static final listItemUserDetailsSendMessage = tr('list-item-user-details-send-message');
   static final listItemUserDetailsViewProfile = tr('list-item-user-details-view-profile');
   static final listItemUserDetailsUnblockUser = tr('list-item-user-details-unblock-user');
