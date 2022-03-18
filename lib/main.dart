@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/rendering.dart';
 import 'package:syphon/context/storage.dart';
 import 'package:syphon/global/platform.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/views/prelock.dart';
 
 // ignore: avoid_void_async
@@ -14,6 +15,9 @@ void main() async {
   // pull current context / nullable
   final context = await loadContextCurrent();
 
+  if (DEBUG_MODE) {
+    debugPaintSizeEnabled = true;
+  }
   // init app
   runApp(Prelock(
     appContext: context,

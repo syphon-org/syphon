@@ -32,7 +32,7 @@ bool cacheMiddleware(Store<AppState> store, dynamic action) {
       printInfo('[initStore] persistor saving from ${action.runtimeType}');
       return true;
     case SetSynced:
-      return (action as SetSynced).synced ?? false;
+      return ((action as SetSynced).synced ?? false) && !store.state.syncStore.synced;
     default:
       return false;
   }
