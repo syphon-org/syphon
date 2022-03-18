@@ -7,6 +7,7 @@ import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
@@ -73,12 +74,31 @@ class SearchUserState extends State<SearchUserScreen> {
   }
 
   @protected
-  onCreateChat({required BuildContext context, _Props? props, User? user}) async {
+  onCreateChat({required BuildContext context, required User user, _Props? props}) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    final existingChatId = selectDirectChatIdExisting(
+      state: store.state,
+      user: user,
+    );
+
+    // Navigate to existing DM if one already exists
+    if (existingChatId.isNotEmpty) {
+      return Navigator.popAndPushNamed(
+        context,
+        Routes.chat,
+        arguments: ChatScreenArguments(
+          roomId: existingChatId,
+          title: user.displayName,
+        ),
+      );
+    }
+
     return showDialog(
       context: context,
       builder: (BuildContext dialogContext) => DialogStartChat(
         user: user,
-        title: 'Chat with ${formatUsername(user!)}',
+        title: 'Chat with ${formatUsername(user)}',
         content: Strings.confirmStartChat,
         onStartChat: () async {
           setState(() {
@@ -108,7 +128,26 @@ class SearchUserState extends State<SearchUserScreen> {
   /// attempt chating with a user by the name searched
   ///
   @protected
-  onAttemptChat({required User user, required BuildContext context, _Props? props}) async {
+  onAttemptChat({required BuildContext context, required User user, _Props? props}) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    final existingChatId = selectDirectChatIdExisting(
+      state: store.state,
+      user: user,
+    );
+
+    // Navigate to existing DM if one already exists
+    if (existingChatId.isNotEmpty) {
+      return Navigator.popAndPushNamed(
+        context,
+        Routes.chat,
+        arguments: ChatScreenArguments(
+          roomId: existingChatId,
+          title: user.displayName,
+        ),
+      );
+    }
+
     return showDialog(
       context: context,
       builder: (BuildContext dialogContext) => DialogStartChat(
@@ -292,45 +331,46 @@ class SearchUserState extends State<SearchUserScreen> {
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
-      distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStateToProps(store),
-      builder: (context, props) {
-        return Scaffold(
-          appBar: AppBarSearch(
-            title: Strings.titleSearchUsers,
-            label: 'Search for a user...',
-            tooltip: 'Search users',
-            forceFocus: true,
-            focusNode: searchInputFocusNode,
-            onChange: (text) => setState(() {
-              searchable = text;
-            }),
-            onSearch: (text) {
-              setState(() {
+        distinct: true,
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store),
+        builder: (context, props) {
+          return Scaffold(
+            appBar: AppBarSearch(
+              title: Strings.titleSearchUsers,
+              label: 'Search for a user...',
+              tooltip: 'Search users',
+              forceFocus: true,
+              focusNode: searchInputFocusNode,
+              onChange: (text) => setState(() {
                 searchable = text;
-              });
-              props.onSearch(text);
-            },
-          ),
-          body: Stack(
-            children: [
-              Visibility(
-                visible: searchable.isEmpty,
-                child: buildPreviewList(context, props),
-              ),
-              Visibility(
-                visible: searchable.isNotEmpty,
-                child: buildSearchList(context, props),
-              ),
-              Positioned(
-                child: Loader(
-                  loading: props.loading,
+              }),
+              onSearch: (text) {
+                setState(() {
+                  searchable = text;
+                });
+                props.onSearch(text);
+              },
+            ),
+            body: Stack(
+              children: [
+                Visibility(
+                  visible: searchable.isEmpty,
+                  child: buildPreviewList(context, props),
                 ),
-              ),
-            ],
-          ),
-        );
-      });
+                Visibility(
+                  visible: searchable.isNotEmpty,
+                  child: buildSearchList(context, props),
+                ),
+                Positioned(
+                  child: Loader(
+                    loading: props.loading,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
 }
 
 class _Props extends Equatable {
@@ -382,10 +422,12 @@ class _Props extends Equatable {
           store.dispatch(searchUsers(searchText: text));
         },
         onCreateChatDirect: ({required User user}) async {
-          return store.dispatch(createRoom(
-            isDirect: true,
-            invites: <User>[user],
-          ));
+          return store.dispatch(
+            createRoom(
+              isDirect: true,
+              invites: <User>[user],
+            ),
+          );
         },
       );
 }
