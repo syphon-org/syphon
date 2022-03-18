@@ -335,9 +335,5 @@
     "tooltip-profile-settings": "Profile and Settings",
     "tooltip-search-chats": "Search Chats",
     "tooltip-search-unencrypted": "Search Unencrypted",
-    "tooltip-cancel-reply": "Cancel Reply",
-    "notification-sent-message": "{} sent a new message",
-    "notification-sent-message-in-room": "{} sent a new message in {}",
-    "notification-new-message": "New message",
-    "notification-new-invite": "New invite"
+    "tooltip-cancel-reply": "Cancel Reply"
 }

@@ -1,4 +1,3 @@
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -21,11 +20,11 @@ String parseMessageNotification({
   }
 
   if (room.direct) {
-    return Strings.notificationSentNewMessage(formattedSender);
+    return '$formattedSender sent a new message';
   }
 
   if (room.invite) {
-    return Strings.notificationInvitedToChat(formattedSender);
+    return '$formattedSender invited you to chat';
   }
 
   String roomName = INVALID;
@@ -35,10 +34,10 @@ String parseMessageNotification({
   }
 
   if (roomName.isEmpty) {
-    return Strings.notificationSentNewMessage(formattedSender);
+    return '$formattedSender sent a new message';
   }
 
-  return Strings.notificationSentNewMessageInRoom(formattedSender, roomName);
+  return '$formattedSender sent a new message in $roomName';
 }
 
 String parseMessageTitle({
@@ -57,11 +56,11 @@ String parseMessageTitle({
   }
 
   if (room.direct) {
-    return Strings.notificationNewMessage;
+    return 'New Message';
   }
 
   if (room.invite) {
-    return Strings.notificationNewInvite;
+    return 'New Invite';
   }
 
   String roomName = INVALID;
@@ -71,7 +70,7 @@ String parseMessageTitle({
   }
 
   if (roomName.isEmpty) {
-    return Strings.notificationNewMessage;
+    return 'New Message';
   }
 
   return roomName;
