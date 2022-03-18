@@ -17,10 +17,12 @@ extension SettingsQueries on StorageDatabase {
   Future<int> insertSettingsStore(SettingsStore store) async {
     final storeJson = json.decode(json.encode(store));
 
-    return into(settings).insertOnConflictUpdate(SettingsCompanion(
-      id: Value(StorageKeys.SETTINGS),
-      store: Value(storeJson),
-    ));
+    return into(settings).insertOnConflictUpdate(
+      SettingsCompanion(
+        id: Value(StorageKeys.SETTINGS),
+        store: Value(storeJson),
+      ),
+    );
   }
 
   Future<SettingsStore?> selectSettingStore() async {
@@ -62,5 +64,10 @@ Future<dynamic> saveTermsAgreement({required int timestamp}) async {
 }
 
 Future<int> loadTermsAgreement() async {
-  return int.parse(await _storage.read(key: TERMS_OF_SERVICE_ACCEPTANCE_KEY) ?? '0');
+  try {
+    return int.parse(await _storage.read(key: TERMS_OF_SERVICE_ACCEPTANCE_KEY) ?? '0');
+  } catch (error) {
+    log.debug('WHAT?');
+    return 0;
+  }
 }

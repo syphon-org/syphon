@@ -180,5 +180,8 @@
     "list-item-via": "A través de",
     "list-item-from": "Desde",
     "title-send-media-message-unencrypted": "Enviar Mensaje Multimedia (Sin cifrar)",
-    "subtitle-proxy-use-basic-authentication": "Proporcionar el nombre de usuario y la contraseña para autenticarse con un proxy"
+    "subtitle-proxy-use-basic-authentication": "Proporcionar el nombre de usuario y la contraseña para autenticarse con un proxy",
+    "content-notification-background": "Conexión en segundo plano habilitada",
+    "content-support-dialog": "La comunidad de Syphon está aquí para ayudarte en lo que podamos.\n\nNo dudes en unirte a nuestro chat de soporte o enviarnos un correo electrónico. ¡Ten en cuenta que el correo electrónico puede tardar entre 1 y 5 días laborables en ser respondido!",
+    "title-lock-overlay": "Por favor, introduzca el código de acceso."
 }

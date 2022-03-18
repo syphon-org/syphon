@@ -10,7 +10,7 @@ class SecureStorage {
 
   static Future<bool> check({required String key}) async {
     try {
-      printInfo('[SecureStorage.check] checking $key');
+      log.info('[SecureStorage.check] checking $key');
       // mobile
       if (Platform.isAndroid || Platform.isIOS) {
         // try to read key
@@ -27,6 +27,7 @@ class SecureStorage {
 
       throw '[SecureStorage.check] Unsupported device error';
     } catch (error) {
+      log.error(error.toString());
       return false;
     }
   }
@@ -44,9 +45,18 @@ class SecureStorage {
       if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
         // try to read key
         final directory = await getApplicationSupportDirectory();
+
+        // desktop requires an additional check or it will crash under macos
+        if (!(await check(key: key))) {
+          return null;
+        }
+
         return File(join(directory.path, key)).readAsString();
       }
+
+      throw '[SecureStorage.read] Unsupported device error';
     } catch (error) {
+      log.error(error.toString());
       return null;
     }
   }
@@ -62,9 +72,12 @@ class SecureStorage {
       // desktop
       if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
         final directory = await getApplicationSupportDirectory();
-        await File(join(directory.path, key)).writeAsString(value, flush: true);
+        return await File(join(directory.path, key)).writeAsString(value, flush: true);
       }
+
+      throw '[SecureStorage.write] Unsupported device error';
     } catch (error) {
+      log.error(error.toString());
       return null;
     }
   }
@@ -80,9 +93,10 @@ class SecureStorage {
       // desktop
       if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
         final directory = await getApplicationSupportDirectory();
-        await File(join(directory.path, key)).delete();
+        return await File(join(directory.path, key)).delete();
       }
     } catch (error) {
+      log.error(error.toString());
       return null;
     }
   }

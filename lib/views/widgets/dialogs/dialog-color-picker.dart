@@ -191,21 +191,23 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
           height: dialogHeight,
           constraints: !widget.advanced ? null : BoxConstraints(minHeight: 460),
           child: SingleChildScrollView(
-            child: Column(children: [
-              if (widget.advanced) buildAdvancedPicker(context) else buildDefaultPicker(context),
-              Visibility(
-                visible: widget.advanced,
-                child: TextField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30.0),
+            child: Column(
+              children: [
+                if (widget.advanced) buildAdvancedPicker(context) else buildDefaultPicker(context),
+                Visibility(
+                  visible: widget.advanced,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      labelText: 'HEX',
                     ),
-                    labelText: 'HEX',
+                    controller: controller,
                   ),
-                  controller: controller,
                 ),
-              ),
-            ]),
+              ],
+            ),
           ),
         ),
         Container(

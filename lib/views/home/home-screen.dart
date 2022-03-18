@@ -40,6 +40,7 @@ import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-ring.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-options.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
@@ -81,11 +82,49 @@ class HomeState extends State<HomeScreen> {
     }
   }
 
-  @protected
   onDismissMessageOptions() {
     setState(() {
       selectedChats = {};
     });
+  }
+
+  onSelectHelp(_Props props) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DialogOptions(
+        title: 'How can we help?',
+        content: Strings.contentSupportDialog,
+        confirmStyle: TextStyle(color: Colors.grey),
+        dismissStyle: TextStyle(color: Colors.blue),
+        dismissText: 'Join Support chat',
+        confirmText: 'Email our team',
+        onDismiss: () async {
+          final supportRoom = Room(
+            id: Values.supportChatId,
+            alias: Values.supportChatAlias,
+          );
+
+          await store.dispatch(joinRoom(room: supportRoom));
+
+          Navigator.of(dialogContext).pop();
+
+          Navigator.pushNamed(
+            context,
+            Routes.chat,
+            arguments: ChatScreenArguments(
+              roomId: supportRoom.id,
+              title: 'Syphon Support',
+            ),
+          );
+        },
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+          await launchUrl(Values.openHelpUrl);
+        },
+      ),
+    );
   }
 
   onArchiveChats(_Props props) async {
@@ -345,7 +384,7 @@ class HomeState extends State<HomeScreen> {
                 Navigator.pushNamed(context, Routes.settings);
                 break;
               case Options.help:
-                props.onSelectHelp();
+                onSelectHelp(props);
                 break;
               default:
                 break;
@@ -388,32 +427,33 @@ class HomeState extends State<HomeScreen> {
 
     if (rooms.isEmpty) {
       return Center(
-          child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            constraints: BoxConstraints(
-              minWidth: Dimensions.mediaSizeMin,
-              maxWidth: Dimensions.mediaSizeMax,
-              maxHeight: Dimensions.mediaSizeMin,
-            ),
-            child: SvgPicture.asset(
-              Assets.heroChatNotFound,
-              semanticsLabel: Strings.semanticsHomeDefault,
-            ),
-          ),
-          GestureDetector(
-            child: Container(
-              margin: EdgeInsets.only(bottom: 48),
-              padding: EdgeInsets.only(top: 16),
-              child: Text(
-                label,
-                style: Theme.of(context).textTheme.headline6,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              constraints: BoxConstraints(
+                minWidth: Dimensions.mediaSizeMin,
+                maxWidth: Dimensions.mediaSizeMax,
+                maxHeight: Dimensions.mediaSizeMin,
+              ),
+              child: SvgPicture.asset(
+                Assets.heroChatNotFound,
+                semanticsLabel: Strings.semanticsHomeDefault,
               ),
             ),
-          ),
-        ],
-      ));
+            GestureDetector(
+              child: Container(
+                margin: EdgeInsets.only(bottom: 48),
+                padding: EdgeInsets.only(top: 16),
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     return ListView.builder(
@@ -806,13 +846,17 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         themeType: store.state.settingsStore.themeSettings.themeType,
-        rooms: availableRooms(sortPrioritizedRooms(filterSearches(
-          filterBlockedRooms(
-            store.state.roomStore.roomList,
-            store.state.userStore.blocked,
+        rooms: availableRooms(
+          sortPrioritizedRooms(
+            filterSearches(
+              filterBlockedRooms(
+                store.state.roomStore.roomList,
+                store.state.userStore.blocked,
+              ),
+              store.state.searchStore.searchMessages,
+            ),
           ),
-          store.state.searchStore.searchMessages,
-        ))),
+        ),
         messages: store.state.eventStore.messages,
         decrypted: store.state.eventStore.messagesDecrypted,
         unauthed: store.state.syncStore.unauthed,
@@ -843,8 +887,6 @@ class _Props extends Equatable {
           );
           return Future(() => true);
         },
-        onSelectHelp: () async {
-          await launchUrl(Values.openHelpUrl);
-        },
+        onSelectHelp: () async {},
       );
 }

@@ -12,17 +12,12 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/sync/background/model.dart';
 import 'package:syphon/store/sync/background/parsers.dart';
+import 'package:syphon/store/sync/background/requests.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/model.dart';
-
-printThreaded(String? content) {
-  if (DEBUG_MODE) {
-    // ignore: avoid_print
-    print(content);
-  }
-}
 
 /// Background Sync Service (Android Only)
 /// static class for managing service through app lifecycle
@@ -57,13 +52,17 @@ class BackgroundSync {
     // android only background sync
     if (!Platform.isAndroid) return;
 
+    log.info('[BackgroundSync] starting');
+
     final secureStorage = FlutterSecureStorage();
 
-    printThreaded('[BackgroundSync] starting');
+    // only write here if one does not exist
+    if (!await secureStorage.containsKey(key: BackgroundSync.lastSinceKey)) {
+      await secureStorage.write(key: BackgroundSync.lastSinceKey, value: lastSince);
+    }
 
     await Future.wait([
       secureStorage.write(key: BackgroundSync.protocolKey, value: protocol),
-      secureStorage.write(key: BackgroundSync.lastSinceKey, value: lastSince),
       secureStorage.write(key: BackgroundSync.roomNamesKey, value: jsonEncode(roomNames)),
       secureStorage.write(key: BackgroundSync.notificationSettingsKey, value: jsonEncode(settings)),
       secureStorage.write(key: BackgroundSync.currentUserKey, value: jsonEncode(currentUser)),
@@ -80,17 +79,14 @@ class BackgroundSync {
     );
 
     // immediately begin checking for notifications
-    compute(
-      notificationJobThreaded,
-      {},
-    );
+    compute(notificationJobThreaded, {});
   }
 
   static Future stop() async {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      printThreaded('[BackgroundSync] $error');
+      log.error('[BackgroundSync] $error');
     }
   }
 }
@@ -100,8 +96,9 @@ class BackgroundSync {
 ///
 /// Same as below, but works in compute / isolates outside alarm_services
 ///
+/// TODO: not working off main thread - due to secure storage and flutter widget binding
 Future notificationJobThreaded(Map params) async {
-  notificationJob();
+  return notificationJob();
 }
 
 ///
@@ -120,14 +117,13 @@ Future notificationJob() async {
 
     try {
       final secureStorage = FlutterSecureStorage();
-      // TODO: figure out why this throws a null check error on non-service / compute starts
       protocol = await secureStorage.read(key: BackgroundSync.protocolKey);
       lastSince = await secureStorage.read(key: BackgroundSync.lastSinceKey);
 
       final _userString = await secureStorage.read(key: BackgroundSync.currentUserKey);
       currentUser = User.fromJson(jsonDecode(_userString ?? '{}'));
     } catch (error) {
-      return printThreaded('[notificationSync] decode error $error');
+      return log.threaded('[notificationJob] decode error $error');
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -135,15 +131,13 @@ Future notificationJob() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        printThreaded(
-          '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
-        );
+        log.threaded('[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload');
         return Future.value(true);
       },
     );
 
     if (pluginInstance == null) {
-      throw '[notificationSync] failed to initialize plugin instance';
+      throw '[notificationJob] failed to initialize plugin instance';
     }
 
     showBackgroundServiceNotification(
@@ -172,7 +166,7 @@ Future notificationJob() async {
       );
     }
   } catch (error) {
-    printThreaded('[notificationSync] $error');
+    log.threaded('[notificationJob] $error');
   }
 }
 
@@ -187,7 +181,7 @@ Future backgroundSync({
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   try {
-    printThreaded('[backgroundSync] starting sync loop');
+    log.threaded('[backgroundSync] starting sync loop');
 
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
@@ -195,7 +189,7 @@ Future backgroundSync({
     final lastSince = params['lastSince'];
     final currentUserId = params['userId'];
 
-    final roomNames = Map<String, String>.from(
+    var roomNames = Map<String, String>.from(
       params['roomNames'] ?? {},
     );
 
@@ -293,48 +287,58 @@ Future backgroundSync({
 
       // Make sure the room name exists in the cache
       if (!roomNames.containsKey(roomId) || roomNames[roomId] == Values.EMPTY_CHAT) {
-        try {
-          final roomNameList = await MatrixApi.fetchRoomName(
-            protocol: protocol,
-            homeserver: homeserver,
-            accessToken: accessToken,
-            roomId: room.id.isEmpty ? roomId : room.id,
-          );
-
-          final roomAlias = roomNameList[roomNameList.length - 1];
-          final roomName = roomAlias.replaceAll('#', '').replaceAll(r'\:.*', '');
-
-          roomNames[room.id] = roomName;
-
-          saveRoomNames(roomNames: roomNames);
-        } catch (error) {
-          // ignore: avoid_print
-          print('[backgroundSyncLoop] failed to fetch & parse room name ${room.id}');
-        }
+        roomNames = await updateRoomNames(
+          protocol: protocol,
+          homeserver: homeserver,
+          accessToken: accessToken,
+          roomId: room.id.isEmpty ? roomId : room.id,
+          roomNames: roomNames,
+        );
       }
 
       final uncheckedMessages = await loadNotificationsUnchecked();
+
+      final List<NotificationContent> notifications = [];
+
+      ///
+      /// Parse and generate notification content
+      ///
+      for (final message in events.messages) {
+        final title = parseMessageTitle(
+          room: room,
+          message: message,
+          roomNames: roomNames,
+          currentUserId: currentUserId,
+        );
+
+        final body = parseMessageNotification(
+          room: room,
+          message: message,
+          roomNames: roomNames,
+          currentUserId: currentUserId,
+        );
+
+        if (body.isNotEmpty) {
+          uncheckedMessages.addAll(
+            {message.id ?? '0': body},
+          );
+
+          notifications.add(
+            NotificationContent(
+              title: title,
+              body: body,
+            ),
+          );
+        }
+      }
+
+      await saveNotificationsUnchecked(uncheckedMessages);
 
       ///
       /// Inbox Style Notifications Only
       ///
       if (settings.styleType == StyleType.Inbox) {
-        for (final message in events.messages) {
-          final messageBody = parseMessageNotification(
-            room: room,
-            message: message,
-            roomNames: roomNames,
-            currentUserId: currentUserId,
-            protocol: protocol,
-            homeserver: homeserver,
-          );
-
-          uncheckedMessages.addAll(
-            {message.id ?? '0': messageBody},
-          );
-        }
-
-        await saveNotificationsUnchecked(uncheckedMessages);
+        if (notifications.isEmpty) return;
 
         var body = 'You have a new unread message';
 
@@ -351,45 +355,21 @@ Future backgroundSync({
         );
       }
 
-      // Run all the room messages at once once room name is confirmed
-      await Future.wait(events.messages.map((message) async {
-        final title = parseMessageTitle(
-          room: room,
-          message: message,
-          roomNames: roomNames,
-          currentUserId: currentUserId,
-          protocol: protocol,
-          homeserver: homeserver,
-        );
-
-        final body = parseMessageNotification(
-          room: room,
-          message: message,
-          roomNames: roomNames,
-          currentUserId: currentUserId,
-          protocol: protocol,
-          homeserver: homeserver,
-        );
-
-        if (body.isEmpty) return Future.value();
-
+      ///
+      /// All other Notifications styles
+      ///
+      await Future.forEach(notifications, (NotificationContent notification) async {
         await showMessageNotification(
           id: uncheckedMessages.isEmpty ? 0 : null,
-          body: body,
-          title: title,
+          body: notification.body,
+          title: notification.title,
           style: settings.styleType,
           pluginInstance: pluginInstance,
         );
-
-        uncheckedMessages.addAll(
-          {message.id ?? '0': body},
-        );
-
-        await saveNotificationsUnchecked(uncheckedMessages);
-      }));
+      });
     });
   } catch (error) {
-    printThreaded('[backgroundSync] $error');
+    log.threaded('[BackgroundSync] $error');
   }
 }
 
@@ -406,9 +386,7 @@ Future notificationSyncTEST() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        printThreaded(
-          '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload',
-        );
+        log.threaded('[onSelectNotification] payload $payload');
         return Future.value(true);
       },
     );
@@ -424,7 +402,7 @@ Future notificationSyncTEST() async {
         jsonDecode(await secureStorage.read(key: BackgroundSync.currentUserKey) ?? '{}'),
       );
     } catch (error) {
-      return printThreaded('[notificationSyncIsolate] $error');
+      return log.threaded('[notificationSyncTEST] $error');
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -441,6 +419,6 @@ Future notificationSyncTEST() async {
       },
     );
   } catch (error) {
-    printError('[notificationSyncTEST] $error');
+    log.threaded('[notificationSyncTEST] $error');
   }
 }

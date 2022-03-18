@@ -9,13 +9,11 @@ String parseMessageNotification({
   required Message message,
   required String currentUserId,
   required Map<String, String> roomNames,
-  required String protocol,
-  required String homeserver,
 }) {
   final String? messageSender = message.sender;
   final String formattedSender = trimAlias(messageSender);
 
-  if (formattedSender.isEmpty || message.sender == currentUserId) {
+  if (formattedSender.isEmpty || messageSender == currentUserId) {
     return INVALID;
   }
 
@@ -45,8 +43,6 @@ String parseMessageTitle({
   required Message message,
   required String currentUserId,
   required Map<String, String> roomNames,
-  required String protocol,
-  required String homeserver,
 }) {
   final String? messageSender = message.sender;
   final String formattedSender = trimAlias(messageSender);
