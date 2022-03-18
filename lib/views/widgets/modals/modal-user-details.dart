@@ -53,38 +53,43 @@ class ModalUserDetails extends StatelessWidget {
 
   onMessageUser({required BuildContext context, required _Props props}) async {
     final user = props.user;
-    return await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) => DialogStartChat(
-        user: user,
-        title: Strings.listItemUserDetailsStartChat(user.displayName),
-        content: Strings.confirmStartChat,
-        onStartChat: () async {
-          final newRoomId = await props.onCreateChatDirect(user: user);
+    String directChatId = props.directChatId;
 
-          Navigator.pop(dialogContext);
-
-          if (nested!) {
+    // Asking the user to create new DM if there isn't one already
+    if (directChatId.isEmpty) {
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) => DialogStartChat(
+          user: user,
+          title: Strings.listItemUserDetailsStartChat(user.displayName),
+          content: Strings.confirmStartChat,
+          onStartChat: () async {
+            directChatId = await props.onCreateChatDirect(user: user) ?? '';
             Navigator.pop(dialogContext);
-          }
 
-          if (newRoomId != null) {
-            Navigator.popAndPushNamed(
-              context,
-              Routes.chat,
-              arguments: ChatScreenArguments(
-                roomId: newRoomId,
-                title: user.displayName,
-              ),
-            );
-          }
-        },
-        onCancel: () async {
-          Navigator.pop(context);
-        },
-      ),
-    );
+            if (nested != null && nested!) {
+              Navigator.pop(dialogContext);
+            }
+          },
+          onCancel: () async {
+            Navigator.pop(dialogContext);
+          },
+        ),
+      );
+    }
+
+    if (directChatId.isNotEmpty) {
+      Navigator.popAndPushNamed(
+        context,
+        Routes.chat,
+        arguments: ChatScreenArguments(
+          roomId: directChatId,
+          title: user.displayName,
+        ),
+      );
+    }
+    
   }
 
   @override
@@ -256,6 +261,7 @@ class ModalUserDetails extends StatelessWidget {
 class _Props extends Equatable {
   final User user;
   final Map<String, User> users;
+  final String directChatId;
   final bool blocked;
   final bool loading;
   final Function onBlockUser;
@@ -264,6 +270,7 @@ class _Props extends Equatable {
   const _Props({
     required this.user,
     required this.users,
+    required this.directChatId,
     required this.loading,
     required this.blocked,
     required this.onCreateChatDirect,
@@ -274,6 +281,7 @@ class _Props extends Equatable {
   List<Object> get props => [
         user,
         users,
+        directChatId,
         loading,
         blocked,
       ];
@@ -298,6 +306,14 @@ class _Props extends Equatable {
           return users[userId] ?? User();
         }(),
         users: store.state.userStore.users,
+        directChatId: () {
+          for (final room in store.state.roomStore.roomList) {
+            if (room.direct && user != null && room.userIds.contains(user.userId)) {
+              return room.id;
+            }
+          }
+          return '';
+        }(),
         loading: store.state.userStore.loading,
         blocked: store.state.userStore.blocked.contains(userId ?? user!.userId),
         onBlockUser: (User user) async {
