@@ -15,9 +15,10 @@ void main() async {
   // pull current context / nullable
   final context = await loadContextCurrent();
 
-  if (DEBUG_MODE) {
-    debugPaintSizeEnabled = true;
+  if (SHOW_BORDERS && DEBUG_MODE) {
+    debugPaintSizeEnabled = SHOW_BORDERS;
   }
+
   // init app
   runApp(Prelock(
     appContext: context,
