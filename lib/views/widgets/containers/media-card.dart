@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'package:syphon/global/colours.dart';
-import 'package:syphon/global/dimensions.dart';
-
-_empty() {}
+import 'package:syphon/global/noop.dart';
 
 class MediaCard extends StatelessWidget {
   const MediaCard({
     Key? key,
     this.text,
     this.icon = Icons.photo,
-    this.onPress = _empty,
+    this.onPress = noop,
     this.disabled = false,
   }) : super(key: key);
 

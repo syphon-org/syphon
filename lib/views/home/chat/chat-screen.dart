@@ -665,9 +665,9 @@ class ChatScreenState extends State<ChatScreen> {
                       child: Stack(
                         children: [
                           MessageList(
+                            roomId: props.room.id,
                             editing: editing,
                             editorController: editorController,
-                            roomId: props.room.id,
                             showAvatars: props.showAvatars,
                             selectedMessage: selectedMessage,
                             scrollController: messagesController,
@@ -862,8 +862,12 @@ class _Props extends Equatable {
             ),
           );
         },
-        onSendMessage: (
-            {required String body, String? type, bool edit = false, Message? related}) async {
+        onSendMessage: ({
+          required String body,
+          String? type,
+          bool edit = false,
+          Message? related,
+        }) async {
           if (roomId == null || body.isEmpty) return;
 
           final room = store.state.roomStore.rooms[roomId]!;
