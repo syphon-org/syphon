@@ -138,7 +138,6 @@ class CacheSerializer implements StateSerializer<AppState> {
       }
     });
 
-    // TODO: move down after 0.2.9 release
     final cryptoState =
         cryptoStore ?? preloaded[StorageKeys.CRYPTO] as CryptoStore? ?? CryptoStore();
 
@@ -149,10 +148,10 @@ class CacheSerializer implements StateSerializer<AppState> {
       loading: false,
       authStore: authStore ?? preloaded[StorageKeys.AUTH] ?? AuthStore(),
       cryptoStore: messageSessionsLoaded.isEmpty
-          ? cryptoState.upgradeSessions_temp()
-          : cryptoState.upgradeSessions_temp().copyWith(
-                messageSessionsInbound: preloaded[StorageKeys.MESSAGE_SESSIONS],
-              ),
+          ? cryptoState
+          : cryptoState.copyWith(
+              messageSessionsInbound: messageSessionsLoaded,
+            ),
       settingsStore: preloaded[StorageKeys.SETTINGS] ?? settingsStore ?? SettingsStore(),
       syncStore: syncStore ?? SyncStore(),
       mediaStore: mediaStore ?? MediaStore().copyWith(mediaCache: preloaded[StorageKeys.MEDIA]),
