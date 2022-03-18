@@ -119,7 +119,7 @@
     "label-search-user": "Cerca un utente…",
     "label-search-users": "Cerca utenti…",
     "label-search-results": "Risultati della ricerca",
-    "label-syncing": "sincronizzazione delle discussioni…",
+    "label-syncing-chats": "sincronizzazione delle discussioni…",
     "label-users-results": "Utenti abbinati",
     "button-text-load-captcha": "Carica Captcha",
     "prompt-homeserver-select": "Seleziona il tuo nome utente e il tuo homeserver",

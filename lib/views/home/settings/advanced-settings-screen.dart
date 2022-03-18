@@ -187,7 +187,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      props.syncObserverActive ? 'Syncing' : 'Stopped',
+                      props.syncObserverActive ? Strings.labelSyncing : Strings.labelStopped,
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -199,13 +199,13 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     onTap: props.syncing ? null : props.onManualSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
-                      'Manual Sync',
+                      Strings.listItemSettingsManualSync,
                       style: Theme.of(context).textTheme.subtitle1!.copyWith(
                             color: props.syncing ? Color(Colours.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
-                      'Perform a forced matrix sync based on last sync timestamp',
+                      Strings.subtitleManualSync,
                       style: TextStyle(
                         color: props.syncing ? Color(Colours.greyDisabled) : null,
                       ),
@@ -223,13 +223,13 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     onTap: props.syncing ? null : props.onForceFullSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
-                      'Force Full Sync',
+                      Strings.listItemSettingsForceFullSync,
                       style: Theme.of(context).textTheme.subtitle1!.copyWith(
                             color: props.syncing ? Color(Colours.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
-                      'Perform a forced full sync of all user data and messages',
+                      Strings.subtitleForceFullSync,
                     ),
                     trailing: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8),
@@ -243,7 +243,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   dense: true,
                   contentPadding: Dimensions.listPadding,
                   title: Text(
-                    'Version',
+                    Strings.labelVersion,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   trailing: Text(
@@ -310,14 +310,14 @@ class _Props extends Equatable {
             context: context,
             barrierDismissible: true,
             builder: (dialogContext) => DialogTextInput(
-              title: 'Modify Sync Interval',
+              title: Strings.titleDialogSyncInterval,
               content: Strings.confirmModifySyncInterval,
               editingController: TextEditingController(
                 text: Duration(
                   milliseconds: store.state.settingsStore.syncInterval,
                 ).inSeconds.toString(),
               ),
-              label: 'seconds',
+              label: Strings.labelSeconds,
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,

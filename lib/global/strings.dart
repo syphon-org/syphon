@@ -49,6 +49,9 @@ class Strings {
   static final titleSendMediaMessageUnencrypted = tr('title-send-media-message-unencrypted');
   static final titleToggleAutocorrect = tr('title-toggle-autocorrect');
   static final titleToggleSuggestions = tr('title-toggle-suggestions');
+  static final titleBlockedUsers = tr('title-blocked-users');
+  static final titleImportSessionKeys = tr('title-import-session-keys');
+  static final titleExportSessionKeys = tr('title-export-session-keys');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -65,6 +68,17 @@ class Strings {
   static final titleDialogAcceptInvite = tr('title-dialog-accept-invite');
   static final titleDialogChatColor = tr('title-dialog-chat-color');
   static final titleDialogDraftPreview = tr('title-dialog-draft-preview');
+  static final titleDialogLogout = tr('title-dialog-logout');
+  static final titleDialogSyncInterval = tr('title-dialog-sync-interval');
+  static String titleDialogChatWithUser(String? username) => tr('title-dialog-chat-with-user', args: ['$username']);
+  static String titleDialogAttemptChatWithUser(String? username) => tr('title-dialog-attempt-chat-with-user', args: ['$username']);
+  static final titleDialogConfirmDeactivateAccount = tr('title-dialog-confirm-deactivate-account');
+  static final titleDialogConfirmDeactivateAccountFinal = tr('title-dialog-confirm-deactivate-account-final');
+  static final titleDialogBackupSessionKeys = tr('title-dialog-backup-session-keys');
+  static final titleDialogRemoveScreenLock = tr('title-dialog-remove-screen-lock');
+  static final titleDialogEnterScreenLockPin = tr('title-dialog-enter-screen-lock-pin');
+  static final titleDialogEnterNewScreenLockPin = tr('title-dialog-enter-new-screen-lock-pin');
+  static final titleDialogVerifyNewScreenLockPin = tr('title-dialog-verify-new-screen-lock-pin');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -73,11 +87,28 @@ class Strings {
   static final subtitleSettingsSyncToggle = tr('subtitle-settings-sync-toggle');
   static final subtitleToggleAutocorrect = tr('subtitle-toggle-autocorrect');
   static final subtitleToggleSuggestions = tr('subtitle-toggle-suggestions');
+  static final subtitleShowMembershipEvents = tr('subtitle-settings-show-membership-events');
+  static final subtitleEnterSends = tr('subtitle-settings-enter-sends');
+  static final subtitle24hFormat = tr('subtitle-settings-24h-format');
+  static final subtitleDismissKeyboard = tr('subtitle-settings-dismiss-keyboard');
+  static final subtitleViewUploadedMedia = tr('subtitle-settings-view-uploaded-media');
+  static final subtitleImagesAudioVideoFiles = tr('subtitle-images-audio-video-files');
+  static String subtitleThemeSettings(String? theme, String? font) =>
+      tr('subtitle-theme-settings', args: ['$theme', '$font']);
+  static String subtitlePrivacySettings(String? screenLock, String? registrationLock) =>
+      tr('subtitle-privacy-settings', args: ['$screenLock', '$registrationLock']);
+  static final subtitleManualSync = tr('subtitle-manual-sync');
+  static final subtitleForceFullSync = tr('subtitle-force-full-sync');
 
   // Headers
   static final headerIntro = tr('header-intro');
   static final headerLogin = tr('header-login');
   static final headerSignupUsername = tr('header-signup-username');
+  static final headerGeneral = tr('header-general');
+  static final headerOrdering = tr('header-ordering');
+  static final headerMedia = tr('header-media');
+  static final headerMediaAutoDownload = tr('header-media-auto-download');
+  static final headerUpdatePassword = tr('header-update-password');
 
   // Labels
   static final labelBack = tr('label-back');
@@ -85,7 +116,7 @@ class Strings {
   static final labelUsers = tr('label-users');
   static final labelEmail = tr('label-email');
   static final labelClose = tr('label-close');
-  static final labelSyncing = tr('label-syncing');
+  static final labelSyncingChats = tr('label-syncing-chats');
   static final labelSearchUser = tr('label-search-user');
   static final labelUsersRecent = tr('label-users-recent');
   static final labelSearching = tr('label-searching');
@@ -111,6 +142,16 @@ class Strings {
   static final labelAbout = tr('label-about');
   static final labelChatSettings = tr('label-chat-settings');
   static final labelColor = tr('label-color');
+  static final labelTimestamp = tr('label-timestamp');
+  static final labelNone = tr('label-none');
+  static final labelSyncing = tr('label-syncing');
+  static final labelStopped = tr('label-stopped');
+  static final labelVersion = tr('label-version');
+  static final labelSeconds = tr('label-seconds');
+  static final labelSearchForUser = tr('label-search-for-user');
+  static final labelCurrentPassword = tr('label-current-password');
+  static final labelNewPassword = tr('label-new-password');
+  static final labelConfirmNewPassword = tr('label-confirm-new-password');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
@@ -124,6 +165,23 @@ class Strings {
   static final listItemSettingsProxyPassword = tr('list-item-settings-proxy-password');
   static final listItemSettingsSyncInterval = tr('list-item-settings-sync-interval');
   static final listItemSettingsSyncToggle = tr('list-item-settings-sync-toggle');
+
+  static final listItemSettingsLanguage = tr('list-item-settings-language');
+  static final listItemSettingsShowMembershipEvents = tr('list-item-settings-show-membership-events');
+  static final listItemSettingsEnterSends = tr('list-item-settings-enter-sends');
+  static final listItemSettings24hFormat = tr('list-item-settings-24h-format');
+  static final listItemSettingsDismissKeyboard = tr('list-item-settings-dismiss-keyboard');
+  static final listItemSettingsSortBy = tr('list-item-settings-sort-by');
+  static final listItemSettingsGroupBy = tr('list-item-settings-group-by');
+  static final listItemSettingsViewUploadedMedia = tr('list-item-settings-view-uploaded-media');
+  static final listItemSettingsAutoDownload = tr('list-item-settings-auto-download');
+  static final listItemSettingsWhenUsingMobileData = tr('list-item-settings-when-using-mobile-data');
+  static final listItemSettingsWhenUsingWiFi = tr('list-item-settings-when-using-wi-fi');
+  static final listItemSettingsWhenRoaming = tr('list-item-settings-when-roaming');
+
+
+  static final listItemSettingsManualSync = tr('list-item-settings-manual-sync');
+  static final listItemSettingsForceFullSync = tr('list-item-settings-force-full-sync');
 
   static String listItemUserDetailsStartChat(String? name) =>
       tr('list-item-user-details-start-chat', args: ['$name']);
@@ -213,6 +271,9 @@ class Strings {
   static final buttonTextGoBack = tr('button-text-go-back');
   static final buttonTextReject = tr('button-text-reject');
   static final buttonTextAccept = tr('button-text-accept');
+  static final buttonTextImport = tr('button-text-import');
+  static final buttonTextConfirmDeleteKeys = tr('button-text-confirm-delete-keys');
+  static final buttonTextRemove = tr('button-text-remove');
 
   // Buttons (Options)
   static final buttonTextCreateGroup = tr('button-text-create-group');
@@ -249,6 +310,9 @@ class Strings {
   static String alertCouldNotLaunchURL(String? url) =>
       tr('alert-could-not-launch-url', args: ['$url']);
   static final alertNoImagesFound = tr('alert-no-images-found');
+  static final alertStorageAccessRequiredForKeys = tr('alert-storage-access-required-for-keys');
+  static final alertWaitForFullSync = tr('alert-wait-for-full-sync-before-switching');
+  static final alertLogOutToEnableMultiaccounts = tr('alert-log-out-enable-multiaccount');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
   static const alertBackgroundService = 'Background connection enabled';
@@ -283,6 +347,16 @@ class Strings {
   static final contentNotificationStyleTypeLatest = tr('content-notification-style-type-latest');
   static final contentNotificationStyleTypeItemized =
       tr('content-notification-style-type-itemized');
+
+  static final contentImportSessionKeysEnterPassword = tr('content-import-session-keys-enter-password');
+  static final contentExportSessionKeysEnterPassword = tr('content-export-session-keys-enter-password');
+  static final contentImportSessionKeys = tr('content-import-session-keys');
+  static final contentExportSessionKeys = tr('content-export-session-keys');
+
+  static final contentLogoutConfirm = tr('content-logout-confirm');
+  static final contentLogoutMultiaccountConfirm = tr('content-logout-multiaccount-confirm');
+
+  static final contentRemoveScreenLock = tr('content-remove-screen-lock');
 
   static final messageEditedAppend = tr('message-edited-append');
 
@@ -345,6 +419,7 @@ class Strings {
   static final semanticsImageSignupUsername = tr('semantics-image-signup-username');
   static final semanticsImagePasswordReset = tr('semantics-image-password-reset');
   static final semanticsCreatePublicRoom = tr('semantics-create-public-room');
+  static final semanticsImagePasswordUpdate = tr('semantics-image-password-update');
 
   // Labels
   static final labelProxyHost = tr('label-proxy-host');
