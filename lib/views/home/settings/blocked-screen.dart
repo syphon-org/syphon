@@ -4,6 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
@@ -95,7 +96,7 @@ class BlockedScreenState extends State<BlockedScreen> {
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) => Scaffold(
         appBar: AppBarNormal(
-          title: 'Blocked users',
+          title: Strings.titleBlockedUsers,
         ),
         body: Stack(
           children: [

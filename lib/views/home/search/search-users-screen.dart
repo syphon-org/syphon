@@ -78,7 +78,7 @@ class SearchUserState extends State<SearchUserScreen> {
       context: context,
       builder: (BuildContext dialogContext) => DialogStartChat(
         user: user,
-        title: 'Chat with ${formatUsername(user!)}',
+        title: Strings.titleDialogChatWithUser(formatUsername(user!)),
         content: Strings.confirmStartChat,
         onStartChat: () async {
           setState(() {
@@ -113,7 +113,7 @@ class SearchUserState extends State<SearchUserScreen> {
       context: context,
       builder: (BuildContext dialogContext) => DialogStartChat(
         user: user,
-        title: 'Try chatting with ${formatUsername(user)}',
+        title: Strings.titleDialogAttemptChatWithUser(formatUsername(user)),
         content: Strings.confirmAttemptChat,
         onStartChat: () async {
           setState(() {
@@ -298,8 +298,8 @@ class SearchUserState extends State<SearchUserScreen> {
         return Scaffold(
           appBar: AppBarSearch(
             title: Strings.titleSearchUsers,
-            label: 'Search for a user...',
-            tooltip: 'Search users',
+            label: Strings.labelSearchForUser,
+            tooltip: Strings.tooltipSearchUsers,
             forceFocus: true,
             focusNode: searchInputFocusNode,
             onChange: (text) => setState(() {

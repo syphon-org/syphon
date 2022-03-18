@@ -57,7 +57,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                     ),
                     child: SvgPicture.asset(
                       Assets.heroSignupPassword,
-                      semanticsLabel: 'User thinking up a password in a swirl of wind',
+                      semanticsLabel: Strings.semanticsImagePasswordUpdate,
                     ),
                   ),
                 ),
@@ -78,7 +78,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 8),
                         child: Text(
-                          'Update Password',
+                          Strings.headerUpdatePassword,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.headline5,
                         ),
@@ -96,7 +96,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       maxWidth: Dimensions.inputWidthMax,
                     ),
                     child: TextFieldSecure(
-                      label: 'Current Password',
+                      label: Strings.labelCurrentPassword,
                       obscureText: false,
                       valid: props.isPasswordValid,
                       focusNode: currentFocusNode,
@@ -128,7 +128,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       maxWidth: Dimensions.inputWidthMax,
                     ),
                     child: TextFieldSecure(
-                      label: 'New Password',
+                      label: Strings.labelCurrentPassword,
                       focusNode: passwordFocusNode,
                       controller: passwordController,
                       valid: props.isPasswordValid,
@@ -183,7 +183,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       maxWidth: Dimensions.inputWidthMax,
                     ),
                     child: TextFieldSecure(
-                      label: 'Confirm New Password',
+                      label: Strings.labelConfirmNewPassword,
                       obscureText: true,
                       focusNode: confirmFocusNode,
                       controller: confirmController,

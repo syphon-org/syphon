@@ -43,8 +43,8 @@ class IntroSettingsScreen extends StatelessWidget {
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) => DialogTextInput(
-        title: 'Import Session Keys',
-        content: 'Enter the password for this session key import.',
+        title: Strings.titleImportSessionKeys,
+        content: Strings.contentImportSessionKeysEnterPassword,
         label: Strings.labelPassword,
         initialValue: '',
         obscureText: true,
@@ -78,7 +78,7 @@ class IntroSettingsScreen extends StatelessWidget {
       if (!status.isGranted) {
         return store.dispatch(addAlert(
           origin: 'exportSessionKeys',
-          message: 'Storage access is required to save a session key backup file.',
+          message: Strings.alertStorageAccessRequiredForKeys,
         ));
       }
     }
@@ -87,8 +87,8 @@ class IntroSettingsScreen extends StatelessWidget {
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) => DialogTextInput(
-        title: 'Export Session Keys',
-        content: 'Enter a password to encrypt your session keys with.',
+        title: Strings.titleExportSessionKeys,
+        content: Strings.contentExportSessionKeysEnterPassword,
         obscureText: true,
         loading: store.state.settingsStore.loading,
         label: Strings.labelPassword,
