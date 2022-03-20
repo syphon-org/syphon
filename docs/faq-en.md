@@ -1,5 +1,13 @@
 # Syphon FAQ
 
+## Where is [X] feature?
+
+Syphon is currently in early development. Whilst we believe the code to of a standard where we can share with a wider userbase, Syphon does not rely on public Matrix libraries, instead coding against [the Matrix specification](https://spec.matrix.org/latest/).
+  
+This means that Syphon is currently missing features found in other Matrix chat clients as the development team work to implement them.
+
+
+
 ## [X] feature is acting strange/my settings aren't saved
 
 Syphon is currently in open alpha, meaning development is currently rapid meaning each release consists of quite a "jump" in features.
