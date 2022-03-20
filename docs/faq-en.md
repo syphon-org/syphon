@@ -22,3 +22,7 @@ n.b. Interactive cross-signing is roadmapped as part of the `0.3.0` release
 Notifications are currently **Android-Only**.
   
 Like most features in Syphon, notifications are disabled by default.
+
+### ...Send Read Receipts?
+
+Like most features in Syphon, Read Receipts are disabled by default and must be enabled in the Settings.
