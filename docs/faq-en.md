@@ -1,5 +1,13 @@
 # Syphon FAQ
 
+## [X] feature is acting strange/my settings aren't saved
+
+Syphon is currently in open alpha, meaning development is currently rapid meaning each release consists of quite a "jump" in features.
+  
+In the first instance, if you've updated your client and are experiencing "weird" behaviour, please **uninstall** your local version and **clean install** the app with its latest version to ensure any local settings files are recreated at their latest settings.
+  
+If you're still encountering errors or weird behaviour, you've probably encountered a bug so please ask for help!
+
 ## How do I...
 
 ### ...Verify my session?
