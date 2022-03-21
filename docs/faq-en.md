@@ -31,7 +31,7 @@ In order to cross-sign/verify your Syphon session, with the Element client:
 1. Click on the untrusted session ![](images/syphon_not_trusted.png)
 1. Click "Manually Verify By Text" ![](images/verify.png)
 
-n.b. Interactive cross-signing is roadmapped as part of the `0.3.0` release
+n.b. Interactive cross-signing is [roadmapped](https://syphon.org/roadmap) as part of the `0.3.0` release.
 
 ### ...Get Notifications?
 
