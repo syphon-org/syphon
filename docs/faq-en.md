@@ -10,7 +10,7 @@ This means that Syphon is currently missing features found in other Matrix chat 
 
 ## [X] feature is acting strange/my settings aren't saved
 
-Syphon is currently in open alpha, meaning development is currently rapid meaning each release consists of quite a "jump" in features.
+Syphon is currently in open alpha, meaning development is currently rapid so each release consists of quite a "jump" in features.
   
 In the first instance, if you've updated your client and are experiencing "weird" behaviour, please **uninstall** your local version and **clean install** the app with its latest version to ensure any local settings files are recreated at their latest settings.
   
