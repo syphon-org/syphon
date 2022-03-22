@@ -209,7 +209,7 @@
     "list-item-settings-manual-sync": "Manual Sync",
     "list-item-settings-force-full-sync": "Force Full Sync",
     "list-item-user-details-invite-to-room": "Invite to Room",
-    "list-item-user-details-confirm-start-chat": "Chat with {}",
+    "list-item-user-details-start-chat": "Chat with {}",
     "list-item-user-details-send-message": "Send A Message",
     "list-item-user-details-view-profile": "View Profile",
     "list-item-user-details-unblock-user": "Unblock User",

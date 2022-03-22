@@ -249,7 +249,7 @@
     "tooltip-profile-settings": "Profilo e impostazioni",
     "tooltip-search-chats": "Cerca discussioni",
     "tooltip-cancel-reply": "Annulla la risposta",
-    "list-item-user-details-confirm-start-chat": "Parla con {}",
+    "list-item-user-details-start-chat": "Parla con {}",
     "subtitle-proxy-use-basic-authentication": "Fornisci nome utente e password per autenticarsi con un proxy",
     "content-proxy-password": "La password per l'autenticazione con il tuo proxy",
     "title-proxy-password": "Modifica la password del proxy",

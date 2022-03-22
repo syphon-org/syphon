@@ -162,7 +162,7 @@
     "list-item-user-details-send-message": "Отправить Сообщение",
     "list-item-user-details-block-user": "Заблокировать Пользователя",
     "list-item-chat-detail-notification-setting": "Настройки Уведомлений",
-    "list-item-user-details-confirm-start-chat": "Чат с {}",
+    "list-item-user-details-start-chat": "Чат с {}",
     "list-item-user-details-unblock-user": "Разблокировать Пользователя",
     "list-item-chat-detail-notifications": "Уведомления",
     "list-item-chat-detail-vibrate": "Вибрация",

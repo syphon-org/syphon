@@ -248,7 +248,7 @@
     "list-item-settings-proxy-password": "Proxy heslo",
     "list-item-settings-sync-interval": "Interval synchronizace",
     "list-item-user-details-invite-to-room": "Pozvat do místnosti",
-    "list-item-user-details-confirm-start-chat": "Psát si s {}",
+    "list-item-user-details-start-chat": "Psát si s {}",
     "list-item-user-details-send-message": "Poslat správu",
     "list-item-advanced-settings-start-background": "Spustit službu na pozadí",
     "list-item-advanced-settings-test-sync-loop": "Test synchronizace na pozadí",
