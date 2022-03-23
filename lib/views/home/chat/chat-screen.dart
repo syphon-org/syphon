@@ -93,14 +93,16 @@ class ChatScreenState extends State<ChatScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => DialogInvite(
+        builder: (dialogContext) => DialogInvite(
           onAccept: props.onAcceptInvite,
           onReject: () {
             props.onRejectInvite();
             Navigator.popUntil(context, (route) => route.isFirst);
+            Navigator.pop(dialogContext);
           },
           onCancel: () {
             Navigator.popUntil(context, (route) => route.isFirst);
+            Navigator.pop(dialogContext);
           },
         ),
       );
@@ -665,9 +667,9 @@ class ChatScreenState extends State<ChatScreen> {
                       child: Stack(
                         children: [
                           MessageList(
+                            roomId: props.room.id,
                             editing: editing,
                             editorController: editorController,
-                            roomId: props.room.id,
                             showAvatars: props.showAvatars,
                             selectedMessage: selectedMessage,
                             scrollController: messagesController,
@@ -862,8 +864,12 @@ class _Props extends Equatable {
             ),
           );
         },
-        onSendMessage: (
-            {required String body, String? type, bool edit = false, Message? related}) async {
+        onSendMessage: ({
+          required String body,
+          String? type,
+          bool edit = false,
+          Message? related,
+        }) async {
           if (roomId == null || body.isEmpty) return;
 
           final room = store.state.roomStore.rooms[roomId]!;

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/settings/proxy-settings/model.dart';
 
 /// This is LetsEncrypt's self-signed trusted root certificate authority
@@ -59,9 +60,9 @@ HttpClient customHttpClient({String? cert}) {
     }
   } on TlsException catch (e) {
     if (e.osError?.message != null && e.osError!.message.contains('CERT_ALREADY_IN_HASH_TABLE')) {
-      print('createHttpClient() - cert already trusted! Skipping.');
+      log.info('[customHttpClient] - cert already trusted! Skipping.');
     } else {
-      print('createHttpClient().setTrustedCertificateBytes EXCEPTION: $e');
+      log.error('[customHttpClient] setTrustedCertificateBytes EXCEPTION: $e');
       rethrow;
     }
   } finally {}
@@ -82,13 +83,11 @@ http.Client createClient({ProxySettings? proxySettings}) {
             proxySettings.host,
             int.parse(proxySettings.port), // port input allows numbers only, so no try/catch
             'Basic', // Basic authentication
-            HttpClientBasicCredentials(proxySettings.username, proxySettings.password)
-        );
+            HttpClientBasicCredentials(proxySettings.username, proxySettings.password));
       }
 
       return 'PROXY ${proxySettings.host}:${proxySettings.port};';
-    }
-    else {
+    } else {
       return 'DIRECT';
     }
   };

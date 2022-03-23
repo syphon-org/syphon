@@ -210,7 +210,7 @@
     "list-item-chat-detail-notification-setting": "Értesítési beállítások",
     "button-chat-details": "beszélgetés részletei",
     "list-item-chat-detail-vibrate": "Rezgés",
-    "list-item-user-details-confirm-start-chat": "Beszélgetés {} felhasználóval",
+    "list-item-user-details-start-chat": "Beszélgetés {} felhasználóval",
     "list-item-image-options-remove-photo": "Kép eltávolítása",
     "list-item-advanced-settings-stop-background": "Összes Service megállítása",
     "content-notification-style-type-itemized": "Új értesítés mutatása minden egyes új üzenethez",

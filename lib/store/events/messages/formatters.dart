@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/media/converters.dart';
 import 'package:syphon/store/media/encryption.dart';

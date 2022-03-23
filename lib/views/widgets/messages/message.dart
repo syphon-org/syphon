@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:swipeable/swipeable.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/noop.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -47,12 +47,13 @@ class MessageWidget extends StatelessWidget {
     this.timeFormat = TimeFormat.hr12,
     this.color,
     this.luminance = 0.0,
+    this.onSwipe = noop,
+    this.onResend = noop,
     this.onSendEdit,
     this.onLongPress,
     this.onPressAvatar,
     this.onInputReaction,
     this.onToggleReaction,
-    this.onSwipe,
   }) : super(key: key);
 
   final bool messageOnly;
@@ -76,7 +77,8 @@ class MessageWidget extends StatelessWidget {
   final ThemeType themeType;
   final TextEditingController? editorController;
 
-  final Function? onSwipe;
+  final Function onSwipe;
+  final Function onResend;
   final Function? onSendEdit;
   final Function? onPressAvatar;
   final Function? onInputReaction;
@@ -203,9 +205,7 @@ class MessageWidget extends StatelessWidget {
   }
 
   onSwipeMessage(Message message) {
-    if (onSwipe != null) {
-      onSwipe!(message);
-    }
+    onSwipe(message);
   }
 
   onConfirmLink(BuildContext context, String? url) {
@@ -415,6 +415,7 @@ class MessageWidget extends StatelessWidget {
         ),
       ),
       child: GestureDetector(
+        onTap: message.failed ? onResend(message) : null,
         onLongPress: () {
           if (onLongPress != null) {
             HapticFeedback.lightImpact();

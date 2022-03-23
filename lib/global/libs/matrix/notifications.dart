@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 

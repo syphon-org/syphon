@@ -114,31 +114,30 @@ class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
         // allows user option to manually load images on tap
         if (!widget.autodownload && !props.exists && !localLoading) {
           return TouchableOpacity(
+            behavior: HitTestBehavior.translucent,
             onTap: () => onManualLoad(),
             child: Container(
+              padding: EdgeInsets.all(widget.loadingPadding),
               width: widget.size ?? widget.width,
               height: widget.size ?? widget.height,
-              child: Padding(
-                padding: EdgeInsets.all(widget.loadingPadding),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.photo,
-                      size: Dimensions.avatarSizeLarge,
-                      color: Colors.white,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 8),
-                      child: Text(
-                        Strings.labelDownloadImage,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.photo,
+                    size: Dimensions.avatarSizeLarge,
+                    color: Colors.white,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
+                      Strings.labelDownloadImage,
+                      style: TextStyle(
+                        color: Colors.white,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );

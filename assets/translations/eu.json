@@ -99,7 +99,7 @@
     "list-item-settings-sync-interval": "Sinkronizazio denbora-tartea",
     "list-item-settings-sync-toggle": "Piztu edo itzali sinkronizazioa",
     "list-item-user-details-invite-to-room": "Gonbidatu gelara",
-    "list-item-user-details-confirm-start-chat": "Txateatu {}(r)ekin",
+    "list-item-user-details-start-chat": "Txateatu {}(r)ekin",
     "list-item-user-details-send-message": "Bidali mezua",
     "list-item-user-details-view-profile": "Ikusi profila",
     "list-item-user-details-unblock-user": "Desblokeatu erabiltzailea",
