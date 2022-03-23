@@ -93,14 +93,16 @@ class ChatScreenState extends State<ChatScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => DialogInvite(
+        builder: (dialogContext) => DialogInvite(
           onAccept: props.onAcceptInvite,
           onReject: () {
             props.onRejectInvite();
             Navigator.popUntil(context, (route) => route.isFirst);
+            Navigator.pop(dialogContext);
           },
           onCancel: () {
             Navigator.popUntil(context, (route) => route.isFirst);
+            Navigator.pop(dialogContext);
           },
         ),
       );
