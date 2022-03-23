@@ -158,6 +158,42 @@ ThunkAction<AppState> mutateMessagesAll() {
   };
 }
 
+// TODO: need to rework to remove old outbox message
+ThunkAction<AppState> sendMessageExisting({
+  required String roomId,
+  required Message message,
+  Message? related,
+  bool edit = false,
+}) {
+  return (Store<AppState> store) async {
+    final room = store.state.roomStore.rooms[roomId]!;
+
+    store.dispatch(DeleteOutboxMessage(
+      message: message,
+    ));
+
+    if (room.encryptionEnabled) {
+      return store.dispatch(
+        sendMessageEncrypted(
+          roomId: room.id,
+          message: message,
+          related: related,
+          edit: edit,
+        ),
+      );
+    }
+
+    return store.dispatch(
+      sendMessage(
+        roomId: room.id,
+        message: message,
+        related: related,
+        edit: edit,
+      ),
+    );
+  };
+}
+
 /// Send Message
 ThunkAction<AppState> sendMessage({
   required String roomId,
@@ -169,16 +205,20 @@ ThunkAction<AppState> sendMessage({
   return (Store<AppState> store) async {
     final room = store.state.roomStore.rooms[roomId]!;
 
+    // if you're incredibly unlucky, and fast, you could have a problem here
+    final tempId = Random.secure().nextInt(1 << 32).toString();
+
+    int? sent;
+    Message? pending;
+
     try {
       store.dispatch(UpdateRoom(id: room.id, sending: true));
 
       final reply = store.state.roomStore.rooms[room.id]!.reply;
       final userId = store.state.authStore.user.userId!;
-      // if you're incredibly unlucky, and fast, you could have a problem here
-      final tempId = Random.secure().nextInt(1 << 32).toString();
 
       // pending outbox message
-      Message pending = await formatMessageContent(
+      pending = await formatMessageContent(
         tempId: tempId,
         userId: userId,
         message: message,
@@ -210,6 +250,7 @@ ThunkAction<AppState> sendMessage({
       );
 
       if (data['errcode'] != null) {
+        // edits will not have outbox messages
         if (!edit) {
           store.dispatch(SaveOutboxMessage(
             tempId: tempId,
@@ -224,6 +265,9 @@ ThunkAction<AppState> sendMessage({
 
         throw data['error'];
       }
+
+      // mark a successfully sent
+      sent = DateTime.now().millisecondsSinceEpoch;
 
       // Update sent message with event id but needs
       // to be syncing to remove from outbox
@@ -240,11 +284,27 @@ ThunkAction<AppState> sendMessage({
 
       return true;
     } catch (error) {
-      store.dispatch(addAlert(
-        error: error,
-        message: error.toString(),
-        origin: 'sendMessage',
-      ));
+      // dont show error notifications for common networking issues
+      if (error is! SocketException) {
+        store.dispatch(addAlert(
+          error: error,
+          message: error.toString(),
+          origin: 'sendMessage',
+        ));
+      }
+
+      // if the message has not been successfully sent
+      if (pending != null && sent == null) {
+        store.dispatch(SaveOutboxMessage(
+          tempId: tempId,
+          pendingMessage: pending.copyWith(
+            timestamp: DateTime.now().millisecondsSinceEpoch,
+            pending: false,
+            syncing: false,
+            failed: true,
+          ),
+        ));
+      }
       return false;
     } finally {
       store.dispatch(UpdateRoom(

@@ -260,6 +260,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};
       final Map<String, dynamic> oneTimeKeyCount = data['device_one_time_keys_count'] ?? {};
 
+      // Parse and save room / message updates
       if (roomJson.isNotEmpty) {
         final Map<String, dynamic> joinedJson = roomJson['join'] ?? {};
         final Map<String, dynamic> invitesJson = roomJson['invite'] ?? {};
@@ -273,26 +274,23 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
           await store.dispatch(syncRooms(invitesJson));
         }
       }
+
+      // Updates for device specific data (mostly room encryption)
       if (toDeviceJson.isNotEmpty) {
-        // Updates for device specific data (mostly room encryption)
         await store.dispatch(syncDevice(toDeviceJson));
       }
 
       // Update encryption one time key count
-      store.dispatch(
-        updateOneTimeKeyCounts(
-          Map<String, int>.from(oneTimeKeyCount),
-        ),
-      );
+      store.dispatch(updateOneTimeKeyCounts(
+        Map<String, int>.from(oneTimeKeyCount),
+      ));
 
       // Update synced to indicate init sync and next batch id (lastSince)
-      store.dispatch(
-        SetSynced(
-          synced: true,
-          syncing: false,
-          lastSince: nextBatch,
-        ),
-      );
+      store.dispatch(SetSynced(
+        synced: true,
+        syncing: false,
+        lastSince: nextBatch,
+      ));
 
       if (isFullSync) {
         printInfo('[fetchSync] *** full sync completed ***');

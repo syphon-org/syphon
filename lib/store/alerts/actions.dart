@@ -41,9 +41,11 @@ ThunkAction<AppState> startAlertsObserver() {
       throw 'Cannot call startAlertsObserver with an existing instance';
     }
 
-    store.dispatch(SetAlertsObserver(
-      alertsObserver: StreamController<Alert>.broadcast(),
-    ));
+    store.dispatch(
+      SetAlertsObserver(
+        alertsObserver: StreamController<Alert>.broadcast(),
+      ),
+    );
   };
 }
 

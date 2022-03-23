@@ -202,7 +202,7 @@
     "list-item-chat-detail-view-key": "Schlüssel anzeigen",
     "list-item-settings-sync-toggle": "Synchronisation an/aus",
     "list-item-user-details-invite-to-room": "In Raum einladen",
-    "list-item-user-details-confirm-start-chat": "Reden mit {}",
+    "list-item-user-details-start-chat": "Reden mit {}",
     "list-item-user-details-unblock-user": "Benutzer entsperren",
     "list-item-user-details-block-user": "Benutzer sperren",
     "list-item-image-options-photo-select-method": "Fotoauswahlverfahren",

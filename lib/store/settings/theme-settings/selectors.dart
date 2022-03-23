@@ -19,6 +19,15 @@ ThemeType themeTypeFromSystem() {
   return ThemeType.Light;
 }
 
+ThemeType resolveThemeOverride(ThemeType themeType) {
+  var themeTypeOverride = themeType;
+  if (themeTypeOverride == ThemeType.System) {
+    themeTypeOverride = themeTypeFromSystem();
+  }
+
+  return themeTypeOverride;
+}
+
 String selectMainFabType(ThemeSettings themeSettings) {
   return enumToString(themeSettings.mainFabType);
 }
@@ -50,10 +59,6 @@ SystemUiOverlayStyle computeSystemUIColor(BuildContext context, {double ratio = 
 }
 
 int selectRowHighlightColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
-
   switch (themeType) {
     case ThemeType.Light:
       return Colours.greyLightest;
@@ -64,10 +69,8 @@ int selectRowHighlightColor(ThemeType themeType) {
   }
 }
 
-int selectSystemUiColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+int selectSystemUiColor(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -79,10 +82,8 @@ int selectSystemUiColor(ThemeType themeType) {
   }
 }
 
-Brightness selectSystemUiIconColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Brightness selectSystemUiIconColor(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -92,10 +93,8 @@ Brightness selectSystemUiIconColor(ThemeType themeType) {
   }
 }
 
-Color selectIconBackground(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Color selectIconBackground(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -107,10 +106,8 @@ Color selectIconBackground(ThemeType themeType) {
   }
 }
 
-Color selectAvatarBackground(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Color selectAvatarBackground(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -122,10 +119,8 @@ Color selectAvatarBackground(ThemeType themeType) {
   }
 }
 
-Brightness selectThemeBrightness(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Brightness selectThemeBrightness(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -135,10 +130,8 @@ Brightness selectThemeBrightness(ThemeType themeType) {
   }
 }
 
-Color selectIconColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Color selectIconColor(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -148,10 +141,8 @@ Color selectIconColor(ThemeType themeType) {
   }
 }
 
-Color? selectModalColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Color? selectModalColor(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Night:
@@ -161,10 +152,8 @@ Color? selectModalColor(ThemeType themeType) {
   }
 }
 
-int? selectScaffoldBackgroundColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+int? selectScaffoldBackgroundColor(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -178,10 +167,8 @@ int? selectScaffoldBackgroundColor(ThemeType themeType) {
   }
 }
 
-Color selectInputTextColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Color selectInputTextColor(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -191,10 +178,8 @@ Color selectInputTextColor(ThemeType themeType) {
   }
 }
 
-Color selectCursorColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Color selectCursorColor(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -204,10 +189,8 @@ Color selectCursorColor(ThemeType themeType) {
   }
 }
 
-Color selectInputBackgroundColor(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+Color selectInputBackgroundColor(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Light:
@@ -219,10 +202,8 @@ Color selectInputBackgroundColor(ThemeType themeType) {
   }
 }
 
-double? selectAppBarElevation(ThemeType themeType) {
-  if (themeType == ThemeType.System) {
-    themeType = themeTypeFromSystem();
-  }
+double? selectAppBarElevation(ThemeType themeTypeNew) {
+  final themeType = resolveThemeOverride(themeTypeNew);
 
   switch (themeType) {
     case ThemeType.Darker:

@@ -192,7 +192,7 @@
     "list-item-settings-sync-interval": "Intervalle de synchronisation",
     "list-item-settings-sync-toggle": "Activer/Désactiver la synchronisation",
     "list-item-user-details-invite-to-room": "Inviter dans le groupe",
-    "list-item-user-details-confirm-start-chat": "Discuter avec {}",
+    "list-item-user-details-start-chat": "Discuter avec {}",
     "list-item-user-details-view-profile": "Voir le profil",
     "list-item-user-details-unblock-user": "Débloquer l'utilisateur",
     "list-item-user-details-block-user": "Bloquer l'utilisateur",

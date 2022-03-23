@@ -1,20 +1,35 @@
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/index.dart';
+import 'package:syphon/store/user/model.dart';
 import './room/model.dart';
 
 Room selectRoom({required AppState state, String? id}) {
   return state.roomStore.rooms[id] ?? Room(id: id ?? '');
 }
 
+String selectDirectChatIdExisting({required AppState state, User? user}) {
+  if (user == null) return '';
+
+  for (final room in state.roomStore.roomList) {
+    if (room.direct && room.userIds.contains(user.userId)) {
+      return room.id;
+    }
+  }
+
+  return '';
+}
+
 List<Room> filterBlockedRooms(List<Room> rooms, List<String> blocked) {
   final List<Room> roomList = rooms;
 
   return roomList
-    ..removeWhere((room) =>
-        room.userIds.length == 2 &&
-        room.userIds.any(
-          (userId) => blocked.contains(userId),
-        ))
+    ..removeWhere(
+      (room) =>
+          room.userIds.length == 2 &&
+          room.userIds.any(
+            (userId) => blocked.contains(userId),
+          ),
+    )
     ..toList();
 }
 
