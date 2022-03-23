@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -37,6 +35,5 @@ class RoomStore extends Equatable {
       );
 
   Map<String, dynamic> toJson() => _$RoomStoreToJson(this);
-  factory RoomStore.fromJson(Map<String, dynamic> json) =>
-      _$RoomStoreFromJson(json);
+  factory RoomStore.fromJson(Map<String, dynamic> json) => _$RoomStoreFromJson(json);
 }

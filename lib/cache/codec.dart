@@ -48,6 +48,7 @@ class _EncryptDecoder extends Converter<String, String> {
     final iv = base64.decode(input.substring(0, IV_LENGTH_BASE_64.round()));
 
     // Extract the real input
+    // ignore: parameter_assignments
     input = input.substring(IV_LENGTH_BASE_64.round());
 
     // Decode the input
@@ -61,7 +62,7 @@ class EncryptCodec extends Codec<String, String> {
   late _EncryptDecoder _decoder;
 
   EncryptCodec(Key passwordBytes) {
-    var aes = AES(passwordBytes, mode: AESMode.ctr, padding: null);
+    final aes = AES(passwordBytes, mode: AESMode.ctr, padding: null);
 
     _encoder = _EncryptEncoder(aes);
     _decoder = _EncryptDecoder(aes);

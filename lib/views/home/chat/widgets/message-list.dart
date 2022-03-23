@@ -6,6 +6,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/actions.dart';
+import 'package:syphon/store/events/messages/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/messages/selectors.dart';
 import 'package:syphon/store/events/reactions/actions.dart';
@@ -23,7 +24,7 @@ import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/messages/typing-indicator.dart';
 
 class MessageList extends StatefulWidget {
-  final String? roomId;
+  final String roomId;
 
   final bool editing;
   final bool showAvatars;
@@ -82,6 +83,18 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
 
     try {
       store.dispatch(selectReply(roomId: roomId, message: message));
+    } catch (error) {
+      printError(error.toString());
+    }
+  }
+
+  onResendMessage(Message message) {
+    final store = StoreProvider.of<AppState>(context);
+
+    final roomId = widget.roomId;
+
+    try {
+      store.dispatch(sendMessageExisting(roomId: roomId, message: message));
     } catch (error) {
       printError(error.toString());
     }
@@ -219,6 +232,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                       timeFormat: props.timeFormat,
                       onSendEdit: widget.onSendEdit,
                       onSwipe: onSelectReply,
+                      onResend: onResendMessage,
                       onPressAvatar: () => widget.onViewUserDetails!(
                         message: message,
                         user: user,

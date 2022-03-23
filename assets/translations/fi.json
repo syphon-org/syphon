@@ -34,5 +34,7 @@
     "tooltip-profile-settings": "Profiili ja asetukset",
     "tooltip-search-chats": "Etsi keskusteluista",
     "tooltip-cancel-reply": "Peruuta vastaus",
-    "semantics-create-public-room": "Luo julkinen huone"
+    "semantics-create-public-room": "Luo julkinen huone",
+    "label-email": "Sähköposti",
+    "button-send-verification": "lähetä vahvistussähköposti"
 }

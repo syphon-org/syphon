@@ -44,7 +44,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                               width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
-                                'General',
+                                Strings.headerGeneral,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -55,7 +55,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 onTap: () => Navigator.pushNamed(context, Routes.settingsLanguages),
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
-                                  'Language',
+                                  Strings.listItemSettingsLanguage,
                                 ),
                                 trailing: Text(props.language!),
                               ),
@@ -66,10 +66,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 enabled: false,
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
-                                  'Show Membership Events',
+                                  Strings.listItemSettingsShowMembershipEvents,
                                 ),
                                 subtitle: Text(
-                                  'Show membership changes within the chat',
+                                  Strings.subtitleShowMembershipEvents,
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                                 trailing: Switch(
@@ -83,10 +83,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                               onTap: () => props.onToggleEnterSend(),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
-                                'Enter Key Sends',
+                                Strings.listItemSettingsEnterSends,
                               ),
                               subtitle: Text(
-                                'Pressing the enter key will send a message',
+                                Strings.subtitleEnterSends,
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
@@ -124,10 +124,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                               onTap: () => props.onToggleTimeFormat(),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
-                                '24 Hour Time Format',
+                                Strings.listItemSettings24hFormat,
                               ),
                               subtitle: Text(
-                                'Show message timestamps using 24 hour format',
+                                Strings.subtitle24hFormat,
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
@@ -139,10 +139,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                               onTap: () => props.onToggleDismissKeyboard(),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
-                                'Dismiss Keyboard',
+                                Strings.listItemSettingsDismissKeyboard,
                               ),
                               subtitle: Text(
-                                'Dismiss the keyboard after sending a message',
+                                Strings.subtitleDismissKeyboard,
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
@@ -160,7 +160,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                               width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
-                                'Ordering',
+                                Strings.headerOrdering,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -170,10 +170,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                               child: ListTile(
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
-                                  'Sort By',
+                                  Strings.listItemSettingsSortBy,
                                 ),
                                 trailing: Text(
-                                  'Timestamp',
+                                  Strings.labelTimestamp, //TODO
                                   style: Theme.of(context).textTheme.subtitle1,
                                 ),
                               ),
@@ -183,10 +183,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                               child: ListTile(
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
-                                  'Group By',
+                                  Strings.listItemSettingsGroupBy,
                                 ),
                                 trailing: Text(
-                                  'None',
+                                  Strings.labelNone, //TODO
                                   style: Theme.of(context).textTheme.subtitle1,
                                 ),
                               ),
@@ -201,7 +201,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                               width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
-                                'Media',
+                                Strings.headerMedia,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -212,10 +212,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 enabled: false,
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
-                                  'View all uploaded Media',
+                                  Strings.listItemSettingsViewUploadedMedia,
                                 ),
                                 subtitle: Text(
-                                  'See all uploaded data, even those unaccessible from messages',
+                                  Strings.subtitleViewUploadedMedia,
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
@@ -230,7 +230,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                               width: width,
                               padding: Dimensions.listPadding,
                               child: Text(
-                                'Media auto-download',
+                                Strings.headerMediaAutoDownload,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.subtitle2,
                               ),
@@ -239,10 +239,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                               onTap: () => props.onToggleAutoDownload(),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
-                                'Auto Download',
+                                Strings.listItemSettingsAutoDownload,
                               ),
                               subtitle: Text(
-                                props.autoDownload ? 'On' : 'Off',
+                                props.autoDownload ? Strings.labelOn : Strings.labelOff,
                                 style: Theme.of(context).textTheme.caption,
                               ),
                               trailing: Switch(
@@ -256,10 +256,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 enabled: false,
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
-                                  'When using mobile data',
+                                  Strings.listItemSettingsWhenUsingMobileData,
                                 ),
                                 subtitle: Text(
-                                  'Images, Audio, Video, Files',
+                                  Strings.subtitleImagesAudioVideoFiles, //TODO
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
@@ -270,10 +270,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 enabled: false,
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
-                                  'When using Wi-Fi',
+                                  Strings.listItemSettingsWhenUsingWiFi,
                                 ),
                                 subtitle: Text(
-                                  'Images, Audio, Video, Files',
+                                  Strings.subtitleImagesAudioVideoFiles, //TODO
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
@@ -284,10 +284,10 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 enabled: false,
                                 contentPadding: Dimensions.listPadding,
                                 title: Text(
-                                  'When Roaming',
+                                  Strings.listItemSettingsWhenRoaming,
                                 ),
                                 subtitle: Text(
-                                  'Images, Audio, Video, Files',
+                                  Strings.subtitleImagesAudioVideoFiles, //TODO
                                   style: Theme.of(context).textTheme.caption,
                                 ),
                               ),
@@ -362,7 +362,7 @@ class Props extends Equatable {
         onIncrementLanguage: () {
           store.dispatch(addInfo(
             message: Strings.alertAppRestartEffect,
-            action: 'Dismiss',
+            action: Strings.buttonDismiss,
           ));
           store.dispatch(incrementLanguage());
         },

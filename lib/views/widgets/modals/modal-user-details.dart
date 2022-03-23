@@ -10,6 +10,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
+import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
@@ -53,7 +54,22 @@ class ModalUserDetails extends StatelessWidget {
 
   onMessageUser({required BuildContext context, required _Props props}) async {
     final user = props.user;
-    return await showDialog(
+    final existingChatId = props.existingChatId;
+
+    // Navigate to existing DM if one already exists
+    if (existingChatId.isNotEmpty) {
+      return Navigator.popAndPushNamed(
+        context,
+        Routes.chat,
+        arguments: ChatScreenArguments(
+          roomId: existingChatId,
+          title: user.displayName,
+        ),
+      );
+    }
+
+    // Asking the user to create new DM if there isn't one already
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) => DialogStartChat(
@@ -61,27 +77,26 @@ class ModalUserDetails extends StatelessWidget {
         title: Strings.listItemUserDetailsStartChat(user.displayName),
         content: Strings.confirmStartChat,
         onStartChat: () async {
-          final newRoomId = await props.onCreateChatDirect(user: user);
-
+          final roomIdNew = await props.onCreateChatDirect(user: user) ?? '';
           Navigator.pop(dialogContext);
 
-          if (nested!) {
+          if (nested != null && nested!) {
             Navigator.pop(dialogContext);
           }
 
-          if (newRoomId != null) {
+          if (roomIdNew) {
             Navigator.popAndPushNamed(
               context,
               Routes.chat,
               arguments: ChatScreenArguments(
-                roomId: newRoomId,
+                roomId: existingChatId,
                 title: user.displayName,
               ),
             );
           }
         },
         onCancel: () async {
-          Navigator.pop(context);
+          Navigator.pop(dialogContext);
         },
       ),
     );
@@ -255,9 +270,10 @@ class ModalUserDetails extends StatelessWidget {
 
 class _Props extends Equatable {
   final User user;
-  final Map<String, User> users;
   final bool blocked;
   final bool loading;
+  final String existingChatId;
+  final Map<String, User> users;
   final Function onBlockUser;
   final Function onCreateChatDirect;
 
@@ -266,6 +282,7 @@ class _Props extends Equatable {
     required this.users,
     required this.loading,
     required this.blocked,
+    required this.existingChatId,
     required this.onCreateChatDirect,
     required this.onBlockUser,
   });
@@ -274,6 +291,7 @@ class _Props extends Equatable {
   List<Object> get props => [
         user,
         users,
+        existingChatId,
         loading,
         blocked,
       ];
@@ -298,6 +316,10 @@ class _Props extends Equatable {
           return users[userId] ?? User();
         }(),
         users: store.state.userStore.users,
+        existingChatId: selectDirectChatIdExisting(
+          state: store.state,
+          user: user ?? User(userId: userId),
+        ),
         loading: store.state.userStore.loading,
         blocked: store.state.userStore.blocked.contains(userId ?? user!.userId),
         onBlockUser: (User user) async {

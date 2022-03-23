@@ -94,7 +94,7 @@ class Props extends Equatable {
           store.dispatch(setLanguage(languageCode));
           store.dispatch(addInfo(
             message: Strings.alertAppRestartEffect,
-            action: 'Dismiss',
+            action: Strings.buttonDismiss,
           ));
         },
       );

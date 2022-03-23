@@ -166,7 +166,7 @@ ThunkAction<AppState> fetchRoom(
 ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
-      printInfo('[fetchSync] *** starting fetch all rooms *** ');
+      printInfo('[fetchRooms] *** starting fetch all rooms *** ');
       final data = await MatrixApi.fetchRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,

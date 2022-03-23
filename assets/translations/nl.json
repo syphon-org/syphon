@@ -23,8 +23,8 @@
     "title-dialog-captcha": "Voltooi Captcha",
     "title-dialog-terms": "Servicevoorwaarden bevestigen",
     "title-dialog-terms-alpha": "Open Alpha Servicevoorwaarden bevestigen",
-    "title-dialog-email-requirement": "Email benodigd",
-    "title-dialog-email-requirement-verified": "Email verificatie",
+    "title-dialog-email-requirement": "E-mail benodigd",
+    "title-dialog-email-requirement-verified": "E-mail verificatie",
     "title-confirm-password": "Wachtwoord bevestigen",
     "label-search-homeservers": "Homeservers zoeken...",
     "label-search-users": "Gebruikers zoeken...",
@@ -93,5 +93,13 @@
     "label-send-unencrypted": "Onversleuteld bericht verzenden",
     "semantics-image-intro-section-four": "Twee verschillende mensen die zich zelfverzekerd voelen en er op hun best uitzien",
     "semantics-image-empty-chat-list": "Verscheidene kleine, schattige monsters die achter het gebladerte door gluren.",
-    "semantics-image-terms-of-service": "Een hand die een telefoon vasthoudt met een servicevoorwaarden checkbox aangevinkt"
+    "semantics-image-terms-of-service": "Een hand die een telefoon vasthoudt met een servicevoorwaarden checkbox aangevinkt",
+    "content-confirm-password-reset": "Klik op de link die naar uw e-mail is gestuurd. Nadat u op de link hebt geklikt, drukt u op de knop Doorgaan hieronder om uw wachtwoord te wijzigen.",
+    "title-confirm-email": "Bevestig e-mail",
+    "content-support-dialog": "De Syphon gemeenschap is hier om je te helpen hoe we ook kunnen.\n\nVoel je vrij om deel te nemen aan onze support chat of stuur ons een e-mail. Houd er rekening mee dat een e-mail 1-5+ werkdagen kan duren voordat u antwoord krijgt!",
+    "label-email": "E-mail",
+    "button-send-verification": "verificatie e-mail sturen",
+    "title-verification": "Verificatie",
+    "header-signup-username": "Een gebruikersnaam aanmaken",
+    "content-forgot-email-verification": "Een verificatie-e-mail zal naar uw inbox worden gestuurd alvorens uw wachtwoord te resetten. Na verificatie zult u'een nieuw wachtwoord kunnen instellen en bevestigen."
 }
