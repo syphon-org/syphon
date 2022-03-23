@@ -229,7 +229,7 @@
     "list-item-received": "Ricevuto",
     "list-item-via": "Piattaforma",
     "list-item-from": "Da",
-    "list-item-read-by": "Letto da",
+    "list-item-read-by": "Visto da",
     "alert-offline": "Sembra che tu sia fuori linea. Controlla la tua connessione e riprova.",
     "alert-unknown": "Si è verificato un errore sconosciuto",
     "alert-could-not-launch-url": "Impossibile lanciare {}",
