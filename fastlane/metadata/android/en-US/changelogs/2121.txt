@@ -1,0 +1,17 @@
+0.2.12
+
+🔮 New Features
+- System Brightness Mode
+- Tap to resend messages
+ 
+🐛 Bug Fixes
+- fixed reusing existing DMs 
+- fixed issues with string mapping
+- fixed loading image tapbox issues
+
+💡 Improvements
+- Performance optimization on cache syncing
+- New Translations and Updates
+
+📐 Refactoring
+- Lots!
