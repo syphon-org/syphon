@@ -34,6 +34,7 @@ import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-avatar.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
+import 'package:syphon/views/widgets/avatars/avatar-badge.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
@@ -256,7 +257,7 @@ class HomeState extends State<HomeScreen> {
   }
 
   @protected
-  Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
+  Widget buildAppBarChatOptions({required BuildContext context, required _Props props}) => AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -536,101 +537,34 @@ class HomeState extends State<HomeScreen> {
                       ),
                       Visibility(
                         visible: !room.encryptionEnabled,
-                        child: Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              Dimensions.badgeAvatarSize,
-                            ),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSize,
-                              height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Icon(
-                                Icons.lock_open,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.iconSizeMini,
-                              ),
-                            ),
-                          ),
+                        child: AvatarBadge(
+                          encryptionEnabled: false,
                         ),
                       ),
                       Visibility(
                         visible: props.roomTypeBadgesEnabled && room.invite,
-                        child: Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSize,
-                              height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Icon(
-                                Icons.mail_outline,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.iconSizeMini,
-                              ),
-                            ),
-                          ),
+                        child: AvatarBadge(
+                          invite: true,
                         ),
                       ),
                       Visibility(
                         visible: newMessage,
-                        child: Positioned(
-                          top: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSizeSmall,
-                              height: Dimensions.badgeAvatarSizeSmall,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          ),
+                        child: AvatarBadge(
+                          indicator: true,
                         ),
                       ),
                       Visibility(
                         visible:
                             props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
-                        child: Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSize,
-                              height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Icon(
-                                Icons.group,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.badgeAvatarSizeSmall,
-                              ),
-                            ),
-                          ),
+                        child: AvatarBadge(
+                          group: true,
                         ),
                       ),
                       Visibility(
                         visible:
                             props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
-                        child: Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSize,
-                              height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Icon(
-                                Icons.public,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.badgeAvatarSize,
-                              ),
-                            ),
-                          ),
+                        child: AvatarBadge(
+                          public: true,
                         ),
                       ),
                     ],
@@ -722,7 +656,7 @@ class HomeState extends State<HomeScreen> {
           );
 
           if (selectedChats.isNotEmpty) {
-            currentAppBar = buildAppBarRoomOptions(
+            currentAppBar = buildAppBarChatOptions(
               props: props,
               context: context,
             );
