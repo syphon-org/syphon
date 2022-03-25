@@ -1,2 +1,2 @@
-versionName=0.2.11
-versionCode=2110
+versionName=0.2.12
+versionCode=2121
