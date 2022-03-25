@@ -514,9 +514,8 @@ class HomeState extends State<HomeScreen> {
           onTap: () => onSelectChat(room, chatName),
           onLongPress: () => onToggleRoomOptions(room: room),
           child: Container(
-            decoration: BoxDecoration(
-              color: backgroundColor, // if selected, color seperately
-            ),
+            // if selected, color seperately
+            decoration: BoxDecoration(color: backgroundColor),
             padding: EdgeInsets.symmetric(
               vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
             ).add(Dimensions.appPaddingHorizontal),
@@ -535,37 +534,12 @@ class HomeState extends State<HomeScreen> {
                         alt: formatRoomInitials(room: room),
                         background: chatColor,
                       ),
-                      Visibility(
-                        visible: !room.encryptionEnabled,
-                        child: AvatarBadge(
-                          encryptionEnabled: false,
-                        ),
-                      ),
-                      Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.invite,
-                        child: AvatarBadge(
-                          invite: true,
-                        ),
-                      ),
-                      Visibility(
-                        visible: newMessage,
-                        child: AvatarBadge(
-                          indicator: true,
-                        ),
-                      ),
-                      Visibility(
-                        visible:
-                            props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
-                        child: AvatarBadge(
-                          group: true,
-                        ),
-                      ),
-                      Visibility(
-                        visible:
-                            props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
-                        child: AvatarBadge(
-                          public: true,
-                        ),
+                      AvatarBadge(
+                        indicator: newMessage,
+                        invite: props.roomTypeBadgesEnabled && room.invite,
+                        group: props.roomTypeBadgesEnabled && room.type == 'group',
+                        public: props.roomTypeBadgesEnabled && room.type == 'public',
+                        unencrypted: !room.encryptionEnabled,
                       ),
                     ],
                   ),
@@ -599,9 +573,7 @@ class HomeState extends State<HomeScreen> {
                         preview,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.caption!.merge(
-                              textStyle,
-                            ),
+                        style: Theme.of(context).textTheme.caption!.merge(textStyle),
                       ),
                     ],
                   ),

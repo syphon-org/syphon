@@ -15,14 +15,14 @@ class AvatarBadge extends StatelessWidget {
     this.group = false,
     this.invite = false,
     this.indicator = false,
-    this.encryptionEnabled = false,
+    this.unencrypted = false,
   }) : super(key: key);
 
   final bool public;
   final bool group;
   final bool invite;
   final bool indicator;
-  final bool encryptionEnabled;
+  final bool unencrypted;
 
   Widget buildIndicator(BuildContext context) {
     return Positioned(
@@ -68,7 +68,7 @@ class AvatarBadge extends StatelessWidget {
             return buildIndicator(context);
           }
 
-          if (!encryptionEnabled) {
+          if (unencrypted) {
             return buildBadge(
               context,
               Icon(
