@@ -274,7 +274,7 @@
     "title-dialog-attempt-chat-with-user": "Versuchen Sie, mit {} zu chatten",
     "title-blocked-users": "Blockierte Benutzer",
     "title-export-session-keys": "Sitzungsschlüssel exportieren",
-    "title-dialog-confirm-deactivate-account": "Kontodeaktivation bestätigen",
+    "title-dialog-confirm-deactivate-account": "Kontodeaktivierung bestätigen",
     "title-dialog-backup-session-keys": "Sitzungsschlüssel sichern",
     "title-dialog-remove-screen-lock": "Bildschirmsperre entfernen",
     "title-dialog-enter-screen-lock-pin": "Geben Sie Ihre aktuelle PIN für die Bildschirmsperre ein",
@@ -334,5 +334,6 @@
     "alert-log-out-enable-multiaccount": "Sie müssen sich von Ihrer aktuellen Sitzung abmelden,\\num Mehrfachkonten zu aktivieren",
     "content-logout-multiaccount-confirm": "\n\nDa Sie noch andere Konten haben, werden Sie beim Abmelden zu einer anderen Kontositzung wechseln.",
     "semantics-image-password-update": "Benutzer denkt sich in einem Windhauch ein Passwort aus",
-    "content-export-session-keys": "Geben Sie ein Passwort für diese Sitzungsschlüsselsicherung ein.\n\nBitte beachten Sie, dass der Export eine gewisse Zeit in Anspruch nehmen kann."
+    "content-export-session-keys": "Geben Sie ein Passwort für diese Sitzungsschlüsselsicherung ein.\n\nBitte beachten Sie, dass der Export eine gewisse Zeit in Anspruch nehmen kann.",
+    "title-dialog-confirm-deactivate-account-final": "Kontodeaktivierung final bestätigen"
 }
