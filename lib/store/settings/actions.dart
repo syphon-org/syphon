@@ -406,6 +406,18 @@ ThunkAction<AppState> incrementLanguage() {
   };
 }
 
+Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
+  final version = await MatrixApi.checkVersion(
+    protocol: store.state.authStore.protocol,
+    homeserver: store.state.authStore.user.homeserver,
+  );
+
+  final unstableFeatures = version['unstable_features'];
+
+  return unstableFeatures.containsKey('org.matrix.msc2285')
+         && unstableFeatures['org.matrix.msc2285'];
+}
+
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
     final readReceiptsIndex =
