@@ -420,16 +420,27 @@ Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
 
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
-    final readReceiptsIndex =
-        ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
+    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
 
-    store.dispatch(SetReadReceipts(
-      readReceipts:
-          ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length],
-    ));
+    final nextReceipt = ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
 
-    if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-      store.dispatch(addInfo(message: Strings.alertHiddenReadReceipts));
+    if (nextReceipt != ReadReceiptTypes.Hidden) { //short-out
+      store.dispatch(SetReadReceipts(
+        readReceipts: nextReceipt,
+      ));
+    }
+    else {
+      if (await homeserverSupportsHiddenReadReceipts(store)) {
+        store.dispatch(SetReadReceipts(
+          readReceipts: ReadReceiptTypes.Hidden,
+        ));
+      }
+      else {
+        store.dispatch(SetReadReceipts(
+          readReceipts: ReadReceiptTypes.values[(readReceiptsIndex + 2) %
+              ReadReceiptTypes.values.length],
+        ));
+      }
     }
   };
 }
