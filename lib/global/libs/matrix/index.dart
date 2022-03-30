@@ -53,6 +53,7 @@ abstract class MatrixApi {
   static const sendMessage = Events.sendMessage;
   static const sendReaction = Events.sendReaction;
   static const sendReadReceipts = Events.sendReadMarkers;
+  static const sendReadReceiptHidden = Events.sendReadMarkerHidden;
   static const sendEventToDevice = Events.sendEventToDevice;
   static const sendMessageEncrypted = Events.sendMessageEncrypted;
   static const fetchStateEvents = Events.fetchStateEvents;
