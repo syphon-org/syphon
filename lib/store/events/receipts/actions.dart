@@ -56,7 +56,6 @@ ThunkAction<AppState> sendReadReceipts({
         roomId: room!.id,
         messageId: message!.id,
         readAll: readAll,
-        hidden: store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden,
       );
 
       if (data['errcode'] != null) {
