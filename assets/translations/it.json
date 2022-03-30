@@ -148,7 +148,6 @@
     "content-dialog-device-rename": "Inserisci il nuovo nome di visualizzazione pubblico per questo dispositivo.",
     "alert-invite-user-unknown": "Questo utente non sembra esistere in matrix, ma puoi tentare di invitarlo comunque.\n\nAssicurati di avere il nome corretto prima di provare.",
     "alert-homeserver-invalid": "Questo server non ha superato il controllo «ben conosciuto». Assicurati che il server sia configurato correttamente.",
-    "alert-hidden-read-receipts": "Le ricevute di lettura nascoste devono essere supportate dal vostro homeserver, o questo avrà lo stesso effetto dell'attivazione delle ricevute di lettura",
     "content-notification-background": "Connessione nello sfondo abilitata",
     "confirm-attempt-chat": "Anche se non invii un messaggio, l'utente vedrà comunque il tuo invito a chattare se esiste.\n\nVuoi provare a chattare con questo nome utente?",
     "content-intro-section-two": "Matrix ti permette di inviare messaggi agli altri",

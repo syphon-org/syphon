@@ -114,7 +114,6 @@
     "prompt-homeserver-select": "Seleccione su nombre de usuario y su servidor doméstico",
     "content-thanks": "Gracias por probar {}!\n\n",
     "alert-invite-user-unknown": "Este usuario no parece existir dentro de matrix, pero puedes intentar invitarlo de todos modos.\n\nAsegúrese de que tener el nombre correcto antes de intentarlo.",
-    "alert-hidden-read-receipts": "Las Confirmaciones de Lectura Ocultas deben ser compatibles con su servidor doméstico, o esto tendrá el mismo efecto que activarlas",
     "prompt-confirm-deactivate": "Introduzca su contraseña a continuación para confirmar la desactivación",
     "content-password-recommendation": "Intenta pensar en 3 o más palabras al azar\npalabras que recuerdes fácilmente",
     "content-intro-section-one": "{} funciona utilizando una red encriptada \ny descentralizada \nllamada ",

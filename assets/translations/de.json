@@ -141,7 +141,6 @@
     "label-back": "Zurückgehen",
     "label-close": "schließen",
     "label-send": "Senden",
-    "alert-hidden-read-receipts": "Versteckte Lesebestätigungen müssen von Ihrem Homeserver unterstützt werden, sonst hat dies den gleichen Effekt wie das Einschalten von Lesebestätigungen",
     "content-captcha-warning": "Einige Matrix-Server erfordern eine Captcha-Bestätigung, die von Google über reCAPTCHA bereitgestellt wird.\n\nWenn Sie dieses Captcha nicht ausfüllen möchten, müssen Sie möglicherweise zur Serverauswahl zurückkehren und einen anderen Server für die Kontoerstellung auswählen.",
     "button-text-invite": "Freunde einladen",
     "button-text-mark-all-read": "Alle gelesen markieren",
