@@ -9,12 +9,13 @@ The following are some of the benefits we find core to Syphon. Some may overlap 
 - Lack of any analytics or such libraries (privacy)
 - App Lock with encryption (privacy)
 - Separate encrypted storages per Multi-Account (privacy)
+- Proxy support (privacy)
+
 - Simple and modern default UI (ease-of-use)
 - Extreme customisability (ease-of-use)
 - Focus on P2P when it's mature enough (privacy, security, resilience)
 - Custom Matrix library (finer control which contributes to privacy and security)
 - Flutter (cross platform / ease-of-use)
-- Proxy support (privacy)
 
 ## Where is [X] feature?
 
