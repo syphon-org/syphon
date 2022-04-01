@@ -156,7 +156,6 @@
     "confirm-leave-chat-single-nonpublic": "Toto nieje verejná konverzácia. Znovupripojenie Vám nebude umožnené bez pozvnania.",
     "confirm-leave-chat-multi": "Ste si istý, že chcete opustiť {} vybranú konverzáciu ?",
     "confirm-block-user": "Ak zablokujete {}, nebudete schopný vidieť správy dotyčného a okamžite opustíte túto konverzáciu.",
-    "alert-hidden-read-receipts": "Skryté potvrdenia o prečítaní musia byť podporované Vaším home-serverom, inak to má rovnaký účinok ako zapnutie potvrdenia o prečítaní",
     "content-captcha-warning": "Niekteré servery Matrix vyžadujú captcha vo forme reCAPTCHA od spoločnosti Google.\n\nPokiaľ nechcete vyplňovat captcha, možno sa budete musieť vrátiť k výberu serveru a vybrať si iní server pre dokončenie registrácie.",
     "content-dialog-device-rename": "Zadajte nové meno, ktoré sa bude zobrazovať pre toto zariadenie.",
     "title-device-rename": "Premenovať zariadenie"

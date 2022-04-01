@@ -151,7 +151,6 @@
     "button-text-mark-all-read": "Označit vše jako přečtené",
     "button-text-invite": "Pozvat přátele",
     "button-text-support": "Pomoc",
-    "alert-hidden-read-receipts": "Skrytá potvrzení o přečtení musí být podporována vaším home-serverem, jinak to má stejný účinek jako zapnutí potvrzení o přečtení",
     "confirm-archive-chat-multi": "Jste si jistý, že chcete archivovat {} vybranou konverzaci?\n{} náhled archivované konverzace není zatím podporován.",
     "confirm-delete-chat-single": "Jste si jistý, že chcete smazat konverzaci \"{}\"? Zprávy budou nenávratně odstraněny.",
     "confirm-leave-chat-single": "Jste si jistý, že chcete opustit tuto konverzaci \"{}\"?",

@@ -45,19 +45,29 @@ ThunkAction<AppState> sendReadReceipts({
         return printInfo('[sendReadReceipts] read receipts disabled');
       }
 
+      final data;
+
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
         printInfo('[sendReadReceipts] read receipts hidden');
-      }
 
-      final data = await MatrixApi.sendReadReceipts(
-        protocol: store.state.authStore.protocol,
-        accessToken: store.state.authStore.user.accessToken,
-        homeserver: store.state.authStore.user.homeserver,
-        roomId: room!.id,
-        messageId: message!.id,
-        readAll: readAll,
-        hidden: store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden,
-      );
+        data = await MatrixApi.sendReadReceiptHidden(
+          protocol: store.state.authStore.protocol,
+          accessToken: store.state.authStore.user.accessToken,
+          homeserver: store.state.authStore.user.homeserver,
+          roomId: room!.id,
+          messageId: message!.id,
+        );
+      }
+      else {
+        data = await MatrixApi.sendReadReceipts(
+          protocol: store.state.authStore.protocol,
+          accessToken: store.state.authStore.user.accessToken,
+          homeserver: store.state.authStore.user.homeserver,
+          roomId: room!.id,
+          messageId: message!.id,
+          readAll: readAll,
+        );
+      }
 
       if (data['errcode'] != null) {
         throw data['error'];

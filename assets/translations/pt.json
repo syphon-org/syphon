@@ -155,7 +155,6 @@
     "confirm-leave-chat-multi-nonpublic": "Algumas ou todas estas conversas não são públicas. Não poderá voltar a estas conversas sem um convite.",
     "confirm-block-user": "Se bloquear {}, não poderá ver as mensagens dessa pessoa e sairá imediatamente desta conversa.",
     "label-back": "Voltar",
-    "alert-hidden-read-receipts": "Os recibos de leitura ocultos devem ser suportados pelo seu servidor doméstico, ou isso terá o mesmo efeito que alternar os recibos de leitura para 'Ativado'",
     "label-download-image": "Carregar imagem",
     "content-dialog-device-rename": "Introduza o novo nome público para este dispositivo.",
     "confirm-linkout": "Tem a certeza que quer abrir a seguinte hiperligação?\n\n{}",

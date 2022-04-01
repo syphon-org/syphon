@@ -262,7 +262,6 @@
     "tooltip-search-chats": "Bilatu txatak",
     "tooltip-cancel-reply": "Baztertu erantzuna",
     "tooltip-search-unencrypted": "Zifratu gabeko bilaketa",
-    "alert-hidden-read-receipts": "Zerbitzariak gaituta izan behar ditu Ezkutuko hartu izan adierazlea, edo bestela hartu izan adierazlea piztuta egotearen emaitza bera izango du",
     "content-support-dialog": "Syphon komunitatea eskura duzu ahal dugun bezala lagun zitzagun.\n\nSar zaitez Laguntza txatean edo bidal iezaguzu poste elektroniko bat. Mesedez, kontuan izan eposta bidez erantzunek 1 eta 5 egun artean (edo gehiago) luzatu daitezkela!",
     "confirm-auth-verification": "Eragiketa hau gauzatzeko pasahitza sartu beharko duzu berriro",
     "confirm-alpha-warning": "Ez erabili —edo gomendatu inori erabil dezan— Syphon segurtasuna kanpoko erakunde batek aztertu eta probatzea ezinbestekoa bada.\n",
