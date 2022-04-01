@@ -11,6 +11,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/global/weburl.dart';
@@ -63,6 +64,7 @@ class HomeState extends State<HomeScreen> {
   final fabKeyCircle = GlobalKey<FabBarContainerState>();
 
   bool searching = false;
+  bool organizing = false;
   String searchText = '';
   Map<String, Room> selectedChats = {};
   Map<String, Color> chatColorCache = {};
@@ -419,7 +421,131 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
-  @protected
+  Widget buildChatRow(
+    BuildContext context,
+    _Props props,
+    Room room, {
+    required String chatName,
+    required Color chatColor,
+  }) {
+    final width = MediaQuery.of(context).size.width;
+    final messages = props.messages[room.id] ?? const [];
+    final decrypted = props.decrypted[room.id] ?? const [];
+
+    final messageLatest = latestMessage(messages, room: room, decrypted: decrypted);
+    final preview = formatPreview(room: room, message: messageLatest);
+
+    final isNewMessage = messageLatest != null &&
+        room.lastRead < messageLatest.timestamp &&
+        messageLatest.sender != props.currentUser.userId;
+
+    var backgroundColor;
+    var textStyle = TextStyle();
+
+    // highlight selected rooms if necessary
+    if (selectedChats.isNotEmpty) {
+      if (!selectedChats.containsKey(room.id)) {
+        backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+      } else {
+        backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
+      }
+    }
+
+    // show draft inidicator if it's an empty room
+    if (room.drafting || messages.isEmpty) {
+      textStyle = TextStyle(fontStyle: FontStyle.italic);
+    }
+
+    if (messages.isNotEmpty && messageLatest != null) {
+      // it has undecrypted message contained within
+      if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
+        textStyle = TextStyle(fontStyle: FontStyle.italic);
+      }
+
+      if (messageLatest.body == null || messageLatest.body!.isEmpty) {
+        textStyle = TextStyle(fontStyle: FontStyle.italic);
+      }
+
+      // display message as being 'unread'
+      if (isNewMessage) {
+        textStyle = textStyle.copyWith(
+          color: Theme.of(context).textTheme.bodyText1!.color,
+          fontWeight: FontWeight.w500,
+        );
+      }
+    }
+
+    return Container(
+      // if selected, color seperately
+      constraints: BoxConstraints(maxWidth: width),
+      decoration: BoxDecoration(color: backgroundColor),
+      padding: EdgeInsets.symmetric(
+        vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
+      ).add(Dimensions.appPaddingHorizontal),
+      child: Flex(
+        direction: Axis.horizontal,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            child: Stack(
+              children: [
+                Avatar(
+                  uri: room.avatarUri,
+                  size: Dimensions.avatarSizeMin,
+                  alt: formatRoomInitials(room: room),
+                  background: chatColor,
+                ),
+                AvatarBadge(
+                  indicator: isNewMessage,
+                  invite: props.roomTypeBadgesEnabled && room.invite,
+                  group: props.roomTypeBadgesEnabled && room.type == 'group',
+                  public: props.roomTypeBadgesEnabled && room.type == 'public',
+                  unencrypted: !room.encryptionEnabled,
+                ),
+              ],
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            fit: FlexFit.tight,
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        chatName,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                    ),
+                    Text(
+                      formatTimestamp(lastUpdateMillis: room.lastUpdate),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
+                    ),
+                  ],
+                ),
+                Text(
+                  preview,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.caption!.merge(textStyle),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget buildChatList(BuildContext context, _Props props) {
     final store = StoreProvider.of<AppState>(context);
     final rooms = props.rooms;
@@ -462,124 +588,39 @@ class HomeState extends State<HomeScreen> {
       itemCount: noSearchResults ? 0 : rooms.length,
       itemBuilder: (BuildContext context, int index) {
         final room = rooms[index];
-        final messages = props.messages[room.id] ?? const [];
-        final decrypted = props.decrypted[room.id] ?? const [];
-
-        final messageLatest = latestMessage(messages, room: room, decrypted: decrypted);
-        final preview = formatPreview(room: room, message: messageLatest);
         final chatName = room.name ?? '';
-        final newMessage = messageLatest != null &&
-            room.lastRead < messageLatest.timestamp &&
-            messageLatest.sender != props.currentUser.userId;
-
-        var backgroundColor;
-        var textStyle = TextStyle();
         final chatColor = selectChatColor(store, room.id);
 
-        // highlight selected rooms if necessary
-        if (selectedChats.isNotEmpty) {
-          if (!selectedChats.containsKey(room.id)) {
-            backgroundColor = Theme.of(context).scaffoldBackgroundColor;
-          } else {
-            backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
-          }
-        }
+        final listItem = buildChatRow(
+          context,
+          props,
+          room,
+          chatColor: chatColor,
+          chatName: chatName,
+        );
 
-        // show draft inidicator if it's an empty room
-        if (room.drafting || messages.isEmpty) {
-          textStyle = TextStyle(fontStyle: FontStyle.italic);
-        }
-
-        if (messages.isNotEmpty && messageLatest != null) {
-          // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
-            textStyle = TextStyle(fontStyle: FontStyle.italic);
-          }
-
-          if (messageLatest.body == null || messageLatest.body!.isEmpty) {
-            textStyle = TextStyle(fontStyle: FontStyle.italic);
-          }
-
-          // display message as being 'unread'
-          if (newMessage) {
-            textStyle = textStyle.copyWith(
-              color: Theme.of(context).textTheme.bodyText1!.color,
-              fontWeight: FontWeight.w500,
-            );
-          }
+        if (organizing) {
+          return Draggable(
+            feedback: listItem,
+            childWhenDragging: listItem,
+            child: listItem,
+          );
         }
 
         // GestureDetector w/ animation
-        return InkWell(
-          onTap: () => onSelectChat(room, chatName),
-          onLongPress: () => onToggleRoomOptions(room: room),
-          child: Container(
-            // if selected, color seperately
-            decoration: BoxDecoration(color: backgroundColor),
-            padding: EdgeInsets.symmetric(
-              vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
-            ).add(Dimensions.appPaddingHorizontal),
-            child: Flex(
-              direction: Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  child: Stack(
-                    children: [
-                      Avatar(
-                        uri: room.avatarUri,
-                        size: Dimensions.avatarSizeMin,
-                        alt: formatRoomInitials(room: room),
-                        background: chatColor,
-                      ),
-                      AvatarBadge(
-                        indicator: newMessage,
-                        invite: props.roomTypeBadgesEnabled && room.invite,
-                        group: props.roomTypeBadgesEnabled && room.type == 'group',
-                        public: props.roomTypeBadgesEnabled && room.type == 'public',
-                        unencrypted: !room.encryptionEnabled,
-                      ),
-                    ],
-                  ),
-                ),
-                Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
-                  child: Flex(
-                    direction: Axis.vertical,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              chatName,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                          ),
-                          Text(
-                            formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        preview,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.caption!.merge(textStyle),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        return GestureDetector(
+          onLongPressMoveUpdate: (details) {
+            if (!organizing) {
+              log.info('[organizing] $organizing');
+              setState(() {
+                organizing = true;
+              });
+            }
+          },
+          child: InkWell(
+            onTap: () => onSelectChat(room, chatName),
+            onLongPress: () => onToggleRoomOptions(room: room),
+            child: listItem,
           ),
         );
       },
@@ -670,10 +711,7 @@ class HomeState extends State<HomeScreen> {
                           ),
                           GestureDetector(
                             onTap: onDismissMessageOptions,
-                            child: buildChatList(
-                              context,
-                              props,
-                            ),
+                            child: buildChatList(context, props),
                           ),
                         ],
                       ),
