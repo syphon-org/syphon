@@ -204,7 +204,7 @@
     "list-item-advanced-settings-test-sync-loop": "Tester la boucle de synchronisation en arrière-plan",
     "list-item-received": "Reçu",
     "list-item-from": "De",
-    "list-item-read-by": "Lu par",
+    "list-item-read-by": "Vu par",
     "alert-offline": "Il semble que vous que soyez hors-ligne. Vérifiez votre connexion et réessayez.",
     "alert-unknown": "Une erreur inconnue s'est produite",
     "alert-could-not-launch-url": "Impossible d'ouvrir {}",
