@@ -426,23 +426,21 @@ ThunkAction<AppState> incrementReadReceipts() {
     final nextReceipt = ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
 
     if (nextReceipt != ReadReceiptTypes.Hidden) { //short-out
-      store.dispatch(SetReadReceipts(
+      return store.dispatch(SetReadReceipts(
         readReceipts: nextReceipt,
       ));
     }
-    else {
-      if (await homeserverSupportsHiddenReadReceipts(store)) {
-        store.dispatch(SetReadReceipts(
-          readReceipts: ReadReceiptTypes.Hidden,
-        ));
-      }
-      else {
-        store.dispatch(SetReadReceipts(
-          readReceipts: ReadReceiptTypes.values[(readReceiptsIndex + 2) %
-              ReadReceiptTypes.values.length],
-        ));
-      }
+
+    if (await homeserverSupportsHiddenReadReceipts(store)) {
+      return store.dispatch(SetReadReceipts(
+        readReceipts: ReadReceiptTypes.Hidden,
+      ));
     }
+
+    return store.dispatch(SetReadReceipts(
+      readReceipts: ReadReceiptTypes.values[(readReceiptsIndex + 2) %
+          ReadReceiptTypes.values.length],
+    ));
   };
 }
 
