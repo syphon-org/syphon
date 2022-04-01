@@ -414,7 +414,8 @@ Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
 
   final unstableFeatures = version['unstable_features'];
 
-  return unstableFeatures.containsKey('org.matrix.msc2285')
+  return unstableFeatures != null
+         && unstableFeatures.containsKey('org.matrix.msc2285')
          && unstableFeatures['org.matrix.msc2285'];
 }
 
