@@ -525,6 +525,7 @@ class _Props extends Equatable {
   final Function onResetConfirmAuth;
   final Function onSetScreenLock;
   final Function onRemoveScreenLock;
+  final Function copyToClipboard;
 
   const _Props({
     required this.valid,
@@ -541,6 +542,7 @@ class _Props extends Equatable {
     required this.onResetConfirmAuth,
     required this.onSetScreenLock,
     required this.onRemoveScreenLock,
+    required this.copyToClipboard,
   });
 
   @override
@@ -552,7 +554,8 @@ class _Props extends Equatable {
         sessionId,
         sessionName,
         sessionKey,
-        screenLockEnabled
+        screenLockEnabled,
+        copyToClipboard,
       ];
 
   static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
@@ -574,5 +577,9 @@ class _Props extends Equatable {
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
+        copyToClipboard: (String? clipboardData) async {
+          await Clipboard.setData(ClipboardData(text: clipboardData));
+          store.dispatch(addInfo(message: Strings.alertCopiedToClipboard));
+        },
       );
 }
