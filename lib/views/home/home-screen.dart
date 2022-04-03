@@ -23,6 +23,8 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/settings/chat-settings/chat-lists/actions.dart';
+import 'package:syphon/store/settings/chat-settings/chat-lists/model.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
@@ -45,7 +47,7 @@ import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-options.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
-enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
+enum Options { newGroup, markAllRead, inviteFriends, createList, settings, licenses, help }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -69,7 +71,91 @@ class HomeState extends State<HomeScreen> {
   Map<String, Room> selectedChats = {};
   Map<String, Color> chatColorCache = {};
 
-  @protected
+  isAllDirect(Map<String, Room> selectedChats) {
+    return selectedChats.values.every((chat) => chat.direct);
+  }
+
+  selectActionAlignment(_Props props) {
+    if (props.fabLocation == MainFabLocation.Left) {
+      return Alignment.bottomLeft;
+    }
+
+    return Alignment.bottomRight;
+  }
+
+  selectActionLocation(_Props props) {
+    if (props.fabLocation == MainFabLocation.Left) {
+      return FloatingActionButtonLocation.startFloat;
+    }
+
+    return FloatingActionButtonLocation.endFloat;
+  }
+
+  onDismissMessageOptions() {
+    setState(() {
+      selectedChats = {};
+    });
+  }
+
+  onCreateList() {
+    final store = StoreProvider.of<AppState>(context);
+    store.dispatch(createChatList());
+  }
+
+  onToggleSearch() {
+    setState(() {
+      searching = !searching;
+      searchText = '';
+    });
+  }
+
+  onSearch(_Props props, String text) {
+    final store = StoreProvider.of<AppState>(context);
+    setState(() {
+      searchText = text;
+    });
+
+    if (text.isEmpty) {
+      return store.dispatch(clearSearchResults());
+    }
+
+    store.dispatch(searchMessages(text));
+  }
+
+  onSelectChat(Room room, String chatName) {
+    final store = StoreProvider.of<AppState>(context);
+
+    if (selectedChats.isNotEmpty) {
+      return onToggleRoomOptions(room: room);
+    }
+
+    Navigator.pushNamed(
+      context,
+      Routes.chat,
+      arguments: ChatScreenArguments(roomId: room.id, title: chatName),
+    );
+
+    Timer(Duration(milliseconds: 500), () {
+      setState(() {
+        searching = false;
+        selectedChats = {};
+      });
+      store.dispatch(clearSearchResults());
+    });
+  }
+
+  onSelectAll(_Props props) {
+    if (selectedChats.values.toSet().containsAll(props.rooms)) {
+      setState(() {
+        selectedChats = {};
+      });
+    } else {
+      setState(() {
+        selectedChats.addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
+      });
+    }
+  }
+
   onToggleRoomOptions({required Room room}) {
     if (searching) {
       onToggleSearch();
@@ -83,12 +169,12 @@ class HomeState extends State<HomeScreen> {
         selectedChats.remove(room.id);
       });
     }
-  }
-
-  onDismissMessageOptions() {
-    setState(() {
-      selectedChats = {};
-    });
+    if (selectedChats.isEmpty) {
+      log.debug('organization $organizing');
+      setState(() {
+        organizing = false;
+      });
+    }
   }
 
   onSelectHelp(_Props props) async {
@@ -200,65 +286,21 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
-  onToggleSearch() {
-    setState(() {
-      searching = !searching;
-      searchText = '';
-    });
-  }
+  Widget buildActionFab(_Props props) {
+    final fabType = props.fabType;
 
-  onSearch(_Props props, String text) {
-    final store = StoreProvider.of<AppState>(context);
-    setState(() {
-      searchText = text;
-    });
-
-    if (text.isEmpty) {
-      return store.dispatch(clearSearchResults());
+    if (fabType == MainFabType.Bar) {
+      return FabBarExpanding(
+        alignment: selectActionAlignment(props),
+      );
     }
 
-    store.dispatch(searchMessages(text));
-  }
-
-  onSelectChat(Room room, String chatName) {
-    final store = StoreProvider.of<AppState>(context);
-
-    if (selectedChats.isNotEmpty) {
-      return onToggleRoomOptions(room: room);
-    }
-
-    Navigator.pushNamed(
-      context,
-      Routes.chat,
-      arguments: ChatScreenArguments(roomId: room.id, title: chatName),
+    return FabRing(
+      fabKey: fabKeyRing,
+      alignment: selectActionAlignment(props),
     );
-
-    Timer(Duration(milliseconds: 500), () {
-      setState(() {
-        searching = false;
-        selectedChats = {};
-      });
-      store.dispatch(clearSearchResults());
-    });
   }
 
-  onSelectAll(_Props props) {
-    if (selectedChats.values.toSet().containsAll(props.rooms)) {
-      setState(() {
-        selectedChats = {};
-      });
-    } else {
-      setState(() {
-        selectedChats.addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
-      });
-    }
-  }
-
-  bool isAllDirect(Map<String, Room> selectedChats) {
-    return selectedChats.values.every((chat) => chat.direct);
-  }
-
-  @protected
   Widget buildAppBarChatOptions({required BuildContext context, required _Props props}) => AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
@@ -332,7 +374,6 @@ class HomeState extends State<HomeScreen> {
         ],
       );
 
-  @protected
   Widget buildAppBar({required BuildContext context, required _Props props}) {
     final assetColor = computeContrastColorText(
       Theme.of(context).appBarTheme.backgroundColor,
@@ -383,6 +424,9 @@ class HomeState extends State<HomeScreen> {
               case Options.markAllRead:
                 props.onMarkAllRead();
                 break;
+              case Options.createList:
+                onCreateList();
+                break;
               case Options.settings:
                 Navigator.pushNamed(context, Routes.settings);
                 break;
@@ -408,6 +452,11 @@ class HomeState extends State<HomeScreen> {
               child: Text(Strings.buttonTextInvite),
             ),
             PopupMenuItem<Options>(
+              value: Options.createList,
+              enabled: true,
+              child: Text('Create List'),
+            ),
+            PopupMenuItem<Options>(
               value: Options.settings,
               child: Text(Strings.buttonTextSettings),
             ),
@@ -418,6 +467,78 @@ class HomeState extends State<HomeScreen> {
           ],
         )
       ],
+    );
+  }
+
+  Widget buildChatListHeader(BuildContext context, _Props props, ChatList list) {
+    final width = MediaQuery.of(context).size.width;
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+
+    return Container(
+      // if selected, color seperately
+      constraints: BoxConstraints(maxWidth: width, maxHeight: 80),
+      decoration: BoxDecoration(color: backgroundColor),
+      padding: EdgeInsets.symmetric(vertical: 8).add(Dimensions.appPaddingHorizontal),
+      child: Flex(
+        direction: Axis.horizontal,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            // TODO: show color dot or emoji icon based on isEmpty for symbol
+            child: ClipRRect(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary,
+                  border: Border.all(
+                    color: Colors.white,
+                  ),
+                  borderRadius: BorderRadius.circular(Dimensions.badgeAvatarSize),
+                ),
+                width: Dimensions.badgeAvatarSize,
+                height: Dimensions.badgeAvatarSize,
+                margin: EdgeInsets.only(left: 4),
+                child: Text(
+                  list.symbol,
+                  style: TextStyle(
+                    fontSize: Dimensions.iconSizeMini,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            fit: FlexFit.tight,
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        list.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    // Icon(
+                    //   Icons.keyboard_arrow_down,
+                    //   color: Theme.of(context).colorScheme.secondary,
+                    // ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -546,7 +667,7 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
-  Widget buildChatList(BuildContext context, _Props props) {
+  Widget buildChatListAll(BuildContext context, _Props props) {
     final store = StoreProvider.of<AppState>(context);
     final rooms = props.rooms;
     final label = props.syncing ? Strings.labelSyncingChats : Strings.labelMessagesEmpty;
@@ -583,79 +704,75 @@ class HomeState extends State<HomeScreen> {
       );
     }
 
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      itemCount: noSearchResults ? 0 : rooms.length,
-      itemBuilder: (BuildContext context, int index) {
-        final room = rooms[index];
-        final chatName = room.name ?? '';
-        final chatColor = selectChatColor(store, room.id);
+    itemBuilder(BuildContext context, int index) {
+      final room = rooms[index];
+      final chatName = room.name ?? '';
+      final chatColor = selectChatColor(store, room.id);
 
-        final listItem = buildChatRow(
-          context,
-          props,
-          room,
-          chatColor: chatColor,
-          chatName: chatName,
-        );
+      final listItem = buildChatRow(
+        context,
+        props,
+        room,
+        chatColor: chatColor,
+        chatName: chatName,
+      );
 
-        if (organizing) {
-          return Draggable(
-            feedback: listItem,
-            childWhenDragging: listItem,
-            child: listItem,
-          );
-        }
-
-        // GestureDetector w/ animation
-        return GestureDetector(
-          onLongPressMoveUpdate: (details) {
+      if (selectedChats.isNotEmpty) {
+        return InkWell(
+          key: Key(room.id),
+          onTap: () => onSelectChat(room, chatName),
+          onLongPress: () {
             if (!organizing) {
-              log.info('[organizing] $organizing');
+              log.debug('[organizing] $organizing');
               setState(() {
                 organizing = true;
               });
             }
           },
-          child: InkWell(
-            onTap: () => onSelectChat(room, chatName),
-            onLongPress: () => onToggleRoomOptions(room: room),
-            child: listItem,
-          ),
+          child: listItem,
         );
-      },
-    );
-  }
+      }
 
-  selectActionAlignment(_Props props) {
-    if (props.fabLocation == MainFabLocation.Left) {
-      return Alignment.bottomLeft;
-    }
-
-    return Alignment.bottomRight;
-  }
-
-  buildActionFab(_Props props) {
-    final fabType = props.fabType;
-
-    if (fabType == MainFabType.Bar) {
-      return FabBarExpanding(
-        alignment: selectActionAlignment(props),
+      // GestureDetector w/ animation
+      return InkWell(
+        onTap: () => onSelectChat(room, chatName),
+        onLongPress: () => onToggleRoomOptions(room: room),
+        child: listItem,
       );
     }
 
-    return FabRing(
-      fabKey: fabKeyRing,
-      alignment: selectActionAlignment(props),
-    );
-  }
-
-  selectActionLocation(_Props props) {
-    if (props.fabLocation == MainFabLocation.Left) {
-      return FloatingActionButtonLocation.startFloat;
+    if (organizing && selectedChats.isNotEmpty) {
+      return ReorderableListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: noSearchResults ? 0 : rooms.length,
+        itemBuilder: itemBuilder,
+        onReorder: (int oldIndex, int newIndex) {
+          log.debug('$oldIndex $newIndex');
+        },
+      );
     }
 
-    return FloatingActionButtonLocation.endFloat;
+    return ListView.separated(
+      scrollDirection: Axis.vertical,
+      itemCount: noSearchResults ? 0 : rooms.length,
+      separatorBuilder: (BuildContext context, int index) {
+        final chatListNext = props.chatLists.where((list) => list.position == index).toList();
+
+        if (chatListNext.isEmpty) {
+          return Container();
+        }
+
+        return ListView(
+          shrinkWrap: true,
+          children: chatListNext
+              .map(
+                (list) => buildChatListHeader(context, props, list),
+              )
+              .toList(),
+        );
+      },
+      itemBuilder: itemBuilder,
+    );
   }
 
   @override
@@ -711,7 +828,7 @@ class HomeState extends State<HomeScreen> {
                           ),
                           GestureDetector(
                             onTap: onDismissMessageOptions,
-                            child: buildChatList(context, props),
+                            child: buildChatListAll(context, props),
                           ),
                         ],
                       ),
@@ -738,6 +855,7 @@ class _Props extends Equatable {
   final MainFabType fabType;
   final MainFabLocation fabLocation;
   final List<Message> searchMessages;
+  final List<ChatList> chatLists;
   final Map<String, ChatSetting> chatSettings;
   final Map<String, List<Message>> messages;
   final Map<String, List<Message>> decrypted;
@@ -745,7 +863,6 @@ class _Props extends Equatable {
   final Function onLeaveChat;
   final Function onDeleteChat;
   final Function onArchiveChat;
-  final Function onSelectHelp;
   final Function onMarkAllRead;
   final Function onFetchSyncForced;
 
@@ -758,6 +875,7 @@ class _Props extends Equatable {
     required this.unauthed,
     required this.messages,
     required this.decrypted,
+    required this.chatLists,
     required this.currentUser,
     required this.chatSettings,
     required this.searchMessages,
@@ -766,7 +884,6 @@ class _Props extends Equatable {
     required this.roomTypeBadgesEnabled,
     required this.onLeaveChat,
     required this.onDeleteChat,
-    required this.onSelectHelp,
     required this.onArchiveChat,
     required this.onMarkAllRead,
     required this.onFetchSyncForced,
@@ -781,6 +898,7 @@ class _Props extends Equatable {
         searching,
         offline,
         unauthed,
+        chatLists,
         currentUser,
         chatSettings,
         roomTypeBadgesEnabled,
@@ -813,6 +931,7 @@ class _Props extends Equatable {
         currentUser: store.state.authStore.user,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         chatSettings: store.state.settingsStore.chatSettings,
+        chatLists: store.state.settingsStore.chatLists,
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());
         },
@@ -831,6 +950,5 @@ class _Props extends Equatable {
           );
           return Future(() => true);
         },
-        onSelectHelp: () async {},
       );
 }

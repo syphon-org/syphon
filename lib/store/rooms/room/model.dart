@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/ids.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
@@ -15,11 +14,6 @@ import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
-
-// TODO: convert to using Identifier wrapper class
-class RoomId extends Identifier {
-  RoomId(id) : super(id: id);
-}
 
 class RoomPresets {
   static const private = 'private_chat';

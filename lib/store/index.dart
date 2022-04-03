@@ -162,7 +162,7 @@ Future<Store<AppState>> initStore(
     shouldSave: cacheMiddleware,
   );
 
-  // Finally load persisted store
+  // finally load persisted store
   try {
     // TODO: this is pretty hacky - merges availableUsers across stores
     if (existingUser) {

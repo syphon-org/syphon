@@ -1,10 +1,13 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/notifications.dart';
 
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/options/types.dart';
+import 'package:syphon/store/sync/background/service.dart';
+
+class ToggleNotifications {}
 
 class MuteChatNotifications {
   final String roomId;
@@ -22,6 +25,64 @@ class SetNotificationSettings {
   SetNotificationSettings({required this.settings});
 }
 
+ThunkAction<AppState> toggleNotifications() {
+  return (Store<AppState> store) async {
+    if (globalNotificationPluginInstance == null) {
+      return;
+    }
+
+    final permitted = await promptNativeNotificationsRequest(
+      pluginInstance: globalNotificationPluginInstance!,
+    );
+
+    if (!permitted) {
+      return;
+    }
+
+    store.dispatch(ToggleNotifications());
+
+    final enabled = store.state.settingsStore.notificationSettings.enabled;
+
+    if (enabled) {
+      store.dispatch(startNotifications());
+    } else {
+      store.dispatch(stopNotifications());
+    }
+  };
+}
+
+ThunkAction<AppState> startNotifications() {
+  return (Store<AppState> store) async {
+    await BackgroundSync.init();
+
+    final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
+      (roomId, room) => MapEntry(roomId, room.name),
+    );
+
+    await BackgroundSync.start(
+      roomNames: roomNames,
+      protocol: store.state.authStore.protocol,
+      lastSince: store.state.syncStore.lastSince,
+      currentUser: store.state.authStore.currentUser,
+      settings: store.state.settingsStore.notificationSettings,
+    );
+
+    showBackgroundServiceNotification(
+      notificationId: BackgroundSync.service_id,
+      pluginInstance: globalNotificationPluginInstance!,
+    );
+  };
+}
+
+ThunkAction<AppState> stopNotifications() {
+  return (Store<AppState> store) async {
+    BackgroundSync.stop();
+    dismissAllNotifications(
+      pluginInstance: globalNotificationPluginInstance,
+    );
+  };
+}
+
 ///
 /// Mute Chat Notifications
 ///
@@ -34,8 +95,7 @@ ThunkAction<AppState> muteChatNotifications({
 }) {
   return (Store<AppState> store) async {
     final settings = store.state.settingsStore.notificationSettings;
-    final options =
-        Map<String, NotificationOptions>.from(settings.notificationOptions);
+    final options = Map<String, NotificationOptions>.from(settings.notificationOptions);
 
     options.putIfAbsent(roomId, () => NotificationOptions());
 
@@ -64,8 +124,7 @@ ThunkAction<AppState> toggleChatNotifications({
 }) {
   return (Store<AppState> store) async {
     final settings = store.state.settingsStore.notificationSettings;
-    final options =
-        Map<String, NotificationOptions>.from(settings.notificationOptions);
+    final options = Map<String, NotificationOptions>.from(settings.notificationOptions);
 
     options.putIfAbsent(roomId, () => NotificationOptions());
 
@@ -91,8 +150,7 @@ ThunkAction<AppState> incrementToggleType() {
     final settings = store.state.settingsStore.notificationSettings;
 
     final index = ToggleType.values.indexOf(settings.toggleType);
-    final toggleType =
-        ToggleType.values[(index + 1) % ToggleType.values.length];
+    final toggleType = ToggleType.values[(index + 1) % ToggleType.values.length];
 
     store.dispatch(SetNotificationSettings(
       settings: settings.copyWith(toggleType: toggleType),
