@@ -297,6 +297,13 @@ class PrivacySettingsScreen extends StatelessWidget {
                               props.sessionId,
                               style: Theme.of(context).textTheme.caption,
                             ),
+                            onTap: () async {
+                              await props.copyToClipboard(props.sessionId);
+                            },
+                            trailing: IconButton(
+                              onPressed: () => props.copyToClipboard(props.sessionId),
+                              icon: Icon(Icons.copy),
+                            ),
                           ),
                           ListTile(
                             contentPadding: Dimensions.listPadding,
