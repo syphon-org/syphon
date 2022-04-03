@@ -288,6 +288,10 @@ class PrivacySettingsScreen extends StatelessWidget {
                               style: Theme.of(context).textTheme.caption,
                             ),
                             onTap: () => props.onRenameDevice(context),
+                            trailing: IconButton(
+                              onPressed: () => props.onRenameDevice(context),
+                              icon: Icon(Icons.edit),
+                            ),
                           ),
                           ListTile(
                             contentPadding: Dimensions.listPadding,
