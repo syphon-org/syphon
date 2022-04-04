@@ -406,7 +406,8 @@ ThunkAction<AppState> incrementLanguage() {
   };
 }
 
-Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
+/// Unstable features are advertised under /versions
+Future<bool> homeserverSupportsUnstableFeature(Store<AppState> store, String msc) async {
   final version = await MatrixApi.checkVersion(
     protocol: store.state.authStore.protocol,
     homeserver: store.state.authStore.user.homeserver,
@@ -415,8 +416,12 @@ Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
   final unstableFeatures = version['unstable_features'];
 
   return unstableFeatures != null
-         && unstableFeatures.containsKey('org.matrix.msc2285')
-         && unstableFeatures['org.matrix.msc2285'];
+      && unstableFeatures.containsKey(msc)
+      && unstableFeatures[msc];
+}
+
+Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
+  return homeserverSupportsUnstableFeature(store, 'org.matrix.msc2285');
 }
 
 ThunkAction<AppState> incrementReadReceipts() {
