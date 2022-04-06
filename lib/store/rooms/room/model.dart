@@ -55,6 +55,7 @@ class Room implements drift.Insertable<Room> {
   final int lastUpdate;
   final int totalJoinedUsers;
   final int namePriority;
+  final int? ephemeralMessagesTimer;
 
   // Event lists and handlers
   final Message? draft;
@@ -118,6 +119,7 @@ class Room implements drift.Insertable<Room> {
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
+    this.ephemeralMessagesTimer = 0,
     this.totalJoinedUsers = 0,
     this.guestEnabled = false,
     this.encryptionEnabled = false,
@@ -147,6 +149,7 @@ class Room implements drift.Insertable<Room> {
     int? lastRead,
     int? lastUpdate,
     int? namePriority,
+    int? ephemeralMessagesTimer,
     int? totalJoinedUsers,
     guestEnabled,
     encryptionEnabled,
@@ -179,6 +182,7 @@ class Room implements drift.Insertable<Room> {
         lastRead: lastRead ?? this.lastRead,
         lastUpdate: lastUpdate ?? this.lastUpdate,
         namePriority: namePriority ?? this.namePriority,
+        ephemeralMessagesTimer: ephemeralMessagesTimer ?? this.ephemeralMessagesTimer,
         totalJoinedUsers: totalJoinedUsers ?? this.totalJoinedUsers,
         guestEnabled: guestEnabled ?? this.guestEnabled,
         encryptionEnabled: encryptionEnabled ?? this.encryptionEnabled,
