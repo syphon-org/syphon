@@ -10,6 +10,7 @@ import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
@@ -154,6 +155,24 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
+                Visibility(
+                  visible: props.serverSupportsEphemeralMessages,
+                  child: ListTile(
+                    onTap: () => props.onToggleEphemeralMessages(),
+                    contentPadding: Dimensions.listPadding,
+                    title: Text(
+                      'Ephemeral messages (MSC2228)', //TODO i18n
+                    ),
+                    subtitle: Text(
+                      'Your server supports a partial implementation of MSC2228', //TODO i18n
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                    trailing: Switch(
+                      value: props.ephemeralMessages,
+                      onChanged: (ephemerality) => props.onToggleEphemeralMessages(),
+                    ),
+                  ),
+                ),
                 ListTile(
                   dense: true,
                   onTap: () => props.onEditSyncInterval(context),
@@ -265,6 +284,8 @@ class _Props extends Equatable {
   final String? lastSince;
   final User currentUser;
   final int syncInterval;
+  final bool serverSupportsEphemeralMessages;
+  final bool ephemeralMessages;
 
   final Function onToggleSyncing;
   final Function onManualSync;
@@ -272,6 +293,7 @@ class _Props extends Equatable {
   final Function onForceFunction;
   final Function onStartBackgroundSync;
   final Function onEditSyncInterval;
+  final Function onToggleEphemeralMessages;
 
   const _Props({
     required this.syncing,
@@ -286,6 +308,9 @@ class _Props extends Equatable {
     required this.onForceFunction,
     required this.onStartBackgroundSync,
     required this.onEditSyncInterval,
+    required this.serverSupportsEphemeralMessages,
+    required this.ephemeralMessages,
+    required this.onToggleEphemeralMessages,
   });
 
   @override
@@ -295,6 +320,7 @@ class _Props extends Equatable {
         lastSince,
         currentUser,
         syncObserverActive,
+        ephemeralMessages,
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
@@ -359,5 +385,8 @@ class _Props extends Equatable {
         onForceFunction: () {
           store.dispatch(generateOneTimeKeys());
         },
+        ephemeralMessages: store.state.settingsStore.ephemeralMessagesEnabled,
+        serverSupportsEphemeralMessages: true,
+        onToggleEphemeralMessages: () => store.dispatch(toggleEphemeralMessages()),
       );
 }
