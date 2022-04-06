@@ -426,6 +426,12 @@ Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
   return homeserverSupportsUnstableFeature(store, 'org.matrix.msc2285');
 }
 
+/// https://github.com/matrix-org/synapse/pull/6409
+/// Synapse supports a subset of msc2228
+Future<bool> homeserverSupportsEphemeralMessages(Store<AppState> store) async {
+  return homeserverSupportsUnstableFeature(store, 'org.matrix.msc2228');
+}
+
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
     final readReceiptsIndex = ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
