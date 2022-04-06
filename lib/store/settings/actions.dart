@@ -119,6 +119,8 @@ class ToggleSuggestions {}
 
 class ToggleAutoDownload {}
 
+class ToggleEphemeralMessages {}
+
 class ToggleDismissKeyboard {}
 
 class ToggleRoomTypeBadges {}
@@ -452,6 +454,12 @@ ThunkAction<AppState> incrementReadReceipts() {
 ThunkAction<AppState> toggleAutoDownload() {
   return (Store<AppState> store) async {
     store.dispatch(ToggleAutoDownload());
+  };
+}
+
+ThunkAction<AppState> toggleEphemeralMessages() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleEphemeralMessages());
   };
 }
 

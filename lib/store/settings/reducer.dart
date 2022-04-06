@@ -122,6 +122,10 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       return state.copyWith(
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
+    case ToggleEphemeralMessages:
+      return state.copyWith(
+        ephemeralMessagesEnabled: !state.ephemeralMessagesEnabled,
+      );
     case ToggleProxy:
       final _state = state.copyWith(
         proxySettings: state.proxySettings.copyWith(enabled: !state.proxySettings.enabled),

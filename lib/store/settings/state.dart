@@ -29,6 +29,7 @@ class SettingsStore extends Equatable {
   final bool timeFormat24Enabled;
   final bool dismissKeyboardEnabled;
   final bool autoDownloadEnabled;
+  final bool ephemeralMessagesEnabled;
 
   final int syncInterval;
   final int syncPollTimeout;
@@ -63,6 +64,7 @@ class SettingsStore extends Equatable {
     this.timeFormat24Enabled = false,
     this.dismissKeyboardEnabled = false,
     this.autoDownloadEnabled = false,
+    this.ephemeralMessagesEnabled = false,
     this.chatSettings = const <String, ChatSetting>{},
     this.devices = const [],
     this.loading = false,
@@ -86,6 +88,7 @@ class SettingsStore extends Equatable {
         timeFormat24Enabled,
         dismissKeyboardEnabled,
         autoDownloadEnabled,
+        ephemeralMessagesEnabled,
         chatSettings,
         chatLists,
         devices,
@@ -110,6 +113,7 @@ class SettingsStore extends Equatable {
     bool? timeFormat24Enabled,
     bool? dismissKeyboardEnabled,
     bool? autoDownloadEnabled,
+    bool? ephemeralMessagesEnabled,
     int? syncInterval,
     int? syncPollTimeout,
     Map<String, ChatSetting>? chatSettings,
@@ -135,6 +139,7 @@ class SettingsStore extends Equatable {
         membershipEventsEnabled: membershipEventsEnabled ?? this.membershipEventsEnabled,
         roomTypeBadgesEnabled: roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
         autoDownloadEnabled: autoDownloadEnabled ?? this.autoDownloadEnabled,
+        ephemeralMessagesEnabled: ephemeralMessagesEnabled ?? this.ephemeralMessagesEnabled,
         syncInterval: syncInterval ?? this.syncInterval,
         syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
         chatSettings: chatSettings ?? this.chatSettings,
