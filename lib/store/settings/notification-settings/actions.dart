@@ -52,6 +52,18 @@ ThunkAction<AppState> muteChatNotifications({
 }
 
 ///
+/// Ephemeral Messages
+///
+ThunkAction<AppState> setEphemeralMessagesTime({
+  required String roomId,
+  required int timestamp,
+}) {
+  return (Store<AppState> store) async {
+    //TODO
+  };
+}
+
+///
 /// Toggle Chat Notifications
 ///
 /// Depending on the state of the allow list / block list

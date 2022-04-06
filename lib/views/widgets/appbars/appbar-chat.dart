@@ -30,6 +30,7 @@ enum ChatOptions {
   inviteFriends,
   muteNotifications,
   blockUser,
+  ephemeralMessages,
 }
 
 class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
@@ -212,6 +213,103 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
     );
   }
 
+  onOpenEphemeralMessagesDialog(BuildContext context, _Props props) {
+    final defaultPadding = EdgeInsets.symmetric(horizontal: 10);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => DialogRounded(
+        title: 'Ephemeral Messages',
+        children: [
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  '4 weeks',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onSetEphemeralTime(Duration(days: 7 * 4));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  '1 week',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onSetEphemeralTime(Duration(days: 7));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  '1 day',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onSetEphemeralTime(Duration(days: 1));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  '8 hours',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onSetEphemeralTime(Duration(hours: 8));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  '1 hour',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onSetEphemeralTime(Duration(hours: 1));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  '5 minutes',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onSetEphemeralTime(Duration(minutes: 5));
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  '30 seconds',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onSetEphemeralTime(Duration(seconds: 30));
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -374,6 +472,9 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     case ChatOptions.muteNotifications:
                       onOpenMuteDialog(context, props);
                       break;
+                    case ChatOptions.ephemeralMessages:
+                      onOpenEphemeralMessagesDialog(context, props);
+                      break;
                     default:
                       break;
                   }
@@ -390,6 +491,11 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                       enabled: false,
                       value: ChatOptions.allMedia,
                       child: Text('All Media'),
+                    ),
+                    PopupMenuItem<ChatOptions>(
+                      enabled: props.ephemeralMessagesEnabled,
+                      value: ChatOptions.ephemeralMessages,
+                      child: Text('Ephemeral Messages'),
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.chatSettings,
@@ -423,16 +529,21 @@ class _Props extends Equatable {
   final User currentUser;
   final List<User?> roomUsers;
 
+  final bool ephemeralMessagesEnabled;
+
   final Function onBlockUser;
   final Function onMuteNotifications;
   final Function onToggleNotifications;
+  final Function onSetEphemeralTime;
 
   const _Props({
     required this.roomUsers,
     required this.currentUser,
+    required this.ephemeralMessagesEnabled,
     required this.onBlockUser,
     required this.onMuteNotifications,
     required this.onToggleNotifications,
+    required this.onSetEphemeralTime,
   });
 
   @override
@@ -446,6 +557,13 @@ class _Props extends Equatable {
         onBlockUser: (String userId) async {
           final user = store.state.userStore.users[userId];
           return await store.dispatch(toggleBlockUser(user: user));
+        },
+        ephemeralMessagesEnabled: store.state.settingsStore.ephemeralMessagesEnabled,
+        onSetEphemeralTime: (Duration duration) {
+          store.dispatch(setEphemeralMessagesTime(
+            roomId: roomId!,
+            timestamp: DateTime.now().add(duration).millisecondsSinceEpoch,
+          ));
         },
         onMuteNotifications: (Duration duration) {
           store.dispatch(muteChatNotifications(
