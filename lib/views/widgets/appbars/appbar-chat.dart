@@ -304,6 +304,18 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               Navigator.pop(context);
             },
           ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  'Off',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              props.onSetEphemeralTime(Duration(seconds: 0));
+              Navigator.pop(context);
+            },
+          ),
         ],
       ),
     );
