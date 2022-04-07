@@ -415,7 +415,11 @@ class MessageWidget extends StatelessWidget {
         ),
       ),
       child: GestureDetector(
-        onTap: message.failed ? onResend(message) : null,
+        onTap: () {
+          if (message.failed) {
+            onResend(message);
+          }
+        },
         onLongPress: () {
           if (onLongPress != null) {
             HapticFeedback.lightImpact();

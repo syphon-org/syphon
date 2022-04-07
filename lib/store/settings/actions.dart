@@ -406,19 +406,41 @@ ThunkAction<AppState> incrementLanguage() {
   };
 }
 
+Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
+  final version = await MatrixApi.checkVersion(
+    protocol: store.state.authStore.protocol,
+    homeserver: store.state.authStore.user.homeserver,
+  );
+
+  final unstableFeatures = version['unstable_features'];
+
+  return unstableFeatures != null
+         && unstableFeatures.containsKey('org.matrix.msc2285')
+         && unstableFeatures['org.matrix.msc2285'];
+}
+
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
-    final readReceiptsIndex =
-        ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
+    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
 
-    store.dispatch(SetReadReceipts(
-      readReceipts:
-          ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length],
-    ));
+    final nextReceipt = ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
 
-    if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-      store.dispatch(addInfo(message: Strings.alertHiddenReadReceipts));
+    if (nextReceipt != ReadReceiptTypes.Hidden) { //short-out
+      return store.dispatch(SetReadReceipts(
+        readReceipts: nextReceipt,
+      ));
     }
+
+    if (await homeserverSupportsHiddenReadReceipts(store)) {
+      return store.dispatch(SetReadReceipts(
+        readReceipts: ReadReceiptTypes.Hidden,
+      ));
+    }
+
+    return store.dispatch(SetReadReceipts(
+      readReceipts: ReadReceiptTypes.values[(readReceiptsIndex + 2) %
+          ReadReceiptTypes.values.length],
+    ));
   };
 }
 

@@ -1,5 +1,22 @@
 # Syphon FAQ
 
+## What makes Syphon "privacy focussed"?
+
+The following are some of the benefits we find core to Syphon. Some may overlap with other clients now but some were unique to Syphon as a mobile client for a while (like Multi-Accounts)
+
+- Read Receipts off by default (privacy)
+- Focus on minimal metadata transfer (privacy)
+- Lack of any analytics or such libraries (privacy)
+- App Lock with encryption (privacy)
+- Separate encrypted storages per Multi-Account (privacy)
+- Proxy support (privacy)
+
+- Simple and modern default UI (ease-of-use)
+- Extreme customisability (ease-of-use)
+- Focus on P2P when it's mature enough (privacy, security, resilience)
+- Custom Matrix library (finer control which contributes to privacy and security)
+- Flutter (cross platform / ease-of-use)
+
 ## Where is [X] feature?
 
 Syphon is currently in early development. Whilst we believe the code to be of a standard where we can share with a wider userbase, Syphon does not rely on public Matrix libraries, instead coding against [the Matrix specification](https://spec.matrix.org/latest/).

@@ -304,7 +304,6 @@ class Strings {
   static final alertMessageSendingFailed = tr('alert-message-failed'); // 'Message Failed To Send';
   static final alertCheckHomeserver = tr('alert-homeserver-invalid'); // 'Message Failed To Send';
   static final alertFeatureInProgress = tr('alert-feature-in-progress');
-  static final alertHiddenReadReceipts = tr('alert-hidden-read-receipts');
   static final alertOffline = tr('alert-offline');
   static final alertUnknown = tr('alert-unknown');
   static String alertCouldNotLaunchURL(String? url) =>

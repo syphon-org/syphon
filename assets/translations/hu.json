@@ -135,7 +135,6 @@
     "button-text-support": "Segítség",
     "list-item-settings-proxy-port": "Port",
     "content-dialog-device-rename": "Írd be a új, nyilvánosan látható nevét ennek az eszköznek.",
-    "alert-hidden-read-receipts": "A rejtett olvasási visszajelzéseket támogatnia kell a Matrix szerverednek, különben ugyan az lesz az eredmény, mint amikor be van kapcsolva",
     "content-proxy-host": "A hosztnév, ahol a proxy található",
     "content-proxy-port": "A proxy hálózati portja",
     "confirm-linkout": "Biztosan megnyitod ezt a linket?\n\n{}",
