@@ -1,0 +1,14 @@
+0.2.13
+
+🔥 Hot Fixes
+- Fixed resend message issues 
+
+🔮 New Features
+- Updated Send Hidden Read Receipt
+- Only Offer Hidden Receipts When Available
+
+💡 Improvements 
+- New Translations and Updates
+
+📐 Refactoring
+- Lots!
