@@ -374,7 +374,6 @@ abstract class Events {
     String? messageId,
     String? lastRead,
     bool readAll = true,
-    bool hidden = false,
   }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/read_markers';
 
@@ -386,8 +385,37 @@ abstract class Events {
     final Map body = {
       'm.fully_read': readAll ? messageId : lastRead,
       'm.read': messageId,
-      'm.hidden': hidden,
     };
+
+    final response = await httpClient.post(
+      Uri.parse(url),
+      headers: headers,
+      body: json.encode(body),
+    );
+
+    return await json.decode(response.body);
+  }
+
+  /// Send Hidden Read Receipt - unstable feature
+  ///
+  /// https://github.com/matrix-org/matrix-spec-proposals/blob/travis/msc/hidden-read-receipts/proposals/2285-hidden-read-receipts.md
+  static Future<dynamic> sendReadMarkerHidden({
+    String? protocol = 'https://',
+    String? homeserver = Values.homeserverDefault,
+    String? accessToken,
+    String? roomId,
+    String? messageId,
+    String? lastRead,
+    bool readAll = true,
+  }) async {
+    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/receipt/m.read.private/$messageId';
+
+    final Map<String, String> headers = {
+      'Authorization': 'Bearer $accessToken',
+      ...Values.defaultHeaders,
+    };
+
+    final Map body = { };
 
     final response = await httpClient.post(
       Uri.parse(url),

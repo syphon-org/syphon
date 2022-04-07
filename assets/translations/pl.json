@@ -156,7 +156,6 @@
     "button-text-create-group": "Nowa Grupa",
     "button-text-invite": "Zaproś Znajomych",
     "button-text-settings": "Ustawienia",
-    "alert-hidden-read-receipts": "Ukryte potwierdzenia odczytu muszą być wspierane przez twój serwer, inaczej wbranie tej opcji będzie miało ten sam efekt co wybranie opcji 'Włączone'",
     "label-download-image": "Załaduj Obraz",
     "title-proxy-host": "Zmień Serwer Proxy",
     "list-item-settings-proxy-port": "Port",
