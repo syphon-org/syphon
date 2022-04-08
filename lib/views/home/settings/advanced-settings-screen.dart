@@ -1,21 +1,15 @@
-import 'dart:io';
-
 import 'package:equatable/equatable.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
@@ -25,7 +19,6 @@ import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
-import 'package:syphon/views/widgets/dialogs/dialog-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
 class AdvancedSettingsScreen extends StatefulWidget {
