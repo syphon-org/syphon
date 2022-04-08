@@ -24,6 +24,8 @@ import 'package:syphon/store/sync/background/service.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 
 class AdvancedSettingsScreen extends StatefulWidget {
@@ -155,22 +157,19 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
-                Visibility(
-                  visible: props.serverSupportsEphemeralMessages,
-                  child: ListTile(
-                    onTap: () => props.onToggleEphemeralMessages(),
-                    contentPadding: Dimensions.listPadding,
-                    title: Text(
-                      'Ephemeral messages (MSC2228)', //TODO i18n
-                    ),
-                    subtitle: Text(
-                      'Your server supports a partial implementation of MSC2228', //TODO i18n
-                      style: Theme.of(context).textTheme.caption,
-                    ),
-                    trailing: Switch(
-                      value: props.ephemeralMessages,
-                      onChanged: (ephemerality) => props.onToggleEphemeralMessages(),
-                    ),
+                ListTile(
+                  onTap: () => props.onToggleEphemeralMessages(context),
+                  contentPadding: Dimensions.listPadding,
+                  title: Text(
+                    'Disappearing messages (MSC2228)', //TODO i18n
+                  ),
+                  subtitle: Text(
+                    'Limited support for Disappearing messages over Matrix', //TODO i18n
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                  trailing: Switch(
+                    value: props.ephemeralMessages,
+                    onChanged: (ephemerality) => props.onToggleEphemeralMessages(context),
                   ),
                 ),
                 ListTile(
@@ -284,7 +283,6 @@ class _Props extends Equatable {
   final String? lastSince;
   final User currentUser;
   final int syncInterval;
-  final bool serverSupportsEphemeralMessages;
   final bool ephemeralMessages;
 
   final Function onToggleSyncing;
@@ -308,7 +306,6 @@ class _Props extends Equatable {
     required this.onForceFunction,
     required this.onStartBackgroundSync,
     required this.onEditSyncInterval,
-    required this.serverSupportsEphemeralMessages,
     required this.ephemeralMessages,
     required this.onToggleEphemeralMessages,
   });
@@ -386,7 +383,42 @@ class _Props extends Equatable {
           store.dispatch(generateOneTimeKeys());
         },
         ephemeralMessages: store.state.settingsStore.ephemeralMessagesEnabled,
-        serverSupportsEphemeralMessages: true,
-        onToggleEphemeralMessages: () => store.dispatch(toggleEphemeralMessages()),
+        onToggleEphemeralMessages: (BuildContext context) async {
+        if (await homeserverSupportsEphemeralMessages(store)) {
+            return showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (dialogContext) => DialogExplanation(
+                //TODO i18n
+                title: 'Warning about Disappearing Messages',
+                content: 'Disappearing messages are based entirely on:\n'
+                         '1. good faith\n'
+                         '2. other homeservers in your chats respecting the request\n'
+                         '3. other clients in your chats respecting the request\n'
+                         '\n'
+                         'Once a message has been sent, even if 2 and 3 are true, '
+                         'you are still relying on other people in the chat to '
+                         'not take screenshots or otherwise forward the messages.',
+                onConfirm: toggleEphemeralMessages(),
+              ),
+            );
+        }
+
+          return showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (dialogContext) => DialogExplanation(
+              //TODO i18n
+              title: 'Your homeserver does not support Disappearing Messages',
+              content: 'If you run your own homeserver you will need to enable '
+                       'MSC2228 support before we can switch this on for you.'
+                       '\n\n'
+                       'If you are not running your own homeserver, you either '
+                       'need to ask the administrator to enable MSC2228 support '
+                       'for you, or you need to move to a homeserver which supports '
+                       'Matrix Disappearing Messages',
+            ),
+          );
+        },
       );
 }

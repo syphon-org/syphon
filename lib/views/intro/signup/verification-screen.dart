@@ -134,7 +134,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                       onTap: () {
                                         showDialog(
                                           context: context,
-                                          builder: (BuildContext context) => DialogExplaination(
+                                          builder: (BuildContext context) => DialogExplanation(
                                             title: Strings.titleDialogSignupEmailVerification,
                                             content: Strings.contentEmailVerification,
                                             onConfirm: () {

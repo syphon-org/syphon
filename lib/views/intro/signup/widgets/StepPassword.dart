@@ -54,7 +54,7 @@ class PasswordStepState extends State<PasswordStep> {
   onCheckInfo(BuildContext context) async {
     await showDialog(
       context: context,
-      builder: (BuildContext context) => DialogExplaination(
+      builder: (BuildContext context) => DialogExplanation(
         title: 'Password Requirements',
         content: Strings.contentPasswordRequirements,
         onConfirm: () {
