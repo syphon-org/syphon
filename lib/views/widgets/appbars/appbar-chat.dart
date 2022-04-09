@@ -218,7 +218,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
     showDialog(
       context: context,
       builder: (BuildContext context) => DialogRounded(
-        title: 'Ephemeral Messages',
+        title: 'Disappearing Messages',
         children: [
           ListTile(
             title: Padding(
@@ -507,7 +507,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     PopupMenuItem<ChatOptions>(
                       enabled: props.ephemeralMessagesEnabled,
                       value: ChatOptions.ephemeralMessages,
-                      child: Text('Ephemeral Messages'),
+                      child: Text('Disappearing Messages'),
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.chatSettings,
