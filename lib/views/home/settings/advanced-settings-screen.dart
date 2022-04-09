@@ -396,7 +396,12 @@ class _Props extends Equatable {
                          'Also be aware that messages disappearing through this '
                          'setting will be deleted on the server after the timer '
                          'has expired, there will be no guarantee anyone in the '
-                         'chat will have seen it.',
+                         'chat will have seen it.\n'
+                         '\n'
+                         'Finally, be aware that this implementation only redacts '
+                         'message contents, it does not remove metadata such as '
+                         'who contacted whom, when, from any server or client - '
+                         'even if it honours the specification.',
                 onConfirm: toggleEphemeralMessages(),
               ),
             );
