@@ -391,7 +391,12 @@ class _Props extends Equatable {
                          '\n'
                          'Once a message has been sent, even if 2 and 3 are true, '
                          'you are still relying on other people in the chat to '
-                         'not take screenshots or otherwise forward the messages.',
+                         'not take screenshots or otherwise forward the messages.\n'
+                         '\n'
+                         'Also be aware that messages disappearing through this '
+                         'setting will be deleted on the server after the timer '
+                         'has expired, there will be no guarantee anyone in the '
+                         'chat will have seen it.',
                 onConfirm: toggleEphemeralMessages(),
               ),
             );
