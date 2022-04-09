@@ -12,3 +12,15 @@ ThunkAction<AppState> updateRoomPrimaryColor({String? roomId, int? color}) {
     ));
   };
 }
+
+///
+/// Ephemeral Messages
+///
+ThunkAction<AppState> setEphemeralMessagesTime({
+  required String roomId,
+  required int timestamp,
+}) {
+  return (Store<AppState> store) async {
+    //TODO
+  };
+}
