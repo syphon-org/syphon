@@ -111,6 +111,16 @@ class SetPollTimeout {
   });
 }
 
+class SetRoomSelfDestructAfter {
+  final String roomId;
+  final int timestamp;
+
+  SetRoomSelfDestructAfter({
+    required this.roomId,
+    required this.timestamp,
+  });
+}
+
 class ToggleEnterSend {}
 
 class ToggleAutocorrect {}

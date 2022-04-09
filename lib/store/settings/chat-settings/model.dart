@@ -27,12 +27,15 @@ class ChatSetting extends Equatable {
 
   final NotificationOptions? notificationOptions;
 
+  final int messagesSelfDestructAfter;
+
   const ChatSetting({
     required this.roomId,
     this.language = 'English',
     this.smsEnabled = false,
     this.primaryColor = Colours.greyDefault,
     this.notificationOptions,
+    this.messagesSelfDestructAfter = 0,
   });
 
   @override
@@ -42,6 +45,7 @@ class ChatSetting extends Equatable {
         smsEnabled,
         language,
         notificationOptions,
+        messagesSelfDestructAfter,
       ];
 
   ChatSetting copyWith({
@@ -50,6 +54,7 @@ class ChatSetting extends Equatable {
     bool? smsEnabled,
     int? primaryColor,
     NotificationOptions? notificationOptions,
+    int? messagesSelfDestructAfter,
   }) =>
       ChatSetting(
         roomId: roomId ?? this.roomId,
@@ -57,6 +62,7 @@ class ChatSetting extends Equatable {
         smsEnabled: smsEnabled ?? this.smsEnabled,
         primaryColor: primaryColor ?? this.primaryColor,
         notificationOptions: notificationOptions ?? this.notificationOptions,
+        messagesSelfDestructAfter: messagesSelfDestructAfter ?? this.messagesSelfDestructAfter,
       );
   Map<String, dynamic> toJson() => _$ChatSettingToJson(this);
 

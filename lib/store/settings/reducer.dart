@@ -78,6 +78,24 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       return state.copyWith(
         chatSettings: chatSettings,
       );
+    case SetRoomSelfDestructAfter:
+      final chatSettings = Map<String, ChatSetting>.from(state.chatSettings);
+
+      // Initialize chat settings if null
+      if (chatSettings[action.roomId] == null) {
+        chatSettings[action.roomId] = ChatSetting(
+          roomId: action.roomId,
+          language: state.language,
+        );
+      }
+
+      chatSettings[action.roomId] = chatSettings[action.roomId]!.copyWith(
+        messagesSelfDestructAfter: action.messagesSelfDestructAfter,
+      );
+      return state.copyWith(
+        chatSettings: chatSettings,
+      );
+
     case SetLanguage:
       return state.copyWith(
         language: action.language,

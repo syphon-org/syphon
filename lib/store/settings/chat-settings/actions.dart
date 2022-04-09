@@ -21,6 +21,9 @@ ThunkAction<AppState> setEphemeralMessagesTime({
   required int timestamp,
 }) {
   return (Store<AppState> store) async {
-    //TODO
+    store.dispatch(SetRoomSelfDestructAfter(
+      roomId: roomId,
+      timestamp: timestamp,
+    ));
   };
 }

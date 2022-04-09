@@ -11,6 +11,7 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
