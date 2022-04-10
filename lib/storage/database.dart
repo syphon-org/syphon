@@ -228,7 +228,7 @@ class StorageDatabase extends _$StorageDatabase {
 
   // you should bump this number whenever you change or add a table definition.
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -237,6 +237,9 @@ class StorageDatabase extends _$StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           printInfo('[MIGRATION] VERSION $from to $to');
+          if (from == 8) {
+            await m.addColumn(messages, messages.selfDestructAfter);
+          }
           if (from == 7) {
             await m.createTable(keySessions);
             await m.createTable(messageSessions);
