@@ -94,6 +94,7 @@ class Decrypted extends Table {
   // Message timestamps
   IntColumn get timestamp => integer()();
   IntColumn get received => integer()();
+  IntColumn get selfDestructAfter => integer()();
 
   // Message Only
   TextColumn get body => text().nullable()();
