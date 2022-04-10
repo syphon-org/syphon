@@ -32,6 +32,8 @@ class Message extends Event implements drift.Insertable<Message> {
   // Message timestamps
   @JsonKey(defaultValue: 0)
   final int received;
+  @JsonKey(defaultValue: 0)
+  final int selfDestructAfter;
 
   // Message Only
   final String? body;
@@ -76,6 +78,7 @@ class Message extends Event implements drift.Insertable<Message> {
     this.info,
     this.formattedBody,
     this.received = 0,
+    this.selfDestructAfter = 0,
     this.ciphertext,
     this.senderKey,
     this.deviceId,
@@ -121,6 +124,7 @@ class Message extends Event implements drift.Insertable<Message> {
     bool? edited,
     int? timestamp,
     int? received,
+    int? selfDestructAfter,
     String? body,
     String? typeDecrypted, // inner type of decrypted event
     String? msgtype,
@@ -157,6 +161,7 @@ class Message extends Event implements drift.Insertable<Message> {
         url: url ?? this.url,
         info: info ?? this.info,
         received: received ?? this.received,
+        selfDestructAfter: selfDestructAfter ?? this.selfDestructAfter,
         ciphertext: ciphertext ?? this.ciphertext,
         senderKey: senderKey ?? this.senderKey,
         deviceId: deviceId ?? this.deviceId,
@@ -191,6 +196,7 @@ class Message extends Event implements drift.Insertable<Message> {
       edited: drift.Value(edited),
       timestamp: drift.Value(timestamp),
       received: drift.Value(received),
+      selfDestructAfter: drift.Value(selfDestructAfter),
       body: drift.Value(body),
       msgtype: drift.Value(msgtype),
       format: drift.Value(format),
@@ -244,6 +250,9 @@ class Message extends Event implements drift.Insertable<Message> {
         }
       }
 
+      // see https://github.com/matrix-org/synapse/pull/6409#issuecomment-585722447
+      final selfDestructAfter = content['org.matrix.self_destruct_after'] ?? 0;
+
       return Message(
         id: event.id,
         userId: event.userId,
@@ -271,6 +280,7 @@ class Message extends Event implements drift.Insertable<Message> {
         replacement: replacement,
         relatedEventId: relatedEventId,
         received: DateTime.now().millisecondsSinceEpoch,
+        selfDestructAfter: selfDestructAfter,
         failed: false,
         pending: false,
         syncing: false,

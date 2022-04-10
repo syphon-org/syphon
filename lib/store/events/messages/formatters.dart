@@ -32,6 +32,8 @@ Future<Message> formatMessageContent({
   EncryptInfo? info = const EncryptInfo(),
   File? file,
 }) async {
+  final timestamp = DateTime.now().millisecondsSinceEpoch;
+
   final formatted = Message(
     id: tempId,
     url: message.url,
@@ -39,7 +41,10 @@ Future<Message> formatMessageContent({
     type: message.type,
     sender: userId,
     roomId: room.id,
-    timestamp: DateTime.now().millisecondsSinceEpoch,
+    timestamp: timestamp,
+    selfDestructAfter: (room.ephemeralMessagesTimer! > 0)
+                          ? timestamp + (room.ephemeralMessagesTimer ?? 0)
+                          : 0,
     pending: true,
     syncing: true,
   );
