@@ -385,13 +385,10 @@ class _Props extends Equatable {
                 //TODO i18n
                 title: 'Warning about Disappearing Messages',
                 content: 'Disappearing messages are based entirely on:\n'
-                         '1. good faith\n'
-                         '2. other homeservers in your chats respecting the request\n'
-                         '3. other clients in your chats respecting the request\n'
-                         '\n'
-                         'Once a message has been sent, even if 2 and 3 are true, '
-                         'you are still relying on other people in the chat to '
-                         'not take screenshots or otherwise forward the messages.\n'
+                         '- other servers in your chats respecting the request\n'
+                         '- other clients in your chats respecting the request\n'
+                         '- other people in your chats respecting the request by '
+                         'not taking screenshots or otherwise forward the messages.\n'
                          '\n'
                          'Also be aware that messages disappearing through this '
                          'setting will be deleted on the server after the timer '
