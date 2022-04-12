@@ -388,7 +388,7 @@ class _Props extends Equatable {
                          '- other servers in your chats respecting the request\n'
                          '- other clients in your chats respecting the request\n'
                          '- other people in your chats respecting the request by '
-                         'not taking screenshots or otherwise forward the messages.\n'
+                         'not taking screenshots or otherwise forwarding the messages.\n'
                          '\n'
                          'Also be aware that messages disappearing through this '
                          'setting will be deleted on the server after the timer '
