@@ -1,9 +1,6 @@
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
@@ -41,23 +38,10 @@ class MediaFullScreen extends StatelessWidget {
               }
           ),
         ],
-        title: Column(
-            children: [
-              Text(
-                  'View embed',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
-                  )
-              ),
-              Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,)
-              ),
-            ]
+        title: Text(
+            title,
+            style: TextStyle(
+              color: Colors.white,)
         ),
         leading: IconButton(
           onPressed: () => {
