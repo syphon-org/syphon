@@ -184,7 +184,15 @@ class MatrixMedia {
 
     return json.decode(mediaUploadResponse.body);
   }
+
+  static String fetchMessageUrl ({
+    String? roomId,
+    String? eventId}){
+    return 'https://matrix.to/#/$roomId/$eventId';
+  }
 }
+
+
 
 dynamic buildMediaDownloadRequest({
   String protocol = Values.DEFAULT_PROTOCOL,
@@ -235,3 +243,4 @@ dynamic buildMediaUploadRequest({
     'headers': headers,
   };
 }
+

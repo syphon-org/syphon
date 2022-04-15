@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
 
 
 class MediaFullScreen extends StatelessWidget {
@@ -28,13 +29,13 @@ class MediaFullScreen extends StatelessWidget {
           IconButton(icon: Icon(Icons.download),
               color: Colors.white,
               onPressed:  () async {
-               
+
               }
           ),
           IconButton(icon: Icon(Icons.share),
               color: Colors.white,
               onPressed: () async {
-                await Share.share('https://matrix.to/#/$roomId/$eventId');
+                await Share.share(MatrixApi.fetchMessageUrl(roomId: roomId,eventId: eventId));
               }
           ),
         ],
