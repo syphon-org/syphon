@@ -1,6 +1,6 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.12+2122
+version: 0.2.13+2130
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -15,9 +15,9 @@ scripts:
   watch: flutter pub run build_runner watch --delete-conflicting-outputs
   uninstall: adb shell && pm uninstall org.tether.tether # (sometimes doesn't uninstall when debugging?)
 
-  build-release-android: flutter build apk --release
   build-release-ios: flutter build ipa  --release # open under xcworkspace, not xcodeproj
-  build-release-macos: flutter build macos --release
+  build-release-macos: flutter pub run build_runner build --delete-conflicting-outputs && flutter build macos --release
+  build-release-android: flutter pub run build_runner build --delete-conflicting-outputs && flutter build apk --release
 
   # mobile development commands
   clean-ios: xcrun simctl delete unavailable

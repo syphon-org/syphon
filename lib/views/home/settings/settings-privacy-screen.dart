@@ -302,6 +302,13 @@ class PrivacySettingsScreen extends StatelessWidget {
                               props.sessionId,
                               style: Theme.of(context).textTheme.caption,
                             ),
+                            onTap: () async {
+                              await props.copyToClipboard(props.sessionId);
+                            },
+                            trailing: IconButton(
+                              onPressed: () => props.copyToClipboard(props.sessionId),
+                              icon: Icon(Icons.copy),
+                            ),
                           ),
                           ListTile(
                             contentPadding: Dimensions.listPadding,
@@ -311,6 +318,13 @@ class PrivacySettingsScreen extends StatelessWidget {
                             subtitle: Text(
                               props.sessionKey,
                               style: Theme.of(context).textTheme.caption,
+                            ),
+                            onTap: () async {
+                              await props.copyToClipboard(props.sessionKey);
+                            },
+                            trailing: IconButton(
+                              onPressed: () => props.copyToClipboard(props.sessionKey),
+                              icon: Icon(Icons.copy),
                             ),
                           ),
                         ],
@@ -529,8 +543,9 @@ class _Props extends Equatable {
   final Function onDisabled;
   final Function onResetConfirmAuth;
   final Function onSetScreenLock;
-  final Function onRemoveScreenLock;
+  final Function onRemoveScreenLock; 
   final Function onRenameDevice;
+  final Function copyToClipboard; 
 
   const _Props({
     required this.valid,
@@ -546,8 +561,9 @@ class _Props extends Equatable {
     required this.onIncrementReadReceipts,
     required this.onResetConfirmAuth,
     required this.onSetScreenLock,
-    required this.onRemoveScreenLock,
-    required this.onRenameDevice,
+    required this.onRemoveScreenLock, 
+    required this.onRenameDevice, 
+    required this.copyToClipboard, 
   });
 
   @override
@@ -559,8 +575,7 @@ class _Props extends Equatable {
         sessionId,
         sessionName,
         sessionKey,
-        screenLockEnabled,
-        onRenameDevice,
+        screenLockEnabled, 
       ];
 
   static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
@@ -581,7 +596,7 @@ class _Props extends Equatable {
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
-        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
+        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()), 
         onRenameDevice: (BuildContext context) async {
           showDialog(
             context: context,
@@ -602,7 +617,10 @@ class _Props extends Equatable {
                 Navigator.of(dialogContext).pop();
               },
             ),
-          );
+          ); 
+        copyToClipboard: (String? clipboardData) async {
+          await Clipboard.setData(ClipboardData(text: clipboardData));
+          store.dispatch(addInfo(message: Strings.alertCopiedToClipboard)); 
         },
       );
 }
