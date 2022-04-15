@@ -287,6 +287,11 @@ class PrivacySettingsScreen extends StatelessWidget {
                               props.sessionName,
                               style: Theme.of(context).textTheme.caption,
                             ),
+                            onTap: () => props.onRenameDevice(context),
+                            trailing: IconButton(
+                              onPressed: () => props.onRenameDevice(context),
+                              icon: Icon(Icons.edit),
+                            ),
                           ),
                           ListTile(
                             contentPadding: Dimensions.listPadding,
@@ -538,8 +543,9 @@ class _Props extends Equatable {
   final Function onDisabled;
   final Function onResetConfirmAuth;
   final Function onSetScreenLock;
-  final Function onRemoveScreenLock;
-  final Function copyToClipboard;
+  final Function onRemoveScreenLock; 
+  final Function onRenameDevice;
+  final Function copyToClipboard; 
 
   const _Props({
     required this.valid,
@@ -555,8 +561,9 @@ class _Props extends Equatable {
     required this.onIncrementReadReceipts,
     required this.onResetConfirmAuth,
     required this.onSetScreenLock,
-    required this.onRemoveScreenLock,
-    required this.copyToClipboard,
+    required this.onRemoveScreenLock, 
+    required this.onRenameDevice, 
+    required this.copyToClipboard, 
   });
 
   @override
@@ -568,8 +575,7 @@ class _Props extends Equatable {
         sessionId,
         sessionName,
         sessionKey,
-        screenLockEnabled,
-        copyToClipboard,
+        screenLockEnabled, 
       ];
 
   static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
@@ -590,10 +596,31 @@ class _Props extends Equatable {
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
-        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
+        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()), 
+        onRenameDevice: (BuildContext context) async {
+          showDialog(
+            context: context,
+            builder: (dialogContext) => DialogTextInput(
+              title: Strings.titleRenameDevice,
+              content: Strings.contentRenameDevice,
+              label: selectCurrentDeviceName(store),
+              onConfirm: (String newDisplayName) async {
+                await store.dispatch(
+                    renameDevice(
+                        deviceId: store.state.authStore.user.deviceId,
+                        displayName: newDisplayName
+                    )
+                );
+                Navigator.of(dialogContext).pop();
+              },
+              onCancel: () async {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ); 
         copyToClipboard: (String? clipboardData) async {
           await Clipboard.setData(ClipboardData(text: clipboardData));
-          store.dispatch(addInfo(message: Strings.alertCopiedToClipboard));
+          store.dispatch(addInfo(message: Strings.alertCopiedToClipboard)); 
         },
       );
 }
