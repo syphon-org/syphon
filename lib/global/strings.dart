@@ -312,6 +312,7 @@ class Strings {
   static final alertStorageAccessRequiredForKeys = tr('alert-storage-access-required-for-keys');
   static final alertWaitForFullSync = tr('alert-wait-for-full-sync-before-switching');
   static final alertLogOutToEnableMultiaccounts = tr('alert-log-out-enable-multiaccount');
+  static final alertCopiedToClipboard = tr('alert-copied-to-clipboard');
 
   // Alert (Non-Flutter / Background Thread w/o i18n)
   static const alertBackgroundService = 'Background connection enabled';

@@ -244,6 +244,7 @@
     "alert-storage-access-required-for-keys": "Enter the password for this session key import.",
     "alert-wait-for-full-sync-before-switching": "Wait for full sync to finish before switching accounts",
     "alert-log-out-enable-multiaccount": "You must logout of your\\ncurrent session to enable multiaccounts",
+    "alert-copied-to-clipboard": "Copied to clipboard",
     "prompt-homeserver-select": "Select your username and homeserver",
     "prompt-confirm-deactivate": "Enter your password below to confirm deactivation",
     "placeholder-topic": "No Topic Description",
