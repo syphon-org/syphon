@@ -618,6 +618,7 @@ class _Props extends Equatable {
               },
             ),
           ); 
+        },
         copyToClipboard: (String? clipboardData) async {
           await Clipboard.setData(ClipboardData(text: clipboardData));
           store.dispatch(addInfo(message: Strings.alertCopiedToClipboard)); 
