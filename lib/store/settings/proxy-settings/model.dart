@@ -9,9 +9,9 @@ class ProxySettings extends Equatable {
   final String host;
   final String port;
 
-  final bool authenticationEnabled; // proxy authentication enabled
   final String username; // proxy username
   final String password; // proxy password
+  final bool authenticationEnabled; // proxy authentication enabled
 
   const ProxySettings({
     this.enabled = false,
