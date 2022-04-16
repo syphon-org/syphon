@@ -63,6 +63,8 @@ class MediaFullScreen extends StatelessWidget {
         ),
       ),
       body: PhotoView(
+        // Allow zooming in up to double the image size;
+        // anything beyond is usually pointless as the image becomes too pixelated
         minScale: PhotoViewComputedScale.contained,
         maxScale: PhotoViewComputedScale.covered * 2,
         imageProvider: MemoryImage(bytes),
