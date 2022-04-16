@@ -6,6 +6,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
+
 
 class MediaFullScreen extends StatelessWidget {
   final String title;
@@ -27,13 +29,17 @@ class MediaFullScreen extends StatelessWidget {
       appBar: AppBar(
         actions: [
           IconButton(icon: Icon(Icons.download),
-              color: Colors.white,
+              color: computeContrastColorText(
+                Theme.of(context).appBarTheme.backgroundColor,
+              ),
               onPressed:  () async {
 
               }
           ),
           IconButton(icon: Icon(Icons.share),
-              color: Colors.white,
+              color: computeContrastColorText(
+                Theme.of(context).appBarTheme.backgroundColor,
+              ),
               onPressed: () async {
                 await Share.share(MatrixApi.fetchMessageUrl(roomId: roomId,eventId: eventId));
               }
@@ -42,14 +48,18 @@ class MediaFullScreen extends StatelessWidget {
         title: Text(
             title,
             style: TextStyle(
-              color: Colors.white,)
+              color: computeContrastColorText(
+                Theme.of(context).appBarTheme.backgroundColor,
+              ),)
         ),
         leading: IconButton(
           onPressed: () => {
             Navigator.of(context).pop(),
           },
           icon: Icon(Icons.arrow_back_outlined,),
-          color: Colors.white,
+          color: computeContrastColorText(
+            Theme.of(context).appBarTheme.backgroundColor,
+          ),
         ),
       ),
       body: PhotoView(
