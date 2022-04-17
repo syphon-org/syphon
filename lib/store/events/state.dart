@@ -25,6 +25,7 @@ class EventStore extends Equatable {
   final Map<String, Map<String, Receipt>> receipts; // eventId, userId indexed
   final Map<String, Map<String, Message>> outbox; // roomId, tempId subindex
   final Map<String, List<Message>> messagesDecrypted; // messages decrypted - in memory only
+  final Map<String, Message> ephemeralMessages; // eventId indexed
 
   const EventStore({
     this.events = const {},
@@ -34,6 +35,7 @@ class EventStore extends Equatable {
     this.receipts = const {},
     this.redactions = const {},
     this.outbox = const {},
+    this.ephemeralMessages = const {},
   });
 
   @override
@@ -45,6 +47,7 @@ class EventStore extends Equatable {
         receipts,
         redactions,
         outbox,
+        ephemeralMessages,
       ];
 
   EventStore copyWith({
@@ -55,6 +58,7 @@ class EventStore extends Equatable {
     Map<String, List<Reaction>>? reactions,
     Map<String, Map<String, Receipt>>? receipts,
     Map<String, Map<String, Message>>? outbox,
+    Map<String, Message>? ephemeralMessages,
   }) =>
       EventStore(
         events: events ?? this.events,
@@ -64,6 +68,7 @@ class EventStore extends Equatable {
         reactions: reactions ?? this.reactions,
         receipts: receipts ?? this.receipts,
         outbox: outbox ?? this.outbox,
+        ephemeralMessages: ephemeralMessages ?? this.ephemeralMessages,
       );
 
   Map<String, dynamic> toJson() => _$EventStoreToJson(this);
