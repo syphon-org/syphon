@@ -326,13 +326,11 @@ ThunkAction<AppState> createRoom({
 
       final currentUser = store.state.authStore.user;
       final inviteIds = invites.map((user) => user.userId).toList();
-      final inviteIdsFiltered = inviteIds.whereNot(
-                                  (userId) => userId == currentUser.userId
-                                )
-                                .toList();
+      final inviteIdsFiltered =
+          inviteIds.whereNot((userId) => userId == currentUser.userId).toList();
 
-      final isNoteToSelf = inviteIds.length == 1
-        && inviteIds.single == currentUser.userId;
+      final isNoteToSelf =
+          inviteIds.length == 1 && inviteIds.single == currentUser.userId;
 
       if (isNoteToSelf) {
         name = Strings.labelNoteToSelf;
@@ -687,7 +685,8 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -755,7 +754,8 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));
