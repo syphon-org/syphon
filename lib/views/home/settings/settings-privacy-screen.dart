@@ -306,7 +306,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                               await props.copyToClipboard(props.sessionId);
                             },
                             trailing: IconButton(
-                              onPressed: () => props.copyToClipboard(props.sessionId),
+                              onPressed: () =>
+                                  props.copyToClipboard(props.sessionId),
                               icon: Icon(Icons.copy),
                             ),
                           ),
@@ -323,7 +324,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                               await props.copyToClipboard(props.sessionKey);
                             },
                             trailing: IconButton(
-                              onPressed: () => props.copyToClipboard(props.sessionKey),
+                              onPressed: () =>
+                                  props.copyToClipboard(props.sessionKey),
                               icon: Icon(Icons.copy),
                             ),
                           ),
@@ -344,7 +346,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, Routes.settingsPassword);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsPassword);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -357,7 +360,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, Routes.settingsBlocked);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsBlocked);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -407,7 +411,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.typingIndicators!,
-                              onChanged: (enterSend) => props.onToggleTypingIndicators(),
+                              onChanged: (enterSend) =>
+                                  props.onToggleTypingIndicators(),
                             ),
                           ),
                         ],
@@ -436,8 +441,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.screenLockEnabled,
-                              onChanged: (enabled) =>
-                                  onSetScreenLockPin(props: props, context: context),
+                              onChanged: (enabled) => onSetScreenLockPin(
+                                  props: props, context: context),
                             ),
                           ),
                           ListTile(
@@ -474,7 +479,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onExportSessionKeys(context: context, props: props),
+                            onTap: () => onExportSessionKeys(
+                                context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Backup Keys',
@@ -496,7 +502,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onDeleteSessionKeys(context: context, props: props),
+                            onTap: () => onDeleteSessionKeys(
+                                context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Delete Keys',
@@ -507,7 +514,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onConfirmDeactivateAccount(context, props),
+                            onTap: () =>
+                                onConfirmDeactivateAccount(context, props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Deactivate Account',
@@ -543,9 +551,9 @@ class _Props extends Equatable {
   final Function onDisabled;
   final Function onResetConfirmAuth;
   final Function onSetScreenLock;
-  final Function onRemoveScreenLock; 
+  final Function onRemoveScreenLock;
   final Function onRenameDevice;
-  final Function copyToClipboard; 
+  final Function copyToClipboard;
 
   const _Props({
     required this.valid,
@@ -561,9 +569,9 @@ class _Props extends Equatable {
     required this.onIncrementReadReceipts,
     required this.onResetConfirmAuth,
     required this.onSetScreenLock,
-    required this.onRemoveScreenLock, 
-    required this.onRenameDevice, 
-    required this.copyToClipboard, 
+    required this.onRemoveScreenLock,
+    required this.onRenameDevice,
+    required this.copyToClipboard,
   });
 
   @override
@@ -575,52 +583,54 @@ class _Props extends Equatable {
         sessionId,
         sessionName,
         sessionKey,
-        screenLockEnabled, 
+        screenLockEnabled,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
-        valid: store.state.authStore.credential != null &&
-            store.state.authStore.credential!.value != null &&
-            store.state.authStore.credential!.value!.isNotEmpty,
-        loading: store.state.authStore.loading,
-        screenLockEnabled: selectScreenLockEnabled(context),
-        typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
-        readReceipts: selectReadReceiptsString(store.state.settingsStore.readReceipts),
-        sessionId: store.state.authStore.user.deviceId ?? Values.empty,
-        sessionName: selectCurrentDeviceName(store),
-        sessionKey: selectCurrentUserSessionKey(store),
-        onSetScreenLock: (String matchedPin) async =>
-            await store.dispatch(setScreenLock(pin: matchedPin)),
-        onRemoveScreenLock: (String matchedPin) async =>
-            await store.dispatch(removeScreenLock(pin: matchedPin)),
-        onDisabled: () => store.dispatch(addInProgress()),
-        onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
-        onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
-        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()), 
-        onRenameDevice: (BuildContext context) async {
-          showDialog(
-            context: context,
-            builder: (dialogContext) => DialogTextInput(
-              title: Strings.titleRenameDevice,
-              content: Strings.contentRenameDevice,
-              label: selectCurrentDeviceName(store),
-              onConfirm: (String newDisplayName) async {
-                await store.dispatch(
-                    renameDevice(
-                        deviceId: store.state.authStore.user.deviceId,
-                        displayName: newDisplayName
-                    )
-                );
-                Navigator.of(dialogContext).pop();
-              },
-              onCancel: () async {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
+  static _Props mapStateToProps(Store<AppState> store, AppContext context) =>
+      _Props(
+          valid: store.state.authStore.credential != null &&
+              store.state.authStore.credential!.value != null &&
+              store.state.authStore.credential!.value!.isNotEmpty,
+          loading: store.state.authStore.loading,
+          screenLockEnabled: selectScreenLockEnabled(context),
+          typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
+          readReceipts:
+              selectReadReceiptsString(store.state.settingsStore.readReceipts),
+          sessionId: store.state.authStore.user.deviceId ?? Values.empty,
+          sessionName: selectCurrentDeviceName(store),
+          sessionKey: selectCurrentUserSessionKey(store),
+          onSetScreenLock: (String matchedPin) async =>
+              await store.dispatch(setScreenLock(pin: matchedPin)),
+          onRemoveScreenLock: (String matchedPin) async =>
+              await store.dispatch(removeScreenLock(pin: matchedPin)),
+          onDisabled: () => store.dispatch(addInProgress()),
+          onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
+          onToggleTypingIndicators: () =>
+              store.dispatch(toggleTypingIndicators()),
+          onIncrementReadReceipts: () =>
+              store.dispatch(incrementReadReceipts()),
+          onRenameDevice: (BuildContext context) async {
+            showDialog(
+              context: context,
+              builder: (dialogContext) => DialogTextInput(
+                title: Strings.titleRenameDevice,
+                content: Strings.contentRenameDevice,
+                label: selectCurrentDeviceName(store),
+                onConfirm: (String newDisplayName) async {
+                  await store.dispatch(renameDevice(
+                      deviceId: store.state.authStore.user.deviceId,
+                      displayName: newDisplayName));
+                  Navigator.of(dialogContext).pop();
+                },
+                onCancel: () async {
+                  Navigator.of(dialogContext).pop();
+                },
+              ),
           ); 
-        copyToClipboard: (String? clipboardData) async {
-          await Clipboard.setData(ClipboardData(text: clipboardData));
-          store.dispatch(addInfo(message: Strings.alertCopiedToClipboard)); 
+          },
+          copyToClipboard: (String? clipboardData) async {
+            await Clipboard.setData(ClipboardData(text: clipboardData));
+            store.dispatch(addInfo(message: Strings.alertCopiedToClipboard));
         },
       );
 }
