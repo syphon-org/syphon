@@ -331,8 +331,6 @@ ThunkAction<AppState> createRoom({
                                 )
                                 .toList();
 
-      final invitesFiltered = invites.whereNot((user) => user.userId == currentUser.userId);
-
       final isNoteToSelf = inviteIds.length == 1
         && inviteIds.single == currentUser.userId;
 
