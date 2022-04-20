@@ -585,51 +585,51 @@ class _Props extends Equatable {
         sessionKey,
         screenLockEnabled,
       ];
-
-  static _Props mapStateToProps(Store<AppState> store, AppContext context) =>
-      _Props(
-          valid: store.state.authStore.credential != null &&
-              store.state.authStore.credential!.value != null &&
-              store.state.authStore.credential!.value!.isNotEmpty,
-          loading: store.state.authStore.loading,
-          screenLockEnabled: selectScreenLockEnabled(context),
-          typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
-          readReceipts:
-              selectReadReceiptsString(store.state.settingsStore.readReceipts),
-          sessionId: store.state.authStore.user.deviceId ?? Values.empty,
-          sessionName: selectCurrentDeviceName(store),
-          sessionKey: selectCurrentUserSessionKey(store),
-          onSetScreenLock: (String matchedPin) async =>
-              await store.dispatch(setScreenLock(pin: matchedPin)),
-          onRemoveScreenLock: (String matchedPin) async =>
-              await store.dispatch(removeScreenLock(pin: matchedPin)),
-          onDisabled: () => store.dispatch(addInProgress()),
-          onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
-          onToggleTypingIndicators: () =>
-              store.dispatch(toggleTypingIndicators()),
-          onIncrementReadReceipts: () =>
-              store.dispatch(incrementReadReceipts()),
-          onRenameDevice: (BuildContext context) async {
-            showDialog(
-              context: context,
-              builder: (dialogContext) => DialogTextInput(
-                title: Strings.titleRenameDevice,
-                content: Strings.contentRenameDevice,
-                label: selectCurrentDeviceName(store),
-                onConfirm: (String newDisplayName) async {
-                  await store.dispatch(renameDevice(
-                      deviceId: store.state.authStore.user.deviceId,
-                      displayName: newDisplayName));
-                  Navigator.of(dialogContext).pop();
-                },
-                onCancel: () async {
-                  Navigator.of(dialogContext).pop();
-                },
-              ),
-            );
-          },
-          copyToClipboard: (String? clipboardData) async {
-            await Clipboard.setData(ClipboardData(text: clipboardData));
-            store.dispatch(addInfo(message: Strings.alertCopiedToClipboard));
-          });
+  
+  static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
+        valid: store.state.authStore.credential != null &&
+            store.state.authStore.credential!.value != null &&
+            store.state.authStore.credential!.value!.isNotEmpty,
+        loading: store.state.authStore.loading,
+        screenLockEnabled: selectScreenLockEnabled(context),
+        typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
+        readReceipts: selectReadReceiptsString(store.state.settingsStore.readReceipts),
+        sessionId: store.state.authStore.user.deviceId ?? Values.empty,
+        sessionName: selectCurrentDeviceName(store),
+        sessionKey: selectCurrentUserSessionKey(store),
+        onSetScreenLock: (String matchedPin) async =>
+            await store.dispatch(setScreenLock(pin: matchedPin)),
+        onRemoveScreenLock: (String matchedPin) async =>
+            await store.dispatch(removeScreenLock(pin: matchedPin)),
+        onDisabled: () => store.dispatch(addInProgress()),
+        onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
+        onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
+        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()), 
+        onRenameDevice: (BuildContext context) async {
+          showDialog(
+            context: context,
+            builder: (dialogContext) => DialogTextInput(
+              title: Strings.titleRenameDevice,
+              content: Strings.contentRenameDevice,
+              label: selectCurrentDeviceName(store),
+              onConfirm: (String newDisplayName) async {
+                await store.dispatch(
+                    renameDevice(
+                        deviceId: store.state.authStore.user.deviceId,
+                        displayName: newDisplayName
+                    )
+                );
+                Navigator.of(dialogContext).pop();
+              },
+              onCancel: () async {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ); 
+        },
+        copyToClipboard: (String? clipboardData) async {
+          await Clipboard.setData(ClipboardData(text: clipboardData));
+          store.dispatch(addInfo(message: Strings.alertCopiedToClipboard)); 
+        },
+      );
 }
