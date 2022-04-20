@@ -437,19 +437,18 @@ class _Props extends Equatable {
             {required User user, required BuildContext context}) async {
           if (user.userId == store.state.authStore.currentUser.userId) {
             //Note to self, create our Avatar
-            final store = StoreProvider.of<AppState>(context);
             final screenshotController = ScreenshotController();
             final avatar = MemoryFileSystem().file('avatar.png');
 
             await screenshotController
-                .captureFromWidget(
-                    Avatar(
+                .captureFromWidget(StoreProvider<AppState>(
+                    store: store,
+                    child: Avatar(
                       alt: Strings.labelNoteToSelf,
                       icon: Icons.sticky_note_2_outlined,
                       size: Dimensions.avatarSizeMax,
                       background: Theme.of(context).primaryColor,
-                    ).build(context),
-                    context: context)
+                    )))
                 .then((capturedAvatar) {
               avatar.writeAsBytesSync(capturedAvatar);
             });
