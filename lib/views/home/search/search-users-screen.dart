@@ -446,7 +446,6 @@ class _Props extends Equatable {
                     child: Avatar(
                       alt: Strings.labelNoteToSelf,
                       icon: Icons.sticky_note_2_outlined,
-                      size: Dimensions.avatarSizeMax,
                       background: Theme.of(context).primaryColor,
                     )))
                 .then((capturedAvatar) {
