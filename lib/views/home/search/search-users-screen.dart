@@ -1,8 +1,11 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:file/memory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -15,6 +18,7 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/lists/list-item-user.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
@@ -158,7 +162,8 @@ class SearchUserState extends State<SearchUserScreen> {
           setState(() {
             creatingRoomDisplayName = user.displayName;
           });
-          final newRoomId = await props!.onCreateChatDirect(user: user);
+          final newRoomId =
+              await props!.onCreateChatDirect(user: user, context: context);
 
           Navigator.pop(dialogContext);
 
@@ -428,7 +433,36 @@ class _Props extends Equatable {
 
           store.dispatch(searchUsers(searchText: text));
         },
-        onCreateChatDirect: ({required User user}) async {
+        onCreateChatDirect: (
+            {required User user, required BuildContext context}) async {
+          if (user.userId == store.state.authStore.currentUser.userId) {
+            //Note to self, create our Avatar
+            final store = StoreProvider.of<AppState>(context);
+            final screenshotController = ScreenshotController();
+            final avatar = MemoryFileSystem().file('avatar.png');
+
+            await screenshotController
+                .captureFromWidget(
+                    Avatar(
+                      alt: Strings.labelNoteToSelf,
+                      icon: Icons.sticky_note_2_outlined,
+                      size: Dimensions.avatarSizeMax,
+                      background: Theme.of(context).primaryColor,
+                    ).build(context),
+                    context: context)
+                .then((capturedAvatar) {
+              avatar.writeAsBytesSync(capturedAvatar);
+            });
+
+            return store.dispatch(
+              createRoom(
+                isDirect: true,
+                invites: <User>[user],
+                avatarFile: avatar,
+              ),
+            );
+          }
+
           return store.dispatch(
             createRoom(
               isDirect: true,
