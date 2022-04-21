@@ -79,7 +79,7 @@ abstract class MatrixApi {
   static const uploadMedia = MatrixMedia.uploadMedia;
   static const fetchMediaThreaded = MatrixMedia.fetchMediaThreaded;
   static const fetchThumbnailThreaded = MatrixMedia.fetchThumbnailThreaded;
-  static const fetchMessageUrl = MatrixMedia.fetchMessageUrl;
+  static const buildMessageUrl = MatrixMedia.buildMessageUrl;
 
   // Device Management
   static const fetchDevices = Devices.fetchDevices;

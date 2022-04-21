@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:photo_view/photo_view.dart';
+import 'package:redux/redux.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/strings.dart';
@@ -46,7 +47,7 @@ class MediaFullScreen extends StatelessWidget {
                 Theme.of(context).appBarTheme.backgroundColor,
               ),
               onPressed: () async {
-                await Share.share(MatrixApi.fetchMessageUrl(roomId: roomId,eventId: eventId));
+                await Share.share(MatrixApi.buildMessageUrl(roomId: roomId,eventId: eventId));
               }
           ),
         ],
