@@ -237,13 +237,16 @@ class IntroSettingsScreen extends StatelessWidget {
                     CardSection(
                       child: Column(
                         children: [
-                          Container(
-                            width: width,
-                            padding: Dimensions.listPadding,
-                            child: Text(
-                              'Key Management Testing',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.subtitle2,
+                          Visibility(
+                            visible: DEBUG_MODE,
+                            child: Container(
+                              width: width,
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                'Key Management Testing',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
                             ),
                           ),
                           Visibility(
