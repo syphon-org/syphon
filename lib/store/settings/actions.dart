@@ -414,18 +414,21 @@ Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
 
   final unstableFeatures = version['unstable_features'];
 
-  return unstableFeatures != null
-         && unstableFeatures.containsKey('org.matrix.msc2285')
-         && unstableFeatures['org.matrix.msc2285'];
+  return unstableFeatures != null &&
+      unstableFeatures.containsKey('org.matrix.msc2285') &&
+      unstableFeatures['org.matrix.msc2285'];
 }
 
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
-    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
+    final readReceiptsIndex =
+        ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
 
-    final nextReceipt = ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
+    final nextReceipt =
+        ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
 
-    if (nextReceipt != ReadReceiptTypes.Hidden) { //short-out
+    if (nextReceipt != ReadReceiptTypes.Hidden) {
+      //short-out
       return store.dispatch(SetReadReceipts(
         readReceipts: nextReceipt,
       ));
@@ -438,8 +441,8 @@ ThunkAction<AppState> incrementReadReceipts() {
     }
 
     return store.dispatch(SetReadReceipts(
-      readReceipts: ReadReceiptTypes.values[(readReceiptsIndex + 2) %
-          ReadReceiptTypes.values.length],
+      readReceipts:
+          ReadReceiptTypes.values[(readReceiptsIndex + 2) % ReadReceiptTypes.values.length],
     ));
   };
 }

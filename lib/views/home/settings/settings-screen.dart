@@ -178,9 +178,11 @@ class SettingsScreen extends StatelessWidget {
                             ),
                             subtitle: Text(
                               Strings.subtitlePrivacySettings(
-                                  props.screenLockEnabled ?? false ? Strings.labelOn : Strings.labelOff,
+                                  props.screenLockEnabled ?? false
+                                      ? Strings.labelOn
+                                      : Strings.labelOff,
                                   Strings.labelOff //TODO
-                              ),
+                                  ),
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ),

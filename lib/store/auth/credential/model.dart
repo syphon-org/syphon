@@ -23,8 +23,7 @@ class Credential extends Equatable {
     }
 
     // TODO: use localization code to find the right one here
-    return params![MatrixAuthTypes.TERMS]['policies']['privacy_policy']['en']
-        ['url'];
+    return params![MatrixAuthTypes.TERMS]['policies']['privacy_policy']['en']['url'];
   }
 
   @override
@@ -47,6 +46,5 @@ class Credential extends Equatable {
 
   Map<String, dynamic> toJson() => _$CredentialToJson(this);
 
-  factory Credential.fromJson(Map<String, dynamic> json) =>
-      _$CredentialFromJson(json);
+  factory Credential.fromJson(Map<String, dynamic> json) => _$CredentialFromJson(json);
 }

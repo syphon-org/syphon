@@ -105,7 +105,7 @@ Sync parseSync(Map params) {
     prevBatch: details.prevBatch,
   );
 
-  if (details.limited != null  && DEBUG_MODE) {
+  if (details.limited != null && DEBUG_MODE) {
     printInfo(
       '[parseSync] ${roomExisting.id} limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
     );

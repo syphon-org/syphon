@@ -14,6 +14,7 @@ scripts:
   build: flutter pub run build_runner build --delete-conflicting-outputs
   watch: flutter pub run build_runner watch --delete-conflicting-outputs
   uninstall: adb shell && pm uninstall org.tether.tether # (sometimes doesn't uninstall when debugging?)
+  format: flutter dartfmt --line-length=120 .
 
   build-release-ios: flutter build ipa  --release # open under xcworkspace, not xcodeproj
   build-release-macos: flutter pub run build_runner build --delete-conflicting-outputs && flutter build macos --release

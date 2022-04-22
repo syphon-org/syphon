@@ -51,6 +51,5 @@ class ProxySettings extends Equatable {
 
   Map<String, dynamic> toJson() => _$ProxySettingsToJson(this);
 
-  factory ProxySettings.fromJson(Map<String, dynamic> json) =>
-      _$ProxySettingsFromJson(json);
+  factory ProxySettings.fromJson(Map<String, dynamic> json) => _$ProxySettingsFromJson(json);
 }

@@ -118,6 +118,5 @@ class ThemeSettings extends Equatable {
 
   Map<String, dynamic> toJson() => _$ThemeSettingsToJson(this);
 
-  factory ThemeSettings.fromJson(Map<String, dynamic> json) =>
-      _$ThemeSettingsFromJson(json);
+  factory ThemeSettings.fromJson(Map<String, dynamic> json) => _$ThemeSettingsFromJson(json);
 }
