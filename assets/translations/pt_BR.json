@@ -182,5 +182,13 @@
     "title-proxy-port": "Modificar porta do proxy",
     "title-toggle-autocorrect": "Autocorreção do teclado",
     "title-blocked-users": "Usuários bloqueados",
-    "title-dialog-confirm-deactivate-account": "Confirmar desativação de conta"
+    "title-dialog-confirm-deactivate-account": "Confirmar desativação de conta",
+    "subtitle-proxy-use-basic-authentication": "Forneça o nome de usuário e senha para autenticar com um proxy",
+    "title-dialog-enter-screen-lock-pin": "Insira seu PIN de bloqueio de tela atual",
+    "subtitle-toggle-autocorrect": "Esteja ciente que teclados podem mandar dados de autocorreção para terceiros",
+    "title-dialog-enter-new-screen-lock-pin": "Insira seu novo PIN de bloqueio de tela",
+    "title-dialog-verify-new-screen-lock-pin": "Insira seu PIN de novo para verificar",
+    "subtitle-proxy-use-proxy": "Isso forçará todo o tráfego a sair do Syphon através de um proxy",
+    "subtitle-toggle-suggestions": "Esteja ciente que teclados podem mandar dados de sugestões para terceiros",
+    "subtitle-settings-enter-sends": "Pressionar a tecla enter vai enviar a mensagem"
 }
