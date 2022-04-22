@@ -114,6 +114,7 @@ dependencies:
   permission_handler: ^8.3.0
   local_image_provider: ^4.0.1
   flutter_image_compress: 1.1.0
+  share_plus: 4.0.3
 
   ### data
   uuid: ^3.0.4
