@@ -335,5 +335,6 @@
     "content-import-session-keys-enter-password": "Saisissez le mot de passe pour cette importation de clé de session.",
     "content-export-session-keys-enter-password": "Saisissez un mot de passe pour crypter vos clés de session.",
     "content-import-session-keys": "Saisissez le mot de passe pour cette importation de clé de session.\n\nVeuillez noter que l'importation peut prendre un certain temps.",
-    "semantics-image-password-update": "Utilisateur imaginant un mot de passe dans un tourbillon de vent"
+    "semantics-image-password-update": "Utilisateur imaginant un mot de passe dans un tourbillon de vent",
+    "alert-copied-to-clipboard": "Copié dans le presse-papiers"
 }

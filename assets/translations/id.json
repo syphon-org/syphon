@@ -335,5 +335,6 @@
     "content-import-session-keys": "Masukkan sebuah kata sandi untuk pengimporan kunci sesi ini.\n\nDiingat bahwa pengimporan mungkin membutuhkan beberapa waktu untuk selesai.",
     "content-logout-confirm": "Apakah Anda yakin untuk keluar dari akun Anda?",
     "content-remove-screen-lock": "Apakah Anda yakin untuk menghapus kunci layar? Ini juga akan menghapus lindungan pin cache",
-    "semantics-image-password-update": "Pengguna memikirkan sebuah kata sandi dalam putaran angin"
+    "semantics-image-password-update": "Pengguna memikirkan sebuah kata sandi dalam putaran angin",
+    "alert-copied-to-clipboard": "Tersalin ke papan klip"
 }
