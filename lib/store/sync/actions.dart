@@ -105,9 +105,10 @@ ThunkAction<AppState> startSyncObserver() {
       }
 
       var backoff = store.state.syncStore.backoff;
+      final stateIsOffline = store.state.syncStore.offline;
 
       if (backoff != 0) {
-        if (backoff > 5 && ConnectionService.isConnected()) {
+        if (backoff > 5 && ConnectionService.isConnected() && !stateIsOffline) {
           ConnectionService.checked = true;
           backoff = 0;
         }
