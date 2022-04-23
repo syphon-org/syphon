@@ -137,7 +137,8 @@ Future notificationJob() async {
         httpClient = createClient(proxySettings: proxySettings);
       } catch (error) {
         log.error(error.toString());
-        throw Exception('Failed to initialize proxy settings, aborting background notifications service')
+        throw Exception(
+            'Failed to initialize proxy settings, aborting background notifications service');
       }
     }
 
