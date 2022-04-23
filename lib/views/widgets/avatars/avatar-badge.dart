@@ -14,97 +14,100 @@ class AvatarBadge extends StatelessWidget {
     this.public = false,
     this.group = false,
     this.invite = false,
-    this.encryptionEnabled = false,
+    this.indicator = false,
+    this.unencrypted = false,
   }) : super(key: key);
 
   final bool public;
   final bool group;
   final bool invite;
-  final bool encryptionEnabled;
+  final bool indicator;
+  final bool unencrypted;
+
+  Widget buildIndicator(BuildContext context) {
+    return Positioned(
+      top: 0,
+      right: 0,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(
+          Dimensions.badgeAvatarSize,
+        ),
+        child: Container(
+          width: Dimensions.badgeAvatarSizeSmall,
+          height: Dimensions.badgeAvatarSizeSmall,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+      ),
+    );
+  }
+
+  Widget buildBadge(BuildContext context, Icon icon, {Color? color}) {
+    return Positioned(
+      bottom: 0,
+      right: 0,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(
+          Dimensions.badgeAvatarSize,
+        ),
+        child: Container(
+          width: Dimensions.badgeAvatarSize,
+          height: Dimensions.badgeAvatarSize,
+          color: color ?? Theme.of(context).scaffoldBackgroundColor,
+          child: icon,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          if (encryptionEnabled) {
-            return Positioned(
-              bottom: 0,
-              right: 0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(
-                  Dimensions.badgeAvatarSize,
-                ),
-                child: Container(
-                  width: Dimensions.badgeAvatarSize,
-                  height: Dimensions.badgeAvatarSize,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: Icon(
-                    Icons.lock_open,
-                    color: Theme.of(context).iconTheme.color,
-                    size: Dimensions.iconSizeMini,
-                  ),
-                ),
+          if (indicator) {
+            return buildIndicator(context);
+          }
+
+          if (unencrypted) {
+            return buildBadge(
+              context,
+              Icon(
+                Icons.lock_open,
+                color: Theme.of(context).iconTheme.color,
+                size: Dimensions.iconSizeMini,
               ),
             );
           }
 
           if (invite) {
-            return Positioned(
-              bottom: 0,
-              right: 0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  width: Dimensions.badgeAvatarSize,
-                  height: Dimensions.badgeAvatarSize,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: Icon(
-                    Icons.mail_outline,
-                    color: Theme.of(context).iconTheme.color,
-                    size: Dimensions.iconSizeMini,
-                  ),
-                ),
+            return buildBadge(
+              context,
+              Icon(
+                Icons.mail_outline,
+                color: Theme.of(context).iconTheme.color,
+                size: Dimensions.iconSizeMini,
               ),
             );
           }
 
           if (group) {
-            return Positioned(
-              bottom: 0,
-              right: 0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  width: Dimensions.badgeAvatarSize,
-                  height: Dimensions.badgeAvatarSize,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: Icon(
-                    Icons.group,
-                    color: Theme.of(context).iconTheme.color,
-                    size: Dimensions.badgeAvatarSizeSmall,
-                  ),
-                ),
+            return buildBadge(
+              context,
+              Icon(
+                Icons.group,
+                color: Theme.of(context).iconTheme.color,
+                size: Dimensions.badgeAvatarSizeSmall,
               ),
             );
           }
 
           if (public) {
-            return Positioned(
-              bottom: 0,
-              right: 0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  width: Dimensions.badgeAvatarSize,
-                  height: Dimensions.badgeAvatarSize,
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  child: Icon(
-                    Icons.public,
-                    color: Theme.of(context).iconTheme.color,
-                    size: Dimensions.badgeAvatarSize,
-                  ),
-                ),
+            return buildBadge(
+              context,
+              Icon(
+                Icons.public,
+                color: Theme.of(context).iconTheme.color,
+                size: Dimensions.badgeAvatarSize,
               ),
             );
           }

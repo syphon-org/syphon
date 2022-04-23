@@ -1,10 +1,13 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:syphon/global/notifications.dart';
 
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/options/types.dart';
+import 'package:syphon/store/sync/background/service.dart';
+
+class ToggleNotifications {}
 
 class MuteChatNotifications {
   final String roomId;
@@ -20,6 +23,64 @@ class MuteChatNotifications {
 class SetNotificationSettings {
   final NotificationSettings settings;
   SetNotificationSettings({required this.settings});
+}
+
+ThunkAction<AppState> toggleNotifications() {
+  return (Store<AppState> store) async {
+    if (globalNotificationPluginInstance == null) {
+      return;
+    }
+
+    final permitted = await promptNativeNotificationsRequest(
+      pluginInstance: globalNotificationPluginInstance!,
+    );
+
+    if (!permitted) {
+      return;
+    }
+
+    store.dispatch(ToggleNotifications());
+
+    final enabled = store.state.settingsStore.notificationSettings.enabled;
+
+    if (enabled) {
+      store.dispatch(startNotifications());
+    } else {
+      store.dispatch(stopNotifications());
+    }
+  };
+}
+
+ThunkAction<AppState> startNotifications() {
+  return (Store<AppState> store) async {
+    await BackgroundSync.init();
+
+    final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
+      (roomId, room) => MapEntry(roomId, room.name),
+    );
+
+    await BackgroundSync.start(
+      roomNames: roomNames,
+      protocol: store.state.authStore.protocol,
+      lastSince: store.state.syncStore.lastSince,
+      currentUser: store.state.authStore.currentUser,
+      settings: store.state.settingsStore.notificationSettings,
+    );
+
+    showBackgroundServiceNotification(
+      notificationId: BackgroundSync.service_id,
+      pluginInstance: globalNotificationPluginInstance!,
+    );
+  };
+}
+
+ThunkAction<AppState> stopNotifications() {
+  return (Store<AppState> store) async {
+    BackgroundSync.stop();
+    dismissAllNotifications(
+      pluginInstance: globalNotificationPluginInstance,
+    );
+  };
 }
 
 ///

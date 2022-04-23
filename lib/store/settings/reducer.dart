@@ -1,7 +1,10 @@
 import 'package:syphon/global/https.dart';
+import 'package:syphon/store/settings/chat-settings/chat-lists/actions.dart';
+import 'package:syphon/store/settings/chat-settings/chat-lists/model.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
+import 'package:uuid/uuid.dart';
 import './actions.dart';
 import './state.dart';
 
@@ -121,6 +124,14 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
     case ToggleAutoDownload:
       return state.copyWith(
         autoDownloadEnabled: !state.autoDownloadEnabled,
+      );
+    case CreateChatList:
+      final chatListsUpdated = List<ChatList>.from(state.chatLists);
+
+      chatListsUpdated.add(ChatList(id: Uuid().v4()));
+
+      return state.copyWith(
+        chatLists: chatListsUpdated,
       );
     case ToggleProxy:
       final _state = state.copyWith(

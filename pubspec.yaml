@@ -105,6 +105,7 @@ dependencies:
   flutter_speed_dial: ^4.2.0
   fab_circular_menu: ^1.0.2
   flutter_screen_lock: ^4.0.0
+  reorderables: 0.4.3
   photo_view: 0.13.0
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 

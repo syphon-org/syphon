@@ -2,9 +2,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -13,9 +11,7 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/models.dart';
-import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/sync/background/service.dart';
 
 class SetThemeType {
   final ThemeType themeType;
@@ -124,8 +120,6 @@ class ToggleDismissKeyboard {}
 class ToggleRoomTypeBadges {}
 
 class ToggleMembershipEvents {}
-
-class ToggleNotifications {}
 
 class ToggleTypingIndicators {}
 
@@ -498,63 +492,5 @@ ThunkAction<AppState> toggleRoomTypeBadges() {
 ThunkAction<AppState> toggleMembershipEvents() {
   return (Store<AppState> store) async {
     store.dispatch(ToggleMembershipEvents());
-  };
-}
-
-ThunkAction<AppState> toggleNotifications() {
-  return (Store<AppState> store) async {
-    if (globalNotificationPluginInstance == null) {
-      return;
-    }
-
-    final permitted = await promptNativeNotificationsRequest(
-      pluginInstance: globalNotificationPluginInstance!,
-    );
-
-    if (!permitted) {
-      return;
-    }
-
-    store.dispatch(ToggleNotifications());
-
-    final enabled = store.state.settingsStore.notificationSettings.enabled;
-
-    if (enabled) {
-      store.dispatch(startNotifications());
-    } else {
-      store.dispatch(stopNotifications());
-    }
-  };
-}
-
-ThunkAction<AppState> startNotifications() {
-  return (Store<AppState> store) async {
-    await BackgroundSync.init();
-
-    final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
-      (roomId, room) => MapEntry(roomId, room.name),
-    );
-
-    await BackgroundSync.start(
-      roomNames: roomNames,
-      protocol: store.state.authStore.protocol,
-      lastSince: store.state.syncStore.lastSince,
-      currentUser: store.state.authStore.currentUser,
-      settings: store.state.settingsStore.notificationSettings,
-    );
-
-    showBackgroundServiceNotification(
-      notificationId: BackgroundSync.service_id,
-      pluginInstance: globalNotificationPluginInstance!,
-    );
-  };
-}
-
-ThunkAction<AppState> stopNotifications() {
-  return (Store<AppState> store) async {
-    BackgroundSync.stop();
-    dismissAllNotifications(
-      pluginInstance: globalNotificationPluginInstance,
-    );
   };
 }

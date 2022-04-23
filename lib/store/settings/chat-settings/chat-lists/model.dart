@@ -13,20 +13,33 @@ enum SortOrder {
 @JsonSerializable()
 class ChatList extends Equatable {
   final String id;
-  final SortOrder order;
+  final String name;
+  final String symbol; // emoji for now
+  // List<roomId>
   final List<String> roomIds;
+  // order is used only under the "Custom" sort order
+  // Map<order, roomId>
+  final Map<int, String> order;
+
+  final int position; // global position in home list
 
   const ChatList({
     required this.id,
-    this.order = SortOrder.Latest, // millis
+    this.name = 'New List',
+    this.symbol = '',
+    this.order = const {},
     this.roomIds = const [],
+    this.position = 0,
   });
 
   @override
   List<Object?> get props => [
         id,
+        name,
+        symbol,
         order,
         roomIds,
+        position,
       ];
 
   Map<String, dynamic> toJson() => _$ChatListToJson(this);

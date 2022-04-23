@@ -33,7 +33,7 @@ class SettingsStore extends Equatable {
   final int syncInterval;
   final int syncPollTimeout;
 
-  final SortOrder globalSortOrder;
+  final SortOrder sortOrderGlobal;
   final List<ChatList> chatLists;
   final ReadReceiptTypes readReceipts;
 
@@ -52,7 +52,7 @@ class SettingsStore extends Equatable {
     this.syncInterval = 2000, // millis
     this.syncPollTimeout = 10000, // millis
     this.chatLists = const [],
-    this.globalSortOrder = SortOrder.Latest,
+    this.sortOrderGlobal = SortOrder.Latest,
     this.enterSendEnabled = false,
     this.autocorrectEnabled = false,
     this.suggestionsEnabled = false,

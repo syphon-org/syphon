@@ -11,6 +11,7 @@ import 'package:syphon/global/colours.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/global/weburl.dart';
@@ -22,6 +23,8 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/room/selectors.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/settings/chat-settings/chat-lists/actions.dart';
+import 'package:syphon/store/settings/chat-settings/chat-lists/model.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
@@ -34,6 +37,7 @@ import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-avatar.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
+import 'package:syphon/views/widgets/avatars/avatar-badge.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-circle-expanding.dart';
@@ -43,7 +47,7 @@ import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-options.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
-enum Options { newGroup, markAllRead, inviteFriends, settings, licenses, help }
+enum Options { newGroup, markAllRead, inviteFriends, createList, settings, licenses, help }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -62,11 +66,96 @@ class HomeState extends State<HomeScreen> {
   final fabKeyCircle = GlobalKey<FabBarContainerState>();
 
   bool searching = false;
+  bool organizing = false;
   String searchText = '';
   Map<String, Room> selectedChats = {};
   Map<String, Color> chatColorCache = {};
 
-  @protected
+  isAllDirect(Map<String, Room> selectedChats) {
+    return selectedChats.values.every((chat) => chat.direct);
+  }
+
+  selectActionAlignment(_Props props) {
+    if (props.fabLocation == MainFabLocation.Left) {
+      return Alignment.bottomLeft;
+    }
+
+    return Alignment.bottomRight;
+  }
+
+  selectActionLocation(_Props props) {
+    if (props.fabLocation == MainFabLocation.Left) {
+      return FloatingActionButtonLocation.startFloat;
+    }
+
+    return FloatingActionButtonLocation.endFloat;
+  }
+
+  onDismissMessageOptions() {
+    setState(() {
+      selectedChats = {};
+    });
+  }
+
+  onCreateList() {
+    final store = StoreProvider.of<AppState>(context);
+    store.dispatch(createChatList());
+  }
+
+  onToggleSearch() {
+    setState(() {
+      searching = !searching;
+      searchText = '';
+    });
+  }
+
+  onSearch(_Props props, String text) {
+    final store = StoreProvider.of<AppState>(context);
+    setState(() {
+      searchText = text;
+    });
+
+    if (text.isEmpty) {
+      return store.dispatch(clearSearchResults());
+    }
+
+    store.dispatch(searchMessages(text));
+  }
+
+  onSelectChat(Room room, String chatName) {
+    final store = StoreProvider.of<AppState>(context);
+
+    if (selectedChats.isNotEmpty) {
+      return onToggleRoomOptions(room: room);
+    }
+
+    Navigator.pushNamed(
+      context,
+      Routes.chat,
+      arguments: ChatScreenArguments(roomId: room.id, title: chatName),
+    );
+
+    Timer(Duration(milliseconds: 500), () {
+      setState(() {
+        searching = false;
+        selectedChats = {};
+      });
+      store.dispatch(clearSearchResults());
+    });
+  }
+
+  onSelectAll(_Props props) {
+    if (selectedChats.values.toSet().containsAll(props.rooms)) {
+      setState(() {
+        selectedChats = {};
+      });
+    } else {
+      setState(() {
+        selectedChats.addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
+      });
+    }
+  }
+
   onToggleRoomOptions({required Room room}) {
     if (searching) {
       onToggleSearch();
@@ -80,12 +169,12 @@ class HomeState extends State<HomeScreen> {
         selectedChats.remove(room.id);
       });
     }
-  }
-
-  onDismissMessageOptions() {
-    setState(() {
-      selectedChats = {};
-    });
+    if (selectedChats.isEmpty) {
+      log.debug('organization $organizing');
+      setState(() {
+        organizing = false;
+      });
+    }
   }
 
   onSelectHelp(_Props props) async {
@@ -197,66 +286,22 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
-  onToggleSearch() {
-    setState(() {
-      searching = !searching;
-      searchText = '';
-    });
-  }
+  Widget buildActionFab(_Props props) {
+    final fabType = props.fabType;
 
-  onSearch(_Props props, String text) {
-    final store = StoreProvider.of<AppState>(context);
-    setState(() {
-      searchText = text;
-    });
-
-    if (text.isEmpty) {
-      return store.dispatch(clearSearchResults());
+    if (fabType == MainFabType.Bar) {
+      return FabBarExpanding(
+        alignment: selectActionAlignment(props),
+      );
     }
 
-    store.dispatch(searchMessages(text));
-  }
-
-  onSelectChat(Room room, String chatName) {
-    final store = StoreProvider.of<AppState>(context);
-
-    if (selectedChats.isNotEmpty) {
-      return onToggleRoomOptions(room: room);
-    }
-
-    Navigator.pushNamed(
-      context,
-      Routes.chat,
-      arguments: ChatScreenArguments(roomId: room.id, title: chatName),
+    return FabRing(
+      fabKey: fabKeyRing,
+      alignment: selectActionAlignment(props),
     );
-
-    Timer(Duration(milliseconds: 500), () {
-      setState(() {
-        searching = false;
-        selectedChats = {};
-      });
-      store.dispatch(clearSearchResults());
-    });
   }
 
-  onSelectAll(_Props props) {
-    if (selectedChats.values.toSet().containsAll(props.rooms)) {
-      setState(() {
-        selectedChats = {};
-      });
-    } else {
-      setState(() {
-        selectedChats.addAll(Map.fromEntries(props.rooms.map((e) => MapEntry(e.id, e))));
-      });
-    }
-  }
-
-  bool isAllDirect(Map<String, Room> selectedChats) {
-    return selectedChats.values.every((chat) => chat.direct);
-  }
-
-  @protected
-  Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
+  Widget buildAppBarChatOptions({required BuildContext context, required _Props props}) => AppBar(
         backgroundColor: Color(Colours.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -329,7 +374,6 @@ class HomeState extends State<HomeScreen> {
         ],
       );
 
-  @protected
   Widget buildAppBar({required BuildContext context, required _Props props}) {
     final assetColor = computeContrastColorText(
       Theme.of(context).appBarTheme.backgroundColor,
@@ -380,6 +424,9 @@ class HomeState extends State<HomeScreen> {
               case Options.markAllRead:
                 props.onMarkAllRead();
                 break;
+              case Options.createList:
+                onCreateList();
+                break;
               case Options.settings:
                 Navigator.pushNamed(context, Routes.settings);
                 break;
@@ -405,6 +452,11 @@ class HomeState extends State<HomeScreen> {
               child: Text(Strings.buttonTextInvite),
             ),
             PopupMenuItem<Options>(
+              value: Options.createList,
+              enabled: true,
+              child: Text('Create List'),
+            ),
+            PopupMenuItem<Options>(
               value: Options.settings,
               child: Text(Strings.buttonTextSettings),
             ),
@@ -418,8 +470,204 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
-  @protected
-  Widget buildChatList(BuildContext context, _Props props) {
+  Widget buildChatListHeader(BuildContext context, _Props props, ChatList list) {
+    final width = MediaQuery.of(context).size.width;
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+
+    return Container(
+      // if selected, color seperately
+      constraints: BoxConstraints(maxWidth: width, maxHeight: 80),
+      decoration: BoxDecoration(color: backgroundColor),
+      padding: EdgeInsets.symmetric(vertical: 8).add(Dimensions.appPaddingHorizontal),
+      child: Flex(
+        direction: Axis.horizontal,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            // TODO: show color dot or emoji icon based on isEmpty for symbol
+            child: ClipRRect(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary,
+                  border: Border.all(
+                    color: Colors.white,
+                  ),
+                  borderRadius: BorderRadius.circular(Dimensions.badgeAvatarSize),
+                ),
+                width: Dimensions.badgeAvatarSize,
+                height: Dimensions.badgeAvatarSize,
+                margin: EdgeInsets.only(left: 4),
+                child: Text(
+                  list.symbol,
+                  style: TextStyle(
+                    fontSize: Dimensions.iconSizeMini,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            fit: FlexFit.tight,
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        list.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    // Icon(
+                    //   Icons.keyboard_arrow_down,
+                    //   color: Theme.of(context).colorScheme.secondary,
+                    // ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildChatRow(
+    BuildContext context,
+    _Props props,
+    Room room, {
+    required String chatName,
+    required Color chatColor,
+  }) {
+    final width = MediaQuery.of(context).size.width;
+    final messages = props.messages[room.id] ?? const [];
+    final decrypted = props.decrypted[room.id] ?? const [];
+
+    final messageLatest = latestMessage(messages, room: room, decrypted: decrypted);
+    final preview = formatPreview(room: room, message: messageLatest);
+
+    final isNewMessage = messageLatest != null &&
+        room.lastRead < messageLatest.timestamp &&
+        messageLatest.sender != props.currentUser.userId;
+
+    var backgroundColor;
+    var textStyle = TextStyle();
+
+    // highlight selected rooms if necessary
+    if (selectedChats.isNotEmpty) {
+      if (!selectedChats.containsKey(room.id)) {
+        backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+      } else {
+        backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
+      }
+    }
+
+    // show draft inidicator if it's an empty room
+    if (room.drafting || messages.isEmpty) {
+      textStyle = TextStyle(fontStyle: FontStyle.italic);
+    }
+
+    if (messages.isNotEmpty && messageLatest != null) {
+      // it has undecrypted message contained within
+      if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
+        textStyle = TextStyle(fontStyle: FontStyle.italic);
+      }
+
+      if (messageLatest.body == null || messageLatest.body!.isEmpty) {
+        textStyle = TextStyle(fontStyle: FontStyle.italic);
+      }
+
+      // display message as being 'unread'
+      if (isNewMessage) {
+        textStyle = textStyle.copyWith(
+          color: Theme.of(context).textTheme.bodyText1!.color,
+          fontWeight: FontWeight.w500,
+        );
+      }
+    }
+
+    return Container(
+      // if selected, color seperately
+      constraints: BoxConstraints(maxWidth: width),
+      decoration: BoxDecoration(color: backgroundColor),
+      padding: EdgeInsets.symmetric(
+        vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
+      ).add(Dimensions.appPaddingHorizontal),
+      child: Flex(
+        direction: Axis.horizontal,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            child: Stack(
+              children: [
+                Avatar(
+                  uri: room.avatarUri,
+                  size: Dimensions.avatarSizeMin,
+                  alt: formatRoomInitials(room: room),
+                  background: chatColor,
+                ),
+                AvatarBadge(
+                  indicator: isNewMessage,
+                  invite: props.roomTypeBadgesEnabled && room.invite,
+                  group: props.roomTypeBadgesEnabled && room.type == 'group',
+                  public: props.roomTypeBadgesEnabled && room.type == 'public',
+                  unencrypted: !room.encryptionEnabled,
+                ),
+              ],
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            fit: FlexFit.tight,
+            child: Flex(
+              direction: Axis.vertical,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        chatName,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                    ),
+                    Text(
+                      formatTimestamp(lastUpdateMillis: room.lastUpdate),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
+                    ),
+                  ],
+                ),
+                Text(
+                  preview,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.caption!.merge(textStyle),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildChatListAll(BuildContext context, _Props props) {
     final store = StoreProvider.of<AppState>(context);
     final rooms = props.rooms;
     final label = props.syncing ? Strings.labelSyncingChats : Strings.labelMessagesEmpty;
@@ -456,259 +704,75 @@ class HomeState extends State<HomeScreen> {
       );
     }
 
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      itemCount: noSearchResults ? 0 : rooms.length,
-      itemBuilder: (BuildContext context, int index) {
-        final room = rooms[index];
-        final messages = props.messages[room.id] ?? const [];
-        final decrypted = props.decrypted[room.id] ?? const [];
+    itemBuilder(BuildContext context, int index) {
+      final room = rooms[index];
+      final chatName = room.name ?? '';
+      final chatColor = selectChatColor(store, room.id);
 
-        final messageLatest = latestMessage(messages, room: room, decrypted: decrypted);
-        final preview = formatPreview(room: room, message: messageLatest);
-        final chatName = room.name ?? '';
-        final newMessage = messageLatest != null &&
-            room.lastRead < messageLatest.timestamp &&
-            messageLatest.sender != props.currentUser.userId;
+      final listItem = buildChatRow(
+        context,
+        props,
+        room,
+        chatColor: chatColor,
+        chatName: chatName,
+      );
 
-        var backgroundColor;
-        var textStyle = TextStyle();
-        final chatColor = selectChatColor(store, room.id);
-
-        // highlight selected rooms if necessary
-        if (selectedChats.isNotEmpty) {
-          if (!selectedChats.containsKey(room.id)) {
-            backgroundColor = Theme.of(context).scaffoldBackgroundColor;
-          } else {
-            backgroundColor = Theme.of(context).primaryColor.withAlpha(128);
-          }
-        }
-
-        // show draft inidicator if it's an empty room
-        if (room.drafting || messages.isEmpty) {
-          textStyle = TextStyle(fontStyle: FontStyle.italic);
-        }
-
-        if (messages.isNotEmpty && messageLatest != null) {
-          // it has undecrypted message contained within
-          if (messageLatest.type == EventTypes.encrypted && messageLatest.body!.isEmpty) {
-            textStyle = TextStyle(fontStyle: FontStyle.italic);
-          }
-
-          if (messageLatest.body == null || messageLatest.body!.isEmpty) {
-            textStyle = TextStyle(fontStyle: FontStyle.italic);
-          }
-
-          // display message as being 'unread'
-          if (newMessage) {
-            textStyle = textStyle.copyWith(
-              color: Theme.of(context).textTheme.bodyText1!.color,
-              fontWeight: FontWeight.w500,
-            );
-          }
-        }
-
-        // GestureDetector w/ animation
+      if (selectedChats.isNotEmpty) {
         return InkWell(
+          key: Key(room.id),
           onTap: () => onSelectChat(room, chatName),
-          onLongPress: () => onToggleRoomOptions(room: room),
-          child: Container(
-            decoration: BoxDecoration(
-              color: backgroundColor, // if selected, color seperately
-            ),
-            padding: EdgeInsets.symmetric(
-              vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
-            ).add(Dimensions.appPaddingHorizontal),
-            child: Flex(
-              direction: Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  child: Stack(
-                    children: [
-                      Avatar(
-                        uri: room.avatarUri,
-                        size: Dimensions.avatarSizeMin,
-                        alt: formatRoomInitials(room: room),
-                        background: chatColor,
-                      ),
-                      Visibility(
-                        visible: !room.encryptionEnabled,
-                        child: Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              Dimensions.badgeAvatarSize,
-                            ),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSize,
-                              height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Icon(
-                                Icons.lock_open,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.iconSizeMini,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible: props.roomTypeBadgesEnabled && room.invite,
-                        child: Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSize,
-                              height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Icon(
-                                Icons.mail_outline,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.iconSizeMini,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible: newMessage,
-                        child: Positioned(
-                          top: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSizeSmall,
-                              height: Dimensions.badgeAvatarSizeSmall,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible:
-                            props.roomTypeBadgesEnabled && room.type == 'group' && !room.invite,
-                        child: Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSize,
-                              height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Icon(
-                                Icons.group,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.badgeAvatarSizeSmall,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible:
-                            props.roomTypeBadgesEnabled && room.type == 'public' && !room.invite,
-                        child: Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              width: Dimensions.badgeAvatarSize,
-                              height: Dimensions.badgeAvatarSize,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              child: Icon(
-                                Icons.public,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.badgeAvatarSize,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
-                  child: Flex(
-                    direction: Axis.vertical,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              chatName,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                          ),
-                          Text(
-                            formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        preview,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.caption!.merge(
-                              textStyle,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          onLongPress: () {
+            if (!organizing) {
+              log.debug('[organizing] $organizing');
+              setState(() {
+                organizing = true;
+              });
+            }
+          },
+          child: listItem,
         );
-      },
-    );
-  }
+      }
 
-  selectActionAlignment(_Props props) {
-    if (props.fabLocation == MainFabLocation.Left) {
-      return Alignment.bottomLeft;
-    }
-
-    return Alignment.bottomRight;
-  }
-
-  buildActionFab(_Props props) {
-    final fabType = props.fabType;
-
-    if (fabType == MainFabType.Bar) {
-      return FabBarExpanding(
-        alignment: selectActionAlignment(props),
+      // GestureDetector w/ animation
+      return InkWell(
+        onTap: () => onSelectChat(room, chatName),
+        onLongPress: () => onToggleRoomOptions(room: room),
+        child: listItem,
       );
     }
 
-    return FabRing(
-      fabKey: fabKeyRing,
-      alignment: selectActionAlignment(props),
-    );
-  }
-
-  selectActionLocation(_Props props) {
-    if (props.fabLocation == MainFabLocation.Left) {
-      return FloatingActionButtonLocation.startFloat;
+    if (organizing && selectedChats.isNotEmpty) {
+      return ReorderableListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: noSearchResults ? 0 : rooms.length,
+        itemBuilder: itemBuilder,
+        onReorder: (int oldIndex, int newIndex) {
+          log.debug('$oldIndex $newIndex');
+        },
+      );
     }
 
-    return FloatingActionButtonLocation.endFloat;
+    return ListView.separated(
+      scrollDirection: Axis.vertical,
+      itemCount: noSearchResults ? 0 : rooms.length,
+      separatorBuilder: (BuildContext context, int index) {
+        final chatListNext = props.chatLists.where((list) => list.position == index).toList();
+
+        if (chatListNext.isEmpty) {
+          return Container();
+        }
+
+        return ListView(
+          shrinkWrap: true,
+          children: chatListNext
+              .map(
+                (list) => buildChatListHeader(context, props, list),
+              )
+              .toList(),
+        );
+      },
+      itemBuilder: itemBuilder,
+    );
   }
 
   @override
@@ -722,7 +786,7 @@ class HomeState extends State<HomeScreen> {
           );
 
           if (selectedChats.isNotEmpty) {
-            currentAppBar = buildAppBarRoomOptions(
+            currentAppBar = buildAppBarChatOptions(
               props: props,
               context: context,
             );
@@ -764,10 +828,7 @@ class HomeState extends State<HomeScreen> {
                           ),
                           GestureDetector(
                             onTap: onDismissMessageOptions,
-                            child: buildChatList(
-                              context,
-                              props,
-                            ),
+                            child: buildChatListAll(context, props),
                           ),
                         ],
                       ),
@@ -794,6 +855,7 @@ class _Props extends Equatable {
   final MainFabType fabType;
   final MainFabLocation fabLocation;
   final List<Message> searchMessages;
+  final List<ChatList> chatLists;
   final Map<String, ChatSetting> chatSettings;
   final Map<String, List<Message>> messages;
   final Map<String, List<Message>> decrypted;
@@ -801,7 +863,6 @@ class _Props extends Equatable {
   final Function onLeaveChat;
   final Function onDeleteChat;
   final Function onArchiveChat;
-  final Function onSelectHelp;
   final Function onMarkAllRead;
   final Function onFetchSyncForced;
 
@@ -814,6 +875,7 @@ class _Props extends Equatable {
     required this.unauthed,
     required this.messages,
     required this.decrypted,
+    required this.chatLists,
     required this.currentUser,
     required this.chatSettings,
     required this.searchMessages,
@@ -822,7 +884,6 @@ class _Props extends Equatable {
     required this.roomTypeBadgesEnabled,
     required this.onLeaveChat,
     required this.onDeleteChat,
-    required this.onSelectHelp,
     required this.onArchiveChat,
     required this.onMarkAllRead,
     required this.onFetchSyncForced,
@@ -837,6 +898,7 @@ class _Props extends Equatable {
         searching,
         offline,
         unauthed,
+        chatLists,
         currentUser,
         chatSettings,
         roomTypeBadgesEnabled,
@@ -869,6 +931,7 @@ class _Props extends Equatable {
         currentUser: store.state.authStore.user,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         chatSettings: store.state.settingsStore.chatSettings,
+        chatLists: store.state.settingsStore.chatLists,
         onMarkAllRead: () {
           store.dispatch(markRoomsReadAll());
         },
@@ -887,6 +950,5 @@ class _Props extends Equatable {
           );
           return Future(() => true);
         },
-        onSelectHelp: () async {},
       );
 }
