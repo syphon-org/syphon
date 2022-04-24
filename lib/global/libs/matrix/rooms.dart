@@ -460,11 +460,12 @@ abstract class Rooms {
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
     String? accessToken,
-    Room? room,}) async{
-
+    Room? room,
+  }) async {
     final String roomId = room!.id;
 
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state/m.room.power_levels/';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/state/m.room.power_levels/';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -478,5 +479,4 @@ abstract class Rooms {
 
     return await json.decode(response.body);
   }
-
 }

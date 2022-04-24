@@ -31,6 +31,5 @@ class ChatList extends Equatable {
 
   Map<String, dynamic> toJson() => _$ChatListToJson(this);
 
-  factory ChatList.fromJson(Map<String, dynamic> json) =>
-      _$ChatListFromJson(json);
+  factory ChatList.fromJson(Map<String, dynamic> json) => _$ChatListFromJson(json);
 }

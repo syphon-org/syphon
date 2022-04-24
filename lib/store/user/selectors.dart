@@ -67,9 +67,7 @@ String formatUsername(User user) {
 }
 
 String safeUserId(User? user) {
-  return user != null
-      ? user.userId ?? Values.defaultUserId
-      : Values.defaultUserId;
+  return user != null ? user.userId ?? Values.defaultUserId : Values.defaultUserId;
 }
 
 String formatUserInitials(User? user) {
@@ -92,7 +90,6 @@ List<User?> searchUsersLocal(
 
   return List.from(users.where(
     (user) =>
-        (user!.displayName ?? '').contains(searchText) ||
-        (user.userId ?? '').contains(searchText),
+        (user!.displayName ?? '').contains(searchText) || (user.userId ?? '').contains(searchText),
   ));
 }

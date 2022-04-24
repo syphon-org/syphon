@@ -70,10 +70,13 @@ class Strings {
   static final titleDialogDraftPreview = tr('title-dialog-draft-preview');
   static final titleDialogLogout = tr('title-dialog-logout');
   static final titleDialogSyncInterval = tr('title-dialog-sync-interval');
-  static String titleDialogChatWithUser(String? username) => tr('title-dialog-chat-with-user', args: ['$username']);
-  static String titleDialogAttemptChatWithUser(String? username) => tr('title-dialog-attempt-chat-with-user', args: ['$username']);
+  static String titleDialogChatWithUser(String? username) =>
+      tr('title-dialog-chat-with-user', args: ['$username']);
+  static String titleDialogAttemptChatWithUser(String? username) =>
+      tr('title-dialog-attempt-chat-with-user', args: ['$username']);
   static final titleDialogConfirmDeactivateAccount = tr('title-dialog-confirm-deactivate-account');
-  static final titleDialogConfirmDeactivateAccountFinal = tr('title-dialog-confirm-deactivate-account-final');
+  static final titleDialogConfirmDeactivateAccountFinal =
+      tr('title-dialog-confirm-deactivate-account-final');
   static final titleDialogBackupSessionKeys = tr('title-dialog-backup-session-keys');
   static final titleDialogRemoveScreenLock = tr('title-dialog-remove-screen-lock');
   static final titleDialogEnterScreenLockPin = tr('title-dialog-enter-screen-lock-pin');
@@ -167,7 +170,8 @@ class Strings {
   static final listItemSettingsSyncToggle = tr('list-item-settings-sync-toggle');
 
   static final listItemSettingsLanguage = tr('list-item-settings-language');
-  static final listItemSettingsShowMembershipEvents = tr('list-item-settings-show-membership-events');
+  static final listItemSettingsShowMembershipEvents =
+      tr('list-item-settings-show-membership-events');
   static final listItemSettingsEnterSends = tr('list-item-settings-enter-sends');
   static final listItemSettings24hFormat = tr('list-item-settings-24h-format');
   static final listItemSettingsDismissKeyboard = tr('list-item-settings-dismiss-keyboard');
@@ -175,10 +179,10 @@ class Strings {
   static final listItemSettingsGroupBy = tr('list-item-settings-group-by');
   static final listItemSettingsViewUploadedMedia = tr('list-item-settings-view-uploaded-media');
   static final listItemSettingsAutoDownload = tr('list-item-settings-auto-download');
-  static final listItemSettingsWhenUsingMobileData = tr('list-item-settings-when-using-mobile-data');
+  static final listItemSettingsWhenUsingMobileData =
+      tr('list-item-settings-when-using-mobile-data');
   static final listItemSettingsWhenUsingWiFi = tr('list-item-settings-when-using-wi-fi');
   static final listItemSettingsWhenRoaming = tr('list-item-settings-when-roaming');
-
 
   static final listItemSettingsManualSync = tr('list-item-settings-manual-sync');
   static final listItemSettingsForceFullSync = tr('list-item-settings-force-full-sync');
@@ -348,8 +352,10 @@ class Strings {
   static final contentNotificationStyleTypeItemized =
       tr('content-notification-style-type-itemized');
 
-  static final contentImportSessionKeysEnterPassword = tr('content-import-session-keys-enter-password');
-  static final contentExportSessionKeysEnterPassword = tr('content-export-session-keys-enter-password');
+  static final contentImportSessionKeysEnterPassword =
+      tr('content-import-session-keys-enter-password');
+  static final contentExportSessionKeysEnterPassword =
+      tr('content-export-session-keys-enter-password');
   static final contentImportSessionKeys = tr('content-import-session-keys');
   static final contentExportSessionKeys = tr('content-export-session-keys');
 

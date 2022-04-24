@@ -7,7 +7,6 @@ class ToggleProxy {}
 
 class ToggleProxyAuthentication {}
 
-
 ///
 /// Toggle HTTP Proxying
 ///

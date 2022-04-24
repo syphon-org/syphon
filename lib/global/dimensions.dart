@@ -78,8 +78,7 @@ class Dimensions {
   static const double paddingContainer = 16;
 
   // Padding EdgeInsets
-  static const modalEdgeInsets =
-      EdgeInsets.symmetric(vertical: 12, horizontal: 24);
+  static const modalEdgeInsets = EdgeInsets.symmetric(vertical: 12, horizontal: 24);
 
   static const inputContentPadding = EdgeInsets.symmetric(
     vertical: 4.0,

@@ -444,11 +444,14 @@ Future<bool> homeserverSupportsEphemeralMessages(Store<AppState> store) async {
 
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
-    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
+    final readReceiptsIndex =
+        ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
 
-    final nextReceipt = ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
+    final nextReceipt =
+        ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
 
-    if (nextReceipt != ReadReceiptTypes.Hidden) { //short-out
+    if (nextReceipt != ReadReceiptTypes.Hidden) {
+      //short-out
       return store.dispatch(SetReadReceipts(
         readReceipts: nextReceipt,
       ));
@@ -461,8 +464,8 @@ ThunkAction<AppState> incrementReadReceipts() {
     }
 
     return store.dispatch(SetReadReceipts(
-      readReceipts: ReadReceiptTypes.values[(readReceiptsIndex + 2) %
-          ReadReceiptTypes.values.length],
+      readReceipts:
+          ReadReceiptTypes.values[(readReceiptsIndex + 2) % ReadReceiptTypes.values.length],
     ));
   };
 }

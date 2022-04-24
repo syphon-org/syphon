@@ -228,12 +228,14 @@ class MessageWidget extends StatelessWidget {
   onViewFullscreen(
     BuildContext context, {
     required Uint8List bytes,
+    required String? eventId,
+    required String? roomId,
     String filename = 'Matrix Image',
   }) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => MediaFullScreen(title: filename, bytes: bytes),
+        builder: (_) => MediaFullScreen(title: filename, bytes: bytes, eventId: eventId, roomId: roomId,),
       ),
     );
   }
@@ -547,7 +549,7 @@ class MessageWidget extends StatelessWidget {
                                         fit: BoxFit.cover,
                                         rebuild: true,
                                         onPressImage: (Uint8List bytes) =>
-                                            onViewFullscreen(context, filename: body, bytes: bytes),
+                                            onViewFullscreen(context, filename: body, bytes: bytes, eventId: message.id, roomId: message.roomId),
                                         width: Dimensions.mediaSizeMaxMessage,
                                         height: Dimensions.mediaSizeMaxMessage,
                                         fallbackColor: Colors.transparent,
