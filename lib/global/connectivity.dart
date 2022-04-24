@@ -3,14 +3,9 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectionService {
-  static bool checked = false;
+  static ConnectivityResult? lastStatus;
   static ConnectivityResult? currentStatus;
   static StreamSubscription<ConnectivityResult>? connectivity;
-
-  static Future<bool> checkConnected() async {
-    currentStatus = await Connectivity().checkConnectivity();
-    return currentStatus != ConnectivityResult.none;
-  }
 
   static bool isConnected() {
     return currentStatus != null && currentStatus != ConnectivityResult.none;
@@ -22,7 +17,6 @@ class ConnectionService {
     currentStatus = await Connectivity().checkConnectivity();
 
     return connectivity = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      checked = false;
       currentStatus = result;
     });
   }

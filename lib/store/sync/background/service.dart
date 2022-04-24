@@ -6,12 +6,14 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/settings/proxy-settings/model.dart';
 import 'package:syphon/store/sync/background/model.dart';
 import 'package:syphon/store/sync/background/parsers.dart';
 import 'package:syphon/store/sync/background/requests.dart';
@@ -30,6 +32,7 @@ class BackgroundSync {
   static const lastSinceKey = 'lastSince';
   static const roomNamesKey = 'roomNamesKey';
   static const currentUserKey = 'currentUserKey';
+  static const proxySettingsKey = 'proxySettingsKey';
   static const notificationSettingsKey = 'notificationSettings';
   static const notificationsUncheckedKey = 'notificationsUnchecked';
 
@@ -48,6 +51,7 @@ class BackgroundSync {
     User? currentUser,
     Map<String, String?>? roomNames,
     NotificationSettings? settings,
+    ProxySettings? proxySettings,
   }) async {
     // android only background sync
     if (!Platform.isAndroid) return;
@@ -64,8 +68,9 @@ class BackgroundSync {
     await Future.wait([
       secureStorage.write(key: BackgroundSync.protocolKey, value: protocol),
       secureStorage.write(key: BackgroundSync.roomNamesKey, value: jsonEncode(roomNames)),
-      secureStorage.write(key: BackgroundSync.notificationSettingsKey, value: jsonEncode(settings)),
       secureStorage.write(key: BackgroundSync.currentUserKey, value: jsonEncode(currentUser)),
+      secureStorage.write(key: BackgroundSync.proxySettingsKey, value: jsonEncode(proxySettings)),
+      secureStorage.write(key: BackgroundSync.notificationSettingsKey, value: jsonEncode(settings)),
     ]);
 
     await AndroidAlarmManager.periodic(
@@ -97,9 +102,7 @@ class BackgroundSync {
 /// Same as below, but works in compute / isolates outside alarm_services
 ///
 /// TODO: not working off main thread - due to secure storage and flutter widget binding
-Future notificationJobThreaded(Map params) async {
-  return notificationJob();
-}
+Future notificationJobThreaded(Map params) async => notificationJob();
 
 ///
 /// Notification Job (Android Only)
@@ -114,16 +117,29 @@ Future notificationJob() async {
     User currentUser;
     String? protocol;
     String? lastSince;
+    ProxySettings proxySettings;
 
     try {
       final secureStorage = FlutterSecureStorage();
       protocol = await secureStorage.read(key: BackgroundSync.protocolKey);
       lastSince = await secureStorage.read(key: BackgroundSync.lastSinceKey);
-
+      final _proxySettingsString = await secureStorage.read(key: BackgroundSync.proxySettingsKey);
       final _userString = await secureStorage.read(key: BackgroundSync.currentUserKey);
       currentUser = User.fromJson(jsonDecode(_userString ?? '{}'));
+      proxySettings = ProxySettings.fromJson(jsonDecode(_proxySettingsString ?? '{}'));
     } catch (error) {
       return log.threaded('[notificationJob] decode error $error');
+    }
+
+    if (proxySettings.enabled) {
+      try {
+        httpClient = createClient(proxySettings: proxySettings);
+      } catch (error) {
+        log.error(error.toString());
+        throw Exception(
+          'Failed to initialize proxy settings, aborting background notifications service',
+        );
+      }
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
