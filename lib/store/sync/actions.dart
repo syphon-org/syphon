@@ -107,10 +107,15 @@ ThunkAction<AppState> startSyncObserver() {
       var backoff = store.state.syncStore.backoff;
 
       if (backoff != 0) {
-        if (backoff > 5 && ConnectionService.isConnected()) {
-          ConnectionService.checked = true;
+        final lastStatus = ConnectionService.lastStatus;
+        final currentStatus = ConnectionService.currentStatus;
+        final hasChanged = lastStatus != currentStatus;
+
+        if (backoff > 5 && hasChanged && ConnectionService.isConnected()) {
           backoff = 0;
         }
+
+        ConnectionService.lastStatus = ConnectionService.currentStatus;
       }
 
       if (backoff != 0) {
@@ -296,11 +301,12 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         printInfo('[fetchSync] *** full sync completed ***');
       }
     } catch (error) {
-      store.dispatch(SetOffline(offline: true));
       printError('[fetchSync] error ${error.toString()}');
 
       final backoff = store.state.syncStore.backoff;
       final nextBackoff = backoff != 0 ? backoff + 1 : 5;
+
+      store.dispatch(SetOffline(offline: true));
       store.dispatch(SetBackoff(backoff: nextBackoff));
       store.dispatch(SetSyncing(syncing: false));
     } finally {

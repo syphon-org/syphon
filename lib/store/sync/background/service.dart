@@ -21,7 +21,6 @@ import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/sync/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
-
 /// Background Sync Service (Android Only)
 /// static class for managing service through app lifecycle
 class BackgroundSync {
@@ -137,7 +136,9 @@ Future notificationJob() async {
         httpClient = createClient(proxySettings: proxySettings);
       } catch (error) {
         log.error(error.toString());
-        throw Exception('Failed to initialize proxy settings, aborting background notifications service')
+        throw Exception(
+          'Failed to initialize proxy settings, aborting background notifications service',
+        );
       }
     }
 
