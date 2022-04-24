@@ -88,7 +88,8 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
       }
 
       if (identityUrl != null) {
-        identityUrl = (response['m.identity_server']['base_url'] as String).replaceAll('https://', '');
+        identityUrl =
+            (response['m.identity_server']['base_url'] as String).replaceAll('https://', '');
       }
 
       return homeserver.copyWith(

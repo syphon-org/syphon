@@ -335,5 +335,6 @@
     "alert-log-out-enable-multiaccount": "Devi uscire dalla tua sessione\\ncorrente per abilitare i multiaccount",
     "content-import-session-keys-enter-password": "Inserisci la password per questa importazione di chiavi di sessione.",
     "semantics-image-password-update": "Utente che pensa a una password in un turbine di vento",
-    "content-logout-multiaccount-confirm": "\n\nDato che hai altri account, il logout ti farà passare a un'altra sessione di account."
+    "content-logout-multiaccount-confirm": "\n\nDato che hai altri account, il logout ti farà passare a un'altra sessione di account.",
+    "alert-copied-to-clipboard": "Copiato negli appunti"
 }

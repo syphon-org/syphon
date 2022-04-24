@@ -10,6 +10,5 @@ class MatrixErrors {
 }
 
 class MatrixErrorsSoft {
-  static const String terms_and_conditions =
-      'agree to our terms and conditions';
+  static const String terms_and_conditions = 'agree to our terms and conditions';
 }

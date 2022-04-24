@@ -69,7 +69,8 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
       setState(() {
         encryption = false;
       });
-    } else { // If toggling the encryption on, show warning
+    } else {
+      // If toggling the encryption on, show warning
       return showDialog(
         context: context,
         barrierDismissible: false,

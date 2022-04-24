@@ -1,8 +1,7 @@
 import './actions.dart';
 import './model.dart';
 
-AlertsStore alertsReducer(
-    [AlertsStore state = const AlertsStore(), dynamic action]) {
+AlertsStore alertsReducer([AlertsStore state = const AlertsStore(), dynamic action]) {
   switch (action.runtimeType) {
     case SetLoading:
       return state.copyWith(loading: action.loading);
@@ -14,9 +13,7 @@ AlertsStore alertsReducer(
       return state.copyWith(alerts: alerts);
     case RemoveAlert:
       List<Alert> alerts = List<Alert>.from(state.alerts);
-      alerts = alerts
-          .where((alert) => alert.message != action.alert.message)
-          .toList();
+      alerts = alerts.where((alert) => alert.message != action.alert.message).toList();
       return state.copyWith(alerts: alerts);
     default:
       return state;

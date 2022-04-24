@@ -35,8 +35,7 @@ class Colours {
 
   static Color hashedColor(String? string) {
     final hashable = string ?? Values.defaultUserId;
-    final int hash =
-        hashable.codeUnits.reduce((value, element) => value + element);
+    final int hash = hashable.codeUnits.reduce((value, element) => value + element);
     return Colours.chatColors[hash % Colours.chatColors.length];
   }
 

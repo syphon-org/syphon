@@ -57,8 +57,7 @@ ThunkAction<AppState> sendReadReceipts({
           roomId: room!.id,
           messageId: message!.id,
         );
-      }
-      else {
+      } else {
         data = await MatrixApi.sendReadReceipts(
           protocol: store.state.authStore.protocol,
           accessToken: store.state.authStore.user.accessToken,

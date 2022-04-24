@@ -7,12 +7,10 @@ bool selectSyncingStatus(AppState state) {
   final backgrounded = state.syncStore.backgrounded;
   final loadingRooms = state.roomStore.loading;
 
-  final lastAttempt =
-      DateTime.fromMillisecondsSinceEpoch(state.syncStore.lastAttempt ?? 0);
+  final lastAttempt = DateTime.fromMillisecondsSinceEpoch(state.syncStore.lastAttempt ?? 0);
 
   // See if the last attempted sy nc is older than 60 seconds
-  final isLastAttemptOld =
-      DateTime.now().difference(lastAttempt).compareTo(Duration(seconds: 90));
+  final isLastAttemptOld = DateTime.now().difference(lastAttempt).compareTo(Duration(seconds: 90));
 
   // syncing for the first time
   if (syncing && !synced) {

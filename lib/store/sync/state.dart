@@ -81,6 +81,5 @@ class SyncStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$SyncStoreToJson(this);
 
-  factory SyncStore.fromJson(Map<String, dynamic> json) =>
-      _$SyncStoreFromJson(json);
+  factory SyncStore.fromJson(Map<String, dynamic> json) => _$SyncStoreFromJson(json);
 }

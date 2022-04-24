@@ -408,14 +408,15 @@ abstract class Events {
     String? lastRead,
     bool readAll = true,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/receipt/m.read.private/$messageId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/receipt/m.read.private/$messageId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    final Map body = { };
+    final Map body = {};
 
     final response = await httpClient.post(
       Uri.parse(url),
@@ -435,8 +436,7 @@ abstract class Events {
     String? roomId,
     String? eventId,
     String? txnId,
-
-  })async{
+  }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/';
 
     final Map<String, String> headers = {
@@ -446,11 +446,11 @@ abstract class Events {
 
     final Map body = {};
 
-    final response = await httpClient.put(Uri.parse(url), headers:  headers, body: json.encode(body));
+    final response =
+        await httpClient.put(Uri.parse(url), headers: headers, body: json.encode(body));
 
     return await json.decode(
       response.body,
     );
   }
-
 }
