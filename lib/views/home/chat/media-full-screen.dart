@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:photo_view/photo_view.dart';
-import 'package:redux/redux.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/strings.dart';
@@ -12,7 +11,6 @@ import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
-
 
 class MediaFullScreen extends StatelessWidget {
   final String title;
@@ -33,36 +31,37 @@ class MediaFullScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(icon: Icon(Icons.download),
-              color: computeContrastColorText(
-                Theme.of(context).appBarTheme.backgroundColor,
-              ),
-              onPressed:  () async {
-                  final store = StoreProvider.of<AppState>(context);
-                  store.dispatch(addInfo(message: Strings.alertFeatureInProgress));
-              }
-          ),
-          IconButton(icon: Icon(Icons.share),
+          IconButton(
+              icon: Icon(Icons.download),
               color: computeContrastColorText(
                 Theme.of(context).appBarTheme.backgroundColor,
               ),
               onPressed: () async {
-                await Share.share(MatrixApi.buildMessageUrl(roomId: roomId,eventId: eventId));
-              }
-          ),
+                final store = StoreProvider.of<AppState>(context);
+                store.dispatch(addInfo(message: Strings.alertFeatureInProgress));
+              }),
+          IconButton(
+              icon: Icon(Icons.share),
+              color: computeContrastColorText(
+                Theme.of(context).appBarTheme.backgroundColor,
+              ),
+              onPressed: () async {
+                await Share.share(MatrixApi.buildMessageUrl(roomId: roomId, eventId: eventId));
+              }),
         ],
-        title: Text(
-            title,
+        title: Text(title,
             style: TextStyle(
               color: computeContrastColorText(
                 Theme.of(context).appBarTheme.backgroundColor,
-              ),)
-        ),
+              ),
+            )),
         leading: IconButton(
           onPressed: () => {
             Navigator.of(context).pop(),
           },
-          icon: Icon(Icons.arrow_back_outlined,),
+          icon: Icon(
+            Icons.arrow_back_outlined,
+          ),
           color: computeContrastColorText(
             Theme.of(context).appBarTheme.backgroundColor,
           ),
