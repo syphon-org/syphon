@@ -69,3 +69,7 @@ Flutter.podspec
 
 # generated shared lib artifacts for iOS
 **/dgph
+
+# testing files
+
+testing*

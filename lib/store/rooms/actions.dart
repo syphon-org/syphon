@@ -306,6 +306,7 @@ ThunkAction<AppState> fetchRoomMembers({
 /// otherwise it will appear like the room does
 /// not exist for the seconds between the response from
 /// matrix and caching in the app
+///
 ThunkAction<AppState> createRoom({
   String? name,
   String? alias,
@@ -345,16 +346,6 @@ ThunkAction<AppState> createRoom({
       // Create a room object with a new room id
       room = Room(id: data['room_id']);
 
-      // Add invites to the user list beforehand
-      final userInviteMap = Map<String, User>.fromIterable(
-        invites,
-        key: (user) => user.userId,
-        value: (user) => user,
-      );
-
-      // generate user invite map to cache recent users
-      room = room.copyWith(usersTEMP: userInviteMap);
-
       if (isDirect) {
         final User directUser = invites[0];
         room = room.copyWith(
@@ -365,11 +356,6 @@ ThunkAction<AppState> createRoom({
             directUser.userId!,
             currentUser.userId!,
           ] as List<String>,
-          // ignore: unnecessary_cast
-          usersTEMP: {
-            directUser.userId!: directUser,
-            currentUser.userId!: currentUser,
-          } as Map<String, User>,
         );
 
         await store.dispatch(toggleDirectRoom(room: room, enabled: true));

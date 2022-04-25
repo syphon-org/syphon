@@ -160,6 +160,7 @@ Future<Store<AppState>> initStore(
     storage: CacheStorage(cache: cache),
     serializer: CacheSerializer(cache: cache, preloaded: preloaded),
     shouldSave: cacheMiddleware,
+    throttleDuration: Duration(milliseconds: 500),
   );
 
   // Finally load persisted store

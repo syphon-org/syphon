@@ -54,11 +54,9 @@ class Room implements drift.Insertable<Room> {
   final Message? draft;
   final Message? reply;
 
-  // Associated user ids - TODO: remove
+  // Associated user ids
+  // TODO: remove by adding pivot table in cold storage
   final List<String> userIds;
-
-  @JsonKey(ignore: true) // TODO: remove
-  final Map<String, User> usersTEMP;
 
   @JsonKey(ignore: true)
   final bool userTyping;
@@ -108,7 +106,6 @@ class Room implements drift.Insertable<Room> {
     this.draft,
     this.reply,
     this.userIds = const [],
-    this.usersTEMP = const {},
     this.lastRead = 0,
     this.lastUpdate = 0,
     this.namePriority = 4,
@@ -184,7 +181,6 @@ class Room implements drift.Insertable<Room> {
         lastBatch: lastBatch ?? this.lastBatch,
         prevBatch: prevBatch ?? this.prevBatch,
         nextBatch: nextBatch ?? this.nextBatch,
-        usersTEMP: usersTEMP ?? this.usersTEMP,
       );
 
   Map<String, dynamic> toJson() => _$RoomToJson(this);

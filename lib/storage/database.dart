@@ -172,10 +172,6 @@ Future<DriftIsolate> spawnDatabaseIsolate(AppContext context, {String pin = Valu
   return await receivePort.first as DriftIsolate;
 }
 
-///
-/// TODO: needs to work with multiaccounts
-/// https://drift.simonbinder.eu/docs/advanced-features/isolates/
-///
 StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.empty}) {
   final connection = DatabaseConnection.delayed(
     () async {
