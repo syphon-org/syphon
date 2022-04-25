@@ -326,8 +326,8 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
 ThunkAction<AppState> syncRooms(Map roomData) {
   return (Store<AppState> store) async {
     // init new store containers
-    final rooms = store.state.roomStore.rooms;
     final user = store.state.authStore.user;
+    final rooms = store.state.roomStore.rooms;
     final synced = store.state.syncStore.synced;
     final lastSince = store.state.syncStore.lastSince;
 
@@ -346,7 +346,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
           'room': roomOld,
           'currentUser': user,
           'lastSince': lastSince,
-          'existingMessages': messagesOld.map((m) => m.id ?? '').toList(),
+          'existingMessagesIds': messagesOld.map((m) => m.id ?? '').toList(),
         });
 
         // overwrite room with updated one from sync
@@ -354,10 +354,10 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
         printInfo(
           // ignore: prefer_interpolation_to_compose_strings
-          '[syncRooms] ${roomSynced.name} ' +
-              'full_synced: $synced ' +
-              'limited: ${roomSynced.limited} ' +
-              'total new messages: ${sync.messages.length} ' +
+          '[syncRooms] ${roomSynced.name} |' +
+              'full_synced: $synced | ' +
+              'limited: ${roomSynced.limited} | ' +
+              'total new messages: ${sync.messages.length} | ' +
               'roomPrevBatch: ${roomSynced.prevBatch}',
         );
 
