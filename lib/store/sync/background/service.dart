@@ -261,19 +261,47 @@ Future backgroundSync({
       // Don't parse room if there are no message events found
       final events = parseEvents(roomJson);
 
+      // TODO: use the same parsing methods across threads
+      // final sync = parseSync(
+      //   roomJson,
+      //   Room(id: roomId),
+      //   User(userId: currentUserId),
+      //   lastSince,
+      //   [], // existing ids
+      //   ignoreMessageless: true,
+      // );
+      // final room = sync.room;
+
       if (events.messages.isEmpty) {
         return;
       }
 
-      final details = parseDetails(roomJson);
+      final currentRoom = Room(id: roomId);
+      final currentUser = User(userId: currentUserId);
+      final details = parseDetails(
+        roomJson,
+      );
 
-      final room = Room(id: roomId).fromEvents(
-        events: events,
-        currentUser: User(userId: currentUserId),
-        lastSince: lastSince,
-        limited: details.limited,
-        lastBatch: details.lastBatch,
+      final stateDetails = parseState(
+        currentUser: currentUser,
+        events: events.state,
+        room: currentRoom,
+      );
+
+      final messageDetails = parseMessages(
+        existingIds: [],
+        room: currentRoom,
+        messages: events.messages,
         prevBatch: details.prevBatch,
+      );
+
+      final room = currentRoom.fromSync(
+        lastSince: lastSince,
+        accountData: SyncAccountData(),
+        stateDetails: stateDetails,
+        messageDetails: messageDetails,
+        ephemerals: SyncEphemerals(),
+        details: details,
       );
 
       final chatOptions = settings.notificationOptions;

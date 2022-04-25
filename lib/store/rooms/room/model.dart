@@ -219,7 +219,7 @@ class Room implements drift.Insertable<Room> {
   Room fromSync({
     required String? lastSince,
     required SyncAccountData accountData,
-    required SyncStateDetails state,
+    required SyncStateDetails stateDetails,
     required SyncMessageDetails messageDetails,
     required SyncEphemerals ephemerals,
     required SyncDetails details,
@@ -232,13 +232,13 @@ class Room implements drift.Insertable<Room> {
       // most recent prev_batch from the last /sync
       prevBatch: details.prevBatch, // TODO: fetchMessages makes this temporarily misassigned
 
-      name: state.name,
-      topic: state.topic,
-      direct: accountData.direct ?? state.direct ?? this.direct,
-      avatarUri: state.avatarUri,
-      joinRule: state.joinRule,
-      namePriority: state.namePriority,
-      lastUpdate: messageDetails.lastUpdate ?? state.lastUpdate,
+      name: stateDetails.name,
+      topic: stateDetails.topic,
+      direct: accountData.direct ?? stateDetails.direct ?? this.direct,
+      avatarUri: stateDetails.avatarUri,
+      joinRule: stateDetails.joinRule,
+      namePriority: stateDetails.namePriority,
+      lastUpdate: messageDetails.lastUpdate ?? stateDetails.lastUpdate,
       limited: details.limited ?? messageDetails.limited,
       encryptionEnabled: this.encryptionEnabled || (messageDetails.encryptionEnabled ?? false),
       userTyping: ephemerals.userTyping,
@@ -247,7 +247,7 @@ class Room implements drift.Insertable<Room> {
       lastRead: ephemerals.lastRead,
 
       // TODO: extract to pivot table for userIds associated by room
-      userIds: (state.userIds ?? {}).toList(),
+      userIds: (stateDetails.userIds ?? {}).toList(),
     );
   }
 

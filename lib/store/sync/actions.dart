@@ -341,7 +341,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
         final roomOld = rooms.containsKey(roomId) ? rooms[roomId]! : Room(id: roomId);
         final messagesOld = store.state.eventStore.messages[roomId] ?? [];
 
-        final sync = await compute(parseSync, {
+        final sync = await compute(parseSyncThreaded, {
           'json': json,
           'room': roomOld,
           'currentUser': user,

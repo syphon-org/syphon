@@ -133,6 +133,27 @@ class SyncEphemerals {
 }
 
 ///
+/// Parse Sync (Threaded)
+///
+/// Parse Sync but isolate safe
+///
+Future<Sync> parseSyncThreaded(Map params) async {
+  final json = params['json'] as Map<String, dynamic>;
+  final Room roomExisting = params['room'];
+  final User currentUser = params['currentUser'];
+  final String? lastSince = params['lastSince'];
+  final List<String> existingIds = params['existingMessagesIds'];
+
+  return parseSync(
+    json,
+    roomExisting,
+    currentUser,
+    lastSince,
+    existingIds,
+  );
+}
+
+///
 /// Parse Sync
 ///
 /// Not all events are needed to derive new information about the room
@@ -140,13 +161,14 @@ class SyncEphemerals {
 /// Existing messages are used to check if a room has backfilled to a
 /// previously known position of chat / messages
 ///
-Sync parseSync(Map params) {
-  final json = params['json'] as Map<String, dynamic>;
-  final Room roomExisting = params['room'];
-  final User currentUser = params['currentUser'];
-  final String? lastSince = params['lastSince'];
-  final List<String> existingIds = params['existingMessagesIds'];
-
+Sync parseSync(
+  final Map<String, dynamic> json,
+  final Room roomExisting,
+  final User currentUser,
+  final String? lastSince,
+  final List<String> existingIds, {
+  final ignoreMessageless = false,
+}) {
   final details = parseDetails(json);
 
   final events = parseEvents(
@@ -160,6 +182,10 @@ Sync parseSync(Map params) {
     printInfo(
       '[parseSync] ${roomExisting.id} limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
     );
+  }
+
+  if (ignoreMessageless) {
+    if (events.messages.isEmpty) return Sync(room: roomExisting);
   }
 
   final accountData = parseAccountData(
@@ -188,7 +214,7 @@ Sync parseSync(Map params) {
   final roomUpdated = roomExisting.fromSync(
     lastSince: lastSince,
     accountData: accountData,
-    state: stateDetails,
+    stateDetails: stateDetails,
     messageDetails: messageDetails,
     ephemerals: ephemerals,
     details: details,
