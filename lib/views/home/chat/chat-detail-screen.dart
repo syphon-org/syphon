@@ -53,10 +53,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
     initialScrollOffset: 0,
   );
 
-  final double headerSize = 54;
-
   double headerOpacity = 1;
-  List<User>? usersList;
 
   @override
   void initState() {

@@ -26,46 +26,47 @@ class MediaFullScreen extends StatelessWidget {
     required this.eventId,
   }) : super(key: key);
 
+  onPressDownload(BuildContext context) async {
+    final store = StoreProvider.of<AppState>(context);
+    store.dispatch(addInfo(message: Strings.alertFeatureInProgress));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = computeContrastColorText(
+      Theme.of(context).appBarTheme.backgroundColor,
+    );
+
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
-              icon: Icon(Icons.download),
-              color: computeContrastColorText(
-                Theme.of(context).appBarTheme.backgroundColor,
-              ),
-              onPressed: () async {
-                final store = StoreProvider.of<AppState>(context);
-                store.dispatch(addInfo(message: Strings.alertFeatureInProgress));
-              }),
+            icon: Icon(Icons.download),
+            color: backgroundColor,
+            onPressed: () => onPressDownload(context),
+          ),
           IconButton(
               icon: Icon(Icons.share),
-              color: computeContrastColorText(
-                Theme.of(context).appBarTheme.backgroundColor,
-              ),
+              color: backgroundColor,
               onPressed: () async {
-                await Share.share(MatrixApi.buildMessageUrl(roomId: roomId, eventId: eventId));
+                await Share.share(MatrixApi.buildMessageUrl(
+                  roomId: roomId,
+                  eventId: eventId,
+                ));
               }),
         ],
         title: Text(title,
             style: TextStyle(
-              color: computeContrastColorText(
-                Theme.of(context).appBarTheme.backgroundColor,
-              ),
+              color: backgroundColor,
             )),
         leading: IconButton(
-          onPressed: () => {
-            Navigator.of(context).pop(),
-          },
-          icon: Icon(
-            Icons.arrow_back_outlined,
-          ),
-          color: computeContrastColorText(
-            Theme.of(context).appBarTheme.backgroundColor,
-          ),
-        ),
+            onPressed: () => {
+                  Navigator.of(context).pop(),
+                },
+            icon: Icon(
+              Icons.arrow_back_outlined,
+            ),
+            color: backgroundColor),
       ),
       body: PhotoView(
         // Allow zooming in up to double the image size

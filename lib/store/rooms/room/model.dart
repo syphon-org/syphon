@@ -220,7 +220,7 @@ class Room implements drift.Insertable<Room> {
     required SyncEphemerals ephemerals,
     required SyncDetails details,
   }) {
-    return copyWith(
+    return this.copyWith(
       // next hash in the timeline
       nextBatch: lastSince,
       // oldest hash in the timeline
@@ -230,7 +230,7 @@ class Room implements drift.Insertable<Room> {
 
       name: stateDetails.name,
       topic: stateDetails.topic,
-      direct: accountData.direct ?? stateDetails.direct ?? this.direct,
+      direct: accountData.direct ?? stateDetails.direct,
       avatarUri: stateDetails.avatarUri,
       joinRule: stateDetails.joinRule,
       namePriority: stateDetails.namePriority,

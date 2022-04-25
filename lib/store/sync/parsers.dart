@@ -551,8 +551,13 @@ SyncStateDetails parseState({
             );
           }
 
-          if (membership == 'leave') {
-            userIdsRemove.add(event.stateKey!);
+          switch (membership) {
+            case 'ban':
+            case 'leave':
+              userIdsRemove.add(event.stateKey!);
+              break;
+            default:
+              break;
           }
 
           break;

@@ -226,6 +226,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                       selectedMessageId: selectedMessageId,
                       avatarUri: avatarUri,
                       displayName: displayName,
+                      currentName: props.currentUser.userId,
                       themeType: props.themeType,
                       color: props.chatColorPrimary ?? color,
                       luminance: luminance,
