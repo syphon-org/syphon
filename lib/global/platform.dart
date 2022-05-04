@@ -10,7 +10,6 @@ import 'package:path_provider_linux/path_provider_linux.dart';
 import 'package:sqlite3/open.dart';
 import 'package:syphon/global/libs/storage/secure-storage.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
 /// TODO: move database DynamicLibrary init here
@@ -22,16 +21,6 @@ import 'package:syphon/store/sync/background/service.dart';
 /// to run Syphon on a specific platform
 ///
 Future<void> initPlatformDependencies() async {
-  // disable debugPrint when in release mode
-
-  if (!DEBUG_MODE) {
-    debugPrint = (String? message, {int? wrapWidth}) {};
-    printDebug = (String message, {String? title}) {};
-    printInfo = (String message, {String? title}) {};
-    printError = (String message, {String? title}) {};
-    printJson = (Map? json) {};
-  }
-
   // init platform overrides for compatability with dart libs
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;

@@ -67,7 +67,7 @@ Future<int> loadTermsAgreement() async {
   try {
     return int.parse(await _storage.read(key: TERMS_OF_SERVICE_ACCEPTANCE_KEY) ?? '0');
   } catch (error) {
-    log.debug('WHAT?');
+    log.error(error.toString());
     return 0;
   }
 }

@@ -200,9 +200,7 @@ ThunkAction<AppState> fetchMessageEvents({
       ) as List<Message>;
 
       // known cached messages for this batch will be loaded
-      if (cached.isNotEmpty) {
-        return;
-      }
+      if (cached.isNotEmpty) return;
 
       final oldest = cached.isEmpty;
 

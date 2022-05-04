@@ -217,7 +217,7 @@ Sync parseSync(
     stateDetails: stateDetails,
     messageDetails: messageDetails,
     ephemerals: ephemerals,
-    details: details,
+    syncDetails: details,
   );
 
   return Sync(

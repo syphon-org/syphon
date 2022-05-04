@@ -301,7 +301,7 @@ Future backgroundSync({
         stateDetails: stateDetails,
         messageDetails: messageDetails,
         ephemerals: SyncEphemerals(),
-        details: details,
+        syncDetails: details,
       );
 
       final chatOptions = settings.notificationOptions;

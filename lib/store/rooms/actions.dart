@@ -151,7 +151,7 @@ ThunkAction<AppState> fetchRoom(
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      printError('[fetchRoom] $roomId $error');
+      log.error('[fetchRoom] $roomId $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }

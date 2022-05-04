@@ -218,28 +218,31 @@ class Room implements drift.Insertable<Room> {
     required SyncStateDetails stateDetails,
     required SyncMessageDetails messageDetails,
     required SyncEphemerals ephemerals,
-    required SyncDetails details,
+    required SyncDetails syncDetails,
   }) {
     return this.copyWith(
       // next hash in the timeline
       nextBatch: lastSince,
       // oldest hash in the timeline
-      lastBatch: details.lastBatch ?? this.lastBatch ?? details.prevBatch,
+      lastBatch: syncDetails.lastBatch ?? this.lastBatch ?? syncDetails.prevBatch,
       // most recent prev_batch from the last /sync
-      prevBatch: details.prevBatch, // TODO: fetchMessages makes this temporarily misassigned
+      prevBatch: syncDetails.prevBatch, // TODO: fetchMessages makes this temporarily misassigned
 
       name: stateDetails.name,
       topic: stateDetails.topic,
+      invite: syncDetails.invite,
       direct: accountData.direct ?? stateDetails.direct,
       avatarUri: stateDetails.avatarUri,
       joinRule: stateDetails.joinRule,
       namePriority: stateDetails.namePriority,
       lastUpdate: messageDetails.lastUpdate ?? stateDetails.lastUpdate,
-      limited: details.limited ?? messageDetails.limited,
-      encryptionEnabled: this.encryptionEnabled || (messageDetails.encryptionEnabled ?? false),
+      limited: syncDetails.limited ?? messageDetails.limited,
+      encryptionEnabled: this.encryptionEnabled ||
+          (stateDetails.encryptionEnabled ?? false) ||
+          (messageDetails.encryptionEnabled ?? false),
       userTyping: ephemerals.userTyping,
       usersTyping: ephemerals.usersTyping,
-      totalJoinedUsers: details.totalMembers,
+      totalJoinedUsers: syncDetails.totalMembers,
       lastRead: ephemerals.lastRead,
 
       // TODO: extract to pivot table for userIds associated by room
