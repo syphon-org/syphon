@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
@@ -36,6 +34,11 @@ import 'package:syphon/views/intro/signup/signup-screen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
 import 'home/settings/settings-intro-screen.dart';
+
+// helper hook for extracting navigation params
+T? useScreenArguments<T>(BuildContext context) {
+  return ModalRoute.of(context)?.settings.arguments as T;
+}
 
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

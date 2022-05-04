@@ -173,9 +173,7 @@ class ChatInputState extends State<ChatInput> {
         });
       });
     }
-    if (widget.onUpdateMessage != null) {
-      widget.onUpdateMessage!(text);
-    }
+    widget.onUpdateMessage?.call(text);
   }
 
   onToggleMediaOptions() {
@@ -201,16 +199,11 @@ class ChatInputState extends State<ChatInput> {
     setState(() {
       sendable = false;
     });
-
-    if (widget.onSubmitMessage != null) {
-      widget.onSubmitMessage!();
-    }
+    widget.onSubmitMessage?.call();
   }
 
   onCancelReply() {
-    if (widget.onCancelReply != null) {
-      widget.onCancelReply!();
-    }
+    widget.onCancelReply?.call();
   }
 
   onAddInProgress() {

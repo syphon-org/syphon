@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/sync/background/service.dart';
 
@@ -28,7 +29,7 @@ Future saveRoomNames({required Map<String, String> roomNames}) async {
       value: jsonEncode(roomNames),
     );
   } catch (error) {
-    print('[saveRoomNames] ${error.toString()}');
+    log.error('[saveRoomNames] ${error.toString()}');
   }
 }
 
@@ -50,7 +51,7 @@ Future<Map<String, String>> loadRoomNames() async {
       _initStorage();
       _secureStorage!.delete(key: BackgroundSync.roomNamesKey);
     } catch (error) {}
-    print('[loadRoomNames] ${error.toString()}');
+    log.error('[loadRoomNames] ${error.toString()}');
   }
 
   return <String, String>{};
@@ -69,7 +70,7 @@ Future saveLastSince({required String lastSince}) async {
     _initStorage();
     await _secureStorage!.write(key: BackgroundSync.lastSinceKey, value: lastSince);
   } catch (error) {
-    print('[saveLastSince] ${error.toString()}');
+    log.error('[saveLastSince] ${error.toString()}');
   }
 }
 
@@ -83,7 +84,7 @@ Future<String> loadLastSince({required String fallback}) async {
     _initStorage();
     return await _secureStorage!.read(key: BackgroundSync.lastSinceKey) ?? fallback;
   } catch (error) {
-    print('[loadLastSince] ${error.toString()}');
+    log.error('[loadLastSince] ${error.toString()}');
   }
 
   return fallback;
@@ -106,7 +107,7 @@ Future saveNotificationSettings({NotificationSettings? settings}) async {
       value: jsonEncode(settings),
     );
   } catch (error) {
-    print('[saveNotificationSettings] ${error.toString()}');
+    log.error('[saveNotificationSettings] ${error.toString()}');
   }
 }
 
@@ -128,7 +129,7 @@ Future<NotificationSettings> loadNotificationSettings(
 
     return NotificationSettings.fromJson(settingsJson);
   } catch (error) {
-    print('[loadNotificationSettings] ${error.toString()}');
+    log.error('[loadNotificationSettings] ${error.toString()}');
   }
 
   return fallback;
@@ -149,7 +150,7 @@ Future saveNotificationsUnchecked(Map<String, String> uncheckedMessages) async {
       value: jsonEncode(uncheckedMessages),
     );
   } catch (error) {
-    print('[saveNotificationsUnchecked] ${error.toString()}');
+    log.error('[saveNotificationsUnchecked] ${error.toString()}');
   }
 }
 
@@ -170,7 +171,7 @@ Future<Map<String, String>> loadNotificationsUnchecked() async {
 
     return Map<String, String>.from(uncheckedJson ?? {});
   } catch (error) {
-    print('[loadNotificationsUnchecked] ${error.toString()}');
+    log.error('[loadNotificationsUnchecked] ${error.toString()}');
   }
 
   return <String, String>{};

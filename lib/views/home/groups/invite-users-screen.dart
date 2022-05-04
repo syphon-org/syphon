@@ -20,6 +20,7 @@ import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-invite-users.dart';
@@ -145,9 +146,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   /// also attempts to invite users directly if a room id already exists
   ///
   onConfirmInvites(_Props props) async {
-    final InviteUsersArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
-    final roomId = arguments.roomId;
+    final arguments = useScreenArguments<InviteUsersArguments>(context);
+    final roomId = arguments?.roomId;
 
     if (roomId != null && invites.isNotEmpty) {
       await onSendInvites(props);
@@ -162,11 +162,10 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   ///
   onSendInvites(_Props props) async {
     FocusScope.of(context).unfocus();
-    final InviteUsersArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
+    final arguments = useScreenArguments<InviteUsersArguments>(context);
     final store = StoreProvider.of<AppState>(context);
 
-    final roomId = arguments.roomId;
+    final roomId = arguments?.roomId;
     final room = store.state.roomStore.rooms[roomId!];
 
     final multiple = invites.length > 1;

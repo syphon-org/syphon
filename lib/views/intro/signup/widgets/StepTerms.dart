@@ -54,12 +54,10 @@ class TermsStep extends StatelessWidget {
                           borderRadius: BorderRadius.circular(40),
                           color: const Color(Colours.cyanSyphon),
                         ),
-                        child: Container(
-                          child: Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 32,
-                          ),
+                        child: Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 32,
                         ),
                       ),
                     )
@@ -81,41 +79,39 @@ class TermsStep extends StatelessWidget {
                       style: Theme.of(context).textTheme.caption,
                     ),
                   ),
-                  Container(
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 24,
-                          ),
-                          child: Text(
-                            'Agree to Terms of Service',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline5,
-                          ),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 24,
                         ),
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: () {
-                              // TODO: show terms of service explaination dialog
-                            },
-                            child: Container(
-                              height: 20,
-                              width: 20,
-                              child: Icon(
-                                Icons.info_outline,
-                                color: Colors.white,
-                                size: 20,
-                              ),
+                        child: Text(
+                          'Agree to Terms of Service',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            // TODO: show terms of service explaination dialog
+                          },
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            child: Icon(
+                              Icons.info_outline,
+                              color: Colors.white,
+                              size: 20,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),

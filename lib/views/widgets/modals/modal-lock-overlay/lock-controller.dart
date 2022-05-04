@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:syphon/global/print.dart';
-
 class LockController {
   LockController();
 

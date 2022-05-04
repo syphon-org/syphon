@@ -190,7 +190,7 @@ class _Props extends Equatable {
         onCompleteCaptcha: (String token) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
-            value: token.toString(),
+            value: token,
           ));
           await store.dispatch(toggleCaptcha(completed: true));
         },

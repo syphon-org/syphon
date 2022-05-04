@@ -8,6 +8,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-color-picker.dart';
@@ -102,21 +103,20 @@ class UserProfileState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
-
-    // Confirm this is needed in chat details
-    final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
-    final contentPadding = Dimensions.listPaddingDynamic(width: width);
-
-    final UserProfileArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as UserProfileArguments;
+    final arguments = useScreenArguments<UserProfileArguments>(context)!;
 
     final user = arguments.user!;
     final userColor = Colours.hashedColor(user.userId);
     final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
         ? Color(Colours.greyLightest)
         : Theme.of(context).scaffoldBackgroundColor;
+
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
+    // Confirm this is needed in chat details
+    final titlePadding = Dimensions.listTitlePaddingDynamic(width: width);
+    final contentPadding = Dimensions.listPaddingDynamic(width: width);
 
     return StoreConnector<AppState, _Props>(
       distinct: true,

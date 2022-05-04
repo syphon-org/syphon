@@ -90,7 +90,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
   @override
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final arguments = ModalRoute.of(context)!.settings.arguments as ChatDetailsArguments?;
+    final arguments = useScreenArguments<ChatDetailsArguments>(context);
 
     if (arguments?.roomId == null) return;
 
@@ -496,37 +496,35 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                         ),
                       ),
                       CardSection(
-                        child: Container(
-                          child: Column(
-                            children: [
-                              Visibility(
-                                visible: props.room.direct,
-                                child: ListTile(
-                                  onTap: () => onBlockUser(
-                                    context: context,
-                                    props: props,
-                                  ),
-                                  contentPadding: contentPadding,
-                                  title: Text(
-                                    Strings.buttonBlockUser,
-                                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                                          color: Colors.redAccent,
-                                        ),
-                                  ),
+                        child: Column(
+                          children: [
+                            Visibility(
+                              visible: props.room.direct,
+                              child: ListTile(
+                                onTap: () => onBlockUser(
+                                  context: context,
+                                  props: props,
                                 ),
-                              ),
-                              ListTile(
-                                onTap: () => onLeaveChat(props),
                                 contentPadding: contentPadding,
                                 title: Text(
-                                  Strings.buttonLeaveChat,
+                                  Strings.buttonBlockUser,
                                   style: Theme.of(context).textTheme.subtitle1!.copyWith(
                                         color: Colors.redAccent,
                                       ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            ListTile(
+                              onTap: () => onLeaveChat(props),
+                              contentPadding: contentPadding,
+                              title: Text(
+                                Strings.buttonLeaveChat,
+                                style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                      color: Colors.redAccent,
+                                    ),
+                              ),
+                            ),
+                          ],
                         ),
                       )
                     ],

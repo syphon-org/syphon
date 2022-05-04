@@ -14,6 +14,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
@@ -45,10 +46,10 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
 
   @override
   onMounted() async {
-    final params = ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments;
+    final params = useScreenArguments<MediaPreviewArguments>(context);
 
     try {
-      final firstImage = params.mediaList.first;
+      final firstImage = params?.mediaList.first;
 
       setState(() {
         currentImage = firstImage;
@@ -60,9 +61,8 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
 
   @protected
   onConfirm(_Props props) async {
-    final params = ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments;
-
-    await params.onConfirmSend();
+    final params = useScreenArguments<MediaPreviewArguments>(context);
+    await params?.onConfirmSend();
     Navigator.pop(context);
   }
 
@@ -71,7 +71,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments).roomId,
+          useScreenArguments<MediaPreviewArguments>(context)?.roomId,
         ),
         builder: (context, props) {
           final encryptionEnabled = props.room.encryptionEnabled;

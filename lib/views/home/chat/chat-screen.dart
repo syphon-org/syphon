@@ -585,7 +585,7 @@ class ChatScreenState extends State<ChatScreen> {
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments).roomId,
+          useScreenArguments<ChatScreenArguments>(context)?.roomId,
         ),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;

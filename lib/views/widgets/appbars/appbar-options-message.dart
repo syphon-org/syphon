@@ -87,9 +87,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                 ),
                 tooltip: Strings.labelBack,
                 onPressed: () {
-                  if (widget.onDismiss != null) {
-                    widget.onDismiss!();
-                  }
+                  widget.onDismiss?.call();
                 },
               ),
             ),
@@ -110,9 +108,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                 ),
               );
 
-              if (widget.onDismiss != null) {
-                widget.onDismiss!();
-              }
+              widget.onDismiss?.call();
             },
           ),
           Visibility(
@@ -123,12 +119,8 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               tooltip: 'Delete Message',
               color: Colors.white,
               onPressed: () {
-                if (widget.onDelete != null) {
-                  widget.onDelete!();
-                }
-                if (widget.onDismiss != null) {
-                  widget.onDismiss!();
-                }
+                widget.onDelete?.call();
+                widget.onDismiss?.call();
               },
             ),
           ),
@@ -140,9 +132,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               tooltip: 'Edit Message',
               color: Colors.white,
               onPressed: () {
-                if (widget.onEdit != null) {
-                  widget.onEdit!();
-                }
+                widget.onEdit?.call();
               },
             ),
           ),
@@ -160,9 +150,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                   ),
                 );
 
-                if (widget.onDismiss != null) {
-                  widget.onDismiss!();
-                }
+                widget.onDismiss?.call();
               },
             ),
           ),

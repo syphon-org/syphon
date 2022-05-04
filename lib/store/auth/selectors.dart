@@ -1,6 +1,5 @@
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/store/index.dart';
 
 // Preauth

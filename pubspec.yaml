@@ -1,10 +1,10 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.13+2130
+version: 0.2.14+2140
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
-  flutter: 2.10.3
+  flutter: 2.10.5
 
 scripts:
   start: flutter run # -d <device_id>
@@ -106,6 +106,7 @@ dependencies:
   fab_circular_menu: ^1.0.2
   flutter_screen_lock: ^4.0.0
   photo_view: 0.13.0
+  vector_math: 2.1.2
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ## media

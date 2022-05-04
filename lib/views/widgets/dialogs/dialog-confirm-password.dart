@@ -124,13 +124,7 @@ class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             TextButton(
-              onPressed: !loading
-                  ? () {
-                      if (widget.onCancel != null) {
-                        widget.onCancel!();
-                      }
-                    }
-                  : null,
+              onPressed: !loading ? () => widget.onCancel?.call() : null,
               child: Text(
                 Strings.buttonCancel,
               ),

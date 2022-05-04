@@ -12,6 +12,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
@@ -43,8 +44,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
   @override
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final ChatUsersDetailArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as ChatUsersDetailArguments;
+    final arguments = useScreenArguments<ChatUsersDetailArguments>(context)!;
 
     final searchResults = store.state.searchStore.searchResults;
 

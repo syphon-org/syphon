@@ -73,23 +73,18 @@ class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch>
 
   @protected
   void onChange({String? text}) {
-    if (widget.onChange != null) {
-      widget.onChange!(text);
-    }
+    widget.onChange?.call(text);
   }
 
   @protected
   void onSearch({String? text}) {
-    if (widget.onSearch != null) {
-      widget.onSearch!(text);
-    }
+    widget.onSearch?.call(text);
   }
 
   @protected
   void onBack() {
-    if (widget.onBack != null) {
-      widget.onBack!();
-    }
+    widget.onBack?.call();
+
     if (widget.navigate) {
       Navigator.pop(context, false);
     }
@@ -98,7 +93,7 @@ class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch>
   @protected
   void onToggleSearch({BuildContext? context}) {
     if (widget.onToggleSearch != null && searching) {
-      widget.onToggleSearch!();
+      widget.onToggleSearch?.call();
       return;
     }
 

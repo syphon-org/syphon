@@ -10,7 +10,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
-import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';

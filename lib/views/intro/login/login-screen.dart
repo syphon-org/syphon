@@ -360,7 +360,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
                                       maxHeight: 180,
                                     ),
                                     child: SvgPicture.asset(
-                                      avatarHash % 2 == 0
+                                      avatarHash.isEven
                                           ? Assets.heroAvatarFemale
                                           : Assets.heroAvatarMale,
                                       width: width * 0.35,

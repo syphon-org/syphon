@@ -32,13 +32,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
   Widget build(BuildContext context) => Opacity(
         opacity: widget.disabled ? 0.4 : opacity,
         child: GestureDetector(
-          onTap: widget.disabled
-              ? null
-              : () {
-                  if (widget.onPressed != null) {
-                    widget.onPressed!();
-                  }
-                },
+          onTap: widget.disabled ? null : () => widget.onPressed?.call(),
           onTapDown: (details) => setState(() {
             opacity = 0.4;
           }),

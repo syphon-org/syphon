@@ -208,6 +208,13 @@ class _Props extends Equatable {
     required this.onChangePasswordConfirm,
   });
 
+  @override
+  List<Object> get props => [
+        password,
+        passwordConfirm,
+        isPasswordValid,
+      ];
+
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         password: store.state.authStore.password,
         passwordConfirm: store.state.authStore.passwordConfirm,
@@ -219,11 +226,4 @@ class _Props extends Equatable {
           store.dispatch(setPasswordConfirm(password: text));
         },
       );
-
-  @override
-  List<Object> get props => [
-        password,
-        passwordConfirm,
-        isPasswordValid,
-      ];
 }

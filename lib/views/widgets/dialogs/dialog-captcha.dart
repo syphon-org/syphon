@@ -70,9 +70,7 @@ class _DialogCaptchaState extends State<DialogCaptcha> {
             ButtonText(
               text: Strings.buttonCancel,
               onPressed: () {
-                if (widget.onCancel != null) {
-                  widget.onCancel!();
-                }
+                widget.onCancel?.call();
                 Navigator.of(context).pop();
               },
             ),

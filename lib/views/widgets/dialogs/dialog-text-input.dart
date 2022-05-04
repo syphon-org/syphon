@@ -149,14 +149,10 @@ class _DialogTextInputState extends State<DialogTextInput> {
                   labelText: widget.label,
                 ),
                 onChanged: (value) {
-                  if (widget.onChange != null) {
-                    widget.onChange!(value);
-                  }
+                  widget.onChange?.call(value);
                 },
                 onSubmitted: (value) {
-                  if (widget.onConfirm != null) {
-                    widget.onConfirm!(value);
-                  }
+                  widget.onConfirm?.call(value);
                 },
               ),
             ),
@@ -166,13 +162,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             TextButton(
-              onPressed: loading
-                  ? null
-                  : () {
-                      if (widget.onCancel != null) {
-                        widget.onCancel!();
-                      }
-                    },
+              onPressed: loading ? null : () => widget.onCancel?.call(),
               child: Text(Strings.buttonCancel),
             ),
             TextButton(

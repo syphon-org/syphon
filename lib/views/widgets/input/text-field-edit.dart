@@ -54,9 +54,7 @@ class _TextFieldInlineState extends State<TextFieldInline> with Lifecycle<TextFi
           controller: _controller,
           textInputAction: TextInputAction.send,
           onEditingComplete: () {
-            if (widget.onEdit != null) {
-              widget.onEdit!(_controller.value.text.toString());
-            }
+            widget.onEdit?.call(_controller.value.text);
           },
           decoration: InputDecoration(
             filled: true,

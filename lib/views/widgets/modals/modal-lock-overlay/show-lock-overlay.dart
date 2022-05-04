@@ -31,7 +31,7 @@ import 'package:syphon/views/widgets/modals/modal-lock-overlay/lock-overlay.dart
 /// - `title`: Change the title widget
 /// - `confirmTitle`: Change the confirm title widget
 /// - `inputController`: Control inputs externally
-Future<T>? showLockOverlay<T>({
+Future<void>? showLockOverlay({
   required BuildContext context,
   required Future<bool> Function(String) onVerify,
   ScreenLockConfig screenLockConfig = const ScreenLockConfig(),
@@ -117,4 +117,5 @@ Future<T>? showLockOverlay<T>({
       },
     ),
   );
+  return null;
 }

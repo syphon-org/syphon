@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
 import 'package:image_picker/image_picker.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
@@ -64,9 +62,7 @@ class ModalImageOptions extends StatelessWidget {
                 if (image == null) return;
 
                 final File imageFile = File(image.path);
-                if (onSetNewAvatar != null) {
-                  onSetNewAvatar!(image: imageFile);
-                }
+                onSetNewAvatar?.call(image: imageFile);
 
                 Navigator.pop(context);
               },
@@ -94,9 +90,7 @@ class ModalImageOptions extends StatelessWidget {
 
                 final File imageFile = File(image.path);
 
-                if (onSetNewAvatar != null) {
-                  onSetNewAvatar!(image: imageFile);
-                }
+                onSetNewAvatar?.call(image: imageFile);
                 Navigator.pop(context);
               },
             ),

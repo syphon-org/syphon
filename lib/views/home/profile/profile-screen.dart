@@ -174,7 +174,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                     boxShadow: const [
                                       BoxShadow(
                                         blurRadius: 6,
-                                        offset: Offset(0, 0),
+                                        offset: Offset.zero,
                                         color: Colors.black54,
                                       )
                                     ],

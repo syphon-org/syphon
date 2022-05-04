@@ -42,7 +42,7 @@ class Prelock extends StatefulWidget {
   const Prelock({
     required this.enabled,
     required this.appContext,
-    this.backgroundLockLatency = const Duration(seconds: 0),
+    this.backgroundLockLatency = Duration.zero,
   });
 
   static restart(BuildContext context) {

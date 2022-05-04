@@ -6,6 +6,6 @@ class Identifier {
 
   @override
   String toString() {
-    return id.toString();
+    return id;
   }
 }

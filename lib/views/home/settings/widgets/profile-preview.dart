@@ -64,7 +64,7 @@ class ProfilePreview extends StatelessWidget {
                     width: Dimensions.avatarSize,
                     height: Dimensions.avatarSize,
                     child: IconButton(
-                      onPressed: () => onModifyAccounts != null ? onModifyAccounts!() : null,
+                      onPressed: () => onModifyAccounts?.call(),
                       icon: Icon(
                         Icons.more_horiz_rounded,
                         color: Color(Colours.greyDefault),
