@@ -45,8 +45,7 @@ saveStorageMiddleware(StorageDatabase? storage) {
     next(action);
 
     if (storage == null) {
-      printWarning('storage is null, skipping saving cold storage data!!!',
-          title: 'storageMiddleware');
+      log.warn('storage is null, skipping saving cold storage data!!!', title: 'storageMiddleware');
       return;
     }
 

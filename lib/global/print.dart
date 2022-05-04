@@ -33,7 +33,7 @@ void _printWarning(String content, {String? title}) {
 void _printError(String content, {String? title}) {
   if (DEBUG_MODE) {
     final output = title != null ? '[$title] $content' : content;
-    print('[error] $output');
+    print('[ERROR] $output');
   }
 }
 
@@ -45,7 +45,7 @@ void _printRelease(String content, {String? title}) {
 void _printDebug(String content, {String? title}) {
   if (DEBUG_MODE) {
     final output = title != null ? '[$title] $content' : content;
-    print('[debug] $output');
+    print('[DEBUG] $output');
   }
 }
 
@@ -56,12 +56,6 @@ void _printJson(Map? jsonMap) {
     debugPrint(prettyEvent, wrapWidth: 2048);
   }
 }
-
-PrintJson printJson = _printJson;
-PrintDebug printInfo = _printInfo;
-PrintDebug printDebug = _printDebug;
-PrintError printError = _printError;
-PrintError printWarning = _printWarning;
 
 // NOTE: start using this for better tab completion
 // ignore: camel_case_types

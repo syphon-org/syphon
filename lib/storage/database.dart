@@ -44,7 +44,7 @@ void _openOnIOS() {
   try {
     open.overrideFor(OperatingSystem.iOS, () => DynamicLibrary.process());
   } catch (error) {
-    printError(error.toString());
+    log.error(error.toString());
   }
 }
 
@@ -52,7 +52,7 @@ void _openOnAndroid() {
   try {
     open.overrideFor(OperatingSystem.android, () => DynamicLibrary.open('libsqlcipher.so'));
   } catch (error) {
-    printError(error.toString());
+    log.error(error.toString());
   }
 }
 
@@ -69,7 +69,7 @@ void _openOnLinux() {
 
       open.overrideFor(OperatingSystem.linux, () => lib);
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
       rethrow;
     }
   }
@@ -142,7 +142,7 @@ void _openDatabaseBackground(DatabaseInfo info) {
     () => DatabaseConnection.fromExecutor(
       NativeDatabase(
         File(info.path),
-        logStatements: false, // DEBUG_MODE,
+        logStatements: false,
         setup: (rawDb) {
           rawDb.execute("PRAGMA key = '${info.key}';");
         },
@@ -192,7 +192,7 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
 
     return NativeDatabase(
       File(info.path),
-      logStatements: false, // DEBUG_MODE,
+      logStatements: false,
       setup: (rawDb) {
         rawDb.execute("PRAGMA key = '${info.key}';");
       },
@@ -232,7 +232,7 @@ class StorageDatabase extends _$StorageDatabase {
           return m.createAll();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          printInfo('[MIGRATION] VERSION $from to $to');
+          log.info('[MIGRATION] VERSION $from to $to');
           if (from == 7) {
             await m.createTable(keySessions);
             await m.createTable(messageSessions);

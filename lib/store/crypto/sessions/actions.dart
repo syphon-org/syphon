@@ -172,7 +172,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
       final deviceId = store.state.authStore.user.deviceId!;
       final keySessions = selectKeySessions(store, identityKey);
 
-      printInfo('[loadKeySessionOutbound] checking outbounds for $identityKey');
+      log.info('[loadKeySessionOutbound] checking outbounds for $identityKey');
 
       for (final session in keySessions.reversed) {
         try {
@@ -183,17 +183,17 @@ ThunkAction<AppState> loadKeySessionOutbound({
 
           final keySessionType = keySession.encrypt_message_type();
 
-          printInfo(
+          log.info(
               '[loadKeySessionOutbound] found $keySessionId for $identityKey of type $keySessionType');
           return keySession;
         } catch (error) {
-          printInfo('[loadKeySessionOutbound] unsuccessful $identityKey $error');
+          log.info('[loadKeySessionOutbound] unsuccessful $identityKey $error');
         }
       }
 
       throw 'No valid sessions found $identityKey';
     } catch (error) {
-      printError('[loadKeySessionOutbound] failure $identityKey $error');
+      log.error('[loadKeySessionOutbound] failure $identityKey $error');
       return null;
     }
   };
@@ -217,7 +217,7 @@ ThunkAction<AppState> loadKeySessionInbound({
     // filter all key session saved under a certain identityKey
     final keySessions = selectKeySessions(store, identityKey);
 
-    printInfo('[loadKeySessionInbound] checking known sessions for sender $identityKey');
+    log.info('[loadKeySessionInbound] checking known sessions for sender $identityKey');
 
     // reverse the list to attempt the latest first (LinkedHashMap will know)
     for (final session in keySessions.reversed) {
@@ -229,23 +229,23 @@ ThunkAction<AppState> loadKeySessionInbound({
         // this returns a flag indicating whether the message was encrypted using that session
         final keySessionMatch = keySession.matches_inbound(body);
 
-        printInfo('[loadKeySessionInbound] $keySessionId session matched $keySessionMatch');
+        log.info('[loadKeySessionInbound] $keySessionId session matched $keySessionMatch');
 
         if (keySessionMatch) {
           return keySession;
         }
 
-        printInfo('[loadKeySessionInbound] $keySessionId attempting decryption');
+        log.info('[loadKeySessionInbound] $keySessionId attempting decryption');
 
         // attempt decryption in case its not a locally known inbound session state
         keySession.decrypt(type, body);
 
-        printInfo('[loadKeySessionInbound] $keySessionId successfully decrypted');
+        log.info('[loadKeySessionInbound] $keySessionId successfully decrypted');
 
         // Return a fresh key session having not decrypted the payload
         return olm.Session()..unpickle(deviceId, session);
       } catch (error) {
-        printError('[loadKeySessionInbound] unsuccessful $error');
+        log.error('[loadKeySessionInbound] unsuccessful $error');
       }
     }
 
@@ -273,7 +273,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         return newKeySession;
       }
     } catch (error) {
-      printError('[loadKeySessionInbound] $error');
+      log.error('[loadKeySessionInbound] $error');
     }
 
     return null;

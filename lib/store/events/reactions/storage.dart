@@ -77,7 +77,7 @@ Future<List<Reaction>> loadReactions({
   try {
     return storage.selectReactionsPerEvent(roomId, eventIds);
   } catch (error) {
-    printError(error.toString(), title: 'loadReactions');
+    log.error(error.toString(), title: 'loadReactions');
     return [];
   }
 }
@@ -104,7 +104,7 @@ Future<Map<String, List<Reaction>>> loadReactionsMapped({
           .toList(),
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadReactions');
+    log.error(error.toString(), title: 'loadReactions');
     return {};
   }
 }

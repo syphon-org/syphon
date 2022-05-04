@@ -84,7 +84,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
     try {
       store.dispatch(selectReply(roomId: roomId, message: message));
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
     }
   }
 
@@ -96,7 +96,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
     try {
       store.dispatch(sendMessageExisting(roomId: roomId, message: message));
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
     }
   }
 

@@ -153,15 +153,13 @@ class ChatScreenState extends State<ChatScreen> {
     final store = StoreProvider.of<AppState>(context);
 
     try {
-      printInfo('TESTING');
       await store.dispatch(
         backfillDecryptMessages(
           props.room.id,
         ),
       );
-      printInfo('WHAT');
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
     }
   }
 
@@ -205,6 +203,7 @@ class ChatScreenState extends State<ChatScreen> {
         mediumType = MediumType.encryption;
       });
       props.onUpdateDeviceKeys();
+      onAttemptDecryption(props);
     }
   }
 
@@ -944,7 +943,7 @@ class _Props extends Equatable {
             toggleRoomEncryption(room: room),
           );
         },
-        onLoadMoreMessages: () {
+        onLoadMoreMessages: () async {
           final room = selectRoom(state: store.state, id: roomId);
 
           // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
@@ -953,13 +952,15 @@ class _Props extends Equatable {
               messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
 
           // fetch messages from the oldest cached batch
-          return store.dispatch(
+          final messagesNew = await store.dispatch(
             fetchMessageEvents(
               room: room,
               from: oldest.prevBatch,
               timestamp: oldest.timestamp,
             ),
           );
+
+          log.debug('Found messages ${messagesNew.length}');
         },
       );
 }

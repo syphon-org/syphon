@@ -42,7 +42,7 @@ Future<Map<String, User>> loadUsers({
   try {
     final users = await storage.selectUsers(ids);
 
-    printInfo('[users] loaded ${users.length}');
+    log.info('[users] loaded ${users.length}');
 
     return Map.fromIterable(
       users,
@@ -50,7 +50,7 @@ Future<Map<String, User>> loadUsers({
       value: (user) => user,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadUsers');
+    log.error(error.toString(), title: 'loadUsers');
     return users;
   }
 }
@@ -66,7 +66,7 @@ Future<Map<String, User>> loadUsersAll({
   try {
     final users = await storage.selectUsersAll();
 
-    printInfo('[users ALL] loaded ${users.length}');
+    log.info('[users ALL] loaded ${users.length}');
 
     return Map.fromIterable(
       users,
@@ -74,7 +74,7 @@ Future<Map<String, User>> loadUsersAll({
       value: (user) => user,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadUsers');
+    log.error(error.toString(), title: 'loadUsers');
     return users;
   }
 }

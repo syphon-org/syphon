@@ -63,7 +63,7 @@ Future<Map<String, Receipt>> loadReceipts(
       value: (receipt) => receipt,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadReactions');
+    log.error(error.toString(), title: 'loadReactions');
     return {};
   }
 }

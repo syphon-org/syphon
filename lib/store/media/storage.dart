@@ -77,7 +77,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 
     final images = await storage.selectMediaAll();
 
-    printInfo('[media] loaded ${images.length.toString()}');
+    log.info('[media] loaded ${images.length.toString()}');
 
     for (final image in images) {
       if (image.mxcUri != null && image.data != null) {
@@ -87,7 +87,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 
     return media;
   } catch (error) {
-    printError(error.toString(), title: 'loadMediaAll');
+    log.error(error.toString(), title: 'loadMediaAll');
     return null;
   }
 }
@@ -113,7 +113,7 @@ Future<Map<String, Uint8List>> loadMediaRelative({
 
     final images = await storage.selectMedias(idsAll);
 
-    printInfo('[media] loaded ${images.length.toString()}');
+    log.info('[media] loaded ${images.length.toString()}');
 
     for (final image in images) {
       if (image.mxcUri != null && image.data != null) {
@@ -121,7 +121,7 @@ Future<Map<String, Uint8List>> loadMediaRelative({
       }
     }
   } catch (error) {
-    printError(error.toString(), title: 'loadMediaRelative');
+    log.error(error.toString(), title: 'loadMediaRelative');
   }
 
   return media;

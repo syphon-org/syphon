@@ -50,7 +50,7 @@ Future<SettingsStore?> loadSettings({required StorageDatabase storage}) async {
   try {
     return storage.selectSettingStore();
   } catch (error) {
-    printError(error.toString(), title: 'loadAuth');
+    log.error(error.toString(), title: 'loadAuth');
     return null;
   }
 }

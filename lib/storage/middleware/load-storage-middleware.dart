@@ -19,7 +19,7 @@ loadStorageMiddleware(StorageDatabase? storage) {
   ) async {
     try {
       if (storage == null) {
-        printWarning(
+        log.warn(
           'storage is null, skipping saving cold storage data!!!',
           title: 'storageMiddleware',
         );
@@ -41,7 +41,7 @@ loadStorageMiddleware(StorageDatabase? storage) {
           break;
       }
     } catch (error) {
-      printError('[loadStorageMiddleware] ${error.toString()}');
+      log.error('[loadStorageMiddleware] ${error.toString()}');
     }
 
     next(action);

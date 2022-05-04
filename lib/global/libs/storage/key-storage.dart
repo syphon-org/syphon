@@ -10,7 +10,7 @@ Future<bool> checkKey(String keyId) async {
   try {
     return await SecureStorage.check(key: keyId);
   } catch (error) {
-    printError('[checkKey] $error');
+    log.error('[checkKey] $error');
     return false;
   }
 }
@@ -19,7 +19,7 @@ Future<void> overrideKey(String keyId, {String value = ''}) async {
   try {
     return await SecureStorage().write(key: keyId, value: value);
   } catch (error) {
-    printError('[checkKey] $error');
+    log.error('[checkKey] $error');
     return;
   }
 }
@@ -28,7 +28,7 @@ Future<void> clearKey(String keyId) async {
   try {
     return await SecureStorage().write(key: keyId, value: '');
   } catch (error) {
-    printError('[checkKey] $error');
+    log.error('[checkKey] $error');
     return;
   }
 }
@@ -40,12 +40,12 @@ Future<String> loadKey(String keyId) async {
   try {
     key = await SecureStorage().read(key: keyId);
   } catch (error) {
-    printError('[loadKey] $error');
+    log.error('[loadKey] $error');
   }
 
   // generate a new one on failure
   if (key == null || key.isEmpty) {
-    printInfo('[loadKey] generating new key for $keyId');
+    log.info('[loadKey] generating new key for $keyId');
     key = generateKey();
     await SecureStorage().write(key: keyId, value: key);
   }
@@ -58,6 +58,6 @@ Future deleteKey(String keyId) async {
   try {
     await SecureStorage().delete(key: keyId);
   } catch (error) {
-    printError('[deleteKey] $error');
+    log.error('[deleteKey] $error');
   }
 }

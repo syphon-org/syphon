@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -20,7 +19,7 @@ class Sync {
   final List<Redaction> redactions;
   final Map<String, User> users;
   final Map<String, Receipt> readReceipts;
-  final bool? override; // TODO: remove - stops loading limited timeline
+  final bool? overwrite; // TODO: remove - stops loading limited timeline
 
   const Sync({
     required this.room,
@@ -30,7 +29,7 @@ class Sync {
     this.messages = const [],
     this.readReceipts = const {},
     this.users = const {},
-    this.override,
+    this.overwrite,
   });
 }
 
@@ -55,7 +54,7 @@ class SyncEvents {
 class SyncDetails {
   final bool? invite;
   final bool? limited;
-  final bool? override;
+  final bool? overwrite;
   final int? totalMembers;
   final String? currBatch; // current batch, if known from fetchMessages
   final String? lastBatch;
@@ -64,7 +63,7 @@ class SyncDetails {
   const SyncDetails({
     this.invite,
     this.limited,
-    this.override,
+    this.overwrite,
     this.currBatch,
     this.lastBatch,
     this.prevBatch,
@@ -178,8 +177,8 @@ Sync parseSync(
     prevBatch: details.prevBatch,
   );
 
-  if (details.limited != null && DEBUG_MODE) {
-    printInfo(
+  if (details.limited != null) {
+    log.info(
       '[parseSync] ${roomExisting.id} limited ${details.limited} lastBatch ${details.lastBatch != null} prevBatch ${details.prevBatch != null}',
     );
   }
@@ -228,7 +227,7 @@ Sync parseSync(
     redactions: events.redactions,
     readReceipts: ephemerals.readReceipts,
     // TODO: clear messages if limited was explicitly false from parsed json
-    override: details.override,
+    overwrite: details.overwrite,
     users: stateDetails.users ?? {},
   );
 }
@@ -416,7 +415,7 @@ SyncMessageDetails parseMessages({
       encryptionEnabled: hasEncrypted != null,
     );
   } catch (error) {
-    printError('[fromMessageEvents] $error');
+    log.error('[fromMessageEvents] $error');
     return SyncMessageDetails();
   }
 }
@@ -455,7 +454,7 @@ SyncDetails parseDetails(Map<String, dynamic> json) {
   return SyncDetails(
     invite: invite,
     limited: limited,
-    override: override,
+    overwrite: override,
     currBatch: currBatch,
     lastBatch: lastBatch,
     prevBatch: prevBatch,
@@ -570,7 +569,7 @@ SyncStateDetails parseState({
           break;
       }
     } catch (error) {
-      printError('[Room.fromStateEvents] $error ${event.type}');
+      log.error('[Room.fromStateEvents] $error ${event.type}');
     }
   }
 

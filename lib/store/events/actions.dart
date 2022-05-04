@@ -170,7 +170,7 @@ ThunkAction<AppState> loadMessagesCached({
 
       return messagesStored;
     } catch (error) {
-      printError('[fetchMessageEvents] $error');
+      log.error('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -200,7 +200,7 @@ ThunkAction<AppState> fetchMessageEvents({
       ) as List<Message>;
 
       // known cached messages for this batch will be loaded
-      if (cached.isNotEmpty) return;
+      if (cached.isNotEmpty) return [];
 
       final oldest = cached.isEmpty;
 
@@ -217,8 +217,6 @@ ThunkAction<AppState> fetchMessageEvents({
         'to': to,
       });
 
-      log.json({'messagesJson': messagesJson});
-
       // The token the pagination ends at. If dir=b this token should be used again to request even earlier events.
       // WARNING: this will be null if there are no more events or batches left to fetch
       final String? end = messagesJson['end'];
@@ -231,8 +229,9 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // reuse the logic for syncing
       // end will be null if no more batches are available to fetch
-      await store.dispatch(syncRooms({
-        room.id: {
+      await store.dispatch(syncRoom(
+        room.id,
+        {
           'timeline': {
             'events': messages,
             'curr_batch': start,
@@ -242,9 +241,11 @@ ThunkAction<AppState> fetchMessageEvents({
             'override': override,
           }
         },
-      }));
+      ));
+
+      return messages;
     } catch (error) {
-      printError('[fetchMessageEvents] error $error');
+      log.error('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -278,7 +279,7 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
         },
       }));
     } catch (error) {
-      printError('[fetchStateEvents] $error');
+      log.error('[fetchStateEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -372,7 +373,7 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
         return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
       }
     } catch (error) {
-      printError('[deleteMessage] $error');
+      log.error('[deleteMessage] $error');
     }
   };
 }

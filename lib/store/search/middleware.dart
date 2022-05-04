@@ -20,8 +20,7 @@ searchMiddleware(StorageDatabase? coldStorage) {
     next(action);
 
     if (coldStorage == null) {
-      printWarning('storage is null, skipping saving cold storage data!!!',
-          title: 'searchMiddleware');
+      log.warn('storage is null, skipping saving cold storage data!!!', title: 'searchMiddleware');
       return;
     }
 

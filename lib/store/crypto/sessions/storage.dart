@@ -133,7 +133,7 @@ Future<Map<String, Map<String, List<model.MessageSession>>>> loadMessageSessions
 
     return messageSessions;
   } catch (error) {
-    printError(error.toString(), title: 'loadCrypto');
+    log.error(error.toString(), title: 'loadCrypto');
     return {};
   }
 }

@@ -40,7 +40,7 @@ class BackgroundSync {
     try {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
-      printError('[BackgroundSync.init] $error');
+      log.error('[BackgroundSync.init] $error');
       return false;
     }
   }

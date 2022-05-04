@@ -107,6 +107,7 @@ dependencies:
   flutter_screen_lock: ^4.0.0
   photo_view: 0.13.0
   vector_math: 2.1.1
+  flutter_hooks: 0.18.3
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ## media

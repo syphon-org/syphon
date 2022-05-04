@@ -22,7 +22,8 @@ String getRandomString(int length) {
   const ch = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz';
   final r = Random();
   return String.fromCharCodes(
-      Iterable.generate(length, (_) => ch.codeUnitAt(r.nextInt(ch.length))));
+    Iterable.generate(length, (_) => ch.codeUnitAt(r.nextInt(ch.length))),
+  );
 }
 
 // time functions by wrapping them here - needs testing
@@ -36,7 +37,7 @@ Future timeWrapper(
 
   final stoptime = stopwatch.elapsed;
 
-  printInfo('[$name TIMER] ${function.runtimeType} $stoptime');
+  log.info('[$name TIMER] ${function.runtimeType} $stoptime');
 
   return result;
 }

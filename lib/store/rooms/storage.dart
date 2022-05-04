@@ -77,7 +77,7 @@ Future<Map<String, Room>> loadRooms({
 
   try {
     final loaded = await storage.selectRoomsAll();
-    printInfo('[rooms] loaded ${loaded.length.toString()}');
+    log.info('[rooms] loaded ${loaded.length.toString()}');
 
     rooms = Map<String, Room>.fromIterable(
       loaded,
@@ -87,7 +87,7 @@ Future<Map<String, Room>> loadRooms({
       },
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadRooms');
+    log.error(error.toString(), title: 'loadRooms');
   }
 
   return rooms;

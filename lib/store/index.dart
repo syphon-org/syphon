@@ -177,7 +177,7 @@ Future<Store<AppState>> initStore(
       initialState = existingState ?? await persistor.load();
     }
   } catch (error) {
-    printError('[persistor.load] error $error');
+    log.error('[persistor.load] $error');
   }
 
   final store = Store<AppState>(

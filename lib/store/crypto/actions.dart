@@ -82,7 +82,7 @@ ThunkAction<AppState> initOlmEncryption(User user) {
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
       }
     } catch (error) {
-      printError('[initOlmEncryption] $error');
+      log.error('[initOlmEncryption] $error');
     }
   };
 }
@@ -167,7 +167,7 @@ ThunkAction<AppState> updateKeySessions({
       );
 
       if (devicesWithoutMessageSessions.isEmpty) {
-        printInfo('[updateKeySessions] all device sessions have a message session for room');
+        log.info('[updateKeySessions] all device sessions have a message session for room');
         return;
       }
 
@@ -235,9 +235,9 @@ ThunkAction<AppState> updateKeySessions({
               throw response['error'];
             }
 
-            printInfo('[sendSessionKeys] success! $randomNumber');
+            log.info('[sendSessionKeys] success! $randomNumber');
           } catch (error) {
-            printError('[sendSessionKeys] $error');
+            log.error('[sendSessionKeys] $error');
           }
         },
       ));

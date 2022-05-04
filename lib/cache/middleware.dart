@@ -29,7 +29,7 @@ bool cacheMiddleware(Store<AppState> store, dynamic action) {
     case SetUser:
     case ResetCrypto:
     case ResetUser:
-      printInfo('[initStore] persistor saving from ${action.runtimeType}');
+      log.info('[initStore] persistor saving from ${action.runtimeType}');
       return true;
     case SetSynced:
       return ((action as SetSynced).synced ?? false) && !store.state.syncStore.synced;

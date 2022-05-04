@@ -146,15 +146,13 @@ Future<List<dynamic>> decryptSessionKeys({
     ).getUint32(0, Endian.big);
 
     // for debugging only
-    if (DEBUG_MODE) {
-      printJson({
-        'version': version,
-        'salt': base64.encode(salt),
-        'iv': ivFormatted,
-        'rounds': roundsFormatted,
-        'keySha': base64.encode(keySha),
-      });
-    }
+    log.json({
+      'version': version,
+      'salt': base64.encode(salt),
+      'iv': ivFormatted,
+      'rounds': roundsFormatted,
+      'keySha': base64.encode(keySha),
+    });
 
     final pbkdf2 = Pbkdf2(
       macAlgorithm: Hmac.sha512(),

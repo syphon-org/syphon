@@ -38,7 +38,7 @@ class CaptchaStepState extends State<CaptchaStep> {
         onComplete: (String token) {
           props.onCompleteCaptcha(token);
 
-          printInfo('COMPLETED');
+          log.info('COMPLETED');
           Navigator.pop(dialogContext);
         },
       ),

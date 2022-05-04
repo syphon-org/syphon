@@ -278,9 +278,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   onDeleteContextStorage(AppContext context) async {
     if (context.id.isEmpty) {
-      printInfo('[onContextChanged] DELETING DEFAULT CONTEXT');
+      log.info('[onContextChanged] DELETING DEFAULT CONTEXT');
     } else {
-      printInfo('[onDeleteContext] DELETING CONTEXT DATA ${context.id}');
+      log.info('[onDeleteContext] DELETING CONTEXT DATA ${context.id}');
     }
 
     await deleteCache(context: context);
@@ -290,7 +290,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   // Reset contexts if the current user has no accessToken (unrecoverable state)
   onResetContext() async {
-    printError('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
+    log.error('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
 
     resetContextsAll();
 

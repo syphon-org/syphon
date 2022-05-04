@@ -47,7 +47,7 @@ Future<AuthStore?> loadAuth({required StorageDatabase storage}) async {
   try {
     return storage.selectAuthStore();
   } catch (error) {
-    printError(error.toString(), title: 'loadAuth');
+    log.error(error.toString(), title: 'loadAuth');
     return null;
   }
 }

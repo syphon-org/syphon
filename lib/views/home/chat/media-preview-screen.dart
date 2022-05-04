@@ -55,7 +55,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
         currentImage = firstImage;
       });
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
     }
   }
 

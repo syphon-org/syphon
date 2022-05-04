@@ -38,7 +38,7 @@ Future<void> initPlatformDependencies() async {
     if (libolmExists) {
       DynamicLibrary.open(libolmDir.path);
     } else {
-      printError('[linux] exists $libolmExists ${libolmDir.path}');
+      log.error('[linux] exists $libolmExists ${libolmDir.path}');
     }
 
     if (libsqliteExists) {
@@ -46,18 +46,18 @@ Future<void> initPlatformDependencies() async {
         return DynamicLibrary.open(libsqliteDir.path);
       });
     } else {
-      printError('[linux] exists $libsqliteExists ${libsqliteDir.path}');
+      log.error('[linux] exists $libsqliteExists ${libsqliteDir.path}');
     }
   }
 
   // init window mangment for desktop builds
   if (Platform.isMacOS) {
     final directory = await getApplicationSupportDirectory();
-    printInfo('[macos] ${directory.path}');
+    log.info('[macos] ${directory.path}');
     try {
       DynamicLibrary.open('libolm.3.dylib');
     } catch (error) {
-      printInfo('[macos] ${error.toString()}');
+      log.info('[macos] ${error.toString()}');
     }
   }
 
@@ -69,6 +69,6 @@ Future<void> initPlatformDependencies() async {
   // init background sync for Android only
   if (Platform.isAndroid) {
     final backgroundSyncStatus = await BackgroundSync.init();
-    printInfo('[main] background service initialized $backgroundSyncStatus');
+    log.info('[main] background service initialized $backgroundSyncStatus');
   }
 }

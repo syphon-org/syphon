@@ -47,7 +47,7 @@ Future<CryptoStore?> loadCrypto({required StorageDatabase storage}) async {
   try {
     return storage.selectCryptoStore();
   } catch (error) {
-    printError(error.toString(), title: 'loadCrypto');
+    log.error(error.toString(), title: 'loadCrypto');
     return null;
   }
 }
