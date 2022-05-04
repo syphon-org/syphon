@@ -106,7 +106,7 @@ dependencies:
   fab_circular_menu: ^1.0.2
   flutter_screen_lock: ^4.0.0
   photo_view: 0.13.0
-  vector_math: 2.1.2
+  vector_math: 2.1.1
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ## media
