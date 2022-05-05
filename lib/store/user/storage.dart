@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/user/model.dart';
@@ -9,12 +11,23 @@ import 'package:syphon/store/user/model.dart';
 ///
 extension UserQueries on StorageDatabase {
   Future<void> insertUsers(List<User> users) {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          this.users,
+          users,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(this.users, users),
     );
   }
 
-  Future<List<User>> selectUsers(List<String> ids, {int offset = 0, int limit = 0}) {
+  Future<List<User>> selectUsers(List<String> ids,
+      {int offset = 0, int limit = 0}) {
     return (select(users)..where((tbl) => tbl.userId.isIn(ids))).get();
   }
 
