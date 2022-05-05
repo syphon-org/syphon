@@ -25,6 +25,7 @@ bool cacheMiddleware(Store<AppState> store, dynamic action) {
     case SetOlmAccountBackup:
     case SetDeviceKeysOwned:
     case AddKeySession:
+    case AddMessageSessionInbound:
     case AddMessageSessionOutbound:
     case SetUser:
     case ResetCrypto:

@@ -191,7 +191,7 @@ ThunkAction<AppState> fetchMessageEvents({
   String? from,
   int timestamp = 0,
   int loadLimit = DEFAULT_LOAD_LIMIT,
-  bool? override,
+  bool? overwrite,
 }) {
   return (Store<AppState> store) async {
     try {
@@ -232,13 +232,13 @@ ThunkAction<AppState> fetchMessageEvents({
       await store.dispatch(syncRoom(
         room.id,
         {
+          'overwrite': overwrite,
           'timeline': {
             'events': messages,
             'curr_batch': start,
             'last_batch': oldest ? end ?? from : null,
             'prev_batch': end,
             'limited': end == start || end == null ? false : null,
-            'override': override,
           }
         },
       ));
@@ -271,11 +271,9 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
         throw stateEvents['error'];
       }
 
-      await store.dispatch(syncRooms({
-        room.id: {
-          'state': {
-            'events': stateEvents,
-          },
+      await store.dispatch(syncRoom(room.id, {
+        'state': {
+          'events': stateEvents,
         },
       }));
     } catch (error) {

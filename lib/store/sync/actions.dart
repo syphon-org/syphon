@@ -265,10 +265,16 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};
       final Map<String, dynamic> oneTimeKeyCount = data['device_one_time_keys_count'] ?? {};
 
+      // Updates for device specific data (mostly room encryption)
+      if (toDeviceJson.isNotEmpty) {
+        await store.dispatch(syncDevice(toDeviceJson));
+      }
+
       // Parse and save room / message updates
       if (roomJson.isNotEmpty) {
         final Map<String, dynamic> joinedJson = roomJson['join'] ?? {};
         final Map<String, dynamic> invitesJson = roomJson['invite'] ?? {};
+        final Map<String, dynamic> leavesJson = roomJson['leave'] ?? {};
         // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
 
         // Updates for rooms
@@ -278,11 +284,9 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         if (invitesJson.isNotEmpty) {
           await store.dispatch(syncRooms(invitesJson));
         }
-      }
-
-      // Updates for device specific data (mostly room encryption)
-      if (toDeviceJson.isNotEmpty) {
-        await store.dispatch(syncDevice(toDeviceJson));
+        if (leavesJson.isNotEmpty) {
+          await store.dispatch(syncRooms(leavesJson));
+        }
       }
 
       // Update encryption one time key count
@@ -317,7 +321,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
   };
 }
 
-ThunkAction<AppState> syncRoom(String id, Map<dynamic, dynamic> json) {
+ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
   return (Store<AppState> store) async {
     // init new store containers
     final user = store.state.authStore.user;
@@ -329,49 +333,54 @@ ThunkAction<AppState> syncRoom(String id, Map<dynamic, dynamic> json) {
       final roomOld = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
       final messagesOld = store.state.eventStore.messages[id] ?? [];
 
-      final sync = await compute(parseSyncThreaded, {
-        'json': json,
-        'room': roomOld,
-        'currentUser': user,
-        'lastSince': lastSince,
-        'existingMessagesIds': messagesOld.map((m) => m.id ?? '').toList(),
-      });
+      final sync = await parseSyncThreaded(
+        json: json,
+        room: roomOld,
+        user: user,
+        lastSince: lastSince,
+        existingIds: messagesOld.map((m) => m.id ?? '').toList(),
+      );
 
-      // overwrite room with updated one from sync
-      final roomSynced = sync.room;
+      if (sync.leave ?? false) {
+        return store.dispatch(RemoveRoom(roomId: id));
+      }
+
+      // updated room and events from sync
+      final room = sync.room;
+      final events = sync.events;
 
       log.info(
         // ignore: prefer_interpolation_to_compose_strings
-        '[syncRooms] ${roomSynced.name} | ' +
+        '[syncRooms] ${room.name} | ' +
             'full_synced: $synced | ' +
-            'limited: ${roomSynced.limited} | ' +
-            'total new messages: ${sync.messages.length} | ' +
-            'roomPrevBatch: ${roomSynced.prevBatch}',
+            'limited: ${room.limited} | ' +
+            'total new messages: ${events.messages.length} | ' +
+            'roomPrevBatch: ${room.prevBatch}',
       );
 
       // update various message mutations and meta data
       await store.dispatch(setUsers(sync.users));
-      await store.dispatch(setReceipts(room: roomSynced, receipts: sync.readReceipts));
-      await store.dispatch(addReactions(reactions: sync.reactions));
+      await store.dispatch(setReceipts(room: room, receipts: sync.readReceipts));
+      await store.dispatch(addReactions(reactions: events.reactions));
 
       // redact events (reactions and messages) through cache and cold storage
-      await store.dispatch(redactEvents(room: roomSynced, redactions: sync.redactions));
+      await store.dispatch(redactEvents(room: room, redactions: events.redactions));
 
       // handles editing newly fetched messages
       final messages = await store.dispatch(
         mutateMessages(
-          messages: sync.messages,
+          messages: events.messages,
           existing: messagesOld,
         ),
       ) as List<Message>;
 
       // update encrypted messages (updating before normal messages prevents flicker)
-      if (roomSynced.encryptionEnabled) {
+      if (room.encryptionEnabled) {
         final decryptedOld = store.state.eventStore.messagesDecrypted[id];
 
         final decrypted = await store.dispatch(
           decryptMessages(
-            roomSynced,
+            room,
             messages,
           ),
         ) as List<Message>;
@@ -386,7 +395,7 @@ ThunkAction<AppState> syncRoom(String id, Map<dynamic, dynamic> json) {
 
         await store.dispatch(
           addMessagesDecrypted(
-            roomId: roomSynced.id,
+            roomId: room.id,
             messages: decryptedMutated,
           ),
         );
@@ -395,20 +404,20 @@ ThunkAction<AppState> syncRoom(String id, Map<dynamic, dynamic> json) {
       // save normal or encrypted messages
       await store.dispatch(
         addMessages(
-          roomId: roomSynced.id,
+          roomId: room.id,
           messages: messages,
           clear: sync.overwrite ?? false,
         ),
       );
 
       // update room
-      store.dispatch(SetRoom(room: roomSynced));
+      store.dispatch(SetRoom(room: room));
 
       // fetch avatar if a uri was found
-      if (roomSynced.avatarUri != null) {
+      if (room.avatarUri != null) {
         store.dispatch(
           fetchMedia(
-            mxcUri: roomSynced.avatarUri,
+            mxcUri: room.avatarUri,
             thumbnail: true,
           ),
         );
@@ -416,16 +425,16 @@ ThunkAction<AppState> syncRoom(String id, Map<dynamic, dynamic> json) {
 
       // fetch previous messages since last /sync (a messages gap)
       // room will be marked limited to indicate this
-      if (roomSynced.limited && synced) {
+      if (room.limited && synced) {
         log.warn(
-          '[syncRooms] ${roomSynced.name} LIMITED TRUE - Fetching more messages',
+          '[syncRooms] ${room.name} LIMITED TRUE - Fetching more messages',
         );
 
         store.dispatch(
           fetchMessageEvents(
-            room: roomSynced,
-            from: roomSynced.prevBatch,
-            override: true,
+            room: room,
+            from: room.prevBatch,
+            overwrite: true,
           ),
         );
       }
@@ -464,7 +473,7 @@ ThunkAction<AppState> syncRooms(Map roomData) {
   return (Store<AppState> store) async {
     await Future.forEach(roomData.keys, (id) async {
       final String roomId = id?.toString() ?? '';
-      final Map json = roomData[roomId] ?? {};
+      final Map<String, dynamic> json = roomData[roomId] ?? {};
       if (json.isEmpty) return;
 
       await store.dispatch(syncRoom(roomId, json));
