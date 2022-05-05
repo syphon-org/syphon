@@ -286,7 +286,7 @@ class HomeState extends State<HomeScreen> {
               onPressed: () {
                 Navigator.pushNamed(
                   context,
-                  Routes.chatDetails,
+                  Routes.chatSettings,
                   arguments: ChatDetailsArguments(
                     roomId: selectedChats.values.first.id,
                     title: selectedChats.values.first.name,

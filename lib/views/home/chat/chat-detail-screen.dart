@@ -39,15 +39,15 @@ class ChatDetailsArguments {
   });
 }
 
-class ChatDetailsScreen extends StatefulWidget {
-  const ChatDetailsScreen({Key? key}) : super(key: key);
+class ChatSettingsScreen extends StatefulWidget {
+  const ChatSettingsScreen({Key? key}) : super(key: key);
 
   @override
-  ChatDetailsState createState() => ChatDetailsState();
+  ChatSettingsState createState() => ChatSettingsState();
 }
 
-class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetailsScreen> {
-  ChatDetailsState() : super();
+class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSettingsScreen> {
+  ChatSettingsState() : super();
 
   final ScrollController scrollController = ScrollController(
     initialScrollOffset: 0,

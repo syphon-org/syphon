@@ -107,7 +107,7 @@ class Routes {
   // Chats and Messages
   static const chat = '/home/chat';
   static const chatUsers = '/home/chat/users';
-  static const chatDetails = '/home/chat/details';
+  static const chatSettings = '/home/chat/details';
   static const chatMediaPreview = '/home/chat/media';
   static const messageDetails = '/home/message/details';
 
@@ -142,7 +142,7 @@ class NavigationProvider {
         Routes.verification: (BuildContext context) => const VerificationScreen(),
         Routes.home: (BuildContext context) => const HomeScreen(),
         Routes.chat: (BuildContext context) => const ChatScreen(),
-        Routes.chatDetails: (BuildContext context) => const ChatDetailsScreen(),
+        Routes.chatSettings: (BuildContext context) => const ChatSettingsScreen(),
         Routes.chatMediaPreview: (BuildContext context) => const MediaPreviewScreen(),
         Routes.messageDetails: (BuildContext context) => const MessageDetailsScreen(),
         Routes.chatUsers: (BuildContext context) => const ChatUsersDetailScreen(),
@@ -162,7 +162,7 @@ class NavigationProvider {
         Routes.licenses: (BuildContext context) =>
             const LicensePage(applicationName: Values.appName),
         Routes.settingsPrivacy: (BuildContext context) => const PrivacySettingsScreen(),
-        Routes.settingsChat: (BuildContext context) => const ChatsSettingsScreen(),
+        Routes.settingsChat: (BuildContext context) => const SettingsChatsScreen(),
         Routes.settingsTheme: (BuildContext context) => const ThemeSettingsScreen(),
         Routes.settingsDevices: (BuildContext context) => DevicesScreen(),
         Routes.settings: (BuildContext context) => const SettingsScreen(),

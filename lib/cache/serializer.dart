@@ -141,8 +141,9 @@ class CacheSerializer implements StateSerializer<AppState> {
     final cryptoState =
         cryptoStore ?? preloaded[StorageKeys.CRYPTO] as CryptoStore? ?? CryptoStore();
 
-    final messageSessionsLoaded = (preloaded[StorageKeys.MESSAGE_SESSIONS] ?? {})
-        as Map<String, Map<String, List<MessageSession>>>;
+    final messageSessionsLoaded =
+        (preloaded[StorageKeys.MESSAGE_SESSIONS] ?? <String, Map<String, List<MessageSession>>>{})
+            as Map<String, Map<String, List<MessageSession>>>;
 
     return AppState(
       loading: false,

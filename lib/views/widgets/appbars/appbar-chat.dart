@@ -234,7 +234,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                 onTap: () {
                   Navigator.pushNamed(
                     context,
-                    Routes.chatDetails,
+                    Routes.chatSettings,
                     arguments: ChatDetailsArguments(
                       roomId: widget.room.id,
                       title: widget.room.name,
@@ -361,7 +361,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     case ChatOptions.chatSettings:
                       Navigator.pushNamed(
                         context,
-                        Routes.chatDetails,
+                        Routes.chatSettings,
                         arguments: ChatDetailsArguments(
                           roomId: widget.room.id,
                           title: widget.room.name,

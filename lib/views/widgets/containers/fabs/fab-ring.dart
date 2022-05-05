@@ -22,32 +22,35 @@ class FabRing extends StatelessWidget {
     this.alignment,
   }) : super(key: key);
 
-  @protected
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
     Navigator.pushNamed(context, Routes.searchGroups);
   }
 
-  @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
     Navigator.pushNamed(context, Routes.searchUsers);
   }
 
-  @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
     Navigator.pushNamed(context, Routes.groupCreate);
   }
 
-  @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.close();
     Navigator.pushNamed(context, Routes.groupCreatePublic);
+  }
+
+  double actionRingDefaultDimensions(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    if (size.width > 640) return 640;
+    if (size.width > 400) return size.width * 0.9;
+    return size.width;
   }
 
   @override
@@ -73,7 +76,7 @@ class FabRing extends StatelessWidget {
             ),
             fabColor: props.primaryColor,
             ringColor: props.primaryColor.withAlpha(144),
-            ringDiameter: Dimensions.actionRingDefaultWidth(context),
+            ringDiameter: actionRingDefaultDimensions(context),
             animationDuration: Duration(milliseconds: 275),
             onDisplayChange: (opened) {},
             children: [

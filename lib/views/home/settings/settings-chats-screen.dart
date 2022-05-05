@@ -14,8 +14,8 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
-class ChatsSettingsScreen extends StatelessWidget {
-  const ChatsSettingsScreen({Key? key}) : super(key: key);
+class SettingsChatsScreen extends StatelessWidget {
+  const SettingsChatsScreen({Key? key}) : super(key: key);
 
   displayThemeType(String themeTypeName) {
     return themeTypeName.split('.')[1].toLowerCase();
