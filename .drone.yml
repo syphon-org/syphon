@@ -38,7 +38,7 @@ steps:
       - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.nightly.android.apk
 
   - name: release android
-    image: golang:1.15
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
@@ -90,7 +90,7 @@ steps:
       - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
 
   - name: release android
-    image: golang:1.15
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
@@ -134,7 +134,7 @@ steps:
       - tar -cvzf syphon.nightly.linux.x64.tar.gz -C build/linux/x64/release/bundle .
 
   - name: release linux
-    image: golang:1.15
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
@@ -223,7 +223,7 @@ steps:
       - tar -cvzf syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz -C build/linux/x64/release/bundle .
 
   - name: release linux
-    image: golang:1.15
+    image: golang:1.13
     environment:
       GITEA_SERVER_TOKEN:
         from_secret: GITEA_API_TOKEN
