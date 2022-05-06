@@ -42,50 +42,6 @@ steps:
       - tea login add -u https://git.syphon.org
       - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-linux" --asset ./syphon.nightly.linux.x64.tar.gz
 ---
-#kind: pipeline
-#type: docker
-#name: linux nightly (arm64)
-#platform:
-#  os: linux
-#  arch: arm64
-#trigger:
-#  branch:
-#    - dev
-#    - main
-#  event:
-#    - push
-#steps:
-#  - name: build linux
-#    image: cirrusci/flutter:2.10.5
-#    commands:
-#      # Install dependencies
-#      - apt-get update -y
-#      - apt-get install -y cmake ninja-build clang pkg-config libgtk-3-dev liblzma-dev libblkid-dev libsecret-1-dev libolm-dev libolm3 libsqlite3-dev libjsoncpp-dev libsqlcipher-dev
-#      - git submodule update --init --recursive
-#      # Set up flutter config
-#      - flutter config --no-analytics
-#      - flutter pub get
-#      - flutter pub run build_runner build --delete-conflicting-outputs
-#      - flutter config --enable-linux-desktop
-#      # Build the linux app exec
-#      - flutter build linux --release
-#      - cp -aL /usr/lib/aarch64-linux-gnu/libjsoncpp.so* build/linux/arm64/release/bundle/lib/
-#      - cp -aL /usr/lib/aarch64-linux-gnu/libsqlite3.so build/linux/arm64/release/bundle/lib/
-#      - cp -aL /usr/lib/aarch64-linux-gnu/libsqlcipher.so build/linux/arm64/release/bundle/lib/
-#      - tar -cvzf syphon.nightly.linux.x64.tar.gz -C build/linux/arm64/release/bundle .
-
-#   - name: release linux
-#     image: golang:1.15
-#     environment:
-#       GITEA_SERVER_TOKEN:
-#         from_secret: GITEA_API_TOKEN
-#     commands:
-#       # Modify the existing release and add the android apk
-#       - go get code.gitea.io/tea
-#       - go install code.gitea.io/tea
-#       - tea login add -u https://git.syphon.org
-#       - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-linux" --asset ./syphon.nightly.linux.x64.tar.gz
-# ---
 kind: pipeline
 type: docker
 name: linux branch build
@@ -131,6 +87,50 @@ steps:
       - tea login add -u https://git.syphon.org
       - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz
 ---
+#kind: pipeline
+#type: docker
+#name: linux nightly (arm64)
+#platform:
+#  os: linux
+#  arch: arm64
+#trigger:
+#  branch:
+#    - dev
+#    - main
+#  event:
+#    - push
+#steps:
+#  - name: build linux
+#    image: cirrusci/flutter:2.10.5
+#    commands:
+#      # Install dependencies
+#      - apt-get update -y
+#      - apt-get install -y cmake ninja-build clang pkg-config libgtk-3-dev liblzma-dev libblkid-dev libsecret-1-dev libolm-dev libolm3 libsqlite3-dev libjsoncpp-dev libsqlcipher-dev
+#      - git submodule update --init --recursive
+#      # Set up flutter config
+#      - flutter config --no-analytics
+#      - flutter pub get
+#      - flutter pub run build_runner build --delete-conflicting-outputs
+#      - flutter config --enable-linux-desktop
+#      # Build the linux app exec
+#      - flutter build linux --release
+#      - cp -aL /usr/lib/aarch64-linux-gnu/libjsoncpp.so* build/linux/arm64/release/bundle/lib/
+#      - cp -aL /usr/lib/aarch64-linux-gnu/libsqlite3.so build/linux/arm64/release/bundle/lib/
+#      - cp -aL /usr/lib/aarch64-linux-gnu/libsqlcipher.so build/linux/arm64/release/bundle/lib/
+#      - tar -cvzf syphon.nightly.linux.x64.tar.gz -C build/linux/arm64/release/bundle .
+
+#   - name: release linux
+#     image: golang:1.15
+#     environment:
+#       GITEA_SERVER_TOKEN:
+#         from_secret: GITEA_API_TOKEN
+#     commands:
+#       # Modify the existing release and add the android apk
+#       - go get code.gitea.io/tea
+#       - go install code.gitea.io/tea
+#       - tea login add -u https://git.syphon.org
+#       - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-linux" --asset ./syphon.nightly.linux.x64.tar.gz
+# ---
 kind: pipeline
 type: docker
 name: android nightly
