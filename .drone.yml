@@ -1,106 +1,5 @@
 kind: pipeline
 type: docker
-name: android nightly
-trigger:
-  branch:
-    - dev
-    - main
-  event:
-    - push
-steps:
-  - name: build android
-    image: cirrusci/flutter:2.10.5
-    commands:
-      # Keep track of the time when build was started
-      - echo $(date -Iseconds) > BUILD_START_TIME
-      # Environment variables
-      - export DEBIAN_FRONTEND=noninteractive
-      - export ANDROID_NDK_HOME=/opt/android-sdk-linux/ndk-bundle/
-      # Install dependencies (git should be pre-installed)
-      - apt-get update && apt-get install --no-install-recommends -y cmake ninja-build
-      - git submodule update --init --recursive
-      - sdkmanager "ndk-bundle"
-      # Set up flutter
-      - flutter config --no-analytics
-      - flutter pub get
-      - flutter pub run build_runner build --delete-conflicting-outputs
-      # Modify gradle build script (remove/change parts which don't work in this environment)
-      - sed -i '/keystoreProperties\[/d' android/app/build.gradle
-      - sed -i 's/version "3.10.2"/version "3.7.0+"/g' android/app/build.gradle
-      - sed -i 's/signingConfig signingConfigs.release/signingConfig signingConfigs.debug/g' android/app/build.gradle
-      # Modify package and app name to allow for installing alongside normal Syphon
-      - sed -i 's/android:label="Syphon"/android:label="Syphon Nightly"/g' android/app/src/main/AndroidManifest.xml
-      - sed -i 's/applicationId "org.tether.tether"/applicationId "org.syphon.syphon.nightly"/g' android/app/build.gradle
-      # Modify the default ic_launcher to the nightly version
-      - sed -i 's/ic_launcher_background">#34C7B5/ic_launcher_background">#161616/g' android/app/src/main/res/values/colors.xml
-      # Build the APK
-      - flutter build apk
-      - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.nightly.android.apk
-
-  - name: release android
-    image: golang:1.17
-    environment:
-      GITEA_SERVER_TOKEN:
-        from_secret: GITEA_API_TOKEN
-    commands:
-      # Modify the existing release and add the android apk
-      - go install code.gitea.io/tea@latest
-      - tea login add -u https://git.syphon.org -n syphon
-      - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-android" --asset ./syphon.nightly.android.apk
----
-kind: pipeline
-type: docker
-name: android branch build
-trigger:
-  branch:
-    exclude:
-      - dev
-      - main
-  event:
-    - push
-steps:
-  - name: build android
-    image: cirrusci/flutter:2.10.5
-    commands:
-      # Keep track of the time when build was started
-      - echo $(date -Iseconds) > BUILD_START_TIME
-      # Environment variables
-      - export DEBIAN_FRONTEND=noninteractive
-      - export ANDROID_NDK_HOME=/opt/android-sdk-linux/ndk-bundle/
-      # Install dependencies (git should be pre-installed)
-      - apt-get update && apt-get install --no-install-recommends -y cmake ninja-build
-      - git submodule update --init --recursive
-      - sdkmanager "ndk-bundle"
-      # Set up flutter
-      - flutter config --no-analytics
-      - flutter pub get
-      - flutter pub run build_runner build --delete-conflicting-outputs
-      # Modify gradle build script (remove/change parts which don't work in this environment)
-      - sed -i '/keystoreProperties\[/d' android/app/build.gradle
-      - sed -i 's/version "3.10.2"/version "3.7.0+"/g' android/app/build.gradle
-      - sed -i 's/signingConfig signingConfigs.release/signingConfig signingConfigs.debug/g' android/app/build.gradle
-      # Modify package and app name to allow for installing alongside normal Syphon
-      - sed -i 's/android:label="Syphon"/android:label="Syphon Nightly"/g' android/app/src/main/AndroidManifest.xml
-      - sed -i 's/applicationId "org.tether.tether"/applicationId "org.syphon.syphon.nightly"/g' android/app/build.gradle
-      # Modify the default ic_launcher to the nightly version
-      - sed -i 's/ic_launcher_background">#34C7B5/ic_launcher_background">#161616/g' android/app/src/main/res/values/colors.xml
-      # Build the APK
-      - flutter build apk
-      - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
-
-  - name: release android
-    image: golang:1.17
-    environment:
-      GITEA_SERVER_TOKEN:
-        from_secret: GITEA_API_TOKEN
-    commands:
-      # Modify the existing release and add the android apk
-      - go install code.gitea.io/tea@latest
-      - tea login add -u https://git.syphon.org -n syphon
-      - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
----
-kind: pipeline
-type: docker
 name: linux nightly (amd64)
 platform:
   os: linux
@@ -231,24 +130,103 @@ steps:
       - go install code.gitea.io/tea@latest
       - tea login add -u https://git.syphon.org
       - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz
-# ---
-# TODO: Remove to test Tea updates
-# kind: pipeline
-# type: docker
-# name: test release
-# trigger:
-#   event:
-#     - push
-# steps:
-#   - name: release test
-#     image: golang:1.17
-#     environment:
-#       GITEA_SERVER_TOKEN:
-#         from_secret: GITEA_API_TOKEN
-#     commands:
-#       - go install code.gitea.io/tea@latest
-#       - tea --version
-#       - which tea
-#       - tea login add -u https://git.syphon.org
-#       - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.testing.linux.x64.tar.gz
-# ---
+kind: pipeline
+type: docker
+name: android nightly
+trigger:
+  branch:
+    - dev
+    - main
+  event:
+    - push
+steps:
+  - name: build android
+    image: cirrusci/flutter:2.10.5
+    commands:
+      # Keep track of the time when build was started
+      - echo $(date -Iseconds) > BUILD_START_TIME
+      # Environment variables
+      - export DEBIAN_FRONTEND=noninteractive
+      - export ANDROID_NDK_HOME=/opt/android-sdk-linux/ndk-bundle/
+      # Install dependencies (git should be pre-installed)
+      - apt-get update && apt-get install --no-install-recommends -y cmake ninja-build
+      - git submodule update --init --recursive
+      - sdkmanager "ndk-bundle"
+      # Set up flutter
+      - flutter config --no-analytics
+      - flutter pub get
+      - flutter pub run build_runner build --delete-conflicting-outputs
+      # Modify gradle build script (remove/change parts which don't work in this environment)
+      - sed -i '/keystoreProperties\[/d' android/app/build.gradle
+      - sed -i 's/version "3.10.2"/version "3.7.0+"/g' android/app/build.gradle
+      - sed -i 's/signingConfig signingConfigs.release/signingConfig signingConfigs.debug/g' android/app/build.gradle
+      # Modify package and app name to allow for installing alongside normal Syphon
+      - sed -i 's/android:label="Syphon"/android:label="Syphon Nightly"/g' android/app/src/main/AndroidManifest.xml
+      - sed -i 's/applicationId "org.tether.tether"/applicationId "org.syphon.syphon.nightly"/g' android/app/build.gradle
+      # Modify the default ic_launcher to the nightly version
+      - sed -i 's/ic_launcher_background">#34C7B5/ic_launcher_background">#161616/g' android/app/src/main/res/values/colors.xml
+      # Build the APK
+      - flutter build apk
+      - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.nightly.android.apk
+
+  - name: release android
+    image: golang:1.17
+    environment:
+      GITEA_SERVER_TOKEN:
+        from_secret: GITEA_API_TOKEN
+    commands:
+      # Modify the existing release and add the android apk
+      - go install code.gitea.io/tea@latest
+      - tea login add -u https://git.syphon.org -n syphon
+      - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-nightly-android" --asset ./syphon.nightly.android.apk
+---
+kind: pipeline
+type: docker
+name: android branch build
+trigger:
+  branch:
+    exclude:
+      - dev
+      - main
+  event:
+    - push
+steps:
+  - name: build android
+    image: cirrusci/flutter:2.10.5
+    commands:
+      # Keep track of the time when build was started
+      - echo $(date -Iseconds) > BUILD_START_TIME
+      # Environment variables
+      - export DEBIAN_FRONTEND=noninteractive
+      - export ANDROID_NDK_HOME=/opt/android-sdk-linux/ndk-bundle/
+      # Install dependencies (git should be pre-installed)
+      - apt-get update && apt-get install --no-install-recommends -y cmake ninja-build
+      - git submodule update --init --recursive
+      - sdkmanager "ndk-bundle"
+      # Set up flutter
+      - flutter config --no-analytics
+      - flutter pub get
+      - flutter pub run build_runner build --delete-conflicting-outputs
+      # Modify gradle build script (remove/change parts which don't work in this environment)
+      - sed -i '/keystoreProperties\[/d' android/app/build.gradle
+      - sed -i 's/version "3.10.2"/version "3.7.0+"/g' android/app/build.gradle
+      - sed -i 's/signingConfig signingConfigs.release/signingConfig signingConfigs.debug/g' android/app/build.gradle
+      # Modify package and app name to allow for installing alongside normal Syphon
+      - sed -i 's/android:label="Syphon"/android:label="Syphon Nightly"/g' android/app/src/main/AndroidManifest.xml
+      - sed -i 's/applicationId "org.tether.tether"/applicationId "org.syphon.syphon.nightly"/g' android/app/build.gradle
+      # Modify the default ic_launcher to the nightly version
+      - sed -i 's/ic_launcher_background">#34C7B5/ic_launcher_background">#161616/g' android/app/src/main/res/values/colors.xml
+      # Build the APK
+      - flutter build apk
+      - cp build/app/outputs/flutter-apk/app-release.apk ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
+
+  - name: release android
+    image: golang:1.17
+    environment:
+      GITEA_SERVER_TOKEN:
+        from_secret: GITEA_API_TOKEN
+    commands:
+      # Modify the existing release and add the android apk
+      - go install code.gitea.io/tea@latest
+      - tea login add -u https://git.syphon.org -n syphon
+      - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-android" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).android.apk
