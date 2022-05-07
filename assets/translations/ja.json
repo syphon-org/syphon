@@ -1,4 +1,11 @@
 {
     "title-intro": "ようこそ へ {}",
-    "header-signup-username": "ユーザー名を作成する"
+    "header-signup-username": "ユーザー名を作成する",
+    "header-ordering": "順序性",
+    "header-general": "ゼネラル",
+    "header-media": "メディア",
+    "header-media-auto-download": "メディアの自動ダウンロード",
+    "header-update-password": "パスワードの更新",
+    "header-login": "おしゃべりを取り返す",
+    "header-intro": "プライバシーと自由を\n手間をかけずに。"
 }
