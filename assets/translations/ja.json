@@ -4,8 +4,11 @@
     "header-ordering": "順序性",
     "header-general": "ゼネラル",
     "header-media": "メディア",
-    "header-media-auto-download": "メディアの自動ダウンロード",
-    "header-update-password": "パスワードの更新",
+    "header-media-auto-download": "メディアのオートダウンロード",
+    "header-update-password": "アップデートパスワード",
     "header-login": "おしゃべりを取り返す",
-    "header-intro": "プライバシーと自由を\n手間をかけずに。"
+    "header-intro": "プライバシーとフリーダムを\n手間をかけずに。",
+    "title-verification": "ベリフィケーション",
+    "title-view-search-groups": "",
+    "title-view-delete-devices": "デバイスの取り外し確認"
 }
