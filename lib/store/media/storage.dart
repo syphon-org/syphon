@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:drift/drift.dart';
@@ -17,12 +18,20 @@ import 'package:syphon/store/user/model.dart';
 /// In redux, they're indexed by RoomID and placed in a list
 ///
 extension MediaQueries on StorageDatabase {
-  Future<void> insertMedia(Media media) {
+  Future<int> insertMedia(Media media) async {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return into(medias).insert(
+        media,
+        mode: InsertMode.insertOrReplace,
+      );
+    }
     return into(medias).insertOnConflictUpdate(media);
   }
 
   Future<Media?> selectMedia(String mxcUri) {
-    return (select(medias)..where((tbl) => tbl.mxcUri.equals(mxcUri))).getSingleOrNull();
+    return (select(medias)..where((tbl) => tbl.mxcUri.equals(mxcUri)))
+        .getSingleOrNull();
   }
 
   Future<List<Media>> selectMedias(List<String?> mxcUris) {
@@ -42,7 +51,7 @@ Future<bool> checkMedia(
   return (await storage.selectMedia(mxcUri)) != null;
 }
 
-Future<void> saveMedia(
+Future<int> saveMedia(
   String? mxcUri,
   Uint8List? data, {
   String? type,
