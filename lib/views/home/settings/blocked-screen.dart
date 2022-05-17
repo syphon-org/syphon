@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -68,7 +68,7 @@ class BlockedScreenState extends State<BlockedScreen> {
                   uri: user.avatarUri,
                   alt: user.displayName ?? user.userId,
                   size: Dimensions.avatarSizeMin,
-                  background: Colours.hashedColorUser(user),
+                  background: AppColors.hashedColorUser(user),
                 ),
                 title: Text(
                   formatUsername(user),
@@ -79,7 +79,7 @@ class BlockedScreenState extends State<BlockedScreen> {
                   user.userId!,
                   style: Theme.of(context).textTheme.caption!.merge(
                         TextStyle(
-                          color: props.loading ? Color(Colours.greyDisabled) : null,
+                          color: props.loading ? Color(AppColors.greyDisabled) : null,
                         ),
                       ),
                 ),

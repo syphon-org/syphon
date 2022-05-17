@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -99,7 +99,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           uri: props.user.avatarUri,
           alt: formatUsername(props.user),
           size: imageSize,
-          background: Colours.hashedColorUser(props.user),
+          background: AppColors.hashedColorUser(props.user),
         );
 
         if (avatarFileNew != null) {
@@ -107,7 +107,7 @@ class ProfileScreenState extends State<ProfileScreen> {
             alt: formatUsername(props.user),
             size: imageSize,
             file: avatarFileNew,
-            background: Colours.hashedColorUser(props.user),
+            background: AppColors.hashedColorUser(props.user),
           );
         }
 

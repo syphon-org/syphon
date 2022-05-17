@@ -4,7 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/print.dart';
@@ -141,8 +141,8 @@ class CaptchaStepState extends State<CaptchaStep> {
                         ? Strings.buttonTextLoadCaptcha
                         : Strings.buttonTextConfirmed,
                     color: !props.completed
-                        ? Color(Colours.cyanSyphon)
-                        : Color(Colours.cyanSyphonAlpha),
+                        ? Color(AppColors.cyanSyphon)
+                        : Color(AppColors.cyanSyphonAlpha),
                     loading: props.loading,
                     disabled: props.completed,
                     onPressed: () => onShowDialog(context, props),

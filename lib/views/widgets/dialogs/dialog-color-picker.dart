@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
 
 class DialogColorPicker extends StatefulWidget {
@@ -42,15 +42,15 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
   buildDefaultPicker(context) => BlockPicker(
         availableColors: const <Color>[
           MaterialColor(
-            Colours.cyanSyphon,
+            AppColors.cyanSyphon,
             <int, Color>{
-              500: Color(Colours.cyanSyphon),
+              500: Color(AppColors.cyanSyphon),
             },
           ),
           MaterialColor(
-            Colours.chatBlue,
+            AppColors.chatBlue,
             <int, Color>{
-              500: Color(Colours.chatBlue),
+              500: Color(AppColors.chatBlue),
             },
           ),
           Colors.red,
@@ -73,9 +73,9 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
           Colors.grey,
           Colors.blueGrey,
           MaterialColor(
-            Colours.blackFull,
+            AppColors.blackFull,
             <int, Color>{
-              500: Color(Colours.blackFull),
+              500: Color(AppColors.blackFull),
             },
           ),
         ],

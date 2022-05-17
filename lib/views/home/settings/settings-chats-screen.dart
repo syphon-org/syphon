@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
@@ -74,7 +74,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 trailing: Switch(
                                   value: false,
-                                  inactiveThumbColor: Color(Colours.greyDisabled),
+                                  inactiveThumbColor: Color(AppColors.greyDisabled),
                                   onChanged: (showMembershipEvents) {},
                                 ),
                               ),

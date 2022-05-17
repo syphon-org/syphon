@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:swipeable/swipeable.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -100,7 +100,7 @@ class MessageWidget extends StatelessWidget {
           width: 36,
           height: Dimensions.iconSizeLarge,
           decoration: BoxDecoration(
-            color: Color(Colours.greyDefault),
+            color: Color(AppColors.greyDefault),
             borderRadius: BorderRadius.circular(Dimensions.iconSizeLarge),
             border: Border.all(
               color: Colors.white,
@@ -184,13 +184,14 @@ class MessageWidget extends StatelessWidget {
     final removePadding = isMedia || (isEditing && selected);
 
     var textColor = Colors.white;
+    Color anchorColor = Colors.blue;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
     var luminance = this.luminance;
 
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
     var replyColor = color;
-    var bubbleColor = color ?? Colours.hashedColor(message.sender);
+    var bubbleColor = color ?? AppColors.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
@@ -270,15 +271,15 @@ class MessageWidget extends StatelessWidget {
 
     if (isUserSent) {
       if (themeType == ThemeType.Dark) {
-        bubbleColor = Color(Colours.greyDark);
+        bubbleColor = Color(AppColors.greyDark);
         luminance = 0.2;
       } else if (themeType != ThemeType.Light) {
-        bubbleColor = Color(Colours.greyDarkest);
+        bubbleColor = Color(AppColors.greyDarkest);
         luminance = bubbleColor.computeLuminance();
         luminance = 0.2;
       } else {
-        textColor = const Color(Colours.blackFull);
-        bubbleColor = const Color(Colours.greyLightest);
+        textColor = const Color(AppColors.blackFull);
+        bubbleColor = const Color(AppColors.greyLightest);
         luminance = 0.85;
       }
 
@@ -313,10 +314,16 @@ class MessageWidget extends StatelessWidget {
       fontStyle = FontStyle.italic;
     }
 
+    if (message.hasLink) {
+      if (bubbleColor.delta(Colors.blue) > 0.85) {
+        anchorColor = Color(AppColors.blueDark);
+      }
+    }
+
     // efficent way to check if Matrix message is a reply
     if (body.isNotEmpty && body[0] == '>') {
       final isLight = (luminance ?? 0.0) > 0.5;
-      replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
+      replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.5 : 0.25).toColor();
     }
 
     return Swipeable(
@@ -402,7 +409,7 @@ class MessageWidget extends StatelessWidget {
                               uri: avatarUri,
                               alt: message.sender,
                               size: Dimensions.avatarSizeMessage,
-                              background: Colours.hashedColor(message.sender),
+                              background: AppColors.hashedColor(message.sender),
                             ),
                           ),
                         ),
@@ -514,6 +521,7 @@ class MessageWidget extends StatelessWidget {
                                         onTapLink: (text, href, title) =>
                                             onConfirmLink(context, href),
                                         styleSheet: MarkdownStyleSheet(
+                                          a: TextStyle(color: anchorColor),
                                           blockquote: TextStyle(
                                             backgroundColor: bubbleColor,
                                           ),
@@ -521,8 +529,8 @@ class MessageWidget extends StatelessWidget {
                                             color: replyColor,
                                             borderRadius: const BorderRadius.only(
                                               //TODO: shape similar to bubbleBorder
-                                              topLeft: Radius.circular(12),
-                                              topRight: Radius.circular(12),
+                                              topLeft: Radius.circular(4),
+                                              topRight: Radius.circular(4),
                                               bottomLeft: Radius.circular(4),
                                               bottomRight: Radius.circular(4),
                                             ),

@@ -16,8 +16,6 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/converters.dart';
 import 'package:syphon/storage/index.dart';
-// ignore: unused_import
-import 'package:syphon/storage/migrations/5.update.messages.dart';
 import 'package:syphon/storage/models.dart';
 import 'package:syphon/store/auth/schema.dart';
 import 'package:syphon/store/crypto/schema.dart';
@@ -224,7 +222,7 @@ class StorageDatabase extends _$StorageDatabase {
 
   // you should bump this number whenever you change or add a table definition.
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -233,6 +231,9 @@ class StorageDatabase extends _$StorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           log.info('[MIGRATION] VERSION $from to $to');
+          if (from == 8) {
+            await m.addColumn(messages, messages.hasLink);
+          }
           if (from == 7) {
             await m.createTable(keySessions);
             await m.createTable(messageSessions);

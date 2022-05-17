@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/model.dart';
@@ -36,7 +36,7 @@ class ProfilePreview extends StatelessWidget {
                   uri: props.avatarUri,
                   alt: props.user.displayName ?? props.user.userId,
                   size: Dimensions.avatarSize,
-                  background: Colours.hashedColorUser(props.user),
+                  background: AppColors.hashedColorUser(props.user),
                 ),
               ),
               Column(
@@ -67,7 +67,7 @@ class ProfilePreview extends StatelessWidget {
                       onPressed: () => onModifyAccounts?.call(),
                       icon: Icon(
                         Icons.more_horiz_rounded,
-                        color: Color(Colours.greyDefault),
+                        color: Color(AppColors.greyDefault),
                         size: avatarSize,
                       ),
                     )),

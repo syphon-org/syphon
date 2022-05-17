@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/strings.dart';
@@ -196,13 +196,13 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     title: Text(
                       Strings.listItemSettingsManualSync,
                       style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                            color: props.syncing ? Color(Colours.greyDisabled) : null,
+                            color: props.syncing ? Color(AppColors.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
                       Strings.subtitleManualSync,
                       style: TextStyle(
-                        color: props.syncing ? Color(Colours.greyDisabled) : null,
+                        color: props.syncing ? Color(AppColors.greyDisabled) : null,
                       ),
                     ),
                     trailing: Container(
@@ -220,7 +220,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     title: Text(
                       Strings.listItemSettingsForceFullSync,
                       style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                            color: props.syncing ? Color(Colours.greyDisabled) : null,
+                            color: props.syncing ? Color(AppColors.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(

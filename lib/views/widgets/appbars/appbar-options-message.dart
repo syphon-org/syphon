@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
@@ -73,7 +73,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
   @override
   Widget build(BuildContext context) => AppBar(
         systemOverlayStyle: computeSystemUIColor(context),
-        backgroundColor: Color(Colours.greyDefault),
+        backgroundColor: Color(AppColors.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
         title: Row(

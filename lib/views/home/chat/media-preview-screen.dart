@@ -7,7 +7,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
@@ -134,7 +134,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                             onTap: sending ? null : () => onConfirm(props),
                             child: CircleAvatar(
                               backgroundColor: sending
-                                  ? Color(Colours.greyDisabled)
+                                  ? Color(AppColors.greyDisabled)
                                   : Theme.of(context).colorScheme.primary,
                               child: sending
                                   ? Padding(

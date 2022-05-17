@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -169,7 +169,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
         ModalRoute.of(context)!.settings.arguments as ChatDetailsArguments?;
 
     final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
-        ? Color(Colours.greyLightest)
+        ? Color(AppColors.greyLightest)
         : Theme.of(context).scaffoldBackgroundColor;
 
     return StoreConnector<AppState, _Props>(

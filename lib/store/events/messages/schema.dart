@@ -34,6 +34,9 @@ class Messages extends Table {
   IntColumn get timestamp => integer()();
   IntColumn get received => integer()();
 
+  // Message details
+  BoolColumn get hasLink => boolean()();
+
   // Message Only
   TextColumn get body => text().nullable()();
   TextColumn get msgtype => text().nullable()();

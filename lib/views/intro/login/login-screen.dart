@@ -9,7 +9,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
@@ -125,7 +125,7 @@ class LoginScreenState extends State<LoginScreen> with Lifecycle<LoginScreen> {
           size: Dimensions.avatarSizeMin,
           url: props.homeserver.photoUrl,
           alt: props.homeserver.hostname ?? '',
-          background: Colours.hashedColor(props.homeserver.hostname),
+          background: AppColors.hashedColor(props.homeserver.hostname),
         ),
         title: Text(
           props.homeserver.hostname ?? '',

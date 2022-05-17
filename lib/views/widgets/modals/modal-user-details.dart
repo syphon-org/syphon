@@ -5,7 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -144,7 +144,7 @@ class ModalUserDetails extends StatelessWidget {
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
                             background: props.user.avatarUri == null
-                                ? Colours.hashedColorUser(props.user)
+                                ? AppColors.hashedColorUser(props.user)
                                 : null,
                           ),
                         ),

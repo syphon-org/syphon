@@ -3,7 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/algos.dart';
 
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'model.dart';
 
@@ -61,11 +61,11 @@ SystemUiOverlayStyle computeSystemUIColor(BuildContext context, {double ratio = 
 int selectRowHighlightColor(ThemeType themeType) {
   switch (themeType) {
     case ThemeType.Light:
-      return Colours.greyLightest;
+      return AppColors.greyLightest;
     case ThemeType.Night:
-      return Colours.greyDarkest;
+      return AppColors.greyDarkest;
     default:
-      return Colours.greyDark;
+      return AppColors.greyDark;
   }
 }
 
@@ -74,11 +74,11 @@ int selectSystemUiColor(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Colours.whiteDefault;
+      return AppColors.whiteDefault;
     case ThemeType.Night:
-      return Colours.blackFull;
+      return AppColors.blackFull;
     default:
-      return Colours.blackDefault;
+      return AppColors.blackDefault;
   }
 }
 
@@ -98,11 +98,11 @@ Color selectIconBackground(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Color(Colours.greyDefault);
+      return Color(AppColors.greyDefault);
     case ThemeType.Night:
-      return Color(Colours.greyDefault);
+      return Color(AppColors.greyDefault);
     default:
-      return Color(Colours.greyDark);
+      return Color(AppColors.greyDark);
   }
 }
 
@@ -111,11 +111,11 @@ Color selectAvatarBackground(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Color(Colours.greyLightest);
+      return Color(AppColors.greyLightest);
     case ThemeType.Night:
-      return Color(Colours.greyDefault);
+      return Color(AppColors.greyDefault);
     default:
-      return Color(Colours.greyDark);
+      return Color(AppColors.greyDark);
   }
 }
 
@@ -157,11 +157,11 @@ int? selectScaffoldBackgroundColor(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Colours.whiteDefault;
+      return AppColors.whiteDefault;
     case ThemeType.Darker:
-      return Colours.blackDefault;
+      return AppColors.blackDefault;
     case ThemeType.Night:
-      return Colours.blackFull;
+      return AppColors.blackFull;
     default:
       return null;
   }
@@ -172,7 +172,7 @@ Color selectInputTextColor(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Color(Colours.blackDefault);
+      return Color(AppColors.blackDefault);
     default:
       return Colors.white;
   }
@@ -194,7 +194,7 @@ Color selectInputBackgroundColor(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Color(Colours.greyEnabled);
+      return Color(AppColors.greyEnabled);
     case ThemeType.Dark:
       return Colors.grey[800]!;
     default:

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/noop.dart';
 
 class MediaCard extends StatelessWidget {
@@ -22,7 +22,7 @@ class MediaCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         clipBehavior: Clip.antiAlias,
         elevation: 0.0,
-        color: const Color(Colours.greyDefault),
+        color: const Color(AppColors.greyDefault),
         child: InkWell(
           onTap: disabled ? null : () => onPress(),
           onLongPress: disabled ? null : () => onPress(),

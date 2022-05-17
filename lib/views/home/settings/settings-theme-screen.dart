@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -48,7 +48,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
       context: context,
       builder: (BuildContext dialogContext) => DialogColorPicker(
         title: title,
-        resetColor: Colours.cyanSyphon,
+        resetColor: AppColors.cyanSyphon,
         currentColor: currentColor,
         onSelectColor: onSelectColor,
         advanced: advanced ?? false,

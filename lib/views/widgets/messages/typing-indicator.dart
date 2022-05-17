@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -119,7 +119,7 @@ class TypingIndicatorState extends State<TypingIndicator> with TickerProviderSta
                                 uri: userTyping.avatarUri,
                                 alt: userTyping.displayName ?? userTyping.userId,
                                 size: Dimensions.avatarSizeMessage,
-                                background: Colours.hashedColorUser(userTyping),
+                                background: AppColors.hashedColorUser(userTyping),
                               ),
                       ),
                     ),

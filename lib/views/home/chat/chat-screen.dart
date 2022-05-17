@@ -10,7 +10,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
@@ -526,7 +526,7 @@ class ChatScreenState extends State<ChatScreen> {
                   Container(
                     padding: EdgeInsets.only(right: 8),
                     child: CircleAvatar(
-                      backgroundColor: const Color(Colours.greyDisabled),
+                      backgroundColor: const Color(AppColors.greyDisabled),
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
                         color: Colors.white,

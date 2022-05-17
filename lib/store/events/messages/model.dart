@@ -28,6 +28,8 @@ class Message extends Event implements drift.Insertable<Message> {
   final bool edited;
   @JsonKey(defaultValue: false)
   final bool replacement;
+  @JsonKey(defaultValue: false)
+  final bool hasLink;
 
   // Message timestamps
   @JsonKey(defaultValue: 0)
@@ -87,6 +89,7 @@ class Message extends Event implements drift.Insertable<Message> {
     this.pending = false,
     this.failed = false,
     this.replacement = false,
+    this.hasLink = false,
     this.editIds = const [],
     this.reactions = const [],
   }) : super(
@@ -167,6 +170,7 @@ class Message extends Event implements drift.Insertable<Message> {
         failed: failed ?? this.failed,
         replacement: replacement ?? this.replacement,
         edited: edited ?? this.edited,
+        hasLink: hasLink ?? hasLink,
         relatedEventId: relatedEventId ?? this.relatedEventId,
         editIds: editIds ?? this.editIds,
         reactions: reactions ?? this.reactions,
@@ -205,6 +209,7 @@ class Message extends Event implements drift.Insertable<Message> {
       sessionId: drift.Value(sessionId),
       relatedEventId: drift.Value(relatedEventId),
       editIds: drift.Value(editIds),
+      hasLink: drift.Value(hasLink),
     ).toColumns(nullToAbsent);
   }
 
@@ -216,10 +221,11 @@ class Message extends Event implements drift.Insertable<Message> {
   factory Message.fromEvent(Event event) {
     try {
       final content = event.content ?? {};
-      var body = content['body'] ?? '';
+      String body = content['body'] ?? '';
       var msgtype = content['msgtype'];
       var replacement = false;
       var relatedEventId;
+      var hasLink = false;
 
       final relatesTo = content['m.relates_to'];
 
@@ -243,6 +249,8 @@ class Message extends Event implements drift.Insertable<Message> {
           log.error('[Message.fromEvent] Info Conversion Failed $error');
         }
       }
+
+      hasLink = body.contains('http');
 
       return Message(
         id: event.id,
@@ -271,6 +279,7 @@ class Message extends Event implements drift.Insertable<Message> {
         replacement: replacement,
         relatedEventId: relatedEventId,
         received: DateTime.now().millisecondsSinceEpoch,
+        hasLink: hasLink,
         failed: false,
         pending: false,
         syncing: false,

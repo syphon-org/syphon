@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 
 part 'model.g.dart';
 
@@ -61,9 +61,9 @@ class ThemeSettings extends Equatable {
   final MainFabLocation mainFabLocation;
 
   const ThemeSettings({
-    this.primaryColor = Colours.cyanSyphon,
-    this.accentColor = Colours.cyanSyphon,
-    this.appBarColor = Colours.cyanSyphon,
+    this.primaryColor = AppColors.cyanSyphon,
+    this.accentColor = AppColors.cyanSyphon,
+    this.appBarColor = AppColors.cyanSyphon,
     this.brightness = 0,
     this.themeType = ThemeType.Light,
     this.fontName = FontName.Rubik,

@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/weburl.dart';
@@ -52,7 +52,7 @@ class TermsStep extends StatelessWidget {
                         width: 56,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(40),
-                          color: const Color(Colours.cyanSyphon),
+                          color: const Color(AppColors.cyanSyphon),
                         ),
                         child: Icon(
                           Icons.check,

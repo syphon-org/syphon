@@ -7,7 +7,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
@@ -223,7 +223,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                   uri: user.avatarUri,
                   alt: user.displayName ?? user.userId,
                   size: Dimensions.avatarSizeMessage,
-                  background: Colours.hashedColorUser(user),
+                  background: AppColors.hashedColorUser(user),
                 ),
                 label: Text(
                   formatUsername(user),

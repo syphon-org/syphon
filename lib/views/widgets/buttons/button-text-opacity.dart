@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 
 import 'package:syphon/global/dimensions.dart';
 
@@ -66,7 +66,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
                       letterSpacing: 0.8,
                       color: () {
                         if (widget.disabled) {
-                          return Color(Colours.greyLight);
+                          return Color(AppColors.greyLight);
                         }
                         if (widget.color != null) {
                           return widget.color;

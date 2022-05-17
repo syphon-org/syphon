@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/actions.dart';
@@ -106,9 +106,9 @@ class UserProfileState extends State<UserProfileScreen> {
     final arguments = useScreenArguments<UserProfileArguments>(context)!;
 
     final user = arguments.user!;
-    final userColor = Colours.hashedColor(user.userId);
+    final userColor = AppColors.hashedColor(user.userId);
     final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
-        ? Color(Colours.greyLightest)
+        ? Color(AppColors.greyLightest)
         : Theme.of(context).scaffoldBackgroundColor;
 
     final double width = MediaQuery.of(context).size.width;
