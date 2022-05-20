@@ -35,7 +35,7 @@ class Messages extends Table {
   IntColumn get received => integer()();
 
   // Message details
-  BoolColumn get hasLink => boolean()();
+  BoolColumn get hasLink => boolean().withDefault(const Constant(false))();
 
   // Message Only
   TextColumn get body => text().nullable()();

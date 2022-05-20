@@ -77,14 +77,14 @@ class ModalUserDetails extends StatelessWidget {
         title: Strings.listItemUserDetailsStartChat(user.displayName),
         content: Strings.confirmStartChat,
         onStartChat: () async {
-          final roomIdNew = await props.onCreateChatDirect(user: user) ?? '';
+          final String roomIdNew = await props.onCreateChatDirect(user: user) ?? '';
           Navigator.pop(dialogContext);
 
           if (nested != null && nested!) {
             Navigator.pop(dialogContext);
           }
 
-          if (roomIdNew) {
+          if (roomIdNew.isNotEmpty) {
             Navigator.popAndPushNamed(
               context,
               Routes.chat,
