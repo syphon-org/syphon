@@ -22,28 +22,24 @@ class FabCircleExpanding extends StatelessWidget {
     this.alignment,
   }) : super(key: key);
 
-  @protected
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
     Navigator.pushNamed(context, Routes.searchGroups);
   }
 
-  @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
     Navigator.pushNamed(context, Routes.searchUsers);
   }
 
-  @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
     Navigator.pushNamed(context, Routes.groupCreate);
   }
 
-  @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);

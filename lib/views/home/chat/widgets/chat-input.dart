@@ -89,7 +89,6 @@ class ChatInputState extends State<ChatInput> {
 
   String hintText = Strings.placeholderMatrixUnencrypted;
 
-  @protected
   onMounted(_Props props) {
     final draft = props.room.draft;
 

@@ -192,7 +192,6 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
     );
   }
 
-  @protected
   Widget buildUserChipList(BuildContext context, _Props props) {
     return ListView.builder(
       shrinkWrap: true,

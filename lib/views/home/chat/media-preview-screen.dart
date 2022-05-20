@@ -59,7 +59,6 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
     }
   }
 
-  @protected
   onConfirm(_Props props) async {
     final params = useScreenArguments<MediaPreviewArguments>(context);
     await params?.onConfirmSend();

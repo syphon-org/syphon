@@ -39,7 +39,6 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
     onMounted();
   }
 
-  @protected
   Future onMounted() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {

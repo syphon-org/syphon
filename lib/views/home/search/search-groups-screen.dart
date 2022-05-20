@@ -39,7 +39,6 @@ class GroupSearchState extends State<GroupSearchScreen> {
     onMounted();
   }
 
-  @protected
   onMounted() async {
     final store = StoreProvider.of<AppState>(context);
     final searchResults = store.state.searchStore.searchResults;
@@ -60,7 +59,6 @@ class GroupSearchState extends State<GroupSearchScreen> {
     super.dispose();
   }
 
-  @protected
   Widget buildSearchList(BuildContext context, _Props props) {
     final label = props.loading ? Strings.labelSearching : Strings.labelGroupsEmpty;
 

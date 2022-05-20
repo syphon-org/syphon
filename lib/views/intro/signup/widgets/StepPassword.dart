@@ -35,7 +35,6 @@ class PasswordStepState extends State<PasswordStep> {
     onMounted();
   }
 
-  @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     passwordController.text = store.state.authStore.password;

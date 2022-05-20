@@ -32,7 +32,6 @@ class BlockedScreenState extends State<BlockedScreen> {
     super.didChangeDependencies();
   }
 
-  @protected
   onShowUserDetails({
     required BuildContext context,
     String? userId,
@@ -47,7 +46,6 @@ class BlockedScreenState extends State<BlockedScreen> {
     );
   }
 
-  @protected
   Widget buildUserList(BuildContext context, _Props props) => ListView.builder(
         shrinkWrap: true,
         scrollDirection: Axis.vertical,

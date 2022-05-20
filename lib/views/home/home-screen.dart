@@ -66,7 +66,6 @@ class HomeState extends State<HomeScreen> {
   Map<String, Room> selectedChats = {};
   Map<String, Color> chatColorCache = {};
 
-  @protected
   onToggleRoomOptions({required Room room}) {
     if (searching) {
       onToggleSearch();
@@ -251,12 +250,9 @@ class HomeState extends State<HomeScreen> {
     }
   }
 
-  bool isAllDirect(Map<String, Room> selectedChats) {
-    return selectedChats.values.every((chat) => chat.direct);
-  }
+  isAllDirect(Map<String, Room> selectedChats) => selectedChats.values.every((chat) => chat.direct);
 
-  @protected
-  Widget buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
+  buildAppBarRoomOptions({required BuildContext context, required _Props props}) => AppBar(
         backgroundColor: Color(AppColors.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
@@ -329,8 +325,7 @@ class HomeState extends State<HomeScreen> {
         ],
       );
 
-  @protected
-  Widget buildAppBar({required BuildContext context, required _Props props}) {
+  buildAppBar({required BuildContext context, required _Props props}) {
     final assetColor = computeContrastColorText(
       Theme.of(context).appBarTheme.backgroundColor,
     );
@@ -418,8 +413,7 @@ class HomeState extends State<HomeScreen> {
     );
   }
 
-  @protected
-  Widget buildChatList(BuildContext context, _Props props) {
+  buildChatList(BuildContext context, _Props props) {
     final store = StoreProvider.of<AppState>(context);
     final rooms = props.rooms;
     final label = props.syncing ? Strings.labelSyncingChats : Strings.labelMessagesEmpty;

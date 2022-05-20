@@ -33,7 +33,6 @@ class TypingIndicator extends StatefulWidget {
 class TypingIndicatorState extends State<TypingIndicator> with TickerProviderStateMixin {
   double fullSize = 1;
 
-  @protected
   wrapAnimation({Widget? animatedWidget, int? milliseconds}) => TweenAnimationBuilder(
         tween: Tween<double>(begin: 0, end: widget.typing! ? 1 : 0),
         duration: Duration(milliseconds: 250),

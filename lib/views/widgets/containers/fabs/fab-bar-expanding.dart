@@ -19,25 +19,21 @@ class FabBarExpanding extends StatelessWidget {
     this.alignment,
   }) : super(key: key);
 
-  @protected
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, Routes.searchGroups);
   }
 
-  @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, Routes.searchUsers);
   }
 
-  @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, Routes.groupCreate);
   }
 
-  @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, Routes.groupCreatePublic);

@@ -34,7 +34,6 @@ class PasswordResetStepState extends State<PasswordResetStep> {
     onMounted();
   }
 
-  @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     passwordController.text = store.state.authStore.password;

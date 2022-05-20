@@ -57,7 +57,6 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
     }
   }
 
-  @protected
   Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
@@ -87,7 +86,6 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
     super.dispose();
   }
 
-  @protected
   Widget buildRoomList(BuildContext context, _Props props) {
     final store = StoreProvider.of<AppState>(context);
     final rooms = props.searchResults as List<Room>;
