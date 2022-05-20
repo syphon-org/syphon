@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
@@ -16,6 +17,17 @@ extension SyncQueries on StorageDatabase {
   Future<int> insertSyncStore(SyncStore store) async {
     final storeJson = json.decode(json.encode(store));
 
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return into(syncs).insert(
+        SyncsCompanion(
+          id: Value(StorageKeys.SYNC),
+          store: Value(storeJson),
+        ),
+        mode: InsertMode.insertOrReplace,
+      );
+    }
+
     return into(syncs).insertOnConflictUpdate(
       SyncsCompanion(
         id: Value(StorageKeys.SYNC),
@@ -25,7 +37,8 @@ extension SyncQueries on StorageDatabase {
   }
 
   Future<SyncStore?> selectSyncStore() async {
-    final row = await (select(syncs)..where((tbl) => tbl.id.isNotNull())).getSingleOrNull();
+    final row = await (select(syncs)..where((tbl) => tbl.id.isNotNull()))
+        .getSingleOrNull();
 
     if (row == null) {
       return null;

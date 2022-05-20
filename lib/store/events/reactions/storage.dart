@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
@@ -14,6 +15,16 @@ import 'package:syphon/store/events/redaction/model.dart';
 ///
 extension ReactionQueries on StorageDatabase {
   Future<void> insertReactionsBatched(List<Reaction> reactions) {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          this.reactions,
+          reactions,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(
         this.reactions,
@@ -28,7 +39,8 @@ extension ReactionQueries on StorageDatabase {
   /// Query every message known in a room
   ///
   Future<List<Reaction>> selectReactionsById(List<String> reactionIds) {
-    return (select(reactions)..where((tbl) => tbl.body.isNotNull() & tbl.id.isIn(reactionIds)))
+    return (select(reactions)
+          ..where((tbl) => tbl.body.isNotNull() & tbl.id.isIn(reactionIds)))
         .get();
   }
 
@@ -37,7 +49,8 @@ extension ReactionQueries on StorageDatabase {
   ///
   /// Query every message known in a room
   ///
-  Future<List<Reaction>> selectReactionsPerEvent(String roomId, List<String>? eventIds) {
+  Future<List<Reaction>> selectReactionsPerEvent(
+      String roomId, List<String>? eventIds) {
     return (select(reactions)
           ..where((tbl) =>
               tbl.body.isNotNull() &
@@ -58,10 +71,12 @@ Future<void> saveReactionsRedacted(
   List<Redaction> redactions, {
   required StorageDatabase storage,
 }) async {
-  final reactionIds = redactions.map((redaction) => redaction.redactId ?? '').toList();
+  final reactionIds =
+      redactions.map((redaction) => redaction.redactId ?? '').toList();
   final reactions = await storage.selectReactionsById(reactionIds);
 
-  final reactionsUpdated = reactions.map((reaction) => reaction.copyWith(body: null)).toList();
+  final reactionsUpdated =
+      reactions.map((reaction) => reaction.copyWith(body: null)).toList();
   await storage.insertReactionsBatched(reactionsUpdated);
 }
 
