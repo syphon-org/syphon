@@ -109,7 +109,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
     });
 
     if (invitesUpdated.isNotEmpty) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         avatarScrollController.animateTo(
           avatarScrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: Values.animationDurationDefaultFast),

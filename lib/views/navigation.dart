@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
@@ -38,6 +39,10 @@ import 'home/settings/settings-intro-screen.dart';
 // helper hook for extracting navigation params
 T? useScreenArguments<T>(BuildContext context) {
   return ModalRoute.of(context)?.settings.arguments as T;
+}
+
+T? useArguments<T>(BuildContext context) {
+  return useMemoized(() => ModalRoute.of(context)?.settings.arguments as T, [context]);
 }
 
 class NavigationService {
@@ -147,13 +152,13 @@ class NavigationProvider {
         Routes.messageDetails: (BuildContext context) => const MessageDetailsScreen(),
         Routes.chatUsers: (BuildContext context) => const ChatUsersDetailScreen(),
         Routes.searchUsers: (BuildContext context) => const SearchUserScreen(),
-        Routes.userDetails: (BuildContext context) => const UserProfileScreen(),
+        Routes.userDetails: (BuildContext context) => UserProfileScreen(),
         Routes.userInvite: (BuildContext context) => const InviteUsersScreen(),
         Routes.searchChats: (BuildContext context) => const ChatSearchScreen(),
         Routes.searchGroups: (BuildContext context) => const GroupSearchScreen(),
         Routes.groupCreate: (BuildContext context) => const CreateGroupScreen(),
         Routes.groupCreatePublic: (BuildContext context) => const CreatePublicGroupScreen(),
-        Routes.settingsProfile: (BuildContext context) => const ProfileScreen(),
+        Routes.settingsProfile: (BuildContext context) => ProfileScreen(),
         Routes.settingsNotifications: (BuildContext context) => const NotificationSettingsScreen(),
         Routes.settingsLanguages: (BuildContext context) => const LanguageSettingsScreen(),
         Routes.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),

@@ -8,7 +8,7 @@ import 'package:syphon/store/settings/models.dart';
 import 'model.dart';
 
 bool isSystemDarkMode() {
-  return SchedulerBinding.instance?.window.platformBrightness == Brightness.dark;
+  return SchedulerBinding.instance.window.platformBrightness == Brightness.dark;
 }
 
 ThemeType themeTypeFromSystem() {

@@ -589,7 +589,7 @@ ThunkAction<AppState> fetchAuthUserProfile() {
       await store.dispatch(SetUser(
         user: store.state.authStore.currentUser.copyWith(
           displayName: data['displayname'],
-          avatarUri: data['avatar_url'],
+          avatarUri: data['avatar_url'] ?? '',
         ),
       ));
     } catch (error) {

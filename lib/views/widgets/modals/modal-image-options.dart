@@ -9,9 +9,11 @@ class ModalImageOptions extends StatelessWidget {
   const ModalImageOptions({
     Key? key,
     this.onSetNewAvatar,
+    this.onRemoveAvatar,
   }) : super(key: key);
 
   final Function? onSetNewAvatar;
+  final Function? onRemoveAvatar;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -95,8 +97,10 @@ class ModalImageOptions extends StatelessWidget {
               },
             ),
             ListTile(
-              onTap: () => Navigator.pop(context),
-              enabled: false,
+              onTap: () async {
+                await onRemoveAvatar?.call();
+                Navigator.pop(context);
+              },
               leading: Container(
                 padding: EdgeInsets.all(4),
                 child: Icon(

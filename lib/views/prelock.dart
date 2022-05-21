@@ -75,7 +75,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     locked = widget.enabled;
     enabled = widget.enabled;
@@ -119,7 +119,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
 
     backgroundLockLatencyTimer?.cancel();
 

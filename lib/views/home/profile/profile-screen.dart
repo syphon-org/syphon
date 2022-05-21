@@ -21,44 +21,48 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
-final title = Strings.titleProfile;
 const imageSize = Dimensions.avatarSizeDetails;
 
 class ProfileScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final dispatch = useDispatch();
+    // global actions dispatch
+    final dispatch = useDispatch<AppState>();
 
+    // global state
     final user = useSelector<AppState, User>(
       (state) => state.authStore.user,
     );
     final loading = useSelector<AppState, bool>(
-      (state) => state.authStore.loading,
-    );
+          (state) => state.authStore.loading,
+        ) ??
+        false;
     final themeType = useSelector<AppState, ThemeType>(
       (state) => state.settingsStore.themeSettings.themeType,
     );
 
-    final userIdState = useState(user.userId);
+    // local state
     final avatarFileState = useState<File?>(null);
-    final displayNameState = useState(user.displayName);
+    final displayNameState = useState(user?.displayName);
 
     // TODO: switch to destructuring when released
-    final userIdNew = userIdState.value;
     final avatarFileNew = avatarFileState.value;
     final displayNameNew = displayNameState.value;
 
-    final userIdController = useTextEditingController();
-    final displayNameController = useTextEditingController();
+    // ui state
+    final userIdController = useTextEditingController(text: user?.userId);
+    final displayNameController = useTextEditingController(text: user?.displayName);
 
+    final title = Strings.titleProfile;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    final backgroundColor = selectAvatarBackground(themeType);
-    final hasNewInfo = avatarFileNew != null || displayNameNew != null || userIdNew != null;
+    final backgroundColor = selectAvatarBackground(themeType!);
+    final hasNewInfo = avatarFileNew != null || displayNameNew != null;
 
+    // local widget functionality
     final onCopyToClipboard = useCallback(() async {
-      await Clipboard.setData(ClipboardData(text: user.userId));
+      await Clipboard.setData(ClipboardData(text: user?.userId));
       dispatch(addInfo(message: 'Copied User ID to clipboard')); //TODO i18n
     }, [dispatch, user]);
 
@@ -66,9 +70,13 @@ class ProfileScreen extends HookWidget {
       await showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
-        builder: (BuildContext context) => ModalImageOptions(
+        builder: (dialogContext) => ModalImageOptions(
           onSetNewAvatar: ({File? image}) {
             avatarFileState.value = image;
+          },
+          onRemoveAvatar: () async {
+            await dispatch(updateAvatarUri(mxcUri: ''));
+            await dispatch(fetchAuthUserProfile());
           },
         ),
       );
@@ -79,7 +87,7 @@ class ProfileScreen extends HookWidget {
       String? userIdNew,
       String? displayNameNew,
     }) async {
-      if (displayNameNew != null && user.displayName != displayNameNew) {
+      if (displayNameNew != null && user?.displayName != displayNameNew) {
         final bool successful = dispatch(
           updateDisplayName(displayNameNew),
         );
@@ -140,9 +148,9 @@ class ProfileScreen extends HookWidget {
                             child: GestureDetector(
                               onTap: () => onShowImageOptions(),
                               child: Avatar(
-                                uri: avatarFileNew != null ? null : user.avatarUri,
+                                uri: avatarFileNew != null ? null : user?.avatarUri,
                                 file: avatarFileNew,
-                                alt: formatUsername(user),
+                                alt: formatUsername(user!),
                                 size: imageSize,
                                 background: AppColors.hashedColorUser(user),
                               ),
@@ -169,32 +177,6 @@ class ProfileScreen extends HookWidget {
                               ),
                               child: Icon(
                                 Icons.camera_alt,
-                                color: Theme.of(context).iconTheme.color,
-                                size: Dimensions.iconSizeLite,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 2,
-                            right: 6,
-                            child: Container(
-                              width: Dimensions.iconSizeLarge,
-                              height: Dimensions.iconSizeLarge,
-                              decoration: BoxDecoration(
-                                color: backgroundColor,
-                                borderRadius: BorderRadius.circular(
-                                  Dimensions.iconSizeLarge,
-                                ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    blurRadius: 6,
-                                    offset: Offset.zero,
-                                    color: Colors.black54,
-                                  )
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.close,
                                 color: Theme.of(context).iconTheme.color,
                                 size: Dimensions.iconSizeLite,
                               ),

@@ -78,7 +78,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     store = widget.store;
     storage = widget.storage;
 
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     // init all on state change listeners
     onInitListeners();
@@ -390,7 +390,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   void dispose() {
     onDestroyListeners();
     closeCache(cache);
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
