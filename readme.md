@@ -10,13 +10,16 @@ a privacy centric matrix client - now in open alpha*
  
 <p align='center'>
     <a href='https://play.google.com/store/apps/details?id=org.tether.tether'>
-        <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='assets/external/en_badge_web_generic.png' />
+        <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='assets/external/en_badge_web_generic.png'/>
     </a>
-    <a href='https://apps.apple.com/us/app/syphon/id1496285352'>
+    <a href='https://apps.apple.com/app/syphon/id1496285352'>
         <img height="56" alt='Download on the App Store' style="padding-right:8px;" src='assets/external/download_on_the_app_store.svg'/>
     </a>
     <a href='https://f-droid.org/packages/org.tether.tether/'>
         <img height="56" src="assets/external/get-it-on-fdroid.png">
+    </a>
+    <a href='https://flathub.org/apps/details/org.syphon.Syphon'>
+        <img height='56' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/>
     </a>
 </p>
 
