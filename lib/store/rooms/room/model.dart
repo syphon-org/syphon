@@ -16,9 +16,9 @@ class RoomId extends Identifier {
 }
 
 class RoomPresets {
+  static const public = 'public_chat';
   static const private = 'private_chat';
   static const privateTrusted = 'trusted_private_chat';
-  static const public = 'public_chat';
 }
 
 @JsonSerializable()
@@ -283,3 +283,5 @@ class Room implements drift.Insertable<Room> {
     ).toColumns(nullToAbsent);
   }
 }
+
+typedef Chat = Room;

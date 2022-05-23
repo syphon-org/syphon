@@ -373,20 +373,10 @@ class _Props extends Equatable {
           // convert to int hex color code
           updateAppBarColor(color),
         ),
-        onIncrementFontType: () => store.dispatch(
-          incrementFontType(),
-        ),
-        onIncrementFontSize: () => store.dispatch(
-          incrementFontSize(),
-        ),
-        onIncrementMessageSize: () => store.dispatch(
-          incrementMessageSize(),
-        ),
-        onIncrementThemeType: () => store.dispatch(
-          incrementThemeType(),
-        ),
-        onIncrementAvatarShape: () => store.dispatch(
-          incrementAvatarShape(),
-        ),
+        onIncrementFontType: () => store.dispatch(incrementFontType()),
+        onIncrementFontSize: () => store.dispatch(incrementFontSize()),
+        onIncrementMessageSize: () => store.dispatch(incrementMessageSize()),
+        onIncrementThemeType: () => store.dispatch(incrementThemeType()),
+        onIncrementAvatarShape: () => store.dispatch(incrementAvatarShape()),
       );
 }

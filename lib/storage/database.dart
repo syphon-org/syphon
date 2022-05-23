@@ -48,8 +48,7 @@ void _openOnIOS() {
 
 void _openOnAndroid() {
   try {
-    open.overrideFor(
-        OperatingSystem.android, () => DynamicLibrary.open('libsqlcipher.so'));
+    open.overrideFor(OperatingSystem.android, () => DynamicLibrary.open('libsqlcipher.so'));
   } catch (error) {
     log.error(error.toString());
   }
@@ -57,8 +56,7 @@ void _openOnAndroid() {
 
 void _openOnLinux() {
   try {
-    open.overrideFor(
-        OperatingSystem.linux, () => DynamicLibrary.open('libsqlcipher.so'));
+    open.overrideFor(OperatingSystem.linux, () => DynamicLibrary.open('libsqlcipher.so'));
     return;
   } catch (_) {
     log.error(_.toString());
@@ -119,9 +117,8 @@ Future<DatabaseInfo> findDatabase(AppContext context,
   // Configure cache encryption/decryption instance
   var storageKey = await loadKey(storageKeyId);
 
-  final isLockedContext = context.id.isNotEmpty &&
-      context.secretKeyEncrypted.isNotEmpty &&
-      pin.isNotEmpty;
+  final isLockedContext =
+      context.id.isNotEmpty && context.secretKeyEncrypted.isNotEmpty && pin.isNotEmpty;
 
   // TODO: move into the isolate?
   if (isLockedContext) {
@@ -160,12 +157,10 @@ void _openDatabaseBackground(DatabaseInfo info) {
   info.port!.send(driftIsolate);
 }
 
-Future<DriftIsolate> spawnDatabaseIsolate(AppContext context,
-    {String pin = Values.empty}) async {
+Future<DriftIsolate> spawnDatabaseIsolate(AppContext context, {String pin = Values.empty}) async {
   final receivePort = ReceivePort();
 
-  final info =
-      await findDatabase(context, pin: pin, port: receivePort.sendPort);
+  final info = await findDatabase(context, pin: pin, port: receivePort.sendPort);
 
   await Isolate.spawn(
     _openDatabaseBackground,
@@ -176,8 +171,7 @@ Future<DriftIsolate> spawnDatabaseIsolate(AppContext context,
   return await receivePort.first as DriftIsolate;
 }
 
-StorageDatabase openDatabaseThreaded(AppContext context,
-    {String pin = Values.empty}) {
+StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.empty}) {
   final connection = DatabaseConnection.delayed(
     () async {
       final isolate = await spawnDatabaseIsolate(context, pin: pin);
@@ -223,11 +217,9 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
   ],
 )
 class StorageDatabase extends _$StorageDatabase {
-  StorageDatabase(AppContext context, {String pin = ''})
-      : super(openDatabase(context, pin: pin));
+  StorageDatabase(AppContext context, {String pin = ''}) : super(openDatabase(context, pin: pin));
 
-  StorageDatabase.connect(DatabaseConnection connection)
-      : super.connect(connection);
+  StorageDatabase.connect(DatabaseConnection connection) : super.connect(connection);
 
   // you should bump this number whenever you change or add a table definition.
   @override
@@ -242,6 +234,7 @@ class StorageDatabase extends _$StorageDatabase {
           log.info('[MIGRATION] VERSION $from to $to');
           if (from == 8) {
             await m.addColumn(messages, messages.hasLink);
+            await m.addColumn(messages, decrypted.hasLink);
           }
           if (from == 7) {
             await m.createTable(keySessions);

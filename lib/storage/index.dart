@@ -41,8 +41,7 @@ class Storage {
   static StorageDatabase? database;
 }
 
-Future initStorage(
-    {AppContext context = const AppContext(), String pin = ''}) async {
+Future initStorage({AppContext context = const AppContext(), String pin = ''}) async {
   final database = openDatabaseThreaded(context, pin: pin);
   Storage.database = database;
   return database;
@@ -105,9 +104,8 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
         storage: storage,
       );
 
-      final currentUserIds = (messages[room.id] ?? [])
-          .map((message) => message.sender ?? '')
-          .toList();
+      final currentUserIds =
+          (messages[room.id] ?? []).map((message) => message.sender ?? '').toList();
 
       userIds.addAll(currentUserIds);
     }
@@ -138,7 +136,7 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
       StorageKeys.MESSAGE_SESSIONS: messageSessions,
     };
   } catch (error) {
-    log.error('[loadStorage]  ${error.toString()}');
+    log.error('[loadStorage] ${error.toString()}');
     return {};
   }
 }
@@ -163,8 +161,7 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
       for (final Room room in rooms) {
         final currentMessages = messages[room.id] ?? [];
         final currentDecrypted = decrypted[room.id] ?? [];
-        final currentMessagesIds =
-            currentMessages.map((e) => e.id ?? '').toList();
+        final currentMessagesIds = currentMessages.map((e) => e.id ?? '').toList();
 
         reactions.addAll(await loadReactionsMapped(
           roomId: room.id,

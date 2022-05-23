@@ -45,10 +45,7 @@ extension MessageQueries on StorageDatabase {
   Future<List<Message>> selectMessagesIds(List<String> messageIds) {
     return (select(messages)
           ..where((tbl) => tbl.id.isIn(messageIds))
-          ..orderBy([
-            (tbl) =>
-                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
-          ]))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)]))
         .get();
   }
 
@@ -67,13 +64,9 @@ extension MessageQueries on StorageDatabase {
     int limit = DEFAULT_LOAD_LIMIT,
   }) {
     return (select(messages)
-          ..where((tbl) =>
-              tbl.roomId.equals(roomId) &
-              tbl.timestamp.isSmallerOrEqualValue(timestamp))
-          ..orderBy([
-            (tbl) =>
-                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
-          ])
+          ..where(
+              (tbl) => tbl.roomId.equals(roomId) & tbl.timestamp.isSmallerOrEqualValue(timestamp))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
           ..limit(limit, offset: offset))
         .get();
   }
@@ -88,10 +81,7 @@ extension MessageQueries on StorageDatabase {
       {int offset = 0, int limit = DEFAULT_LOAD_LIMIT}) {
     return (select(messages)
           ..where((tbl) => tbl.roomId.equals(roomId))
-          ..orderBy([
-            (tbl) =>
-                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
-          ])
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
           ..limit(limit, offset: offset))
         .get();
   }
@@ -143,12 +133,10 @@ Future<void> saveMessagesRedacted(
   List<Redaction> redactions, {
   required StorageDatabase storage,
 }) async {
-  final messageIds =
-      redactions.map((redaction) => redaction.redactId ?? '').toList();
+  final messageIds = redactions.map((redaction) => redaction.redactId ?? '').toList();
   final messages = await storage.selectMessagesIds(messageIds);
 
-  final messagesUpdated =
-      messages.map((message) => message.copyWith(body: null)).toList();
+  final messagesUpdated = messages.map((message) => message.copyWith(body: null)).toList();
   await storage.insertMessagesBatched(messagesUpdated);
 }
 
@@ -256,13 +244,9 @@ extension DecryptedQueries on StorageDatabase {
     int limit = DEFAULT_LOAD_LIMIT,
   }) {
     return (select(decrypted)
-          ..where((tbl) =>
-              tbl.roomId.equals(roomId) &
-              tbl.timestamp.isSmallerOrEqualValue(timestamp))
-          ..orderBy([
-            (tbl) =>
-                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
-          ])
+          ..where(
+              (tbl) => tbl.roomId.equals(roomId) & tbl.timestamp.isSmallerOrEqualValue(timestamp))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
           ..limit(limit, offset: offset))
         .get();
   }
@@ -274,10 +258,7 @@ extension DecryptedQueries on StorageDatabase {
   }) {
     return (select(decrypted)
           ..where((tbl) => tbl.roomId.equals(roomId))
-          ..orderBy([
-            (tbl) =>
-                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
-          ])
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
           ..limit(limit, offset: offset))
         .get();
   }

@@ -97,6 +97,9 @@ class Decrypted extends Table {
   IntColumn get timestamp => integer()();
   IntColumn get received => integer()();
 
+  // Message details
+  BoolColumn get hasLink => boolean().withDefault(const Constant(false))();
+
   // Message Only
   TextColumn get body => text().nullable()();
   TextColumn get msgtype => text().nullable()();

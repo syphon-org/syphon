@@ -21,12 +21,16 @@ class StoreHookState<S> extends HookState<redux.Store<S>, StoreHook<S>> {
 
 redux.Store<S> useStore<S>() => use(StoreHook<S>());
 
-Dispatch useDispatch<S>() => useStore<S>().dispatch;
+Dispatch useDispatch<AppState>() => useStore<AppState>().dispatch;
 
-Output? useSelector<State, Output>(Selector<State, Output> selector, [EqualityFn? equalityFn]) {
+Output? useSelector<State, Output>(
+  Selector<State, Output> selector, {
+  EqualityFn? equality,
+  Output? fallback,
+}) {
   final store = useStore<State>();
   final snap = useStream<Output>(
-    store.onChange.map(selector).distinct(equalityFn),
+    store.onChange.map(selector).distinct(equality),
     initialData: selector(store.state),
   );
 

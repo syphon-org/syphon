@@ -12,14 +12,15 @@ import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
 class FabRing extends StatelessWidget {
-  final GlobalKey<FabCircularMenuState>? fabKey;
-
   final Alignment? alignment;
+  final GlobalKey<FabCircularMenuState>? fabKey;
+  final bool showLabels;
 
   const FabRing({
     Key? key,
     this.fabKey,
     this.alignment,
+    this.showLabels = false,
   }) : super(key: key);
 
   onNavigateToPublicSearch(context) {
@@ -80,45 +81,144 @@ class FabRing extends StatelessWidget {
             animationDuration: Duration(milliseconds: 275),
             onDisplayChange: (opened) {},
             children: [
-              FloatingActionButton(
-                heroTag: 'fab1',
-                tooltip: 'Create Public Room',
-                backgroundColor: props.primaryColor,
-                onPressed: () => onNavigateToCreateGroupPublic(context),
-                child: SvgPicture.asset(
-                  Assets.iconPublicAddBeing,
-                  color: Colors.white,
-                ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'fab1',
+                    tooltip: 'Start Public Chat',
+                    backgroundColor: props.primaryColor,
+                    onPressed: () => onNavigateToCreateGroupPublic(context),
+                    child: SvgPicture.asset(
+                      Assets.iconPublicAddBeing,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    left: -148,
+                    child: Visibility(
+                      visible: showLabels,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 4),
+                        child: Chip(
+                          label: Text(
+                            'Start Public Chat',
+                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                                  color: Colors.white,
+                                ),
+                          ),
+                          backgroundColor: props.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              FloatingActionButton(
-                heroTag: 'fab2',
-                tooltip: 'Create Group',
-                backgroundColor: props.primaryColor,
-                onPressed: () => onNavigateToCreateGroup(context),
-                child: SvgPicture.asset(
-                  Assets.iconGroupAddBeing,
-                  color: Colors.white,
-                ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'fab2',
+                    tooltip: 'Start Group Chat',
+                    backgroundColor: props.primaryColor,
+                    onPressed: () => onNavigateToCreateGroup(context),
+                    child: SvgPicture.asset(
+                      Assets.iconGroupAddBeing,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    left: -148,
+                    child: Visibility(
+                      visible: showLabels,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 4),
+                        child: Chip(
+                          label: Text(
+                            'Start Group Chat',
+                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                                  color: Colors.white,
+                                ),
+                          ),
+                          backgroundColor: props.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              FloatingActionButton(
-                heroTag: 'fab3',
-                tooltip: 'Direct Message',
-                backgroundColor: props.primaryColor,
-                onPressed: () => onNavigateToDraft(context),
-                child: SvgPicture.asset(
-                  Assets.iconPersonAddBeing,
-                  color: Colors.white,
-                ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'fab3',
+                    tooltip: 'Start Private Chat',
+                    backgroundColor: props.primaryColor,
+                    onPressed: () => onNavigateToDraft(context),
+                    child: SvgPicture.asset(
+                      Assets.iconPersonAddBeing,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Positioned(
+                    top: -4,
+                    left: -156,
+                    child: Visibility(
+                      visible: showLabels,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 4),
+                        child: Chip(
+                          label: Text(
+                            'Start Private Chat',
+                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                                  color: Colors.white,
+                                ),
+                          ),
+                          backgroundColor: props.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              FloatingActionButton(
-                heroTag: 'fab4',
-                tooltip: 'Search Public Groups',
-                backgroundColor: props.primaryColor,
-                onPressed: () => onNavigateToPublicSearch(context),
-                child: SvgPicture.asset(
-                  Assets.iconSearchPublicCondensedBeing,
-                  color: Colors.white,
-                ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'fab4',
+                    tooltip: 'Search',
+                    backgroundColor: props.primaryColor,
+                    onPressed: () => onNavigateToPublicSearch(context),
+                    child: SvgPicture.asset(
+                      Assets.iconSearchPublicCondensedBeing,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Positioned(
+                    top: -68,
+                    bottom: 0,
+                    left: -68,
+                    child: Visibility(
+                      visible: showLabels,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 4),
+                        child: Chip(
+                          label: Text(
+                            'Search',
+                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                                  color: Colors.white,
+                                ),
+                          ),
+                          backgroundColor: props.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           );

@@ -145,7 +145,7 @@ class NavigationProvider {
         Routes.reset: (BuildContext context) => const ResetPasswordScreen(),
         Routes.searchHomeservers: (BuildContext context) => const SearchHomeserverScreen(),
         Routes.verification: (BuildContext context) => const VerificationScreen(),
-        Routes.home: (BuildContext context) => const HomeScreen(),
+        Routes.home: (BuildContext context) => HomeScreen(),
         Routes.chat: (BuildContext context) => const ChatScreen(),
         Routes.chatSettings: (BuildContext context) => const ChatSettingsScreen(),
         Routes.chatMediaPreview: (BuildContext context) => const MediaPreviewScreen(),

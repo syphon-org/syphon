@@ -34,20 +34,20 @@ class ProfileScreen extends HookWidget {
       (state) => state.authStore.user,
     );
     final loading = useSelector<AppState, bool>(
-          (state) => state.authStore.loading,
-        ) ??
-        false;
+      (state) => state.authStore.loading,
+      fallback: false,
+    )!;
     final themeType = useSelector<AppState, ThemeType>(
       (state) => state.settingsStore.themeSettings.themeType,
     );
 
     // local state
-    final avatarFileState = useState<File?>(null);
-    final displayNameState = useState(user?.displayName);
+    final avatarFile = useState<File?>(null);
+    final displayName = useState(user?.displayName);
 
     // TODO: switch to destructuring when released
-    final avatarFileNew = avatarFileState.value;
-    final displayNameNew = displayNameState.value;
+    final avatarFileNew = avatarFile.value;
+    final displayNameNew = displayName.value;
 
     // ui state
     final userIdController = useTextEditingController(text: user?.userId);
@@ -63,7 +63,7 @@ class ProfileScreen extends HookWidget {
     // local widget functionality
     final onCopyToClipboard = useCallback(() async {
       await Clipboard.setData(ClipboardData(text: user?.userId));
-      dispatch(addInfo(message: 'Copied User ID to clipboard')); //TODO i18n
+      dispatch(addInfo(message: 'Copied User ID to clipboard'));
     }, [dispatch, user]);
 
     final onShowImageOptions = useCallback(() async {
@@ -72,7 +72,7 @@ class ProfileScreen extends HookWidget {
         backgroundColor: Colors.transparent,
         builder: (dialogContext) => ModalImageOptions(
           onSetNewAvatar: ({File? image}) {
-            avatarFileState.value = image;
+            avatarFile.value = image;
           },
           onRemoveAvatar: () async {
             await dispatch(updateAvatarUri(mxcUri: ''));
@@ -207,7 +207,7 @@ class ProfileScreen extends HookWidget {
                               label: 'Display Name',
                               controller: displayNameController,
                               onChanged: (name) {
-                                displayNameState.value = name;
+                                displayName.value = name;
                               },
                             ),
                           ),
