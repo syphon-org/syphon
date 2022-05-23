@@ -352,7 +352,7 @@ class Props extends Equatable {
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        language: DisplayName(Locale(store.state.settingsStore.language)).toDisplayName(),
+        language: toDisplayName(store.state.settingsStore.language),
         enterSend: store.state.settingsStore.enterSendEnabled,
         autocorrect: store.state.settingsStore.autocorrectEnabled,
         suggestions: store.state.settingsStore.suggestionsEnabled,

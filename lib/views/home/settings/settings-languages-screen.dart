@@ -26,7 +26,7 @@ class LanguageSettingsScreen extends StatelessWidget {
                   itemCount: props.languagesAll.length,
                   itemBuilder: (BuildContext context, int index) {
                     final language = props.languagesAll[index];
-                    final names = DisplayName.isoLangs[language]!;
+                    final names = isoLangs[language]!;
                     final displayName = names['name'];
                     final nativeName = names['nativeName'];
 
