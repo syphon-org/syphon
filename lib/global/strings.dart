@@ -156,6 +156,11 @@ class Strings {
   static final labelNewPassword = tr('label-new-password');
   static final labelConfirmNewPassword = tr('label-confirm-new-password');
 
+  static final labelFabSearch = tr('label-fab-search');
+  static final labelFabCreateDM = tr('label-fab-create-dm');
+  static final labelFabCreateGroup = tr('label-fab-create-group');
+  static final labelFabCreatePublic = tr('label-fab-create-public');
+
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');
   static final listItemSettingsNotification = tr('list-item-settings-notification');

@@ -7,19 +7,22 @@ import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
+calculatePosition(int copyLength) => copyLength * 3.4;
+
 class FabRing extends StatelessWidget {
-  final Alignment? alignment;
-  final GlobalKey<FabCircularMenuState>? fabKey;
   final bool showLabels;
+  final Alignment alignment;
+  final GlobalKey<FabCircularMenuState>? fabKey;
 
   const FabRing({
     Key? key,
     this.fabKey,
-    this.alignment,
+    this.alignment = Alignment.bottomRight,
     this.showLabels = false,
   }) : super(key: key);
 
@@ -59,11 +62,13 @@ class FabRing extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
+          final modifier = alignment == Alignment.bottomRight ? -1.0 : .425;
+
           return FabCircularMenu(
             key: fabKey,
             fabSize: 58,
             fabElevation: 4.0,
-            alignment: alignment ?? Alignment.bottomRight,
+            alignment: alignment,
             fabOpenIcon: Icon(
               Icons.bubble_chart,
               size: Dimensions.iconSizeLarge,
@@ -86,7 +91,7 @@ class FabRing extends StatelessWidget {
                 children: [
                   FloatingActionButton(
                     heroTag: 'fab1',
-                    tooltip: 'Start Public Chat',
+                    tooltip: Strings.labelFabCreatePublic,
                     backgroundColor: props.primaryColor,
                     onPressed: () => onNavigateToCreateGroupPublic(context),
                     child: SvgPicture.asset(
@@ -97,14 +102,14 @@ class FabRing extends StatelessWidget {
                   Positioned(
                     top: 0,
                     bottom: 0,
-                    left: -148,
+                    left: 148 * modifier,
                     child: Visibility(
                       visible: showLabels,
                       child: Padding(
                         padding: EdgeInsets.only(right: 4),
                         child: Chip(
                           label: Text(
-                            'Start Public Chat',
+                            Strings.labelFabCreatePublic,
                             style: Theme.of(context).textTheme.subtitle2?.copyWith(
                                   color: Colors.white,
                                 ),
@@ -121,7 +126,7 @@ class FabRing extends StatelessWidget {
                 children: [
                   FloatingActionButton(
                     heroTag: 'fab2',
-                    tooltip: 'Start Group Chat',
+                    tooltip: Strings.labelFabCreateGroup,
                     backgroundColor: props.primaryColor,
                     onPressed: () => onNavigateToCreateGroup(context),
                     child: SvgPicture.asset(
@@ -132,14 +137,14 @@ class FabRing extends StatelessWidget {
                   Positioned(
                     top: 0,
                     bottom: 0,
-                    left: -148,
+                    left: 148 * modifier,
                     child: Visibility(
                       visible: showLabels,
                       child: Padding(
                         padding: EdgeInsets.only(right: 4),
                         child: Chip(
                           label: Text(
-                            'Start Group Chat',
+                            Strings.labelFabCreateGroup,
                             style: Theme.of(context).textTheme.subtitle2?.copyWith(
                                   color: Colors.white,
                                 ),
@@ -156,24 +161,24 @@ class FabRing extends StatelessWidget {
                 children: [
                   FloatingActionButton(
                     heroTag: 'fab3',
-                    tooltip: 'Start Private Chat',
+                    tooltip: Strings.labelFabCreateDM,
                     backgroundColor: props.primaryColor,
                     onPressed: () => onNavigateToDraft(context),
                     child: SvgPicture.asset(
-                      Assets.iconPersonAddBeing,
+                      Assets.iconMessageCircleBeing,
                       color: Colors.white,
                     ),
                   ),
                   Positioned(
                     top: -4,
-                    left: -156,
+                    left: 136 * modifier,
                     child: Visibility(
                       visible: showLabels,
                       child: Padding(
                         padding: EdgeInsets.only(right: 4),
                         child: Chip(
                           label: Text(
-                            'Start Private Chat',
+                            Strings.labelFabCreateDM,
                             style: Theme.of(context).textTheme.subtitle2?.copyWith(
                                   color: Colors.white,
                                 ),
@@ -190,7 +195,7 @@ class FabRing extends StatelessWidget {
                 children: [
                   FloatingActionButton(
                     heroTag: 'fab4',
-                    tooltip: 'Search',
+                    tooltip: Strings.labelFabSearch,
                     backgroundColor: props.primaryColor,
                     onPressed: () => onNavigateToPublicSearch(context),
                     child: SvgPicture.asset(
@@ -201,14 +206,14 @@ class FabRing extends StatelessWidget {
                   Positioned(
                     top: -68,
                     bottom: 0,
-                    left: -68,
+                    left: 112 * modifier,
                     child: Visibility(
                       visible: showLabels,
                       child: Padding(
                         padding: EdgeInsets.only(right: 4),
                         child: Chip(
                           label: Text(
-                            'Search',
+                            Strings.labelFabSearch,
                             style: Theme.of(context).textTheme.subtitle2?.copyWith(
                                   color: Colors.white,
                                 ),

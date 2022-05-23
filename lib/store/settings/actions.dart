@@ -40,6 +40,11 @@ class SetMainFabLocation {
   SetMainFabLocation({this.fabLocation});
 }
 
+class SetMainFabLabels {
+  final MainFabLabel? fabLabels;
+  SetMainFabLabels({this.fabLabels});
+}
+
 class SetAccentColor {
   final int? color;
   SetAccentColor({this.color});
@@ -382,6 +387,18 @@ ThunkAction<AppState> incrementFabLocation() {
 
     store.dispatch(SetMainFabLocation(
       fabLocation: MainFabLocation.values[(fabTypeIndex + 1) % MainFabLocation.values.length],
+    ));
+  };
+}
+
+/// Iterate over AvatarShapes on action
+ThunkAction<AppState> incrementFabLabels() {
+  return (Store<AppState> store) async {
+    final currentTheme = store.state.settingsStore.themeSettings;
+    final fabTypeIndex = MainFabLabel.values.indexOf(currentTheme.mainFabLabel);
+
+    store.dispatch(SetMainFabLabels(
+      fabLabels: MainFabLabel.values[(fabTypeIndex + 1) % MainFabLabel.values.length],
     ));
   };
 }

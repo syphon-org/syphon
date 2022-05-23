@@ -36,6 +36,10 @@ String selectMainFabLocation(ThemeSettings themeSettings) {
   return enumToString(themeSettings.mainFabLocation);
 }
 
+String selectMainFabLabels(ThemeSettings themeSettings) {
+  return enumToString(themeSettings.mainFabLabel);
+}
+
 String selectThemeTypeString(ThemeType themeType) {
   return enumToString(themeType);
 }

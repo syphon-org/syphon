@@ -8,6 +8,7 @@ import 'package:syphon/store/hooks.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/search/actions.dart';
+import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/sync/actions.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
@@ -43,21 +44,41 @@ class HomeScreen extends HookWidget {
             (state) => state.settingsStore.themeSettings.mainFabType) ??
         MainFabType.Ring;
 
+    final fabLabels = useSelector<AppState, MainFabLabel>(
+            (state) => state.settingsStore.themeSettings.mainFabLabel) ??
+        MainFabLabel.Off;
+
     final fabLocation = useSelector<AppState, MainFabLocation>(
             (state) => state.settingsStore.themeSettings.mainFabLocation) ??
         MainFabLocation.Right;
 
     final fabKeyRing = useState(GlobalKey<FabCircularMenuState>());
 
+    final onboardingState = useState(false);
+
     final searchModeState = useState(false);
     final searchTextState = useState('');
     final selectedChatsState = useState<List<String>>([]);
 
+    final onboarding = onboardingState.value;
     final searchMode = searchModeState.value;
     final searchText = searchTextState.value;
     final selectedChats = selectedChatsState.value;
 
     final searchFocusNode = useFocusNode();
+
+    useEffect(() {
+      checkTermsTimestamp() async {
+        final firstLoginMillis = await loadTermsAgreement();
+        final firstLoginTimestamp = DateTime.fromMillisecondsSinceEpoch(firstLoginMillis);
+        if (DateTime.now().difference(firstLoginTimestamp).inDays < 1) {
+          onboardingState.value = true;
+        }
+      }
+
+      checkTermsTimestamp();
+      return null;
+    }, []);
 
     onToggleSearch() {
       searchModeState.value = !searchModeState.value;
@@ -133,12 +154,14 @@ class HomeScreen extends HookWidget {
     buildActionFab() {
       if (fabType == MainFabType.Bar) {
         return FabBarExpanding(
+          showLabels: onboarding || fabLabels == MainFabLabel.On,
           alignment: selectActionAlignment(),
         );
       }
 
       return FabRing(
         fabKey: fabKeyRing.value,
+        showLabels: onboarding || fabLabels == MainFabLabel.On,
         alignment: selectActionAlignment(),
       );
     }

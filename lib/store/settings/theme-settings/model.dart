@@ -13,17 +13,20 @@ enum ThemeType {
   Night,
   System,
 }
+
 enum FontName {
   Rubik,
   Roboto,
   Poppins,
   Inter,
 }
+
 enum MessageSize {
   Small,
   Default,
   Large,
 }
+
 enum FontSize {
   Small,
   Default,
@@ -38,12 +41,17 @@ enum AvatarShape {
 enum MainFabType {
   Ring,
   Bar,
-  // Circle,
 }
 
 enum MainFabLocation {
   Right,
   Left,
+}
+
+enum MainFabLabel {
+  On,
+  Off,
+  // Short,
 }
 
 @JsonSerializable()
@@ -58,6 +66,7 @@ class ThemeSettings extends Equatable {
   final MessageSize messageSize;
   final AvatarShape avatarShape;
   final MainFabType mainFabType;
+  final MainFabLabel mainFabLabel;
   final MainFabLocation mainFabLocation;
 
   const ThemeSettings({
@@ -71,6 +80,7 @@ class ThemeSettings extends Equatable {
     this.messageSize = MessageSize.Default,
     this.avatarShape = AvatarShape.Circle,
     this.mainFabType = MainFabType.Ring,
+    this.mainFabLabel = MainFabLabel.Off,
     this.mainFabLocation = MainFabLocation.Right,
   });
 
@@ -86,6 +96,7 @@ class ThemeSettings extends Equatable {
         messageSize,
         avatarShape,
         mainFabType,
+        mainFabLabel,
         mainFabLocation,
       ];
 
@@ -100,6 +111,7 @@ class ThemeSettings extends Equatable {
     MessageSize? messageSize,
     AvatarShape? avatarShape,
     MainFabType? mainFabType,
+    MainFabLabel? mainFabLabel,
     MainFabLocation? mainFabLocation,
   }) =>
       ThemeSettings(
@@ -113,6 +125,7 @@ class ThemeSettings extends Equatable {
         messageSize: messageSize ?? this.messageSize,
         avatarShape: avatarShape ?? this.avatarShape,
         mainFabType: mainFabType ?? this.mainFabType,
+        mainFabLabel: mainFabLabel ?? this.mainFabLabel,
         mainFabLocation: mainFabLocation ?? this.mainFabLocation,
       );
 

@@ -68,14 +68,17 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
   // NOTE: example of calling actions using Store.of(context)
   onIncrementFabType() {
     final store = StoreProvider.of<AppState>(context);
-
     store.dispatch(incrementFabType());
   }
 
   onIncrementFabLocation() {
     final store = StoreProvider.of<AppState>(context);
-
     store.dispatch(incrementFabLocation());
+  }
+
+  onIncrementFabLabels() {
+    final store = StoreProvider.of<AppState>(context);
+    store.dispatch(incrementFabLabels());
   }
 
   @override
@@ -206,7 +209,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           onTap: () => onIncrementFabType(),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
-                            'Main FAB Type',
+                            'Home FAB Type',
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(props.mainFabType),
@@ -215,11 +218,22 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           onTap: () => onIncrementFabLocation(),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
-                            'Main FAB Location',
+                            'Home FAB Location',
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
                             props.mainFabLocation,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => onIncrementFabLabels(),
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Home FAB Labels',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(
+                            props.mainFabLabel,
                           ),
                         ),
                       ],
@@ -292,6 +306,7 @@ class _Props extends Equatable {
   final String messageSize;
   final String avatarShape;
   final String mainFabType;
+  final String mainFabLabel;
   final String mainFabLocation;
 
   final bool roomTypeBadgesEnabled;
@@ -317,6 +332,7 @@ class _Props extends Equatable {
     required this.messageSize,
     required this.avatarShape,
     required this.mainFabType,
+    required this.mainFabLabel,
     required this.mainFabLocation,
     required this.roomTypeBadgesEnabled,
     required this.onSelectPrimaryColor,
@@ -342,6 +358,7 @@ class _Props extends Equatable {
         avatarShape,
         roomTypeBadgesEnabled,
         mainFabType,
+        mainFabLabel,
         mainFabLocation,
       ];
 
@@ -357,6 +374,7 @@ class _Props extends Equatable {
         avatarShape: selectAvatarShapeString(store.state.settingsStore.themeSettings.avatarShape),
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         mainFabType: selectMainFabType(store.state.settingsStore.themeSettings),
+        mainFabLabel: selectMainFabLabels(store.state.settingsStore.themeSettings),
         mainFabLocation: selectMainFabLocation(store.state.settingsStore.themeSettings),
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),
