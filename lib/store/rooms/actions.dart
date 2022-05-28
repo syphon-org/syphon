@@ -11,6 +11,7 @@ import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/storage/constants.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -325,6 +326,16 @@ ThunkAction<AppState> createRoom({
 
       final currentUser = store.state.authStore.user;
       final inviteIds = invites.map((user) => user.userId).toList();
+      final inviteIdsFiltered =
+          inviteIds.whereNot((userId) => userId == currentUser.userId).toList();
+
+      final isNoteToSelf =
+          inviteIds.length == 1 && inviteIds.single == currentUser.userId;
+
+      if (isNoteToSelf) {
+        name = Strings.labelNoteToSelf;
+        topic = Strings.labelNoteToSelfTopic;
+      }
 
       final data = await MatrixApi.createRoom(
         protocol: store.state.authStore.protocol,
@@ -333,7 +344,7 @@ ThunkAction<AppState> createRoom({
         name: name,
         topic: topic,
         alias: alias,
-        invites: inviteIds,
+        invites: inviteIdsFiltered, //Don't invite ourself
         isDirect: isDirect,
         chatTypePreset: preset,
       );
@@ -356,7 +367,7 @@ ThunkAction<AppState> createRoom({
       room = room.copyWith(usersTEMP: userInviteMap);
 
       if (isDirect) {
-        final User directUser = invites[0];
+        final User directUser = currentUser;
         room = room.copyWith(
           direct: true,
           name: directUser.displayName ?? directUser.userId,
@@ -674,7 +685,8 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -742,7 +754,8 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));

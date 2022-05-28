@@ -306,7 +306,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                               await props.copyToClipboard(props.sessionId);
                             },
                             trailing: IconButton(
-                              onPressed: () => props.copyToClipboard(props.sessionId),
+                              onPressed: () =>
+                                  props.copyToClipboard(props.sessionId),
                               icon: Icon(Icons.copy),
                             ),
                           ),
@@ -323,7 +324,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                               await props.copyToClipboard(props.sessionKey);
                             },
                             trailing: IconButton(
-                              onPressed: () => props.copyToClipboard(props.sessionKey),
+                              onPressed: () =>
+                                  props.copyToClipboard(props.sessionKey),
                               icon: Icon(Icons.copy),
                             ),
                           ),
@@ -344,7 +346,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, Routes.settingsPassword);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsPassword);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -357,7 +360,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, Routes.settingsBlocked);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsBlocked);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -407,7 +411,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.typingIndicators!,
-                              onChanged: (enterSend) => props.onToggleTypingIndicators(),
+                              onChanged: (enterSend) =>
+                                  props.onToggleTypingIndicators(),
                             ),
                           ),
                         ],
@@ -436,8 +441,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.screenLockEnabled,
-                              onChanged: (enabled) =>
-                                  onSetScreenLockPin(props: props, context: context),
+                              onChanged: (enabled) => onSetScreenLockPin(
+                                  props: props, context: context),
                             ),
                           ),
                           ListTile(
@@ -474,7 +479,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onExportSessionKeys(context: context, props: props),
+                            onTap: () => onExportSessionKeys(
+                                context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Backup Keys',
@@ -496,7 +502,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onDeleteSessionKeys(context: context, props: props),
+                            onTap: () => onDeleteSessionKeys(
+                                context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Delete Keys',
@@ -507,7 +514,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onConfirmDeactivateAccount(context, props),
+                            onTap: () =>
+                                onConfirmDeactivateAccount(context, props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Deactivate Account',
@@ -577,7 +585,7 @@ class _Props extends Equatable {
         sessionKey,
         screenLockEnabled,
       ];
-
+  
   static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
         valid: store.state.authStore.credential != null &&
             store.state.authStore.credential!.value != null &&

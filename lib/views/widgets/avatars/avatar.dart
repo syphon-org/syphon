@@ -25,6 +25,7 @@ class Avatar extends StatelessWidget {
     Key? key,
     this.uri = '',
     this.url = '',
+    this.icon,
     this.file,
     this.alt,
     this.size = Dimensions.avatarSizeMin,
@@ -45,6 +46,7 @@ class Avatar extends StatelessWidget {
   final String? url;
   final String? alt;
   final File? file;
+  final IconData? icon;
   final double size;
   final Color? background;
   final EdgeInsets? margin;
@@ -111,6 +113,17 @@ class Avatar extends StatelessWidget {
                 width: size,
                 height: size,
                 fit: BoxFit.cover,
+              ),
+            );
+          }
+
+          if (icon != null) {
+            avatarWidget = ClipRRect(
+              borderRadius: borderRadius,
+              child: Icon(
+                icon,
+                size: Dimensions.iconSizeLarge,
+                color: Colors.white,
               ),
             );
           }

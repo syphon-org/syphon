@@ -126,6 +126,8 @@
     "label-new-password": "New Password",
     "label-confirm-new-password": "Confirm New Password",
     "label-default-room-notification": "Default (Argon)",
+    "label-note-to-self": "Note to Self",
+    "label-note-to-self-topic": "A place to leave yourself notes",
     "button-login": "log in",
     "button-login-sso": "single sign on",
     "button-save": "save",

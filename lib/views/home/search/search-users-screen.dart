@@ -1,8 +1,11 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:file/memory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -15,6 +18,7 @@ import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 import 'package:syphon/views/widgets/lists/list-item-user.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
@@ -158,7 +162,8 @@ class SearchUserState extends State<SearchUserScreen> {
           setState(() {
             creatingRoomDisplayName = user.displayName;
           });
-          final newRoomId = await props!.onCreateChatDirect(user: user);
+          final newRoomId =
+              await props!.onCreateChatDirect(user: user, context: context);
 
           Navigator.pop(dialogContext);
 
@@ -212,6 +217,7 @@ class SearchUserState extends State<SearchUserScreen> {
             onTap: () => onAttemptChat(props: props, context: context, user: attemptableUser),
             child: ListItemUser(
               user: attemptableUser,
+              currentUser: props.currentUser,
               enabled: creatingRoomDisplayName != searchable,
               loading: props.loading,
               real: false,
@@ -230,6 +236,7 @@ class SearchUserState extends State<SearchUserScreen> {
               onTap: () => onShowUserDetails(context: context, user: user),
               child: ListItemUser(
                 user: user,
+                currentUser: props.currentUser,
                 enabled: creatingRoomDisplayName != user.displayName,
                 loading: props.loading,
                 onPress: () => onCreateChat(
@@ -279,6 +286,7 @@ class SearchUserState extends State<SearchUserScreen> {
               onTap: () => onShowUserDetails(context: context, user: user),
               child: ListItemUser(
                 user: user,
+                currentUser: props.currentUser,
                 enabled: creatingRoomDisplayName != user.displayName,
                 loading: props.loading,
                 onPress: () => onCreateChat(
@@ -314,6 +322,7 @@ class SearchUserState extends State<SearchUserScreen> {
               onTap: () => onShowUserDetails(context: context, user: user),
               child: ListItemUser(
                 user: user,
+                currentUser: props.currentUser,
                 enabled: creatingRoomDisplayName != user.displayName,
                 loading: props.loading,
                 onPress: () => onCreateChat(
@@ -377,6 +386,7 @@ class _Props extends Equatable {
   final bool loading;
   final ThemeType themeType;
   final bool creatingRoom;
+  final User currentUser;
   final List<User> usersRecent;
   final List<User> usersKnown;
   final List<dynamic> searchResults;
@@ -389,6 +399,7 @@ class _Props extends Equatable {
     required this.loading,
     required this.creatingRoom,
     required this.searchResults,
+    required this.currentUser,
     required this.usersRecent,
     required this.usersKnown,
     required this.onSearch,
@@ -407,6 +418,7 @@ class _Props extends Equatable {
         themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.searchStore.loading,
         creatingRoom: store.state.roomStore.loading,
+        currentUser: store.state.authStore.currentUser,
         usersKnown: selectKnownUsers(store.state),
         usersRecent: selectFriendlyUsers(store.state),
         searchResults: store.state.searchStore.searchResults,
@@ -421,7 +433,34 @@ class _Props extends Equatable {
 
           store.dispatch(searchUsers(searchText: text));
         },
-        onCreateChatDirect: ({required User user}) async {
+        onCreateChatDirect: (
+            {required User user, required BuildContext context}) async {
+          if (user.userId == store.state.authStore.currentUser.userId) {
+            //Note to self, create our Avatar
+            final screenshotController = ScreenshotController();
+            final avatar = MemoryFileSystem().file('avatar.png');
+
+            await screenshotController
+                .captureFromWidget(StoreProvider<AppState>(
+                    store: store,
+                    child: Avatar(
+                      alt: Strings.labelNoteToSelf,
+                      icon: Icons.sticky_note_2_outlined,
+                      background: Theme.of(context).primaryColor,
+                    )))
+                .then((capturedAvatar) {
+              avatar.writeAsBytesSync(capturedAvatar);
+            });
+
+            return store.dispatch(
+              createRoom(
+                isDirect: true,
+                invites: <User>[user],
+                avatarFile: avatar,
+              ),
+            );
+          }
+
           return store.dispatch(
             createRoom(
               isDirect: true,

@@ -342,6 +342,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                                   props: props, context: context, user: attemptableUser),
                               type: ListItemUserType.Selectable,
                               user: attemptableUser,
+                              currentUser: props.currentUser,
                               enabled: creatingRoomDisplayName != searchable,
                               loading: props.loading,
                               real: false,
@@ -358,6 +359,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                               return ListItemUser(
                                 type: ListItemUserType.Selectable,
                                 user: user,
+                                currentUser: props.currentUser,
                                 enabled: creatingRoomDisplayName != user.displayName,
                                 selected: invites.contains(user),
                                 loading: props.loading,
@@ -388,6 +390,7 @@ class _Props extends Equatable {
   final bool loading;
   final ThemeType themeType;
   final bool creatingRoom;
+  final User currentUser;
   final List<User> usersRecent;
   final List<dynamic> searchResults;
 
@@ -398,6 +401,7 @@ class _Props extends Equatable {
   const _Props({
     required this.themeType,
     required this.loading,
+    required this.currentUser,
     required this.usersRecent,
     required this.creatingRoom,
     required this.searchResults,
@@ -414,6 +418,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
+        currentUser: store.state.authStore.currentUser,
         usersRecent: selectFriendlyUsers(store.state),
         themeType: store.state.settingsStore.themeSettings.themeType,
         loading: store.state.searchStore.loading,
