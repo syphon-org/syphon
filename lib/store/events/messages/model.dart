@@ -217,7 +217,8 @@ class Message extends Event implements drift.Insertable<Message> {
   @override
   Map<String, dynamic> toJson() => _$MessageToJson(this);
 
-  factory Message.fromJson(Map<String, dynamic> json) => _$MessageFromJson(json);
+  factory Message.fromJson(Map<String, dynamic> json) =>
+      _$MessageFromJson(json);
 
   factory Message.fromEvent(Event event) {
     try {

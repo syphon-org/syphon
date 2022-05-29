@@ -17,6 +17,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
 import 'package:syphon/store/settings/selectors.dart';
+import 'package:syphon/store/settings/storage-settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/syphon.dart';
@@ -107,9 +108,7 @@ class PrivacySettingsScreen extends StatelessWidget {
       allowedExtensions: ['txt'],
     );
 
-    if (file == null) {
-      return;
-    }
+    if (file == null) return;
 
     showDialog(
       context: context,
@@ -133,6 +132,27 @@ class PrivacySettingsScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  onUpdateBackupLocation({
+    required _Props props,
+    required BuildContext context,
+  }) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    final selectedDirectory = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Select Backup Directory',
+      initialDirectory:
+          store.state.settingsStore.storageSettings.keyBackupLocation,
+    );
+
+    if (selectedDirectory == null) {
+      store.dispatch(addInfo(message: 'No directory was selected'));
+    } else {
+      store.dispatch(SetKeyBackupLocation(
+        location: selectedDirectory,
+      ));
+    }
   }
 
   onExportSessionKeys({
@@ -306,7 +326,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                               await props.copyToClipboard(props.sessionId);
                             },
                             trailing: IconButton(
-                              onPressed: () => props.copyToClipboard(props.sessionId),
+                              onPressed: () =>
+                                  props.copyToClipboard(props.sessionId),
                               icon: Icon(Icons.copy),
                             ),
                           ),
@@ -323,7 +344,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                               await props.copyToClipboard(props.sessionKey);
                             },
                             trailing: IconButton(
-                              onPressed: () => props.copyToClipboard(props.sessionKey),
+                              onPressed: () =>
+                                  props.copyToClipboard(props.sessionKey),
                               icon: Icon(Icons.copy),
                             ),
                           ),
@@ -344,7 +366,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, Routes.settingsPassword);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsPassword);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -357,7 +380,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(context, Routes.settingsBlocked);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsBlocked);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -407,7 +431,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.typingIndicators!,
-                              onChanged: (enterSend) => props.onToggleTypingIndicators(),
+                              onChanged: (enterSend) =>
+                                  props.onToggleTypingIndicators(),
                             ),
                           ),
                         ],
@@ -436,8 +461,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                             trailing: Switch(
                               value: props.screenLockEnabled,
-                              onChanged: (enabled) =>
-                                  onSetScreenLockPin(props: props, context: context),
+                              onChanged: (enabled) => onSetScreenLockPin(
+                                  props: props, context: context),
                             ),
                           ),
                           ListTile(
@@ -474,12 +499,41 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onExportSessionKeys(context: context, props: props),
+                            onTap: () => onExportSessionKeys(
+                                context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Backup Keys',
                             ),
                           ),
+                          Visibility(
+                            visible: true,
+                            child: ListTile(
+                              onTap: () => onUpdateBackupLocation(
+                                  props: props, context: context),
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Backup Folder',
+                              ),
+                              subtitle: Text(
+                                props.keyBackupLocation,
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ),
+                          ),
+                          Visibility(
+                            visible: true,
+                            child: ListTile(
+                              contentPadding: Dimensions.listPadding,
+                              title: Text(
+                                'Automatic Backup Frequency',
+                              ),
+                              subtitle: Text(
+                                'Manual Only',
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -496,7 +550,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onDeleteSessionKeys(context: context, props: props),
+                            onTap: () => onDeleteSessionKeys(
+                                context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Delete Keys',
@@ -507,7 +562,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onConfirmDeactivateAccount(context, props),
+                            onTap: () =>
+                                onConfirmDeactivateAccount(context, props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Deactivate Account',
@@ -537,6 +593,7 @@ class _Props extends Equatable {
   final String sessionName;
   final String sessionKey;
   final String readReceipts;
+  final String keyBackupLocation;
 
   final Function onToggleTypingIndicators;
   final Function onIncrementReadReceipts;
@@ -551,6 +608,7 @@ class _Props extends Equatable {
     required this.valid,
     required this.loading,
     required this.readReceipts,
+    required this.keyBackupLocation,
     required this.screenLockEnabled,
     required this.typingIndicators,
     required this.sessionId,
@@ -571,6 +629,7 @@ class _Props extends Equatable {
         valid,
         loading,
         typingIndicators,
+        keyBackupLocation,
         readReceipts,
         sessionId,
         sessionName,
@@ -578,14 +637,18 @@ class _Props extends Equatable {
         screenLockEnabled,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, AppContext context) =>
+      _Props(
         valid: store.state.authStore.credential != null &&
             store.state.authStore.credential!.value != null &&
             store.state.authStore.credential!.value!.isNotEmpty,
         loading: store.state.authStore.loading,
         screenLockEnabled: selectScreenLockEnabled(context),
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
-        readReceipts: selectReadReceiptsString(store.state.settingsStore.readReceipts),
+        keyBackupLocation:
+            store.state.settingsStore.storageSettings.keyBackupLocation,
+        readReceipts:
+            selectReadReceiptsString(store.state.settingsStore.readReceipts),
         sessionId: store.state.authStore.user.deviceId ?? Values.empty,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),
@@ -595,7 +658,8 @@ class _Props extends Equatable {
             await store.dispatch(removeScreenLock(pin: matchedPin)),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
-        onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
+        onToggleTypingIndicators: () =>
+            store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
         onRenameDevice: (BuildContext context) async {
           showDialog(
@@ -606,7 +670,8 @@ class _Props extends Equatable {
               label: selectCurrentDeviceName(store),
               onConfirm: (String newDisplayName) async {
                 await store.dispatch(renameDevice(
-                    deviceId: store.state.authStore.user.deviceId, displayName: newDisplayName));
+                    deviceId: store.state.authStore.user.deviceId,
+                    displayName: newDisplayName));
                 Navigator.of(dialogContext).pop();
               },
               onCancel: () async {

@@ -116,7 +116,8 @@ ThunkAction<AppState> addMessageSessionOutbound({
 
 ThunkAction<AppState> exportMessageSession({String? roomId}) {
   return (Store<AppState> store) async {
-    final olm.OutboundGroupSession outboundMessageSession = await store.dispatch(
+    final olm.OutboundGroupSession outboundMessageSession =
+        await store.dispatch(
       loadMessageSessionOutbound(roomId: roomId),
     );
 
@@ -217,7 +218,8 @@ ThunkAction<AppState> loadKeySessionInbound({
     // filter all key session saved under a certain identityKey
     final keySessions = selectKeySessions(store, identityKey);
 
-    log.info('[loadKeySessionInbound] checking known sessions for sender $identityKey');
+    log.info(
+        '[loadKeySessionInbound] checking known sessions for sender $identityKey');
 
     // reverse the list to attempt the latest first (LinkedHashMap will know)
     for (final session in keySessions.reversed) {
@@ -229,7 +231,8 @@ ThunkAction<AppState> loadKeySessionInbound({
         // this returns a flag indicating whether the message was encrypted using that session
         final keySessionMatch = keySession.matches_inbound(body);
 
-        log.info('[loadKeySessionInbound] $keySessionId session matched $keySessionMatch');
+        log.info(
+            '[loadKeySessionInbound] $keySessionId session matched $keySessionMatch');
 
         if (keySessionMatch) {
           return keySession;
@@ -240,7 +243,8 @@ ThunkAction<AppState> loadKeySessionInbound({
         // attempt decryption in case its not a locally known inbound session state
         keySession.decrypt(type, body);
 
-        log.info('[loadKeySessionInbound] $keySessionId successfully decrypted');
+        log.info(
+            '[loadKeySessionInbound] $keySessionId successfully decrypted');
 
         // Return a fresh key session having not decrypted the payload
         return olm.Session()..unpickle(deviceId, session);
@@ -309,9 +313,11 @@ ThunkAction<AppState> loadMessageSessionInbound({
   required String ciphertext,
 }) {
   return (Store<AppState> store) async {
-    final roomMessageSessions = store.state.cryptoStore.messageSessionsInbound[roomId];
+    final roomMessageSessions =
+        store.state.cryptoStore.messageSessionsInbound[roomId];
 
-    if (roomMessageSessions == null || !roomMessageSessions.containsKey(identityKey)) {
+    if (roomMessageSessions == null ||
+        !roomMessageSessions.containsKey(identityKey)) {
       throw 'Unable to find inbound message session for decryption';
     }
 
@@ -327,7 +333,8 @@ ThunkAction<AppState> loadMessageSessionInbound({
 
         return messageSession;
       } catch (error) {
-        log.warn('[loadMessageSessionInbound] valid session could not decrypt message');
+        log.warn(
+            '[loadMessageSessionInbound] valid session could not decrypt message');
       }
     }
 
@@ -411,7 +418,8 @@ ThunkAction<AppState> createMessageSessionOutbound({required String roomId}) {
 ThunkAction<AppState> loadMessageSessionOutbound({String? roomId}) {
   return (Store<AppState> store) async {
     // Load session for identity
-    var outboundMessageSessionSerialized = store.state.cryptoStore.outboundMessageSessions[roomId!];
+    var outboundMessageSessionSerialized =
+        store.state.cryptoStore.outboundMessageSessions[roomId!];
 
     if (outboundMessageSessionSerialized == null) {
       outboundMessageSessionSerialized = await store.dispatch(
@@ -431,16 +439,29 @@ ThunkAction<AppState> exportSessionKeys(String password) {
       store.dispatch(SetLoadingSettings(loading: true));
 
       // create file
+      final keybackupLocation =
+          store.state.settingsStore.storageSettings.keyBackupLocation;
       var directory = await getApplicationDocumentsDirectory();
       var confirmation = 'Successfully backed up your current session keys';
 
       if (Platform.isAndroid) {
-        directory = Directory(Values.ANDROID_DEFAULT_DIRECTORY);
-        confirmation += ' to Documents folder';
+        directory = Directory(keybackupLocation.isEmpty
+            ? Values.ANDROID_DEFAULT_DIRECTORY
+            : keybackupLocation);
+
+        final pathFolders = directory.path.split('/');
+        final backupFolder = pathFolders.last;
+        confirmation += ' to $backupFolder folder';
       }
 
       if (Platform.isIOS) {
-        confirmation += ' to ${directory.path}';
+        directory = keybackupLocation.isEmpty
+            ? directory
+            : Directory(keybackupLocation);
+
+        final pathFolders = directory.path.split('/');
+        final backupFolder = pathFolders.last;
+        confirmation += ' to $backupFolder folder';
       }
 
       if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
@@ -456,16 +477,18 @@ ThunkAction<AppState> exportSessionKeys(String password) {
           ));
         }
 
-        directory = Directory(directoryPath);
-
-        confirmation += ' to $directoryPath';
+        final pathFolders = directory.path.split('/');
+        final backupFolder = pathFolders.last;
+        confirmation += ' to $backupFolder';
       }
 
       final deviceKeys = store.state.cryptoStore.deviceKeys;
       final messageSessions = store.state.cryptoStore.messageSessionsInbound;
 
-      final deviceKeysByDeviceId = deviceKeys.values.toList().fold<Map<String, DeviceKey>>(
-          <String, DeviceKey>{}, (previous, current) => previous..addAll(current));
+      final deviceKeysByDeviceId = deviceKeys.values
+          .toList()
+          .fold<Map<String, DeviceKey>>(<String, DeviceKey>{},
+              (previous, current) => previous..addAll(current));
 
       final deviceKeyIdentities = Map.fromIterable(
         deviceKeysByDeviceId.values,
@@ -489,7 +512,8 @@ ThunkAction<AppState> exportSessionKeys(String password) {
             final messageIndex = session.index;
 
             // attempt to decrypt with any existing sessions
-            final inboundSession = olm.InboundGroupSession()..unpickle(roomId, session.serialized);
+            final inboundSession = olm.InboundGroupSession()
+              ..unpickle(roomId, session.serialized);
 
             // session
             final sessionId = inboundSession.session_id();
@@ -525,8 +549,10 @@ ThunkAction<AppState> exportSessionKeys(String password) {
       });
 
       final currentTime = DateTime.now();
-      final formattedTime = DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
-      final fileName = '${Values.appName}_key_backup_$formattedTime.txt'.toLowerCase();
+      final formattedTime =
+          DateFormat('MMM_dd_yyyy_hh_mm_aa').format(currentTime).toLowerCase();
+      final fileName =
+          '${Values.appName}_key_backup_$formattedTime.txt'.toLowerCase();
 
       final file = File('${directory.path}/$fileName');
 
@@ -555,7 +581,8 @@ ThunkAction<AppState> exportSessionKeys(String password) {
 /// Responsible for decrypting the key import file and setting
 /// the resulting session to storage.
 ///
-ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password}) {
+ThunkAction<AppState> importSessionKeys(FilePickerResult file,
+    {String? password}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoadingSettings(loading: true));
@@ -563,7 +590,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
 
       final keyFile = File(file.paths[0]!);
       final fileData = await keyFile.readAsString();
-      final roomsEncrypted = store.state.roomStore.roomList.where((room) => room.encryptionEnabled);
+      final roomsEncrypted = store.state.roomStore.roomList
+          .where((room) => room.encryptionEnabled);
 
       var sessionJson;
 
@@ -576,7 +604,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         );
       }
 
-      final messageSessions = Map<String, Map<String, List<MessageSession>>>.from(
+      final messageSessions =
+          Map<String, Map<String, List<MessageSession>>>.from(
         store.state.cryptoStore.messageSessionsInbound,
       );
 
@@ -585,7 +614,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         final senderKey = session['sender_key'] as String;
         final sessionKey = session['session_key'] as String;
 
-        final inboundSession = olm.InboundGroupSession()..import_session(sessionKey);
+        final inboundSession = olm.InboundGroupSession()
+          ..import_session(sessionKey);
         final sessionIndexNew = inboundSession.first_known_index();
 
         // for debugging only
@@ -625,7 +655,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
 
       // Only set local message sessions where rooms are actively being synced
       final roomIdsEncrypted = roomsEncrypted.map((room) => room.id);
-      final messageSessionsActive = Map<String, Map<String, List<MessageSession>>>.from(
+      final messageSessionsActive =
+          Map<String, Map<String, List<MessageSession>>>.from(
         messageSessions,
       );
       messageSessionsActive.removeWhere(
@@ -651,7 +682,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
 
       store.dispatch(addConfirmation(
         origin: 'importSessionKeys',
-        message: 'Successfully imported keys, your previous messages should be decrypting.',
+        message:
+            'Successfully imported keys, your previous messages should be decrypting.',
       ));
 
       await store.dispatch(startSyncObserver());
@@ -659,7 +691,8 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
       store.dispatch(addAlert(
         error: error,
         origin: 'importSessionKeys',
-        message: 'Failed to import your session key backup, check your password and try again.',
+        message:
+            'Failed to import your session key backup, check your password and try again.',
       ));
     } finally {
       store.dispatch(SetLoadingSettings(loading: false));

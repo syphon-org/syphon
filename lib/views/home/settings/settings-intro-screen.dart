@@ -77,7 +77,7 @@ class IntroSettingsScreen extends StatelessWidget {
 
       if (!status.isGranted) {
         return store.dispatch(addAlert(
-          origin: 'exportSessionKeys',
+          origin: 'onExportSessionKeys',
           message: Strings.alertStorageAccessRequiredForKeys,
         ));
       }

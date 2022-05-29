@@ -122,6 +122,8 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 ### macos  
 1. ```flutter config --enable-macos-desktop```
 2. ```brew install libolm``` to install native olm dependencies
+3. copy the dylib - not the soft links - to the macos folder
+  - `cp /opt/homebrew/Cellar/libolm/libolm.3.x.x.dylib ./macos/libolm.3.x.x.dylib`
 3. follow instructions for linking the dylib generated from brew to the Syphon project
   - refer to [macos dylib linking guide](https://flutter.dev/docs/development/platform-integration/c-interop#compiled-dynamic-library-macos)
 4. ```flutter build macos``` to build the .app bundle

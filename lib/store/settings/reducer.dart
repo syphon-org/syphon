@@ -1,11 +1,18 @@
 import 'package:syphon/global/https.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/settings/privacy-settings/actions.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
+import 'package:syphon/store/settings/storage-settings/actions.dart';
+import 'package:syphon/store/settings/theme-settings/actions.dart';
 import './actions.dart';
 import './state.dart';
 
-SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dynamic action]) {
+SettingsStore settingsReducer([
+  SettingsStore state = const SettingsStore(),
+  dynamic action,
+]) {
   switch (action.runtimeType) {
     case SetLoadingSettings:
       return state.copyWith(
@@ -33,26 +40,31 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       );
     case SetMessageSize:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(messageSize: action.messageSize),
+        themeSettings:
+            state.themeSettings.copyWith(messageSize: action.messageSize),
       );
     case SetAvatarShape:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(avatarShape: action.avatarShape),
+        themeSettings:
+            state.themeSettings.copyWith(avatarShape: action.avatarShape),
       );
     case SetMainFabType:
       final _action = action as SetMainFabType;
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(mainFabType: _action.fabType),
+        themeSettings:
+            state.themeSettings.copyWith(mainFabType: _action.fabType),
       );
     case SetMainFabLocation:
       final _action = action as SetMainFabLocation;
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(mainFabLocation: _action.fabLocation),
+        themeSettings:
+            state.themeSettings.copyWith(mainFabLocation: _action.fabLocation),
       );
     case SetMainFabLabels:
       final _action = action as SetMainFabLabels;
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(mainFabLabel: _action.fabLabels),
+        themeSettings:
+            state.themeSettings.copyWith(mainFabLabel: _action.fabLabels),
       );
     case SetDevices:
       return state.copyWith(
@@ -89,7 +101,8 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       );
     case SetThemeType:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(themeType: action.themeType),
+        themeSettings:
+            state.themeSettings.copyWith(themeType: action.themeType),
       );
     case ToggleEnterSend:
       return state.copyWith(
@@ -127,9 +140,24 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       return state.copyWith(
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
+    case SetKeyBackupLocation:
+      final _action = action as SetKeyBackupLocation;
+      return state.copyWith(
+        storageSettings: state.storageSettings.copyWith(
+          keyBackupLocation: _action.location,
+        ),
+      );
+    case SetKeyBackupInterval:
+      return state.copyWith(
+        privacySettings: state.privacySettings.copyWith(
+          keyBackupInterval: action.duration,
+        ),
+      );
     case ToggleProxy:
       final _state = state.copyWith(
-        proxySettings: state.proxySettings.copyWith(enabled: !state.proxySettings.enabled),
+        proxySettings: state.proxySettings.copyWith(
+          enabled: !state.proxySettings.enabled,
+        ),
       );
 
       httpClient = createClient(proxySettings: _state.proxySettings);
@@ -153,8 +181,8 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       return _state;
     case ToggleProxyAuthentication:
       final _state = state.copyWith(
-        proxySettings: state.proxySettings
-            .copyWith(authenticationEnabled: !state.proxySettings.authenticationEnabled),
+        proxySettings: state.proxySettings.copyWith(
+            authenticationEnabled: !state.proxySettings.authenticationEnabled),
       );
 
       httpClient = createClient(proxySettings: _state.proxySettings);
@@ -191,8 +219,8 @@ SettingsStore settingsReducer([SettingsStore state = const SettingsStore(), dyna
       );
     case ToggleNotifications:
       return state.copyWith(
-        notificationSettings:
-            state.notificationSettings.copyWith(enabled: !state.notificationSettings.enabled),
+        notificationSettings: state.notificationSettings
+            .copyWith(enabled: !state.notificationSettings.enabled),
       );
     case SetNotificationSettings:
       return state.copyWith(notificationSettings: action.settings);

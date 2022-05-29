@@ -23,9 +23,13 @@ import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/settings/privacy-settings/actions.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
+import 'package:syphon/store/settings/storage-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
+import 'package:syphon/store/settings/theme-settings/actions.dart';
 import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
@@ -45,7 +49,8 @@ saveStorageMiddleware(StorageDatabase? storage) {
     next(action);
 
     if (storage == null) {
-      log.warn('storage is null, skipping saving cold storage data!!!', title: 'storageMiddleware');
+      log.warn('storage is null, skipping saving cold storage data!!!',
+          title: 'storageMiddleware');
       return;
     }
 
@@ -63,8 +68,8 @@ saveStorageMiddleware(StorageDatabase? storage) {
         final _action = action as UpdateMediaCache;
 
         // dont save decrypted images
-        final decrypting =
-            store.state.mediaStore.mediaStatus[_action.mxcUri] == MediaStatus.DECRYPTING.value;
+        final decrypting = store.state.mediaStore.mediaStatus[_action.mxcUri] ==
+            MediaStatus.DECRYPTING.value;
         if (decrypting) return;
 
         saveMedia(_action.mxcUri, _action.data,
@@ -79,7 +84,8 @@ saveStorageMiddleware(StorageDatabase? storage) {
 
         // room information (or a room) should be small enought to update frequently
         // TODO: extract room event keys to a helper class / object to remove large map copies
-        if ((isSending || isDrafting || isLastRead) && rooms.containsKey(_action.id)) {
+        if ((isSending || isDrafting || isLastRead) &&
+            rooms.containsKey(_action.id)) {
           final room = rooms[_action.id];
           saveRoom(room!, storage: storage);
         }
@@ -150,13 +156,17 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case ToggleProxy:
       case SetProxyHost:
       case SetProxyPort:
+      case SetKeyBackupInterval:
+      case SetKeyBackupLocation:
       case ToggleProxyAuthentication:
       case SetProxyUsername:
       case SetProxyPassword:
         saveSettings(store.state.settingsStore, storage: storage);
         break;
       case LogAppAgreement:
-        saveTermsAgreement(timestamp: int.parse(store.state.settingsStore.alphaAgreement ?? '0'));
+        saveTermsAgreement(
+            timestamp:
+                int.parse(store.state.settingsStore.alphaAgreement ?? '0'));
         break;
       case SetOlmAccountBackup:
       case SetDeviceKeysOwned:
