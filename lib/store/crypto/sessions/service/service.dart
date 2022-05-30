@@ -88,7 +88,7 @@ class KeyBackupService {
     try {
       await Workmanager().initialize(
         callback, // The top level function, aka callbackDispatcher
-        isInDebugMode: true, // prints notification on run
+        isInDebugMode: false, // prints notification on run
       );
       return true;
     } catch (error) {

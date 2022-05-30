@@ -140,6 +140,10 @@ dev_dependencies:
 # TODO: remove when similar functionality is merged
 dependency_overrides:
   platform: ^3.1.0
+  workmanager: # TODO: lower ios deployment target
+    git:
+      url: https://github.com/syphon-org/flutter_workmanager.git
+      ref: cdb255e5827dcc962e0340ab6a535bd8e1139a27
   swipeable: # TODO: null saftey version
     git:
       url: https://github.com/ereio/swipeable.git
