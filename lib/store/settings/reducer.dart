@@ -140,6 +140,13 @@ SettingsStore settingsReducer([
       return state.copyWith(
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
+    case SetLastBackupMillis:
+      final _action = action as SetLastBackupMillis;
+      return state.copyWith(
+        privacySettings: state.privacySettings.copyWith(
+          lastBackupMillis: _action.timestamp,
+        ),
+      );
     case SetKeyBackupLocation:
       final _action = action as SetKeyBackupLocation;
       return state.copyWith(
@@ -148,9 +155,11 @@ SettingsStore settingsReducer([
         ),
       );
     case SetKeyBackupInterval:
+      final _action = action as SetKeyBackupInterval;
       return state.copyWith(
         privacySettings: state.privacySettings.copyWith(
-          keyBackupInterval: action.duration,
+          keyBackupInterval: _action.duration,
+          lastBackupMillis: DateTime.now().millisecondsSinceEpoch.toString(),
         ),
       );
     case ToggleProxy:

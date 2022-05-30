@@ -438,9 +438,12 @@ ThunkAction<AppState> exportSessionKeys(String password) {
     try {
       store.dispatch(SetLoadingSettings(loading: true));
 
-      // create file
+      final deviceKeys = store.state.cryptoStore.deviceKeys;
+      final messageSessions = store.state.cryptoStore.messageSessionsInbound;
       final keybackupLocation =
           store.state.settingsStore.storageSettings.keyBackupLocation;
+
+      // create file
       var directory = await getApplicationDocumentsDirectory();
       var confirmation = 'Successfully backed up your current session keys';
 
@@ -481,9 +484,6 @@ ThunkAction<AppState> exportSessionKeys(String password) {
         final backupFolder = pathFolders.last;
         confirmation += ' to $backupFolder';
       }
-
-      final deviceKeys = store.state.cryptoStore.deviceKeys;
-      final messageSessions = store.state.cryptoStore.messageSessionsInbound;
 
       final deviceKeysByDeviceId = deviceKeys.values
           .toList()

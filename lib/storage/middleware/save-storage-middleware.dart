@@ -30,7 +30,7 @@ import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/store/settings/storage-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
 import 'package:syphon/store/settings/theme-settings/actions.dart';
-import 'package:syphon/store/sync/background/storage.dart';
+import 'package:syphon/store/sync/service/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 

@@ -10,7 +10,7 @@ import 'package:path_provider_linux/path_provider_linux.dart';
 import 'package:sqlite3/open.dart';
 import 'package:syphon/global/libs/storage/secure-storage.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/sync/service/service.dart';
 
 /// TODO: move database DynamicLibrary init here
 
@@ -78,7 +78,7 @@ Future<void> initPlatformDependencies() async {
 
   // init background sync for Android only
   if (Platform.isAndroid) {
-    final backgroundSyncStatus = await BackgroundSync.init();
+    final backgroundSyncStatus = await SyncService.init();
     log.info('[main] background service initialized $backgroundSyncStatus');
   }
 }

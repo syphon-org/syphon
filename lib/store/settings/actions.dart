@@ -11,7 +11,8 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/models.dart';
-import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/sync/service/actions.dart';
+import 'package:syphon/store/sync/service/service.dart';
 
 class SetPusherToken {
   final String? token;
@@ -344,42 +345,9 @@ ThunkAction<AppState> toggleNotifications() {
     final enabled = store.state.settingsStore.notificationSettings.enabled;
 
     if (enabled) {
-      store.dispatch(startNotifications());
+      store.dispatch(startSyncService());
     } else {
-      store.dispatch(stopNotifications());
+      store.dispatch(stopSyncService());
     }
-  };
-}
-
-ThunkAction<AppState> startNotifications() {
-  return (Store<AppState> store) async {
-    await BackgroundSync.init();
-
-    final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
-      (roomId, room) => MapEntry(roomId, room.name),
-    );
-
-    await BackgroundSync.start(
-      roomNames: roomNames,
-      protocol: store.state.authStore.protocol,
-      lastSince: store.state.syncStore.lastSince,
-      currentUser: store.state.authStore.currentUser,
-      settings: store.state.settingsStore.notificationSettings,
-      proxySettings: store.state.settingsStore.proxySettings,
-    );
-
-    showBackgroundServiceNotification(
-      notificationId: BackgroundSync.service_id,
-      pluginInstance: globalNotificationPluginInstance!,
-    );
-  };
-}
-
-ThunkAction<AppState> stopNotifications() {
-  return (Store<AppState> store) async {
-    BackgroundSync.stop();
-    dismissAllNotifications(
-      pluginInstance: globalNotificationPluginInstance,
-    );
   };
 }

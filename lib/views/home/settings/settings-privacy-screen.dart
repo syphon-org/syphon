@@ -16,6 +16,8 @@ import 'package:syphon/store/crypto/sessions/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
+import 'package:syphon/store/settings/privacy-settings/actions.dart';
+import 'package:syphon/store/settings/privacy-settings/selectors.dart';
 import 'package:syphon/store/settings/selectors.dart';
 import 'package:syphon/store/settings/storage-settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
@@ -25,8 +27,117 @@ import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-rounded.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/show-lock-overlay.dart';
+
+class _Props extends Equatable {
+  final bool loading;
+  final bool valid;
+  final bool? typingIndicators;
+  final bool screenLockEnabled;
+
+  final String sessionId;
+  final String sessionName;
+  final String sessionKey;
+  final String readReceipts;
+  final String keyBackupSchedule;
+  final String keyBackupLocation;
+
+  final Function onToggleTypingIndicators;
+  final Function onIncrementReadReceipts;
+  final Function onDisabled;
+  final Function onResetConfirmAuth;
+  final Function onSetScreenLock;
+  final Function onRemoveScreenLock;
+  final Function onRenameDevice;
+  final Function copyToClipboard;
+
+  const _Props({
+    required this.valid,
+    required this.loading,
+    required this.readReceipts,
+    required this.keyBackupSchedule,
+    required this.keyBackupLocation,
+    required this.screenLockEnabled,
+    required this.typingIndicators,
+    required this.sessionId,
+    required this.sessionName,
+    required this.sessionKey,
+    required this.onDisabled,
+    required this.onToggleTypingIndicators,
+    required this.onIncrementReadReceipts,
+    required this.onResetConfirmAuth,
+    required this.onSetScreenLock,
+    required this.onRemoveScreenLock,
+    required this.onRenameDevice,
+    required this.copyToClipboard,
+  });
+
+  @override
+  List<Object?> get props => [
+        valid,
+        loading,
+        typingIndicators,
+        keyBackupLocation,
+        keyBackupSchedule,
+        readReceipts,
+        sessionId,
+        sessionName,
+        sessionKey,
+        screenLockEnabled,
+      ];
+
+  static _Props mapStateToProps(Store<AppState> store, AppContext context) =>
+      _Props(
+        valid: store.state.authStore.credential != null &&
+            store.state.authStore.credential!.value != null &&
+            store.state.authStore.credential!.value!.isNotEmpty,
+        loading: store.state.authStore.loading,
+        screenLockEnabled: selectScreenLockEnabled(context),
+        typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
+        keyBackupSchedule: selectKeyBackupSchedule(store.state),
+        keyBackupLocation:
+            store.state.settingsStore.storageSettings.keyBackupLocation,
+        readReceipts:
+            selectReadReceiptsString(store.state.settingsStore.readReceipts),
+        sessionId: store.state.authStore.user.deviceId ?? Values.empty,
+        sessionName: selectCurrentDeviceName(store),
+        sessionKey: selectCurrentUserSessionKey(store),
+        onSetScreenLock: (String matchedPin) async =>
+            await store.dispatch(setScreenLock(pin: matchedPin)),
+        onRemoveScreenLock: (String matchedPin) async =>
+            await store.dispatch(removeScreenLock(pin: matchedPin)),
+        onDisabled: () => store.dispatch(addInProgress()),
+        onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
+        onToggleTypingIndicators: () =>
+            store.dispatch(toggleTypingIndicators()),
+        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
+        onRenameDevice: (BuildContext context) async {
+          showDialog(
+            context: context,
+            builder: (dialogContext) => DialogTextInput(
+              title: Strings.titleRenameDevice,
+              content: Strings.contentRenameDevice,
+              label: selectCurrentDeviceName(store),
+              onConfirm: (String newDisplayName) async {
+                await store.dispatch(renameDevice(
+                    deviceId: store.state.authStore.user.deviceId,
+                    displayName: newDisplayName));
+                Navigator.of(dialogContext).pop();
+              },
+              onCancel: () async {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          );
+        },
+        copyToClipboard: (String? clipboardData) async {
+          await Clipboard.setData(ClipboardData(text: clipboardData));
+          store.dispatch(addInfo(message: Strings.alertCopiedToClipboard));
+        },
+      );
+}
 
 class PrivacySettingsScreen extends StatelessWidget {
   const PrivacySettingsScreen({Key? key}) : super(key: key);
@@ -135,7 +246,6 @@ class PrivacySettingsScreen extends StatelessWidget {
   }
 
   onUpdateBackupLocation({
-    required _Props props,
     required BuildContext context,
   }) async {
     final store = StoreProvider.of<AppState>(context);
@@ -153,6 +263,124 @@ class PrivacySettingsScreen extends StatelessWidget {
         location: selectedDirectory,
       ));
     }
+  }
+
+  onUpdateBackupSchedule({
+    required BuildContext context,
+  }) async {
+    final store = StoreProvider.of<AppState>(context);
+    final defaultPadding = EdgeInsets.symmetric(horizontal: 10);
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => DialogRounded(
+        title: 'Set Key Backup Schedule',
+        children: [
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  'Manual Only',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              store.dispatch(
+                SetKeyBackupInterval(duration: Duration.zero),
+              );
+              Navigator.pop(dialogContext);
+            },
+          ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  'Every hour',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              store.dispatch(
+                SetKeyBackupInterval(duration: Duration(hours: 1)),
+              );
+              Navigator.pop(dialogContext);
+            },
+          ),
+          ListTile(
+            title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  'Every 6 hours',
+                  style: Theme.of(context).textTheme.subtitle1,
+                )),
+            onTap: () {
+              store.dispatch(
+                SetKeyBackupInterval(duration: Duration(hours: 6)),
+              );
+              Navigator.pop(dialogContext);
+            },
+          ),
+          ListTile(
+            title: Padding(
+              padding: defaultPadding,
+              child: Text(
+                'Every 12 hours',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            onTap: () {
+              store.dispatch(
+                SetKeyBackupInterval(duration: Duration(hours: 12)),
+              );
+              Navigator.pop(dialogContext);
+            },
+          ),
+          ListTile(
+            title: Padding(
+              padding: defaultPadding,
+              child: Text(
+                'Every day',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            onTap: () {
+              store.dispatch(
+                SetKeyBackupInterval(duration: Duration(hours: 24)),
+              );
+              Navigator.pop(dialogContext);
+            },
+          ),
+          ListTile(
+            title: Padding(
+              padding: defaultPadding,
+              child: Text(
+                'Every week',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            onTap: () {
+              store.dispatch(
+                SetKeyBackupInterval(duration: Duration(days: 7)),
+              );
+              Navigator.pop(dialogContext);
+            },
+          ),
+          ListTile(
+            title: Padding(
+              padding: defaultPadding,
+              child: Text(
+                'Once a month',
+                style: Theme.of(context).textTheme.subtitle1,
+              ),
+            ),
+            onTap: () {
+              store.dispatch(
+                SetKeyBackupInterval(duration: Duration(days: 29)),
+              );
+              Navigator.pop(dialogContext);
+            },
+          )
+        ],
+      ),
+    );
   }
 
   onExportSessionKeys({
@@ -509,8 +737,8 @@ class PrivacySettingsScreen extends StatelessWidget {
                           Visibility(
                             visible: true,
                             child: ListTile(
-                              onTap: () => onUpdateBackupLocation(
-                                  props: props, context: context),
+                              onTap: () =>
+                                  onUpdateBackupLocation(context: context),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Backup Folder',
@@ -524,12 +752,14 @@ class PrivacySettingsScreen extends StatelessWidget {
                           Visibility(
                             visible: true,
                             child: ListTile(
+                              onTap: () =>
+                                  onUpdateBackupSchedule(context: context),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
-                                'Automatic Backup Frequency',
+                                'Backup Schedule',
                               ),
                               subtitle: Text(
-                                'Manual Only',
+                                props.keyBackupSchedule,
                                 style: Theme.of(context).textTheme.caption,
                               ),
                             ),
@@ -579,110 +809,6 @@ class PrivacySettingsScreen extends StatelessWidget {
                   ],
                 )),
           );
-        },
-      );
-}
-
-class _Props extends Equatable {
-  final bool loading;
-  final bool valid;
-  final bool? typingIndicators;
-  final bool screenLockEnabled;
-
-  final String sessionId;
-  final String sessionName;
-  final String sessionKey;
-  final String readReceipts;
-  final String keyBackupLocation;
-
-  final Function onToggleTypingIndicators;
-  final Function onIncrementReadReceipts;
-  final Function onDisabled;
-  final Function onResetConfirmAuth;
-  final Function onSetScreenLock;
-  final Function onRemoveScreenLock;
-  final Function onRenameDevice;
-  final Function copyToClipboard;
-
-  const _Props({
-    required this.valid,
-    required this.loading,
-    required this.readReceipts,
-    required this.keyBackupLocation,
-    required this.screenLockEnabled,
-    required this.typingIndicators,
-    required this.sessionId,
-    required this.sessionName,
-    required this.sessionKey,
-    required this.onDisabled,
-    required this.onToggleTypingIndicators,
-    required this.onIncrementReadReceipts,
-    required this.onResetConfirmAuth,
-    required this.onSetScreenLock,
-    required this.onRemoveScreenLock,
-    required this.onRenameDevice,
-    required this.copyToClipboard,
-  });
-
-  @override
-  List<Object?> get props => [
-        valid,
-        loading,
-        typingIndicators,
-        keyBackupLocation,
-        readReceipts,
-        sessionId,
-        sessionName,
-        sessionKey,
-        screenLockEnabled,
-      ];
-
-  static _Props mapStateToProps(Store<AppState> store, AppContext context) =>
-      _Props(
-        valid: store.state.authStore.credential != null &&
-            store.state.authStore.credential!.value != null &&
-            store.state.authStore.credential!.value!.isNotEmpty,
-        loading: store.state.authStore.loading,
-        screenLockEnabled: selectScreenLockEnabled(context),
-        typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
-        keyBackupLocation:
-            store.state.settingsStore.storageSettings.keyBackupLocation,
-        readReceipts:
-            selectReadReceiptsString(store.state.settingsStore.readReceipts),
-        sessionId: store.state.authStore.user.deviceId ?? Values.empty,
-        sessionName: selectCurrentDeviceName(store),
-        sessionKey: selectCurrentUserSessionKey(store),
-        onSetScreenLock: (String matchedPin) async =>
-            await store.dispatch(setScreenLock(pin: matchedPin)),
-        onRemoveScreenLock: (String matchedPin) async =>
-            await store.dispatch(removeScreenLock(pin: matchedPin)),
-        onDisabled: () => store.dispatch(addInProgress()),
-        onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
-        onToggleTypingIndicators: () =>
-            store.dispatch(toggleTypingIndicators()),
-        onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
-        onRenameDevice: (BuildContext context) async {
-          showDialog(
-            context: context,
-            builder: (dialogContext) => DialogTextInput(
-              title: Strings.titleRenameDevice,
-              content: Strings.contentRenameDevice,
-              label: selectCurrentDeviceName(store),
-              onConfirm: (String newDisplayName) async {
-                await store.dispatch(renameDevice(
-                    deviceId: store.state.authStore.user.deviceId,
-                    displayName: newDisplayName));
-                Navigator.of(dialogContext).pop();
-              },
-              onCancel: () async {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-          );
-        },
-        copyToClipboard: (String? clipboardData) async {
-          await Clipboard.setData(ClipboardData(text: clipboardData));
-          store.dispatch(addInfo(message: Strings.alertCopiedToClipboard));
         },
       );
 }

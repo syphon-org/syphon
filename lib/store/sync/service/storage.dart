@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
-import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/sync/service/service.dart';
 
 FlutterSecureStorage? _secureStorage;
 
@@ -13,7 +13,7 @@ _initStorage() {
 }
 
 ///
-/// Save Room Names (BackgroundSync)
+/// Save Room Names (SyncService)
 ///
 /// Save the crypto store to cold storage
 /// Idealy, run this after performance a pure action
@@ -25,7 +25,7 @@ Future saveRoomNames({required Map<String, String> roomNames}) async {
     _initStorage();
 
     await _secureStorage!.write(
-      key: BackgroundSync.roomNamesKey,
+      key: SyncService.roomNamesKey,
       value: jsonEncode(roomNames),
     );
   } catch (error) {
@@ -34,7 +34,7 @@ Future saveRoomNames({required Map<String, String> roomNames}) async {
 }
 
 ///
-/// Load Room Names (BackgroundSync)
+/// Load Room Names (SyncService)
 ///
 /// In storage, the crypto store is saved in it's entirety
 /// in a separate thread/isolate
@@ -43,13 +43,13 @@ Future<Map<String, String>> loadRoomNames() async {
     _initStorage();
     return Map<String, String>.from(
       await jsonDecode(
-        await _secureStorage!.read(key: BackgroundSync.roomNamesKey) ?? '{}',
+        await _secureStorage!.read(key: SyncService.roomNamesKey) ?? '{}',
       ),
     );
   } catch (error) {
     try {
       _initStorage();
-      _secureStorage!.delete(key: BackgroundSync.roomNamesKey);
+      _secureStorage!.delete(key: SyncService.roomNamesKey);
     } catch (error) {}
     log.error('[loadRoomNames] ${error.toString()}');
   }
@@ -58,7 +58,7 @@ Future<Map<String, String>> loadRoomNames() async {
 }
 
 ///
-/// Load Last Since (BackgroundSync)
+/// Load Last Since (SyncService)
 ///
 /// Save the crypto store to cold storage
 /// Idealy, run this after performance a pure action
@@ -68,21 +68,23 @@ Future saveLastSince({required String lastSince}) async {
     if (lastSince.isEmpty) return;
 
     _initStorage();
-    await _secureStorage!.write(key: BackgroundSync.lastSinceKey, value: lastSince);
+    await _secureStorage!
+        .write(key: SyncService.lastSinceKey, value: lastSince);
   } catch (error) {
     log.error('[saveLastSince] ${error.toString()}');
   }
 }
 
 ///
-/// Load Crypto (BackgroundSync)
+/// Load Crypto (SyncService)
 ///
 /// In storage, the crypto store is saved in it's entirety
 /// in a separate thread/isolate
 Future<String> loadLastSince({required String fallback}) async {
   try {
     _initStorage();
-    return await _secureStorage!.read(key: BackgroundSync.lastSinceKey) ?? fallback;
+    return await _secureStorage!.read(key: SyncService.lastSinceKey) ??
+        fallback;
   } catch (error) {
     log.error('[loadLastSince] ${error.toString()}');
   }
@@ -91,7 +93,7 @@ Future<String> loadLastSince({required String fallback}) async {
 }
 
 ///
-/// Save Notification Settings (BackgroundSync)
+/// Save Notification Settings (SyncService)
 ///
 /// Used to update settings while the background
 /// sync thread is currently running
@@ -103,7 +105,7 @@ Future saveNotificationSettings({NotificationSettings? settings}) async {
 
     _initStorage();
     await _secureStorage!.write(
-      key: BackgroundSync.notificationSettingsKey,
+      key: SyncService.notificationSettingsKey,
       value: jsonEncode(settings),
     );
   } catch (error) {
@@ -112,7 +114,7 @@ Future saveNotificationSettings({NotificationSettings? settings}) async {
 }
 
 ///
-/// Load Notification Settings (BackgroundSync)
+/// Load Notification Settings (SyncService)
 ///
 /// Used to load settings while the background
 /// sync thread is currently running
@@ -122,7 +124,7 @@ Future<NotificationSettings> loadNotificationSettings(
   try {
     _initStorage();
     final settingsEncoded = await _secureStorage!.read(
-      key: BackgroundSync.notificationSettingsKey,
+      key: SyncService.notificationSettingsKey,
     );
 
     final settingsJson = await jsonDecode(settingsEncoded!);
@@ -136,7 +138,7 @@ Future<NotificationSettings> loadNotificationSettings(
 }
 
 ///
-/// Save Notification Data Unchecked (BackgroundSync)
+/// Save Notification Data Unchecked (SyncService)
 ///
 /// Used to save unchecked notification data when
 /// the notification style is Inbox. Aggregates all unchecked
@@ -146,7 +148,7 @@ Future saveNotificationsUnchecked(Map<String, String> uncheckedMessages) async {
   try {
     _initStorage();
     await _secureStorage!.write(
-      key: BackgroundSync.notificationsUncheckedKey,
+      key: SyncService.notificationsUncheckedKey,
       value: jsonEncode(uncheckedMessages),
     );
   } catch (error) {
@@ -155,7 +157,7 @@ Future saveNotificationsUnchecked(Map<String, String> uncheckedMessages) async {
 }
 
 ///
-/// Load Notification Data Unchecked (BackgroundSync)
+/// Load Notification Data Unchecked (SyncService)
 ///
 /// Used to load settings while the background
 /// sync thread is currently running
@@ -164,7 +166,7 @@ Future<Map<String, String>> loadNotificationsUnchecked() async {
   try {
     _initStorage();
     final uncheckedData = await _secureStorage!.read(
-          key: BackgroundSync.notificationsUncheckedKey,
+          key: SyncService.notificationsUncheckedKey,
         ) ??
         '{}';
     final uncheckedJson = jsonDecode(uncheckedData);

@@ -5,21 +5,26 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class PrivacySettings extends Equatable {
+  final String lastBackupMillis;
   final Duration keyBackupInterval;
 
   const PrivacySettings({
-    this.keyBackupInterval = const Duration(days: 1),
+    this.lastBackupMillis = '0',
+    this.keyBackupInterval = Duration.zero,
   });
 
   @override
   List<Object?> get props => [
+        lastBackupMillis,
         keyBackupInterval,
       ];
 
   PrivacySettings copyWith({
+    String? lastBackupMillis,
     Duration? keyBackupInterval,
   }) =>
       PrivacySettings(
+        lastBackupMillis: lastBackupMillis ?? this.lastBackupMillis,
         keyBackupInterval: keyBackupInterval ?? this.keyBackupInterval,
       );
 

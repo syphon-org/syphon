@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
@@ -21,8 +20,8 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/sync/background/storage.dart';
 import 'package:syphon/store/sync/parsers.dart';
+import 'package:syphon/store/sync/service/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 
 class SetBackoff {
@@ -148,7 +147,8 @@ ThunkAction<AppState> startSyncObserver() {
     if (syncObserver == null || !syncObserver.isActive) {
       store.dispatch(
         SetSyncObserver(
-          syncObserver: Timer.periodic(Duration(milliseconds: interval), onSync),
+          syncObserver:
+              Timer.periodic(Duration(milliseconds: interval), onSync),
         ),
       );
     }
@@ -263,7 +263,8 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       final String nextBatch = data['next_batch'];
       final Map<String, dynamic> roomJson = data['rooms'] ?? {};
       final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};
-      final Map<String, dynamic> oneTimeKeyCount = data['device_one_time_keys_count'] ?? {};
+      final Map<String, dynamic> oneTimeKeyCount =
+          data['device_one_time_keys_count'] ?? {};
 
       // Updates for device specific data (mostly room encryption)
       if (toDeviceJson.isNotEmpty) {
@@ -360,11 +361,13 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
 
       // update various message mutations and meta data
       await store.dispatch(setUsers(sync.users));
-      await store.dispatch(setReceipts(room: room, receipts: sync.readReceipts));
+      await store
+          .dispatch(setReceipts(room: room, receipts: sync.readReceipts));
       await store.dispatch(addReactions(reactions: events.reactions));
 
       // redact events (reactions and messages) through cache and cold storage
-      await store.dispatch(redactEvents(room: room, redactions: events.redactions));
+      await store
+          .dispatch(redactEvents(room: room, redactions: events.redactions));
 
       // handles editing newly fetched messages
       final messages = await store.dispatch(

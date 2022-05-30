@@ -2,9 +2,9 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/options/types.dart';
+import 'package:syphon/store/sync/service/actions.dart';
 
 class MuteChatNotifications {
   final String roomId;
@@ -34,7 +34,8 @@ ThunkAction<AppState> muteChatNotifications({
 }) {
   return (Store<AppState> store) async {
     final settings = store.state.settingsStore.notificationSettings;
-    final options = Map<String, NotificationOptions>.from(settings.notificationOptions);
+    final options =
+        Map<String, NotificationOptions>.from(settings.notificationOptions);
 
     options.putIfAbsent(roomId, () => NotificationOptions());
 
@@ -63,7 +64,8 @@ ThunkAction<AppState> toggleChatNotifications({
 }) {
   return (Store<AppState> store) async {
     final settings = store.state.settingsStore.notificationSettings;
-    final options = Map<String, NotificationOptions>.from(settings.notificationOptions);
+    final options =
+        Map<String, NotificationOptions>.from(settings.notificationOptions);
 
     options.putIfAbsent(roomId, () => NotificationOptions());
 
@@ -89,15 +91,15 @@ ThunkAction<AppState> incrementToggleType() {
     final settings = store.state.settingsStore.notificationSettings;
 
     final index = ToggleType.values.indexOf(settings.toggleType);
-    final toggleType = ToggleType.values[(index + 1) % ToggleType.values.length];
+    final toggleType =
+        ToggleType.values[(index + 1) % ToggleType.values.length];
 
     store.dispatch(SetNotificationSettings(
       settings: settings.copyWith(toggleType: toggleType),
     ));
 
     // Reset notification background thread
-    await store.dispatch(stopNotifications());
-    store.dispatch(startNotifications());
+    await store.dispatch(resetSyncService());
   };
 }
 
@@ -121,7 +123,6 @@ ThunkAction<AppState> incrementStyleType() {
     ));
 
     // Reset notification background thread
-    await store.dispatch(stopNotifications());
-    store.dispatch(startNotifications());
+    await store.dispatch(resetSyncService());
   };
 }
