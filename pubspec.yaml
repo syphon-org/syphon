@@ -143,7 +143,8 @@ dependency_overrides:
   workmanager: # TODO: lower ios deployment target
     git:
       url: https://github.com/syphon-org/flutter_workmanager.git
-      ref: cdb255e5827dcc962e0340ab6a535bd8e1139a27
+      ref: origin/fix/support-ios-9 
+      # ref: cdb255e5827dcc962e0340ab6a535bd8e1139a27
   swipeable: # TODO: null saftey version
     git:
       url: https://github.com/ereio/swipeable.git
