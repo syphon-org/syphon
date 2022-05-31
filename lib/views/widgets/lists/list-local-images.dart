@@ -1,12 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:local_image_provider/device_image.dart';
-import 'package:local_image_provider/local_image.dart';
 import 'package:local_image_provider/local_image_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -32,7 +30,8 @@ class ListLocalImages extends StatefulWidget {
   _ListLocalImagesState createState() => _ListLocalImagesState();
 }
 
-class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLocalImages> {
+class _ListLocalImagesState extends State<ListLocalImages>
+    with Lifecycle<ListLocalImages> {
   List<LocalImage> images = [];
   LocalImageProvider imageProvider = LocalImageProvider();
 
@@ -86,7 +85,7 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
                 child: Icon(
                   Icons.search,
                   size: Dimensions.iconSize * 1.5,
-                  color: const Color(Colours.greyDefault),
+                  color: const Color(AppColors.greyDefault),
                 ),
               ),
               Text(

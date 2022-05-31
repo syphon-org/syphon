@@ -5,7 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -77,14 +77,14 @@ class ModalUserDetails extends StatelessWidget {
         title: Strings.listItemUserDetailsStartChat(user.displayName),
         content: Strings.confirmStartChat,
         onStartChat: () async {
-          final roomIdNew = await props.onCreateChatDirect(user: user) ?? '';
+          final String roomIdNew = await props.onCreateChatDirect(user: user) ?? '';
           Navigator.pop(dialogContext);
 
           if (nested != null && nested!) {
             Navigator.pop(dialogContext);
           }
 
-          if (roomIdNew) {
+          if (roomIdNew.isNotEmpty) {
             Navigator.popAndPushNamed(
               context,
               Routes.chat,
@@ -144,7 +144,7 @@ class ModalUserDetails extends StatelessWidget {
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
                             background: props.user.avatarUri == null
-                                ? Colours.hashedColorUser(props.user)
+                                ? AppColors.hashedColorUser(props.user)
                                 : null,
                           ),
                         ),

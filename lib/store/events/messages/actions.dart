@@ -149,7 +149,7 @@ ThunkAction<AppState> mutateMessagesAll() {
         messagesUpdated.addAll({room.id: allUpdated[0]});
         decryptedUpdated.addAll({room.id: allUpdated[1]});
       } catch (error) {
-        printError('[mutateMessagesAll] error ${room.id} ${error.toString()}');
+        log.error('[mutateMessagesAll] ${room.id} ${error.toString()}');
       }
     });
 
@@ -361,7 +361,7 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       if (hasReply) {
         unencryptedData['m.relates_to'] = {
-          'm.in_reply_to': {'event_id': reply!.id}
+          'm.in_reply_to': {'event_id': reply.id}
         };
 
         pending = formatMessageReply(room, pending, reply);
@@ -369,7 +369,7 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       if (hasReplacement) {
         unencryptedData['m.relates_to'] = {
-          'event_id': related!.id,
+          'event_id': related.id,
           'rel_type': RelationTypes.replace,
         };
       }
@@ -444,7 +444,8 @@ ThunkAction<AppState> sendMessageEncrypted({
   };
 }
 
-Future<bool> isMessageDeletable({required Message message, User? user, Room? room}) async {
+Future<bool> isMessageDeletable(
+    {required Message message, User? user, Room? room}) async {
   try {
     final powerLevels = await MatrixApi.fetchPowerLevels(
       room: room,
@@ -465,7 +466,7 @@ Future<bool> isMessageDeletable({required Message message, User? user, Room? roo
 
     return false;
   } catch (error) {
-    printDebug('[isMessageDeletable] $error');
+    log.debug('[isMessageDeletable] $error');
     return false;
   }
 }

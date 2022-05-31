@@ -4,6 +4,9 @@ include: package:lint/analysis_options.yaml
 analyzer:
   strong-mode:
     implicit-casts: true
+  exclude:
+    - lib/**/*.g.dart
+    - test/_data/**
 
 linter:
   rules:
@@ -14,6 +17,7 @@ linter:
     prefer_typing_uninitialized_variables: false
     empty_catches: false
     avoid_dynamic_calls: false
+    prefer_constructors_over_static_methods: false
     # sort_constructors_first: true
     # always_put_required_named_parameters_first: true
     # always_specify_types: true

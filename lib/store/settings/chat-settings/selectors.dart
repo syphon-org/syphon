@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/store/index.dart';
 
 final _chatColorCache = <String, Color>{};
@@ -28,13 +28,13 @@ Color selectChatColor(Store<AppState> store, String? roomId) {
   if (room != null && room.direct) {
     final userId = room.userIds.firstWhere((id) => id != currentUserId, orElse: () => '');
     if (userId.isNotEmpty) {
-      final chatColor = Colours.hashedColor(userId);
+      final chatColor = AppColors.hashedColor(userId);
       _chatColorCache.putIfAbsent(room.id, () => chatColor);
       return chatColor;
     }
   }
 
-  final chatColor = Colours.hashedColor(roomId);
+  final chatColor = AppColors.hashedColor(roomId);
   _chatColorCache.putIfAbsent(roomId, () => chatColor);
   return chatColor;
 }

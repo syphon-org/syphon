@@ -9,7 +9,7 @@ extension Version6 on StorageDatabase {
           return m.createAll();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          printInfo('[MIGRATION] VERSION $from to $to');
+          log.info('[MIGRATION] VERSION $from to $to');
           if (from == 5) {
             m.createTable(reactions);
           }

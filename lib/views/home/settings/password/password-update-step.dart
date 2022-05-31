@@ -41,183 +41,181 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
 
-          return Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Flexible(
-                  flex: 4,
-                  fit: FlexFit.tight,
-                  child: Container(
-                    width: width * 0.65,
-                    padding: EdgeInsets.only(bottom: 16),
-                    constraints: BoxConstraints(
-                      maxHeight: Dimensions.mediaSizeMax,
-                      maxWidth: Dimensions.mediaSizeMax,
-                    ),
-                    child: SvgPicture.asset(
-                      Assets.heroSignupPassword,
-                      semanticsLabel: Strings.semanticsImagePasswordUpdate,
-                    ),
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Flexible(
+                flex: 4,
+                fit: FlexFit.tight,
+                child: Container(
+                  width: width * 0.65,
+                  padding: EdgeInsets.only(bottom: 16),
+                  constraints: BoxConstraints(
+                    maxHeight: Dimensions.mediaSizeMax,
+                    maxWidth: Dimensions.mediaSizeMax,
+                  ),
+                  child: SvgPicture.asset(
+                    Assets.heroSignupPassword,
+                    semanticsLabel: Strings.semanticsImagePasswordUpdate,
                   ),
                 ),
-                Flexible(
-                  flex: 2,
-                  child: Flex(
-                    direction: Axis.vertical,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.only(bottom: 8, top: 8),
-                        child: Text(
-                          Strings.contentPasswordRecommendation,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.caption,
-                        ),
+              ),
+              Flexible(
+                flex: 2,
+                child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(bottom: 8, top: 8),
+                      child: Text(
+                        Strings.contentPasswordRecommendation,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.caption,
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: Text(
-                          Strings.headerUpdatePassword,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5,
-                        ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        Strings.headerUpdatePassword,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline5,
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: Container(
+                  width: width * 0.7,
+                  height: Dimensions.inputHeight,
+                  constraints: BoxConstraints(
+                    minWidth: Dimensions.inputWidthMin,
+                    maxWidth: Dimensions.inputWidthMax,
+                  ),
+                  child: TextFieldSecure(
+                    label: Strings.labelCurrentPassword,
+                    obscureText: false,
+                    valid: props.isPasswordValid,
+                    focusNode: currentFocusNode,
+                    controller: currentController,
+                    onChanged: (text) {
+                      props.onChangeCurrentPassword(text);
+                    },
+                    onSubmitted: (String value) {
+                      FocusScope.of(context).requestFocus(confirmFocusNode);
+                    },
+                    onEditingComplete: () {
+                      props.onChangeCurrentPassword(props.password);
+                      passwordFocusNode.unfocus();
+                    },
                   ),
                 ),
-                Flexible(
-                  flex: 1,
-                  child: Container(
-                    width: width * 0.7,
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minWidth: Dimensions.inputWidthMin,
-                      maxWidth: Dimensions.inputWidthMax,
-                    ),
-                    child: TextFieldSecure(
-                      label: Strings.labelCurrentPassword,
-                      obscureText: false,
-                      valid: props.isPasswordValid,
-                      focusNode: currentFocusNode,
-                      controller: currentController,
-                      onChanged: (text) {
-                        props.onChangeCurrentPassword(text);
-                      },
-                      onSubmitted: (String value) {
-                        FocusScope.of(context).requestFocus(confirmFocusNode);
-                      },
-                      onEditingComplete: () {
-                        props.onChangeCurrentPassword(props.password);
-                        passwordFocusNode.unfocus();
-                      },
-                    ),
+              ),
+              Container(
+                  padding: EdgeInsets.symmetric(
+                vertical: 8,
+              )),
+              Flexible(
+                flex: 1,
+                child: Container(
+                  width: width * 0.7,
+                  height: Dimensions.inputHeight,
+                  constraints: BoxConstraints(
+                    minWidth: Dimensions.inputWidthMin,
+                    maxWidth: Dimensions.inputWidthMax,
                   ),
-                ),
-                Container(
-                    padding: EdgeInsets.symmetric(
-                  vertical: 8,
-                )),
-                Flexible(
-                  flex: 1,
-                  child: Container(
-                    width: width * 0.7,
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minWidth: Dimensions.inputWidthMin,
-                      maxWidth: Dimensions.inputWidthMax,
-                    ),
-                    child: TextFieldSecure(
-                      label: Strings.labelCurrentPassword,
-                      focusNode: passwordFocusNode,
-                      controller: passwordController,
-                      valid: props.isPasswordValid,
-                      obscureText: !visibility,
-                      onChanged: (text) {
-                        props.onChangePassword(text);
-                      },
-                      onSubmitted: (String value) {
-                        FocusScope.of(context).requestFocus(confirmFocusNode);
-                      },
-                      onEditingComplete: () {
-                        props.onChangePassword(props.password);
-                        passwordFocusNode.unfocus();
-                      },
-                      suffix: GestureDetector(
-                        onTap: () {
-                          if (!passwordFocusNode.hasFocus) {
-                            // Unfocus all focus nodes
-                            passwordFocusNode.unfocus();
+                  child: TextFieldSecure(
+                    label: Strings.labelCurrentPassword,
+                    focusNode: passwordFocusNode,
+                    controller: passwordController,
+                    valid: props.isPasswordValid,
+                    obscureText: !visibility,
+                    onChanged: (text) {
+                      props.onChangePassword(text);
+                    },
+                    onSubmitted: (String value) {
+                      FocusScope.of(context).requestFocus(confirmFocusNode);
+                    },
+                    onEditingComplete: () {
+                      props.onChangePassword(props.password);
+                      passwordFocusNode.unfocus();
+                    },
+                    suffix: GestureDetector(
+                      onTap: () {
+                        if (!passwordFocusNode.hasFocus) {
+                          // Unfocus all focus nodes
+                          passwordFocusNode.unfocus();
 
-                            // Disable text field's focus node request
-                            passwordFocusNode.canRequestFocus = false;
-                          }
+                          // Disable text field's focus node request
+                          passwordFocusNode.canRequestFocus = false;
+                        }
 
-                          // Do your stuff
-                          setState(() {
-                            visibility = !visibility;
+                        // Do your stuff
+                        setState(() {
+                          visibility = !visibility;
+                        });
+
+                        if (!passwordFocusNode.hasFocus) {
+                          //Enable the text field's focus node request after some delay
+                          Future.delayed(Duration(milliseconds: 100), () {
+                            passwordFocusNode.canRequestFocus = true;
                           });
-
-                          if (!passwordFocusNode.hasFocus) {
-                            //Enable the text field's focus node request after some delay
-                            Future.delayed(Duration(milliseconds: 100), () {
-                              passwordFocusNode.canRequestFocus = true;
-                            });
-                          }
-                        },
-                        child: Icon(
-                          visibility ? Icons.visibility : Icons.visibility_off,
-                        ),
+                        }
+                      },
+                      child: Icon(
+                        visibility ? Icons.visibility : Icons.visibility_off,
                       ),
                     ),
                   ),
                 ),
-                Container(padding: EdgeInsets.symmetric(vertical: 8)),
-                Flexible(
-                  flex: 1,
-                  child: Container(
-                    width: width * 0.7,
-                    height: Dimensions.inputHeight,
-                    constraints: BoxConstraints(
-                      minWidth: Dimensions.inputWidthMin,
-                      maxWidth: Dimensions.inputWidthMax,
-                    ),
-                    child: TextFieldSecure(
-                      label: Strings.labelConfirmNewPassword,
-                      obscureText: true,
-                      focusNode: confirmFocusNode,
-                      controller: confirmController,
-                      onChanged: (text) {
-                        props.onChangePasswordConfirm(text);
-                      },
-                      onEditingComplete: () {
-                        props.onChangePasswordConfirm(props.password);
-                        confirmFocusNode.unfocus();
-                      },
-                      suffix: Visibility(
-                        visible: props.isPasswordValid,
+              ),
+              Container(padding: EdgeInsets.symmetric(vertical: 8)),
+              Flexible(
+                flex: 1,
+                child: Container(
+                  width: width * 0.7,
+                  height: Dimensions.inputHeight,
+                  constraints: BoxConstraints(
+                    minWidth: Dimensions.inputWidthMin,
+                    maxWidth: Dimensions.inputWidthMax,
+                  ),
+                  child: TextFieldSecure(
+                    label: Strings.labelConfirmNewPassword,
+                    obscureText: true,
+                    focusNode: confirmFocusNode,
+                    controller: confirmController,
+                    onChanged: (text) {
+                      props.onChangePasswordConfirm(text);
+                    },
+                    onEditingComplete: () {
+                      props.onChangePasswordConfirm(props.password);
+                      confirmFocusNode.unfocus();
+                    },
+                    suffix: Visibility(
+                      visible: props.isPasswordValid,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        margin: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          borderRadius: BorderRadius.circular(24),
+                        ),
                         child: Container(
-                          width: 12,
-                          height: 12,
-                          margin: EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          child: Container(
-                            padding: EdgeInsets.all(6),
-                            child: Icon(
-                              Icons.check,
-                              color: Colors.white,
-                            ),
+                          padding: EdgeInsets.all(6),
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.white,
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       );

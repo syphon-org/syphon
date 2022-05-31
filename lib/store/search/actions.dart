@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -75,7 +74,7 @@ Future<String?> fetchFavicon({String? url}) async {
     // get the root store
     final origins = url.toString().split('.');
     final baseUrl = origins.length > 1
-        ? origins[origins.length - 2] + '.' + origins[origins.length - 1]
+        ? '${origins[origins.length - 2]}.${origins[origins.length - 1]}'
         : origins[0];
     final fullUrl = 'https://$baseUrl';
 
@@ -102,7 +101,7 @@ Future<String?> fetchFavicon({String? url}) async {
 
     return faviconUrl + favicon.attributes['href']!.replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
-    printError(error.toString());
+    log.error(error.toString());
   }
 
   return null;
@@ -245,7 +244,7 @@ ThunkAction<AppState> searchUsers({String? searchText}) {
         totalResults: searchResults.length,
       ));
     } catch (error) {
-      printError('[searchPublicRooms] $error');
+      log.error('[searchPublicRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

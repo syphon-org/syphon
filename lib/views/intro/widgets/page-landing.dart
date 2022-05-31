@@ -17,7 +17,7 @@ class LandingPage extends StatelessWidget {
     final double height = MediaQuery.of(context).size.height;
 
     final widthScale = width * 0.8;
-    final heightScale = height / 3;
+    // final heightScale = height / 3; // TODO:
 
     return Center(
       child: Column(

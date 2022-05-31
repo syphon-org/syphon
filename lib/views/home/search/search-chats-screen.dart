@@ -17,6 +17,7 @@ import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
@@ -56,14 +57,12 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
     }
   }
 
-  @protected
   Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
-    final ChatSearchArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
-    final user = arguments.user!;
-    final username = formatUsername(user);
+    final arguments = useScreenArguments<ChatSearchArguments>(context);
+    final user = arguments?.user;
+    final username = formatUsername(user!);
 
     return showDialog(
       context: context,
@@ -87,7 +86,6 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
     super.dispose();
   }
 
-  @protected
   Widget buildRoomList(BuildContext context, _Props props) {
     final store = StoreProvider.of<AppState>(context);
     final rooms = props.searchResults as List<Room>;
@@ -286,8 +284,7 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        final ChatSearchArguments arguments =
-            ModalRoute.of(context)!.settings.arguments as ChatSearchArguments;
+        final arguments = useScreenArguments<ChatSearchArguments>(context)!;
         return Scaffold(
           appBar: AppBarSearch(
             title: '${Strings.titleInvite} ${formatUsername(arguments.user!)}',

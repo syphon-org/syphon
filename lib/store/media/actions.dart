@@ -81,7 +81,7 @@ ThunkAction<AppState> uploadMedia({
 
       return data;
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
 
       store.dispatch(addAlert(
         origin: 'uploadMedia',
@@ -201,7 +201,7 @@ ThunkAction<AppState> fetchMedia({
         UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.SUCCESS),
       );
     } catch (error) {
-      printError('[fetchMedia] $mxcUri $error');
+      log.error('[fetchMedia] $mxcUri $error');
       store.dispatch(
         UpdateMediaChecks(mxcUri: mxcUri, status: MediaStatus.FAILURE),
       );

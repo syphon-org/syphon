@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -12,6 +12,7 @@ import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
@@ -43,8 +44,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
   @override
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final ChatUsersDetailArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as ChatUsersDetailArguments;
+    final arguments = useScreenArguments<ChatUsersDetailArguments>(context)!;
 
     final searchResults = store.state.searchStore.searchResults;
 
@@ -94,7 +94,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
                   uri: user.avatarUri,
                   alt: user.displayName ?? user.userId,
                   size: Dimensions.avatarSizeMin,
-                  background: Colours.hashedColor(
+                  background: AppColors.hashedColor(
                     user.displayName ?? user.userId,
                   ),
                 ),
@@ -107,7 +107,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
                   user.userId!,
                   style: Theme.of(context).textTheme.caption!.merge(
                         TextStyle(
-                          color: props.loading ? Color(Colours.greyDisabled) : null,
+                          color: props.loading ? Color(AppColors.greyDisabled) : null,
                         ),
                       ),
                 ),

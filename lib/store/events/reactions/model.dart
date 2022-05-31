@@ -22,7 +22,6 @@ class Reaction extends Event implements drift.Insertable<Reaction> {
     prevBatch,
     timestamp,
     content,
-    data,
     this.body,
     this.relType,
     this.relEventId,

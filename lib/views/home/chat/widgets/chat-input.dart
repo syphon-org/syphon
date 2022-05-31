@@ -10,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
@@ -89,7 +89,6 @@ class ChatInputState extends State<ChatInput> {
 
   String hintText = Strings.placeholderMatrixUnencrypted;
 
-  @protected
   onMounted(_Props props) {
     final draft = props.room.draft;
 
@@ -173,9 +172,7 @@ class ChatInputState extends State<ChatInput> {
         });
       });
     }
-    if (widget.onUpdateMessage != null) {
-      widget.onUpdateMessage!(text);
-    }
+    widget.onUpdateMessage?.call(text);
   }
 
   onToggleMediaOptions() {
@@ -201,16 +198,11 @@ class ChatInputState extends State<ChatInput> {
     setState(() {
       sendable = false;
     });
-
-    if (widget.onSubmitMessage != null) {
-      widget.onSubmitMessage!();
-    }
+    widget.onSubmitMessage?.call();
   }
 
   onCancelReply() {
-    if (widget.onCancelReply != null) {
-      widget.onCancelReply!();
-    }
+    widget.onCancelReply?.call();
   }
 
   onAddInProgress() {
@@ -273,11 +265,11 @@ class ChatInputState extends State<ChatInput> {
               // account for if editing
               widget.editing && (widget.editorController?.text.isNotEmpty ?? false);
 
-          Color sendButtonColor = const Color(Colours.blueBubbly);
+          Color sendButtonColor = const Color(AppColors.blueBubbly);
 
           if (widget.mediumType == MediumType.plaintext) {
             hintText = Strings.placeholderMatrixUnencrypted;
-            sendButtonColor = Color(Colours.greyDark);
+            sendButtonColor = Color(AppColors.greyDark);
           }
 
           if (widget.mediumType == MediumType.encryption) {
@@ -287,7 +279,7 @@ class ChatInputState extends State<ChatInput> {
 
           // if the button is disabled, make it more transparent to indicate that
           if (widget.sending) {
-            sendButtonColor = Color(Colours.greyDisabled);
+            sendButtonColor = Color(AppColors.greyDisabled);
           }
 
           var sendButton = Semantics(

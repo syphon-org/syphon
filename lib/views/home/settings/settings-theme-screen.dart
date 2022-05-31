@@ -2,11 +2,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/theme-settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
@@ -48,7 +49,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
       context: context,
       builder: (BuildContext dialogContext) => DialogColorPicker(
         title: title,
-        resetColor: Colours.cyanSyphon,
+        resetColor: AppColors.cyanSyphon,
         currentColor: currentColor,
         onSelectColor: onSelectColor,
         advanced: advanced ?? false,
@@ -68,14 +69,17 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
   // NOTE: example of calling actions using Store.of(context)
   onIncrementFabType() {
     final store = StoreProvider.of<AppState>(context);
-
     store.dispatch(incrementFabType());
   }
 
   onIncrementFabLocation() {
     final store = StoreProvider.of<AppState>(context);
-
     store.dispatch(incrementFabLocation());
+  }
+
+  onIncrementFabLabels() {
+    final store = StoreProvider.of<AppState>(context);
+    store.dispatch(incrementFabLabels());
   }
 
   @override
@@ -186,7 +190,8 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           ),
                           trailing: Switch(
                             value: props.roomTypeBadgesEnabled,
-                            onChanged: (value) => props.onToggleRoomTypeBadges(),
+                            onChanged: (value) =>
+                                props.onToggleRoomTypeBadges(),
                             activeColor: Color(props.primaryColor),
                           ),
                           onTap: () => props.onToggleRoomTypeBadges(),
@@ -206,7 +211,7 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           onTap: () => onIncrementFabType(),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
-                            'Main FAB Type',
+                            'Home FAB Type',
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(props.mainFabType),
@@ -215,11 +220,22 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
                           onTap: () => onIncrementFabLocation(),
                           contentPadding: Dimensions.listPadding,
                           title: Text(
-                            'Main FAB Location',
+                            'Home FAB Location',
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           trailing: Text(
                             props.mainFabLocation,
+                          ),
+                        ),
+                        ListTile(
+                          onTap: () => onIncrementFabLabels(),
+                          contentPadding: Dimensions.listPadding,
+                          title: Text(
+                            'Home FAB Labels',
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                          trailing: Text(
+                            props.mainFabLabel,
                           ),
                         ),
                       ],
@@ -292,6 +308,7 @@ class _Props extends Equatable {
   final String messageSize;
   final String avatarShape;
   final String mainFabType;
+  final String mainFabLabel;
   final String mainFabLocation;
 
   final bool roomTypeBadgesEnabled;
@@ -317,6 +334,7 @@ class _Props extends Equatable {
     required this.messageSize,
     required this.avatarShape,
     required this.mainFabType,
+    required this.mainFabLabel,
     required this.mainFabLocation,
     required this.roomTypeBadgesEnabled,
     required this.onSelectPrimaryColor,
@@ -342,6 +360,7 @@ class _Props extends Equatable {
         avatarShape,
         roomTypeBadgesEnabled,
         mainFabType,
+        mainFabLabel,
         mainFabLocation,
       ];
 
@@ -349,15 +368,23 @@ class _Props extends Equatable {
         primaryColor: store.state.settingsStore.themeSettings.primaryColor,
         accentColor: store.state.settingsStore.themeSettings.accentColor,
         appBarColor: store.state.settingsStore.themeSettings.appBarColor,
-        themeType: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
+        themeType: selectThemeTypeString(
+            store.state.settingsStore.themeSettings.themeType),
         language: store.state.settingsStore.language,
-        fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
-        fontSize: selectFontSizeString(store.state.settingsStore.themeSettings.fontSize),
-        messageSize: selectMessageSizeString(store.state.settingsStore.themeSettings.messageSize),
-        avatarShape: selectAvatarShapeString(store.state.settingsStore.themeSettings.avatarShape),
+        fontName: selectFontNameString(
+            store.state.settingsStore.themeSettings.fontName),
+        fontSize: selectFontSizeString(
+            store.state.settingsStore.themeSettings.fontSize),
+        messageSize: selectMessageSizeString(
+            store.state.settingsStore.themeSettings.messageSize),
+        avatarShape: selectAvatarShapeString(
+            store.state.settingsStore.themeSettings.avatarShape),
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
         mainFabType: selectMainFabType(store.state.settingsStore.themeSettings),
-        mainFabLocation: selectMainFabLocation(store.state.settingsStore.themeSettings),
+        mainFabLabel:
+            selectMainFabLabels(store.state.settingsStore.themeSettings),
+        mainFabLocation:
+            selectMainFabLocation(store.state.settingsStore.themeSettings),
         onToggleRoomTypeBadges: () => store.dispatch(
           toggleRoomTypeBadges(),
         ),
@@ -373,20 +400,10 @@ class _Props extends Equatable {
           // convert to int hex color code
           updateAppBarColor(color),
         ),
-        onIncrementFontType: () => store.dispatch(
-          incrementFontType(),
-        ),
-        onIncrementFontSize: () => store.dispatch(
-          incrementFontSize(),
-        ),
-        onIncrementMessageSize: () => store.dispatch(
-          incrementMessageSize(),
-        ),
-        onIncrementThemeType: () => store.dispatch(
-          incrementThemeType(),
-        ),
-        onIncrementAvatarShape: () => store.dispatch(
-          incrementAvatarShape(),
-        ),
+        onIncrementFontType: () => store.dispatch(incrementFontType()),
+        onIncrementFontSize: () => store.dispatch(incrementFontSize()),
+        onIncrementMessageSize: () => store.dispatch(incrementMessageSize()),
+        onIncrementThemeType: () => store.dispatch(incrementThemeType()),
+        onIncrementAvatarShape: () => store.dispatch(incrementAvatarShape()),
       );
 }

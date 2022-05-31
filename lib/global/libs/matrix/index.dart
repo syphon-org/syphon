@@ -1,7 +1,7 @@
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/devices.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/libs/matrix/events.dart';
+import 'package:syphon/global/libs/matrix/events/requests.dart';
 import 'package:syphon/global/libs/matrix/media.dart';
 import 'package:syphon/global/libs/matrix/notifications.dart';
 import 'package:syphon/global/libs/matrix/rooms.dart';

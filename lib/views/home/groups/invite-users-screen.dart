@@ -7,7 +7,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
@@ -20,6 +20,7 @@ import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-invite-users.dart';
@@ -108,7 +109,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
     });
 
     if (invitesUpdated.isNotEmpty) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         avatarScrollController.animateTo(
           avatarScrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: Values.animationDurationDefaultFast),
@@ -145,9 +146,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   /// also attempts to invite users directly if a room id already exists
   ///
   onConfirmInvites(_Props props) async {
-    final InviteUsersArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
-    final roomId = arguments.roomId;
+    final arguments = useScreenArguments<InviteUsersArguments>(context);
+    final roomId = arguments?.roomId;
 
     if (roomId != null && invites.isNotEmpty) {
       await onSendInvites(props);
@@ -162,11 +162,10 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   ///
   onSendInvites(_Props props) async {
     FocusScope.of(context).unfocus();
-    final InviteUsersArguments arguments =
-        ModalRoute.of(context)!.settings.arguments as InviteUsersArguments;
+    final arguments = useScreenArguments<InviteUsersArguments>(context);
     final store = StoreProvider.of<AppState>(context);
 
-    final roomId = arguments.roomId;
+    final roomId = arguments?.roomId;
     final room = store.state.roomStore.rooms[roomId!];
 
     final multiple = invites.length > 1;
@@ -193,7 +192,6 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
     );
   }
 
-  @protected
   Widget buildUserChipList(BuildContext context, _Props props) {
     return ListView.builder(
       shrinkWrap: true,
@@ -224,7 +222,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                   uri: user.avatarUri,
                   alt: user.displayName ?? user.userId,
                   size: Dimensions.avatarSizeMessage,
-                  background: Colours.hashedColorUser(user),
+                  background: AppColors.hashedColorUser(user),
                 ),
                 label: Text(
                   formatUsername(user),

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
@@ -73,7 +73,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
   @override
   Widget build(BuildContext context) => AppBar(
         systemOverlayStyle: computeSystemUIColor(context),
-        backgroundColor: Color(Colours.greyDefault),
+        backgroundColor: Color(AppColors.greyDefault),
         automaticallyImplyLeading: false,
         titleSpacing: 0.0,
         title: Row(
@@ -87,9 +87,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                 ),
                 tooltip: Strings.labelBack,
                 onPressed: () {
-                  if (widget.onDismiss != null) {
-                    widget.onDismiss!();
-                  }
+                  widget.onDismiss?.call();
                 },
               ),
             ),
@@ -110,9 +108,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                 ),
               );
 
-              if (widget.onDismiss != null) {
-                widget.onDismiss!();
-              }
+              widget.onDismiss?.call();
             },
           ),
           Visibility(
@@ -123,12 +119,8 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               tooltip: 'Delete Message',
               color: Colors.white,
               onPressed: () {
-                if (widget.onDelete != null) {
-                  widget.onDelete!();
-                }
-                if (widget.onDismiss != null) {
-                  widget.onDismiss!();
-                }
+                widget.onDelete?.call();
+                widget.onDismiss?.call();
               },
             ),
           ),
@@ -140,9 +132,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               tooltip: 'Edit Message',
               color: Colors.white,
               onPressed: () {
-                if (widget.onEdit != null) {
-                  widget.onEdit!();
-                }
+                widget.onEdit?.call();
               },
             ),
           ),
@@ -160,9 +150,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
                   ),
                 );
 
-                if (widget.onDismiss != null) {
-                  widget.onDismiss!();
-                }
+                widget.onDismiss?.call();
               },
             ),
           ),

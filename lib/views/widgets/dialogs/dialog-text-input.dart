@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/auth/actions.dart';
 
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
-class DialogTextInput extends StatefulWidget {
+class DialogTextInput extends HookWidget {
   const DialogTextInput({
     Key? key,
     this.title = '',
@@ -16,6 +19,7 @@ class DialogTextInput extends StatefulWidget {
     this.loading = false,
     this.valid = false,
     this.obscureText = false,
+    this.randomizeText = false,
     this.confirmText = '',
     this.keyboardType = TextInputType.text,
     this.inputFormatters = const [],
@@ -31,9 +35,11 @@ class DialogTextInput extends StatefulWidget {
   final String initialValue;
   final String confirmText;
 
-  final bool loading;
-  final bool valid;
   final bool obscureText;
+  final bool randomizeText;
+
+  final bool valid;
+  final bool loading;
   final TextInputType keyboardType;
   final List<TextInputFormatter> inputFormatters;
   final TextEditingController? editingController;
@@ -43,36 +49,62 @@ class DialogTextInput extends StatefulWidget {
   final Function? onCancel;
 
   @override
-  _DialogTextInputState createState() => _DialogTextInputState();
-}
-
-class _DialogTextInputState extends State<DialogTextInput> {
-  final inputFieldNode = FocusNode();
-
-  bool isEmpty = true;
-  bool visibility = false;
-  bool localLoading = false;
-  TextEditingController editingControllerDefault = TextEditingController();
-  @override
-  void initState() {
-    super.initState();
-    editingControllerDefault.text = widget.initialValue;
-
-    editingControllerDefault.addListener(() {
-      setState(() {
-        isEmpty = editingControllerDefault.text.isEmpty;
-      });
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double defaultWidgetScaling = width * 0.725;
+    final editingControllerLocal =
+        editingController ?? useTextEditingController(text: initialValue);
 
-    final editingController = widget.editingController ?? editingControllerDefault;
+    final inputFocusNode = useFocusNode();
 
-    final loading = localLoading || widget.loading;
+    final isEmpty = useState<bool>(editingControllerLocal.text.isEmpty);
+    final visibility = useState<bool>(true);
+    final loadingLocal = useState<bool>(loading);
+
+    useEffect(() {
+      editingControllerLocal.addListener(() {
+        isEmpty.value = editingControllerLocal.text.isEmpty;
+      });
+
+      return null;
+    }, []);
+
+    final width = MediaQuery.of(context).size.width;
+    final defaultWidgetScaling = useMemoized(() => width * 0.725, [width]);
+    final loadingAny = loadingLocal.value || loading;
+
+    final suffix = useMemoized(
+      () {
+        if (randomizeText) {
+          return GestureDetector(
+            onTap: () {
+              editingControllerLocal.text = generateDeviceId().deviceId ?? '';
+            },
+            child: Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Icon(
+                FaIcon(FontAwesomeIcons.dice).icon,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          );
+        }
+
+        if (obscureText) {
+          return GestureDetector(
+            onTap: () {
+              visibility.value = !visibility.value;
+            },
+            child: Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Icon(
+                visibility.value ? Icons.visibility : Icons.visibility_off,
+                color: visibility.value ? Theme.of(context).primaryColor : null,
+              ),
+            ),
+          );
+        }
+      },
+      [obscureText, randomizeText],
+    );
 
     return SimpleDialog(
       shape: RoundedRectangleBorder(
@@ -88,7 +120,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
         right: 16,
         bottom: 16,
       ),
-      title: Text(widget.title),
+      title: Text(title),
       children: <Widget>[
         Column(
           children: <Widget>[
@@ -100,7 +132,7 @@ class _DialogTextInputState extends State<DialogTextInput> {
                 left: 8,
               ),
               child: Text(
-                widget.content,
+                content,
                 textAlign: TextAlign.start,
                 style: Theme.of(context).textTheme.caption,
               ),
@@ -117,46 +149,29 @@ class _DialogTextInputState extends State<DialogTextInput> {
                 maxWidth: Dimensions.inputWidthMax,
               ),
               child: TextField(
-                enabled: !loading,
-                focusNode: inputFieldNode,
-                controller: editingController,
-                keyboardType: widget.keyboardType,
-                inputFormatters: widget.inputFormatters,
-                obscureText: widget.obscureText && (!visibility || loading),
+                enabled: !loadingAny,
+                focusNode: inputFocusNode,
+                controller: editingControllerLocal,
+                keyboardType: keyboardType,
+                inputFormatters: inputFormatters,
+                obscureText: obscureText && (!visibility.value || loadingAny),
                 decoration: InputDecoration(
-                  suffix: widget.obscureText
-                      ? GestureDetector(
-                          onTap: () => setState(() {
-                            visibility = !visibility;
-                          }),
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 16),
-                            child: Icon(
-                              visibility ? Icons.visibility : Icons.visibility_off,
-                              color: visibility ? Theme.of(context).primaryColor : null,
-                            ),
-                          ),
-                        )
-                      : null,
+                  suffix: suffix,
                   contentPadding: EdgeInsets.only(
                     left: 20,
-                    right: !widget.obscureText ? 0 : 20,
+                    right: suffix == null ? 0 : 20,
                     bottom: 32,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
-                  labelText: widget.label,
+                  labelText: label,
                 ),
                 onChanged: (value) {
-                  if (widget.onChange != null) {
-                    widget.onChange!(value);
-                  }
+                  onChange?.call(value);
                 },
                 onSubmitted: (value) {
-                  if (widget.onConfirm != null) {
-                    widget.onConfirm!(value);
-                  }
+                  onConfirm?.call(value);
                 },
               ),
             ),
@@ -166,33 +181,23 @@ class _DialogTextInputState extends State<DialogTextInput> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             TextButton(
-              onPressed: loading
-                  ? null
-                  : () {
-                      if (widget.onCancel != null) {
-                        widget.onCancel!();
-                      }
-                    },
+              onPressed: loadingAny ? null : () => onCancel?.call(),
               child: Text(Strings.buttonCancel),
             ),
             TextButton(
-              onPressed: loading || isEmpty
+              onPressed: loadingAny || isEmpty.value
                   ? null
                   : () async {
-                      if (widget.onConfirm != null && !isEmpty) {
-                        inputFieldNode.unfocus();
-                        setState(() {
-                          localLoading = true;
-                          visibility = false;
-                        });
-                        await widget.onConfirm!(editingController.text);
-                        setState(() {
-                          localLoading = false;
-                        });
+                      if (onConfirm != null && !isEmpty.value) {
+                        inputFocusNode.unfocus();
+                        loadingLocal.value = true;
+                        visibility.value = false;
+                        await onConfirm!(editingControllerLocal.text);
+                        loadingLocal.value = false;
                       }
                     },
-              child: !loading
-                  ? Text(widget.confirmText.isEmpty ? Strings.buttonSave : widget.confirmText)
+              child: !loadingAny
+                  ? Text(confirmText.isEmpty ? Strings.buttonSave : confirmText)
                   : LoadingIndicator(size: 16),
             ),
           ],

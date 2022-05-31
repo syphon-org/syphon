@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
@@ -36,7 +36,7 @@ class ButtonSolid extends StatelessWidget {
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.resolveWith<Color?>(
               (Set<MaterialState> states) => states.contains(MaterialState.disabled)
-                  ? Color(Colours.greyLight)
+                  ? Color(AppColors.greyLight)
                   : Theme.of(context).primaryColor,
             ),
             backgroundColor: MaterialStateProperty.resolveWith<Color>(
@@ -61,7 +61,7 @@ class ButtonSolid extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w100,
                         letterSpacing: 0.8,
-                        color: disabled ? Color(Colours.greyLight) : Colors.white,
+                        color: disabled ? Color(AppColors.greyLight) : Colors.white,
                       ),
                     )),
         ),

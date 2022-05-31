@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class DialogRounded extends StatefulWidget {
+class DialogRounded extends StatelessWidget {
   const DialogRounded({
     Key? key,
     this.title = '',
@@ -12,11 +12,6 @@ class DialogRounded extends StatefulWidget {
   final String content;
   final List<Widget> children;
 
-  @override
-  _DialogTextInputState createState() => _DialogTextInputState();
-}
-
-class _DialogTextInputState extends State<DialogRounded> {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
@@ -37,13 +32,13 @@ class _DialogTextInputState extends State<DialogRounded> {
         // right: 16,
         bottom: 16,
       ),
-      title: Text(widget.title),
+      title: Text(title),
       children: <Widget>[
         SizedBox(
           width: defaultWidgetScaling,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: widget.children,
+            children: children,
           ),
         )
       ],

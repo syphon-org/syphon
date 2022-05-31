@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/events/messages/model.dart';
 
 class SearchStore extends Equatable {

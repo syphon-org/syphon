@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:drift/drift.dart';
@@ -17,12 +18,20 @@ import 'package:syphon/store/user/model.dart';
 /// In redux, they're indexed by RoomID and placed in a list
 ///
 extension MediaQueries on StorageDatabase {
-  Future<void> insertMedia(Media media) {
+  Future<int> insertMedia(Media media) async {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return into(medias).insert(
+        media,
+        mode: InsertMode.insertOrReplace,
+      );
+    }
     return into(medias).insertOnConflictUpdate(media);
   }
 
   Future<Media?> selectMedia(String mxcUri) {
-    return (select(medias)..where((tbl) => tbl.mxcUri.equals(mxcUri))).getSingleOrNull();
+    return (select(medias)..where((tbl) => tbl.mxcUri.equals(mxcUri)))
+        .getSingleOrNull();
   }
 
   Future<List<Media>> selectMedias(List<String?> mxcUris) {
@@ -42,7 +51,7 @@ Future<bool> checkMedia(
   return (await storage.selectMedia(mxcUri)) != null;
 }
 
-Future<void> saveMedia(
+Future<int> saveMedia(
   String? mxcUri,
   Uint8List? data, {
   String? type,
@@ -77,7 +86,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 
     final images = await storage.selectMediaAll();
 
-    printInfo('[media] loaded ${images.length.toString()}');
+    log.info('[media] loaded ${images.length.toString()}');
 
     for (final image in images) {
       if (image.mxcUri != null && image.data != null) {
@@ -87,7 +96,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 
     return media;
   } catch (error) {
-    printError(error.toString(), title: 'loadMediaAll');
+    log.error(error.toString(), title: 'loadMediaAll');
     return null;
   }
 }
@@ -113,7 +122,7 @@ Future<Map<String, Uint8List>> loadMediaRelative({
 
     final images = await storage.selectMedias(idsAll);
 
-    printInfo('[media] loaded ${images.length.toString()}');
+    log.info('[media] loaded ${images.length.toString()}');
 
     for (final image in images) {
       if (image.mxcUri != null && image.data != null) {
@@ -121,7 +130,7 @@ Future<Map<String, Uint8List>> loadMediaRelative({
       }
     }
   } catch (error) {
-    printError(error.toString(), title: 'loadMediaRelative');
+    log.error(error.toString(), title: 'loadMediaRelative');
   }
 
   return media;

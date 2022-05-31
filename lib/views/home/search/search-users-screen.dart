@@ -42,7 +42,6 @@ class SearchUserState extends State<SearchUserScreen> {
     onMounted();
   }
 
-  @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
 
@@ -60,7 +59,6 @@ class SearchUserState extends State<SearchUserScreen> {
     super.dispose();
   }
 
-  @protected
   onShowUserDetails({required BuildContext context, User? user}) async {
     await showModalBottomSheet(
       context: context,
@@ -73,7 +71,6 @@ class SearchUserState extends State<SearchUserScreen> {
     );
   }
 
-  @protected
   onCreateChat({required BuildContext context, required User user, _Props? props}) async {
     final store = StoreProvider.of<AppState>(context);
 
@@ -127,7 +124,7 @@ class SearchUserState extends State<SearchUserScreen> {
   ///
   /// attempt chating with a user by the name searched
   ///
-  @protected
+
   onAttemptChat({required BuildContext context, required User user, _Props? props}) async {
     final store = StoreProvider.of<AppState>(context);
 
@@ -176,7 +173,6 @@ class SearchUserState extends State<SearchUserScreen> {
     );
   }
 
-  @protected
   Widget buildSearchList(BuildContext context, _Props props) {
     final usersList = props.searchResults;
 
@@ -245,7 +241,6 @@ class SearchUserState extends State<SearchUserScreen> {
     );
   }
 
-  @protected
   Widget buildPreviewList(BuildContext context, _Props props) {
     final usersList = props.usersRecent;
     final knownList = props.usersKnown;

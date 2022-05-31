@@ -113,7 +113,7 @@ class Props extends Equatable {
         onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(
             type: MatrixAuthTypes.RECAPTCHA,
-            value: token.toString(),
+            value: token,
           ));
           await store.dispatch(toggleCaptcha(completed: true));
           Navigator.of(context).pop();

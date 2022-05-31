@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
@@ -14,8 +14,8 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
-class ChatsSettingsScreen extends StatelessWidget {
-  const ChatsSettingsScreen({Key? key}) : super(key: key);
+class SettingsChatsScreen extends StatelessWidget {
+  const SettingsChatsScreen({Key? key}) : super(key: key);
 
   displayThemeType(String themeTypeName) {
     return themeTypeName.split('.')[1].toLowerCase();
@@ -74,7 +74,7 @@ class ChatsSettingsScreen extends StatelessWidget {
                                 ),
                                 trailing: Switch(
                                   value: false,
-                                  inactiveThumbColor: Color(Colours.greyDisabled),
+                                  inactiveThumbColor: Color(AppColors.greyDisabled),
                                   onChanged: (showMembershipEvents) {},
                                 ),
                               ),
@@ -352,7 +352,7 @@ class Props extends Equatable {
       ];
 
   static Props mapStateToProps(Store<AppState> store) => Props(
-        language: DisplayName(Locale(store.state.settingsStore.language)).toDisplayName(),
+        language: toDisplayName(store.state.settingsStore.language),
         enterSend: store.state.settingsStore.enterSendEnabled,
         autocorrect: store.state.settingsStore.autocorrectEnabled,
         suggestions: store.state.settingsStore.suggestionsEnabled,

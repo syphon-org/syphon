@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
@@ -16,6 +17,17 @@ extension CryptoQueries on StorageDatabase {
   Future<int> insertCryptoStore(CryptoStore store) async {
     final storeJson = json.decode(json.encode(store));
 
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return into(cryptos).insert(
+        CryptosCompanion(
+          id: Value(StorageKeys.CRYPTO),
+          store: Value(storeJson),
+        ),
+        mode: InsertMode.insertOrReplace,
+      );
+    }
+
     return into(cryptos).insertOnConflictUpdate(CryptosCompanion(
       id: Value(StorageKeys.CRYPTO),
       store: Value(storeJson),
@@ -23,7 +35,8 @@ extension CryptoQueries on StorageDatabase {
   }
 
   Future<CryptoStore?> selectCryptoStore() async {
-    final row = await (select(cryptos)..where((tbl) => tbl.id.isNotNull())).getSingleOrNull();
+    final row = await (select(cryptos)..where((tbl) => tbl.id.isNotNull()))
+        .getSingleOrNull();
 
     if (row == null) {
       return null;
@@ -47,7 +60,7 @@ Future<CryptoStore?> loadCrypto({required StorageDatabase storage}) async {
   try {
     return storage.selectCryptoStore();
   } catch (error) {
-    printError(error.toString(), title: 'loadCrypto');
+    log.error(error.toString(), title: 'loadCrypto');
     return null;
   }
 }

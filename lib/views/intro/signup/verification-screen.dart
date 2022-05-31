@@ -29,7 +29,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     setState(() {
       sending = false;
@@ -39,7 +39,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/database.dart';
@@ -11,6 +13,16 @@ import 'package:syphon/store/crypto/sessions/model.dart' as model;
 ///
 extension SessionQueries on StorageDatabase {
   Future<void> insertMessageSessions(List<MessageSession> sessions) async {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          messageSessions,
+          sessions,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(
         messageSessions,
@@ -19,17 +31,24 @@ extension SessionQueries on StorageDatabase {
     );
   }
 
-  Future<List<MessageSession>> selectMessageSessionsInbound(List<String> roomIds) {
+  Future<List<MessageSession>> selectMessageSessionsInbound(
+      List<String> roomIds) {
     return (select(messageSessions)
           ..where((tbl) => tbl.roomId.isIn(roomIds) & tbl.inbound.equals(true))
-          ..orderBy([(tbl) => OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc)]))
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc)
+          ]))
         .get();
   }
 
   Future<List<MessageSession>> selectMessageSessionsInboundAll() {
     return (select(messageSessions)
           ..where((tbl) => tbl.inbound.equals(true))
-          ..orderBy([(tbl) => OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc)]))
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.createdAt, mode: OrderingMode.desc)
+          ]))
         .get();
   }
 }
@@ -92,7 +111,8 @@ Future<void> saveMessageSessionsInbound(
 /// Load Crypto Store (Cold Storage)
 ///
 ///
-Future<Map<String, Map<String, List<model.MessageSession>>>> loadMessageSessionsInbound({
+Future<Map<String, Map<String, List<model.MessageSession>>>>
+    loadMessageSessionsInbound({
   List<String>? roomIds,
   required StorageDatabase storage,
 }) async {
@@ -133,7 +153,7 @@ Future<Map<String, Map<String, List<model.MessageSession>>>> loadMessageSessions
 
     return messageSessions;
   } catch (error) {
-    printError(error.toString(), title: 'loadCrypto');
+    log.error(error.toString(), title: 'loadCrypto');
     return {};
   }
 }

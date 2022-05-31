@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -120,7 +120,7 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
 
     return AppBar(
       systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
-      backgroundColor: Color(Colours.greyDefault),
+      backgroundColor: Color(AppColors.greyDefault),
       automaticallyImplyLeading: false,
       titleSpacing: 0.0,
       title: Row(
@@ -189,8 +189,8 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final sectionBackgroundColor = Theme.of(context).brightness == Brightness.dark
-              ? const Color(Colours.blackDefault)
-              : const Color(Colours.whiteDefault);
+              ? const Color(AppColors.blackDefault)
+              : const Color(AppColors.whiteDefault);
 
           Widget currentAppBar = AppBarNormal(title: Strings.titleDevices);
 
@@ -229,8 +229,8 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
                       }
 
                       if (selectedDevices != null && selectedDevices!.contains(device)) {
-                        backgroundColor = Colours.hashedColor(device.deviceId);
-                        backgroundColor = Color(Colours.greyDefault);
+                        backgroundColor = AppColors.hashedColor(device.deviceId);
+                        backgroundColor = Color(AppColors.greyDefault);
                         textStyle = textStyle.copyWith(color: Colors.white);
                         iconColor = Colors.white;
                       }

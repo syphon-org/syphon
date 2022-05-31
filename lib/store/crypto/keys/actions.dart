@@ -136,7 +136,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       // return the generated keys
       return deviceKeysOwned;
     } catch (error) {
-      printError('[generateIdentityKeys] $error');
+      log.error('[generateIdentityKeys] $error');
       return null;
     }
   };
@@ -236,7 +236,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeyCounts) 
   return (Store<AppState> store) async {
     final currentKeyCounts = store.state.cryptoStore.oneTimeKeysCounts;
 
-    printInfo('[updateOneTimeKeyCounts] $oneTimeKeyCounts, current $currentKeyCounts');
+    log.info('[updateOneTimeKeyCounts] $oneTimeKeyCounts, current $currentKeyCounts');
 
     // Confirm user has access token
     final accessToken = store.state.authStore.user.accessToken;
@@ -269,7 +269,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeyCounts) 
       return;
     }
 
-    printInfo(
+    log.info(
       '[updateOneTimeKeyCounts] Updating $oneTimeKeyCounts, current $currentKeyCounts',
     );
 
@@ -321,7 +321,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         throw data['error'];
       }
 
-      printInfo('[updateOneTimeKeys] successfully uploaded oneTimeKeys');
+      log.info('[updateOneTimeKeys] successfully uploaded oneTimeKeys');
 
       // save account state after successful upload
       olmAccount.mark_keys_as_published();
@@ -332,7 +332,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         Map<String, int>.from(data['one_time_key_counts']),
       ));
 
-      printInfo('[updateOneTimeKeys] successfully updated oneTimeKeys');
+      log.info('[updateOneTimeKeys] successfully updated oneTimeKeys');
     } catch (error) {
       store.dispatch(addAlert(
           error: error,
@@ -372,7 +372,7 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
-        printInfo('[claimOneTimeKeys] all key sharing sessions per device are ready');
+        log.info('[claimOneTimeKeys] all key sharing sessions per device are ready');
         return true;
       }
 

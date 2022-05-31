@@ -85,3 +85,21 @@ List<Room> sortPrioritizedRooms(List<Room> rooms) {
 
   return rooms;
 }
+
+List<Room> availableRooms(List<Room> rooms) {
+  return List.from(rooms.where((room) => !room.hidden));
+}
+
+List<Room> selectHomeChats(AppState state) {
+  return availableRooms(
+    sortPrioritizedRooms(
+      filterSearches(
+        filterBlockedRooms(
+          state.roomStore.roomList,
+          state.userStore.blocked,
+        ),
+        state.searchStore.searchMessages,
+      ),
+    ),
+  );
+}

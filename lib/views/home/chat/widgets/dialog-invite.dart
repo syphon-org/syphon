@@ -39,9 +39,7 @@ class DialogInvite extends StatelessWidget {
                   vertical: 12,
                 ),
                 onPressed: () {
-                  if (onCancel != null) {
-                    onCancel!();
-                  }
+                  onCancel?.call();
                 },
                 child: Text(
                   Strings.buttonTextGoBack,
@@ -58,9 +56,7 @@ class DialogInvite extends StatelessWidget {
                       vertical: 12,
                     ),
                     onPressed: () {
-                      if (onReject != null) {
-                        onReject!();
-                      }
+                      onReject?.call();
                     },
                     child: Text(
                       Strings.buttonTextReject,
@@ -73,10 +69,7 @@ class DialogInvite extends StatelessWidget {
                       vertical: 8,
                     ),
                     onPressed: () {
-                      if (onAccept != null) {
-                        onAccept!();
-                      }
-
+                      onAccept?.call();
                       Navigator.pop(context);
                     },
                     child: Text(

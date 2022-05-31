@@ -12,6 +12,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 
@@ -28,7 +29,6 @@ class MessageDetailArguments {
 class MessageDetailsScreen extends StatelessWidget {
   const MessageDetailsScreen({Key? key}) : super(key: key);
 
-  @protected
   Widget buildUserReadList(_Props props, double width) {
     final Receipt readReceipts = props.readReceipts[props.message!.id!] ?? Receipt();
     final userReads = Map<String, int>.from(readReceipts.userReads);
@@ -47,7 +47,7 @@ class MessageDetailsScreen extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          ModalRoute.of(context)!.settings.arguments as MessageDetailArguments,
+          useScreenArguments<MessageDetailArguments>(context),
         ),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -218,13 +218,13 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(
     Store<AppState> store,
-    MessageDetailArguments args,
+    MessageDetailArguments? args,
   ) =>
       _Props(
-        roomId: args.roomId,
-        message: args.message,
+        roomId: args?.roomId,
+        message: args?.message,
         users: store.state.userStore.users,
-        readReceipts: store.state.eventStore.receipts[args.roomId!] ?? <String, Receipt>{},
+        readReceipts: store.state.eventStore.receipts[args?.roomId!] ?? <String, Receipt>{},
         userId: store.state.authStore.user.userId,
         themeType: store.state.settingsStore.themeSettings.themeType,
         timeFormat:

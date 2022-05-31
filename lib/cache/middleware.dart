@@ -25,11 +25,12 @@ bool cacheMiddleware(Store<AppState> store, dynamic action) {
     case SetOlmAccountBackup:
     case SetDeviceKeysOwned:
     case AddKeySession:
+    case AddMessageSessionInbound:
     case AddMessageSessionOutbound:
     case SetUser:
     case ResetCrypto:
     case ResetUser:
-      printInfo('[initStore] persistor saving from ${action.runtimeType}');
+      log.info('[initStore] persistor saving from ${action.runtimeType}');
       return true;
     case SetSynced:
       return ((action as SetSynced).synced ?? false) && !store.state.syncStore.synced;

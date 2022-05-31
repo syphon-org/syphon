@@ -15,6 +15,48 @@ Uint8List convertIntToBytes(int value) =>
     Uint8List(4)..buffer.asByteData().setUint32(0, value, Endian.big);
 
 ///
+/// Decrypt Session Keys (Threaded)
+///
+/// Responsible for decrypting the key import file as well
+/// Below is a block table for the encrypted data
+///
+/// Allows running decryption in a background thread
+///
+Future<String> encryptSessionKeyPasswordThreaded(Map params) async {
+  final String? password = params['password'];
+
+  return encryptSessionKeyPassword(password!);
+}
+
+Future<String> encryptSessionKeyPassword(String password) async {
+  if (password.isEmpty) {
+    throw 'Must have a password for encrypting key backups';
+  }
+
+  final salt = encrypt.SecureRandom(16);
+
+  final pbkdf2 = Pbkdf2(
+    macAlgorithm: Hmac.sha512(),
+    iterations: DEFAULT_ROUNDS,
+    bits: 512,
+  );
+
+  final encryptionKeySecret = await pbkdf2.deriveKey(
+    secretKey: SecretKey(utf8.encode(password)),
+    nonce: salt.bytes,
+  );
+
+  final encryptionKeys = await encryptionKeySecret.extractBytes();
+
+  // NOTE: split on 256 offset, for K and K'
+  final encryptionKey = base64.encode(
+    encryptionKeys.sublist(0, 32),
+  );
+
+  return encryptionKey;
+}
+
+///
 /// Encrypt Session Keys
 ///
 /// Responsible for decrypting the key import file as well
@@ -36,8 +78,6 @@ Future<String> encryptSessionKeys({
       throw 'Must have a password for encrypting a file';
     }
 
-    final sessionString = json.encode(sessionJson);
-
     final iv = encrypt.SecureRandom(16);
     final salt = encrypt.SecureRandom(16);
 
@@ -54,8 +94,6 @@ Future<String> encryptSessionKeys({
 
     final encryptionKeys = await encryptionKeySecret.extractBytes();
 
-    final sessionJsonFormatted = utf8.encode(sessionString);
-
     // NOTE: split on 256 offset, for K and K'
     final encryptionKey = base64.encode(
       encryptionKeys.sublist(0, 32),
@@ -67,8 +105,11 @@ Future<String> encryptSessionKeys({
       padding: null,
     );
 
+    final sessionString = json.encode(sessionJson);
+    final sessionUTF8 = utf8.encode(sessionString);
+
     final sessionData = codec.encrypt(
-      Uint8List.fromList(sessionJsonFormatted),
+      Uint8List.fromList(sessionUTF8),
       iv: encrypt.IV.fromBase64(iv.base64),
     );
 
@@ -80,10 +121,12 @@ Future<String> encryptSessionKeys({
     byteBuilder.add(convertIntToBytes(DEFAULT_ROUNDS));
     byteBuilder.add(sessionData.bytes); // actual session data
 
-    final hmacSha256 = crypto.Hmac(crypto.sha256, encryptionKeys.sublist(32, 64));
+    final hmacSha256 =
+        crypto.Hmac(crypto.sha256, encryptionKeys.sublist(32, 64));
     final digest = hmacSha256.convert(byteBuilder.toBytes());
 
-    byteBuilder.add(digest.bytes); // HMAC-SHA-256 of all of the above together using k'
+    // HMAC-SHA-256 of all of the above together using k'
+    byteBuilder.add(digest.bytes);
 
     // Uncomment for testing
     // printJson({
@@ -147,7 +190,7 @@ Future<List<dynamic>> decryptSessionKeys({
 
     // for debugging only
     if (DEBUG_MODE) {
-      printJson({
+      log.json({
         'version': version,
         'salt': base64.encode(salt),
         'iv': ivFormatted,
@@ -229,10 +272,13 @@ Future<String> encryptSessionKeysThreaded(Map params) async {
   );
 }
 
-Map<String, Map<String, List<MessageSession>>> combineMessageSesssions(sessionNew, sessionOld) {
-  final messageSessionsNew = sessionNew as Map<String, Map<String, List<MessageSession>>>;
+Map<String, Map<String, List<MessageSession>>> combineMessageSesssions(
+    sessionNew, sessionOld) {
+  final messageSessionsNew =
+      sessionNew as Map<String, Map<String, List<MessageSession>>>;
 
-  final messageSessionsOld = Map<String, Map<String, List<MessageSession>>>.from(
+  final messageSessionsOld =
+      Map<String, Map<String, List<MessageSession>>>.from(
     sessionOld,
   );
 

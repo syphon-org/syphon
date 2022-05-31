@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
@@ -15,6 +16,16 @@ import 'package:syphon/store/events/redaction/model.dart';
 ///
 extension MessageQueries on StorageDatabase {
   Future<void> insertMessagesBatched(List<Message> messages) {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          this.messages,
+          messages,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(
         this.messages,
@@ -158,7 +169,7 @@ Future<List<Message>> loadMessages({
       limit: limit,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    log.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
@@ -177,7 +188,7 @@ Future<List<Message>> loadMessagesRoom(
       limit: limit,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    log.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
@@ -200,6 +211,16 @@ Future<List<Message>> searchMessagesStored(
 //
 extension DecryptedQueries on StorageDatabase {
   Future<void> insertDecryptedBatched(List<Message> decrypted) {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          this.decrypted,
+          decrypted,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(
         this.decrypted,
@@ -279,7 +300,7 @@ Future<List<Message>> loadDecrypted({
   try {
     return storage.selectDecrypted(roomId);
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    log.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
@@ -309,7 +330,7 @@ Future<List<Message>> loadDecryptedRoom(
       limit: limit,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    log.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }

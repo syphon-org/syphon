@@ -1,7 +1,7 @@
 // ignore_for_file: unused_field
 
 import 'package:flutter/material.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
@@ -124,13 +124,7 @@ class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             TextButton(
-              onPressed: !loading
-                  ? () {
-                      if (widget.onCancel != null) {
-                        widget.onCancel!();
-                      }
-                    }
-                  : null,
+              onPressed: !loading ? () => widget.onCancel?.call() : null,
               child: Text(
                 Strings.buttonCancel,
               ),
@@ -150,7 +144,8 @@ class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
               child: !loading
                   ? Text(Strings.buttonConfirmFormal,
                       style: TextStyle(
-                        color: valid ? Theme.of(context).primaryColor : Color(Colours.greyDisabled),
+                        color:
+                            valid ? Theme.of(context).primaryColor : Color(AppColors.greyDisabled),
                       ))
                   : LoadingIndicator(),
             ),

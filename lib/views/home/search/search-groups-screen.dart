@@ -7,7 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
@@ -39,7 +39,6 @@ class GroupSearchState extends State<GroupSearchScreen> {
     onMounted();
   }
 
-  @protected
   onMounted() async {
     final store = StoreProvider.of<AppState>(context);
     final searchResults = store.state.searchStore.searchResults;
@@ -60,7 +59,6 @@ class GroupSearchState extends State<GroupSearchScreen> {
     super.dispose();
   }
 
-  @protected
   Widget buildSearchList(BuildContext context, _Props props) {
     final label = props.loading ? Strings.labelSearching : Strings.labelGroupsEmpty;
 
@@ -101,7 +99,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
         final room = props.searchResults[index] as Room;
         final formattedUserTotal = NumberFormat.compact();
         final localUserTotal = NumberFormat();
-        final hashedColor = Colours.hashedColor(room.id);
+        final hashedColor = AppColors.hashedColor(room.id);
 
         return Container(
           padding: const EdgeInsets.only(

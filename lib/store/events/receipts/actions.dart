@@ -42,13 +42,13 @@ ThunkAction<AppState> sendReadReceipts({
     try {
       // Skip if typing indicators are disabled
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
-        return printInfo('[sendReadReceipts] read receipts disabled');
+        return log.info('[sendReadReceipts] read receipts disabled');
       }
 
       final data;
 
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-        printInfo('[sendReadReceipts] read receipts hidden');
+        log.info('[sendReadReceipts] read receipts hidden');
 
         data = await MatrixApi.sendReadReceiptHidden(
           protocol: store.state.authStore.protocol,
@@ -72,9 +72,9 @@ ThunkAction<AppState> sendReadReceipts({
         throw data['error'];
       }
 
-      printInfo('[sendReadReceipts] sent ${message.id} $data');
+      log.info('[sendReadReceipts] sent ${message.id} $data');
     } catch (error) {
-      printInfo('[sendReadReceipts] failed $error');
+      log.info('[sendReadReceipts] failed $error');
     }
   };
 }
@@ -92,7 +92,7 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicatorsEnabled) {
-        printInfo('[sendTyping] typing indicators disabled');
+        log.info('[sendTyping] typing indicators disabled');
         return;
       }
 
@@ -109,7 +109,7 @@ ThunkAction<AppState> sendTyping({
         throw data['error'];
       }
     } catch (error) {
-      printError('[sendTyping] $error');
+      log.error('[sendTyping] $error');
     }
   };
 }

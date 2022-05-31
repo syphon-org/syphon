@@ -10,8 +10,7 @@ import 'package:path_provider_linux/path_provider_linux.dart';
 import 'package:sqlite3/open.dart';
 import 'package:syphon/global/libs/storage/secure-storage.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/store/sync/background/service.dart';
+import 'package:syphon/store/sync/service/service.dart';
 
 /// TODO: move database DynamicLibrary init here
 
@@ -22,16 +21,6 @@ import 'package:syphon/store/sync/background/service.dart';
 /// to run Syphon on a specific platform
 ///
 Future<void> initPlatformDependencies() async {
-  // disable debugPrint when in release mode
-
-  if (!DEBUG_MODE) {
-    debugPrint = (String? message, {int? wrapWidth}) {};
-    printDebug = (String message, {String? title}) {};
-    printInfo = (String message, {String? title}) {};
-    printError = (String message, {String? title}) {};
-    printJson = (Map? json) {};
-  }
-
   // init platform overrides for compatability with dart libs
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows || Platform.isLinux)) {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
@@ -42,14 +31,16 @@ Future<void> initPlatformDependencies() async {
 
     final appDir = File(Platform.script.toFilePath()).parent;
     final libolmDir = File(path.join(appDir.path, 'lib/libolm.so'));
-    final libsqliteDir = File(path.join(appDir.path, 'lib/libsqlite3.so'));
+    final libsqliteDir = File(path.join(appDir.path, './libsqlite3.so'));
+    final libsqlcipherDir = File(path.join(appDir.path, './libsqlcipher.so'));
     final libolmExists = await libolmDir.exists();
     final libsqliteExists = await libsqliteDir.exists();
+    final libsqlcipherExists = await libsqlcipherDir.exists();
 
     if (libolmExists) {
       DynamicLibrary.open(libolmDir.path);
     } else {
-      printError('[linux] exists $libolmExists ${libolmDir.path}');
+      log.error('[linux] not found libolmExists ${libolmDir.path}');
     }
 
     if (libsqliteExists) {
@@ -57,18 +48,26 @@ Future<void> initPlatformDependencies() async {
         return DynamicLibrary.open(libsqliteDir.path);
       });
     } else {
-      printError('[linux] exists $libsqliteExists ${libsqliteDir.path}');
+      log.error('[linux] not found libsqliteExists ${libsqliteDir.path}');
+    }
+
+    if (libsqlcipherExists) {
+      open.overrideFor(OperatingSystem.linux, () {
+        return DynamicLibrary.open(libsqlcipherDir.path);
+      });
+    } else {
+      log.error('[linux] not found libsqlcipherExists ${libsqlcipherDir.path}');
     }
   }
 
   // init window mangment for desktop builds
   if (Platform.isMacOS) {
     final directory = await getApplicationSupportDirectory();
-    printInfo('[macos] ${directory.path}');
+    log.info('[macos] ${directory.path}');
     try {
       DynamicLibrary.open('libolm.3.dylib');
     } catch (error) {
-      printInfo('[macos] ${error.toString()}');
+      log.info('[macos] ${error.toString()}');
     }
   }
 
@@ -79,7 +78,7 @@ Future<void> initPlatformDependencies() async {
 
   // init background sync for Android only
   if (Platform.isAndroid) {
-    final backgroundSyncStatus = await BackgroundSync.init();
-    printInfo('[main] background service initialized $backgroundSyncStatus');
+    final backgroundSyncStatus = await SyncService.init();
+    log.info('[main] background service initialized $backgroundSyncStatus');
   }
 }

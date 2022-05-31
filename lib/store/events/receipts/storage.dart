@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/events/receipts/model.dart';
@@ -12,6 +14,16 @@ import 'package:syphon/store/events/receipts/model.dart';
 ///
 extension ReceiptQueries on StorageDatabase {
   Future<void> insertReceiptsBatched(List<Receipt> receipts) {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          this.receipts,
+          receipts,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(
         this.receipts,
@@ -63,7 +75,7 @@ Future<Map<String, Receipt>> loadReceipts(
       value: (receipt) => receipt,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadReactions');
+    log.error(error.toString(), title: 'loadReactions');
     return {};
   }
 }

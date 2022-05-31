@@ -179,12 +179,6 @@ class Dimensions {
     return size.height * 0.4;
   }
 
-  // Action Rin
-  static double actionRingDefaultWidth(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return size.width < 400 ? size.width : size.width * 0.9;
-  }
-
   // * Device Specific *
   static const buttonlessHeightiOS = 736;
 }

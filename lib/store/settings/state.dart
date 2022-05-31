@@ -4,6 +4,8 @@ import 'package:syphon/store/settings/chat-settings/chat-lists/model.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
+import 'package:syphon/store/settings/privacy-settings/model.dart';
+import 'package:syphon/store/settings/storage-settings/model.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
 
 import './chat-settings/model.dart';
@@ -38,11 +40,12 @@ class SettingsStore extends Equatable {
   final ReadReceiptTypes readReceipts;
 
   final List<Device> devices;
+  final ProxySettings proxySettings;
   final ThemeSettings themeSettings;
+  final StorageSettings storageSettings;
+  final PrivacySettings privacySettings;
   final Map<String, ChatSetting> chatSettings; // roomId
   final NotificationSettings notificationSettings;
-
-  final ProxySettings proxySettings;
 
   @JsonKey(ignore: true)
   final String? pusherToken; // NOTE: can be device token for APNS
@@ -66,12 +69,14 @@ class SettingsStore extends Equatable {
     this.chatSettings = const <String, ChatSetting>{},
     this.devices = const [],
     this.loading = false,
-    this.notificationSettings = const NotificationSettings(),
-    this.themeSettings = const ThemeSettings(),
     this.alphaAgreement,
-    this.pusherToken,
     this.readReceipts = ReadReceiptTypes.Off,
+    this.themeSettings = const ThemeSettings(),
     this.proxySettings = const ProxySettings(),
+    this.privacySettings = const PrivacySettings(),
+    this.storageSettings = const StorageSettings(),
+    this.notificationSettings = const NotificationSettings(),
+    this.pusherToken,
   });
 
   @override
@@ -112,16 +117,18 @@ class SettingsStore extends Equatable {
     bool? autoDownloadEnabled,
     int? syncInterval,
     int? syncPollTimeout,
-    Map<String, ChatSetting>? chatSettings,
-    NotificationSettings? notificationSettings,
-    ThemeSettings? themeSettings,
-    List<Device>? devices,
-    List<ChatList>? chatLists,
     bool? loading,
     String? alphaAgreement,
     String? pusherToken, // NOTE: device token for APNS
     ReadReceiptTypes? readReceipts,
+    List<Device>? devices,
+    List<ChatList>? chatLists,
+    ThemeSettings? themeSettings,
     ProxySettings? proxySettings,
+    PrivacySettings? privacySettings,
+    StorageSettings? storageSettings,
+    Map<String, ChatSetting>? chatSettings,
+    NotificationSettings? notificationSettings,
   }) =>
       SettingsStore(
         language: language ?? this.language,
@@ -129,27 +136,34 @@ class SettingsStore extends Equatable {
         enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
         autocorrectEnabled: autocorrectEnabled ?? this.autocorrectEnabled,
         suggestionsEnabled: suggestionsEnabled ?? this.suggestionsEnabled,
-        typingIndicatorsEnabled: typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
+        typingIndicatorsEnabled:
+            typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
-        dismissKeyboardEnabled: dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
-        membershipEventsEnabled: membershipEventsEnabled ?? this.membershipEventsEnabled,
-        roomTypeBadgesEnabled: roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
+        dismissKeyboardEnabled:
+            dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
+        membershipEventsEnabled:
+            membershipEventsEnabled ?? this.membershipEventsEnabled,
+        roomTypeBadgesEnabled:
+            roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
         autoDownloadEnabled: autoDownloadEnabled ?? this.autoDownloadEnabled,
         syncInterval: syncInterval ?? this.syncInterval,
         syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
-        chatSettings: chatSettings ?? this.chatSettings,
         chatLists: chatLists ?? this.chatLists,
-        notificationSettings: notificationSettings ?? this.notificationSettings,
-        themeSettings: themeSettings ?? this.themeSettings,
-        devices: devices ?? this.devices,
         loading: loading ?? this.loading,
         alphaAgreement: alphaAgreement ?? this.alphaAgreement,
         pusherToken: pusherToken ?? this.pusherToken,
+        devices: devices ?? this.devices,
         readReceipts: readReceipts ?? this.readReceipts,
+        chatSettings: chatSettings ?? this.chatSettings,
+        themeSettings: themeSettings ?? this.themeSettings,
         proxySettings: proxySettings ?? this.proxySettings,
+        privacySettings: privacySettings ?? this.privacySettings,
+        storageSettings: storageSettings ?? this.storageSettings,
+        notificationSettings: notificationSettings ?? this.notificationSettings,
       );
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
 
-  factory SettingsStore.fromJson(Map<String, dynamic> json) => _$SettingsStoreFromJson(json);
+  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
+      _$SettingsStoreFromJson(json);
 }

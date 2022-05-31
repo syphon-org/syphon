@@ -66,10 +66,10 @@ String formatTimestampFull({
   if (lastUpdateMillis == 0) return '';
 
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
-  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm';
+  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm a';
 
   return DateFormat(
-    showTime ? 'MMM d $hourFormat a' : 'MMM d yyyy',
+    showTime ? 'MMM d $hourFormat' : 'MMM d yyyy',
   ).format(timestamp);
 }
 
@@ -83,20 +83,20 @@ String formatTimestamp({
 
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
   final sinceLastUpdate = DateTime.now().difference(timestamp);
-  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm';
+  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm a';
 
   if (sinceLastUpdate.inDays > 365) {
     return DateFormat(
-      showTime ? 'MMM d $hourFormat a' : 'MMM d yyyy',
+      showTime ? 'MMM d $hourFormat' : 'MMM d yyyy',
     ).format(timestamp);
   } else if (sinceLastUpdate.inDays > 6) {
     // Abbreviated month and day number - Jan 1
     return DateFormat(
-      showTime ? 'MMM d $hourFormat a' : 'MMM d',
+      showTime ? 'MMM d $hourFormat' : 'MMM d',
     ).format(timestamp);
   } else if (sinceLastUpdate.inDays > 0) {
     // Abbreviated weekday - Fri
-    return DateFormat(showTime ? 'E $hourFormat a' : 'E').format(timestamp);
+    return DateFormat(showTime ? 'E $hourFormat' : 'E').format(timestamp);
   } else if (sinceLastUpdate.inHours > 0) {
     // Abbreviated hours since - 1h
     return '${sinceLastUpdate.inHours}h';

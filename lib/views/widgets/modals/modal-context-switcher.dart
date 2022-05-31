@@ -5,7 +5,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
@@ -126,8 +126,8 @@ class ModalContextSwitcher extends StatelessWidget {
                     style: Theme.of(context).textTheme.headline5?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).brightness == Brightness.light
-                              ? Color(Colours.greyDark)
-                              : Color(Colours.whiteDefault),
+                              ? Color(AppColors.greyDark)
+                              : Color(AppColors.whiteDefault),
                         ),
                   ),
                 ),

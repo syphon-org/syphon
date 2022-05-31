@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
@@ -16,6 +17,17 @@ extension AuthQueries on StorageDatabase {
   Future<int> insertAuthStore(AuthStore store) async {
     final storeJson = json.decode(json.encode(store));
 
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return into(auths).insert(
+        AuthsCompanion(
+          id: Value(StorageKeys.AUTH),
+          store: Value(storeJson),
+        ),
+        mode: InsertMode.insertOrReplace,
+      );
+    }
+
     return into(auths).insertOnConflictUpdate(AuthsCompanion(
       id: Value(StorageKeys.AUTH),
       store: Value(storeJson),
@@ -23,7 +35,8 @@ extension AuthQueries on StorageDatabase {
   }
 
   Future<AuthStore?> selectAuthStore() async {
-    final row = await (select(auths)..where((tbl) => tbl.id.isNotNull())).getSingleOrNull();
+    final row = await (select(auths)..where((tbl) => tbl.id.isNotNull()))
+        .getSingleOrNull();
 
     if (row == null) {
       return null;
@@ -47,7 +60,7 @@ Future<AuthStore?> loadAuth({required StorageDatabase storage}) async {
   try {
     return storage.selectAuthStore();
   } catch (error) {
-    printError(error.toString(), title: 'loadAuth');
+    log.error(error.toString(), title: 'loadAuth');
     return null;
   }
 }
