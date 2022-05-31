@@ -27,6 +27,7 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/auth/homeserver/actions.dart';
 import 'package:syphon/store/auth/homeserver/model.dart';
 import 'package:syphon/store/crypto/actions.dart';
+import 'package:syphon/store/crypto/sessions/service/actions.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
@@ -276,9 +277,13 @@ ThunkAction<AppState> startAuthObserver() {
         if (store.state.settingsStore.notificationSettings.enabled) {
           store.dispatch(startSyncService());
         }
-        // enable notifications
-        if (store.state.settingsStore.notificationSettings.enabled) {
-          store.dispatch(startSyncService());
+
+        final keyBackupInterval =
+            store.state.settingsStore.privacySettings.keyBackupInterval;
+
+        // enable scheduled key backups
+        if (keyBackupInterval != Duration.zero) {
+          store.dispatch(startKeyBackupService());
         }
       } else {
         // wipe sensitive redux state
@@ -315,47 +320,45 @@ ThunkAction<AppState> stopAuthObserver() {
 ///
 /// Used in matrix to distinguish devices
 /// for encryption and verification
-ThunkAction<AppState> generateDeviceId({String salt = ''}) {
-  return (Store<AppState> store) async {
-    final defaultId = Random.secure().nextInt(1 << 31).toString();
+Device generateDeviceId({String salt = ''}) {
+  final defaultId = Random.secure().nextInt(1 << 31).toString();
 
-    try {
-      final deviceId = Random.secure().nextInt(1 << 31).toString();
+  try {
+    final deviceId = Random.secure().nextInt(1 << 31).toString();
 
-      // TODO: enable device persistant sessions to better
-      // TODO: keep track of device identity anonymously
-      // final deviceInfoPlugin = DeviceInfoPlugin();
+    // TODO: enable device persistant sessions to better
+    // TODO: keep track of device identity anonymously
+    // final deviceInfoPlugin = DeviceInfoPlugin();
 
-      // Find a unique value for the type of device
-      // if (Platform.isAndroid) {
-      //   final info = await deviceInfoPlugin.androidInfo;
-      //   deviceId = info.androidId;
-      // } else if (Platform.isIOS) {
-      //   final info = await deviceInfoPlugin.iosInfo;
-      //   deviceId = info.identifierForVendor;
-      // }
+    // Find a unique value for the type of device
+    // if (Platform.isAndroid) {
+    //   final info = await deviceInfoPlugin.androidInfo;
+    //   deviceId = info.androidId;
+    // } else if (Platform.isIOS) {
+    //   final info = await deviceInfoPlugin.iosInfo;
+    //   deviceId = info.identifierForVendor;
+    // }
 
-      // hash it
-      final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
+    // hash it
+    final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
 
-      final deviceIdHash = base64
-          .encode(deviceIdDigest.bytes)
-          .toUpperCase()
-          .replaceAll(RegExp(r'[^\w]'), '')
-          .substring(0, 10);
+    final deviceIdHash = base64
+        .encode(deviceIdDigest.bytes)
+        .toUpperCase()
+        .replaceAll(RegExp(r'[^\w]'), '')
+        .substring(0, 10);
 
-      return Device(
-        deviceId: deviceIdHash,
-        displayName: Values.appDisplayName,
-      );
-    } catch (error) {
-      log.error('[generateDeviceId] $error');
-      return Device(
-        deviceId: defaultId,
-        displayName: Values.appDisplayName,
-      );
-    }
-  };
+    return Device(
+      deviceId: deviceIdHash,
+      displayName: Values.appDisplayName,
+    );
+  } catch (error) {
+    log.error('[generateDeviceId] $error');
+    return Device(
+      deviceId: defaultId,
+      displayName: Values.appDisplayName,
+    );
+  }
 }
 
 ThunkAction<AppState> loginUser() {

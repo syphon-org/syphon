@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:local_image_provider/device_image.dart';
-import 'package:local_image_provider/local_image.dart';
 import 'package:local_image_provider/local_image_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -32,7 +30,8 @@ class ListLocalImages extends StatefulWidget {
   _ListLocalImagesState createState() => _ListLocalImagesState();
 }
 
-class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLocalImages> {
+class _ListLocalImagesState extends State<ListLocalImages>
+    with Lifecycle<ListLocalImages> {
   List<LocalImage> images = [];
   LocalImageProvider imageProvider = LocalImageProvider();
 

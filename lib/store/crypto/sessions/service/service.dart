@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/keys/models.dart';
-import 'package:syphon/store/crypto/sessions/service/functions.dart';
 import 'package:syphon/store/crypto/sessions/model.dart';
+import 'package:syphon/store/crypto/sessions/service/functions.dart';
 import 'package:workmanager/workmanager.dart';
 
 void callback() {
@@ -14,7 +16,7 @@ void callback() {
     );
 
     final data = inputData ?? {};
-    final location = data['location'];
+    final directory = data['directory'];
     final password = data['password'];
     final deviceKeys = Map<String, Map<String, DeviceKey>>.from(
       jsonDecode(data['deviceKeys']),
@@ -24,17 +26,9 @@ void callback() {
       jsonDecode(data['messageSessions']),
     );
 
-    // TODO: debug ONLY
-    log.json({
-      'location': location,
-      'password': password,
-      'deviceKeys': deviceKeys,
-      'messageSessions': messageSessions,
-    });
-
     try {
-      await exportSessionKeysThreaded(
-        location: location,
+      await backupSessionKeys(
+        directory: directory,
         password: password,
         deviceKeys: deviceKeys,
         messageSessions: messageSessions,
@@ -58,30 +52,75 @@ class KeyBackupService {
   static const service_title = 'KeyBackupService';
 
   static Future start({
-    required String location,
+    required String path,
     required String password,
     required Map<String, Map<String, DeviceKey>> deviceKeys,
     required Map<String, Map<String, List<MessageSession>>> messageSessions,
-    required Duration schedule,
+    required String lastBackupMillis,
+    required Duration frequency,
+    required Function onCompleted,
   }) async {
-    log.info('[KeyBackupService] starting');
+    if (frequency == Duration.zero) {
+      log.info('[KeyBackupService] disabled - no schedule frequency');
+      return Future.value();
+    } else {
+      log.info('[KeyBackupService] starting');
+    }
 
-    if (schedule == Duration.zero) return;
-
-    Workmanager().registerOneOffTask(
-      service_title, service_title, // Ignored on iOS
-      initialDelay: schedule,
-      constraints: Constraints(
-        networkType: NetworkType.not_required,
-        requiresBatteryNotLow: true,
-      ),
-      inputData: {
-        'location': location,
-        'password': password,
-        'deviceKeys': jsonEncode(deviceKeys),
-        'messageSessions': jsonEncode(messageSessions),
-      },
+    final lastBackup = DateTime.fromMillisecondsSinceEpoch(
+      int.parse(lastBackupMillis),
     );
+
+    // add the frequency to the last backup time
+    final nextBackup = lastBackup.add(frequency);
+
+    // find the amount of time that has passed since the last backup
+    final nextBackupDelta = nextBackup.difference(DateTime.now());
+
+    final directory = await resolveBackupDirectory(path: path);
+
+    if (DEBUG_MODE) {
+      log.json({
+        'frequency': frequency.toString(),
+        'lastBackup': lastBackup.toIso8601String(),
+        'nextBackup': nextBackup.toIso8601String(),
+        'nextBackupDelta': nextBackupDelta.toString(),
+        'nextBackupDeltaNegative': nextBackupDelta.isNegative,
+      });
+    }
+
+    // if more time has passed, start the backup process
+    if (nextBackupDelta.isNegative) {
+      final completed = await compute(backupSessionKeysThreaded, {
+        'directory': directory,
+        'password': password,
+        'deviceKeys': deviceKeys,
+        'messageSessions': messageSessions,
+      });
+
+      if (completed) {
+        log.info('[KeyBackupService] completd backup successfully!!');
+        return onCompleted();
+      } else {
+        log.error('[KeyBackupService] completd backup successfully!!');
+      }
+    }
+
+    // TODO: cannot handle
+    // Workmanager().registerOneOffTask(
+    //   service_title, service_title, // Ignored on iOS
+    //   initialDelay: Duration.zero,
+    //   constraints: Constraints(
+    //     networkType: NetworkType.not_required,
+    //     requiresBatteryNotLow: true,
+    //   ),
+    //   inputData: {
+    //     'directory': directory,
+    //     'password': password,
+    //     'deviceKeys': jsonEncode(deviceKeys),
+    //     'messageSessions': jsonEncode(messageSessions),
+    //   },
+    // );
   }
 
   static Future<bool> init() async {

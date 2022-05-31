@@ -8,7 +8,7 @@ String generateKey() {
 
 Future<bool> checkKey(String keyId) async {
   try {
-    return await SecureStorage.check(key: keyId);
+    return await SecureStorage().check(key: keyId);
   } catch (error) {
     log.error('[checkKey] $error');
     return false;

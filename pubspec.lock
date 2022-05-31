@@ -564,6 +564,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  font_awesome_flutter:
+    dependency: "direct main"
+    description:
+      name: font_awesome_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "10.1.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -689,7 +696,7 @@ packages:
       name: local_image_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.1"
+    version: "4.2.0"
   local_image_provider_platform_interface:
     dependency: transitive
     description:
@@ -1445,8 +1452,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: cdb255e5827dcc962e0340ab6a535bd8e1139a27
-      resolved-ref: cdb255e5827dcc962e0340ab6a535bd8e1139a27
+      ref: main
+      resolved-ref: "78fcb2a443149f89fbbaf051fc11f894ed94e626"
       url: "https://github.com/syphon-org/flutter_workmanager.git"
     source: git
     version: "0.5.0"

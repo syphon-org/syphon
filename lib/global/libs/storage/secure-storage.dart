@@ -8,7 +8,7 @@ import 'package:syphon/global/print.dart';
 class SecureStorage {
   static FlutterSecureStorage? instance;
 
-  static Future<bool> check({required String key}) async {
+  Future<bool> check({required String key}) async {
     try {
       log.info('[SecureStorage.check] checking $key');
       // mobile
@@ -72,7 +72,8 @@ class SecureStorage {
       // desktop
       if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
         final directory = await getApplicationSupportDirectory();
-        return await File(join(directory.path, key)).writeAsString(value, flush: true);
+        return await File(join(directory.path, key))
+            .writeAsString(value, flush: true);
       }
 
       throw '[SecureStorage.write] Unsupported device error';

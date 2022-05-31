@@ -147,6 +147,9 @@ SettingsStore settingsReducer([
           lastBackupMillis: _action.timestamp,
         ),
       );
+    case SetKeyBackupPassword:
+      // NOTE: saved to cold storage only instead of state
+      return state;
     case SetKeyBackupLocation:
       final _action = action as SetKeyBackupLocation;
       return state.copyWith(

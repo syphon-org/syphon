@@ -10,27 +10,59 @@ import 'package:syphon/store/crypto/keys/models.dart';
 import 'package:syphon/store/crypto/sessions/converters.dart';
 import 'package:syphon/store/crypto/sessions/model.dart';
 
-Future<bool> exportSessionKeysThreaded({
-  required String location,
+Future<bool> backupSessionKeysThreaded(Map params) {
+  final String directory = params['directory'];
+  final String password = params['password'];
+  final deviceKeys = Map<String, Map<String, DeviceKey>>.from(
+    params['deviceKeys'],
+  );
+  final messageSessions = Map<String, Map<String, List<MessageSession>>>.from(
+    params['messageSessions'],
+  );
+
+  return backupSessionKeys(
+    directory: directory,
+    password: password,
+    deviceKeys: deviceKeys,
+    messageSessions: messageSessions,
+  );
+}
+
+Future<String> resolveBackupDirectory({
+  required String path,
+}) async {
+  var directory = await getApplicationDocumentsDirectory();
+
+  if (Platform.isAndroid) {
+    directory = path.isEmpty
+        ? Directory(Values.ANDROID_DEFAULT_DIRECTORY)
+        : Directory(path);
+  }
+
+  if (Platform.isIOS) {
+    directory = path.isEmpty
+        ? directory
+        : Directory(
+            path,
+          );
+  }
+
+  return directory.path;
+}
+
+Future<bool> backupSessionKeys({
+  required String directory,
   required String password,
   required Map<String, Map<String, DeviceKey>> deviceKeys,
   required Map<String, Map<String, List<MessageSession>>> messageSessions,
 }) async {
-  // create file
-  var directory = await getApplicationDocumentsDirectory();
-
-  if (Platform.isAndroid) {
-    directory = location.isEmpty
-        ? Directory(Values.ANDROID_DEFAULT_DIRECTORY)
-        : Directory(location);
-  }
-
-  if (Platform.isIOS) {
-    directory = location.isEmpty
-        ? directory
-        : Directory(
-            location,
-          );
+  if (DEBUG_MODE) {
+    log.json({
+      'directory': directory,
+      'password': password,
+      'deviceKeys': deviceKeys,
+      'messageSessions': messageSessions,
+    });
   }
 
   final deviceKeysByDeviceId = deviceKeys.values
@@ -103,9 +135,17 @@ Future<bool> exportSessionKeysThreaded({
   final fileName =
       '${Values.appName}_key_backup_$formattedTime.txt'.toLowerCase();
 
-  final file = File('${directory.path}/$fileName');
+  final file = File('$directory/$fileName');
 
   await file.writeAsString(encryptedExport);
+
+  // for debugging only
+  if (DEBUG_MODE) {
+    log.json({
+      'context': 'worker',
+      'status': 'completed',
+    });
+  }
 
   return true;
 }

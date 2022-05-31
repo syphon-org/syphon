@@ -108,7 +108,7 @@ ThunkAction<AppState> addAlert({
   dynamic error,
 }) {
   return (Store<AppState> store) async {
-    final errorMessage = error?.toString() ?? '';
+    final errorMessage = error?.toString() ?? message;
 
     log.error('[ERROR] [$origin] $errorMessage');
 

@@ -86,6 +86,7 @@ dependencies:
   flutter_dotenv: ^4.0.0-nullsafety.0
   android_alarm_manager_plus: ^2.0.3
   workmanager: 0.5.0 
+  # background_fetch: 1.1.0
   uni_links: ^0.5.0
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
@@ -109,13 +110,14 @@ dependencies:
   photo_view: 0.13.0
   vector_math: 2.1.2
   flutter_hooks: 0.18.4
+  font_awesome_flutter: 10.1.0
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ## media
   file_picker: ^4.1.1
   image_picker: ^0.8.4
   permission_handler: ^8.3.0
-  local_image_provider: ^4.0.1
+  local_image_provider: 4.2.0 
   flutter_image_compress: 1.1.0
   share_plus: 4.0.3
 
@@ -143,7 +145,7 @@ dependency_overrides:
   workmanager: # TODO: lower ios deployment target
     git:
       url: https://github.com/syphon-org/flutter_workmanager.git
-      ref: origin/fix/support-ios-9 
+      ref: main
       # ref: cdb255e5827dcc962e0340ab6a535bd8e1139a27
   swipeable: # TODO: null saftey version
     git:
@@ -182,7 +184,7 @@ flutter:
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Italic.ttf
-        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Regular.ttf 
         - asset: assets/fonts/Poppins-Medium.ttf
         - asset: assets/fonts/Poppins-Light.ttf
         - asset: assets/fonts/Poppins-Thin.ttf

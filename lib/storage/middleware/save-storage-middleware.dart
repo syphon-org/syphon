@@ -26,6 +26,7 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
 import 'package:syphon/store/settings/privacy-settings/actions.dart';
+import 'package:syphon/store/settings/privacy-settings/storage.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
 import 'package:syphon/store/settings/storage-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
@@ -161,7 +162,12 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case ToggleProxyAuthentication:
       case SetProxyUsername:
       case SetProxyPassword:
+      case SetLastBackupMillis:
         saveSettings(store.state.settingsStore, storage: storage);
+        break;
+      case SetKeyBackupPassword:
+        final _action = action as SetKeyBackupPassword;
+        saveBackupPassword(password: _action.password);
         break;
       case LogAppAgreement:
         saveTermsAgreement(

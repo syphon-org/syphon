@@ -1,11 +1,17 @@
+// ignore_for_file: prefer_function_declarations_over_variables
+
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart' as hooks;
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/context/types.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -13,11 +19,13 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/crypto/actions.dart';
 import 'package:syphon/store/crypto/keys/selectors.dart';
 import 'package:syphon/store/crypto/sessions/actions.dart';
+import 'package:syphon/store/crypto/sessions/service/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/devices-settings/selectors.dart';
 import 'package:syphon/store/settings/privacy-settings/actions.dart';
 import 'package:syphon/store/settings/privacy-settings/selectors.dart';
+import 'package:syphon/store/settings/privacy-settings/storage.dart';
 import 'package:syphon/store/settings/selectors.dart';
 import 'package:syphon/store/settings/storage-settings/actions.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
@@ -42,6 +50,7 @@ class _Props extends Equatable {
   final String sessionKey;
   final String readReceipts;
   final String keyBackupSchedule;
+  final String keyBackupLatest;
   final String keyBackupLocation;
 
   final Function onToggleTypingIndicators;
@@ -58,6 +67,7 @@ class _Props extends Equatable {
     required this.loading,
     required this.readReceipts,
     required this.keyBackupSchedule,
+    required this.keyBackupLatest,
     required this.keyBackupLocation,
     required this.screenLockEnabled,
     required this.typingIndicators,
@@ -79,6 +89,7 @@ class _Props extends Equatable {
         valid,
         loading,
         typingIndicators,
+        keyBackupLatest,
         keyBackupLocation,
         keyBackupSchedule,
         readReceipts,
@@ -96,18 +107,19 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         screenLockEnabled: selectScreenLockEnabled(context),
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
+        keyBackupLatest:
+            store.state.settingsStore.privacySettings.lastBackupMillis,
         keyBackupSchedule: selectKeyBackupSchedule(store.state),
-        keyBackupLocation:
-            store.state.settingsStore.storageSettings.keyBackupLocation,
+        keyBackupLocation: selectKeyBackupLocation(store.state),
         readReceipts:
             selectReadReceiptsString(store.state.settingsStore.readReceipts),
         sessionId: store.state.authStore.user.deviceId ?? Values.empty,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),
         onSetScreenLock: (String matchedPin) async =>
-            await store.dispatch(setScreenLock(pin: matchedPin)),
+            store.dispatch(setScreenLock(pin: matchedPin)),
         onRemoveScreenLock: (String matchedPin) async =>
-            await store.dispatch(removeScreenLock(pin: matchedPin)),
+            store.dispatch(removeScreenLock(pin: matchedPin)),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
         onToggleTypingIndicators: () =>
@@ -119,11 +131,15 @@ class _Props extends Equatable {
             builder: (dialogContext) => DialogTextInput(
               title: Strings.titleRenameDevice,
               content: Strings.contentRenameDevice,
+              randomizeText: true,
               label: selectCurrentDeviceName(store),
               onConfirm: (String newDisplayName) async {
-                await store.dispatch(renameDevice(
+                store.dispatch(
+                  renameDevice(
                     deviceId: store.state.authStore.user.deviceId,
-                    displayName: newDisplayName));
+                    displayName: newDisplayName,
+                  ),
+                );
                 Navigator.of(dialogContext).pop();
               },
               onCancel: () async {
@@ -139,8 +155,10 @@ class _Props extends Equatable {
       );
 }
 
-class PrivacySettingsScreen extends StatelessWidget {
-  const PrivacySettingsScreen({Key? key}) : super(key: key);
+class PrivacySettingsScreen extends hooks.HookWidget {
+  const PrivacySettingsScreen({
+    Key? key,
+  }) : super(key: key);
 
   onConfirmDeactivateAccount(BuildContext context, _Props props) async {
     await showDialog(
@@ -265,120 +283,198 @@ class PrivacySettingsScreen extends StatelessWidget {
     }
   }
 
+  onUpdateBackupSchedulePassword({
+    required BuildContext context,
+    required Function onComplete,
+  }) async {
+    final store = StoreProvider.of<AppState>(context);
+
+    final password = await loadBackupPassword();
+
+    if (password.isNotEmpty) {
+      return onComplete();
+    }
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => DialogTextInput(
+        title: 'Scheduled Backup Password',
+        content: Strings.contentExportSessionKeysEnterPassword,
+        obscureText: true,
+        loading: store.state.settingsStore.loading,
+        label: Strings.labelPassword,
+        initialValue: '',
+        confirmText: Strings.buttonSave,
+        inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+        onCancel: () async {
+          Navigator.of(dialogContext).pop();
+        },
+        onConfirm: (String password) async {
+          await store.dispatch(SetKeyBackupPassword(
+            password: password,
+          ));
+
+          Navigator.of(dialogContext).pop();
+          onComplete();
+        },
+      ),
+    );
+  }
+
+  onUpdateBackupScheduleNotice({
+    required BuildContext context,
+    bool isDefault = false,
+  }) async {
+    final store = StoreProvider.of<AppState>(context);
+    if (isDefault && Platform.isIOS) {
+      await showDialog(
+        context: context,
+        builder: (dialogContext) => DialogConfirm(
+          title: Strings.titleDialogKeyBackupWarning,
+          content: Strings.contentKeyBackupWarning,
+          confirmText: Strings.buttonConfirm,
+          confirmStyle: TextStyle(color: Theme.of(context).primaryColor),
+          dismissText: Strings.buttonCancel,
+          onDismiss: () {
+            store.dispatch(SetKeyBackupInterval(
+              duration: Duration.zero,
+            ));
+            Navigator.pop(dialogContext);
+          },
+          onConfirm: () {
+            Navigator.pop(dialogContext);
+          },
+        ),
+      );
+    }
+  }
+
   onUpdateBackupSchedule({
     required BuildContext context,
   }) async {
     final store = StoreProvider.of<AppState>(context);
     final defaultPadding = EdgeInsets.symmetric(horizontal: 10);
+    final isDefault =
+        store.state.settingsStore.privacySettings.keyBackupInterval ==
+            Duration.zero;
 
-    await showDialog(
+    final onSelect = (BuildContext dialogContext, Duration duration) {
+      store.dispatch(
+        SetKeyBackupInterval(duration: duration),
+      );
+      Navigator.pop(dialogContext);
+      onUpdateBackupScheduleNotice(
+        context: context,
+        isDefault: isDefault,
+      );
+
+      if (isDefault) {
+        store.dispatch(startKeyBackupService());
+      }
+    };
+
+    onUpdateBackupSchedulePassword(
       context: context,
-      builder: (dialogContext) => DialogRounded(
-        title: 'Set Key Backup Schedule',
-        children: [
-          ListTile(
-            title: Padding(
+      onComplete: () async => showDialog(
+        context: context,
+        builder: (dialogContext) => DialogRounded(
+          title: 'Set Key Backup Schedule',
+          children: [
+            ListTile(
+              title: Padding(
+                  padding: defaultPadding,
+                  child: Text(
+                    'Manual Only',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  )),
+              onTap: () {
+                onSelect(dialogContext, Duration.zero);
+              },
+            ),
+            ListTile(
+              title: Padding(
+                  padding: defaultPadding,
+                  child: Text(
+                    'Every 15 Minutes',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  )),
+              onTap: () {
+                onSelect(dialogContext, Duration(minutes: 15));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                  padding: defaultPadding,
+                  child: Text(
+                    'Every hour',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  )),
+              onTap: () {
+                onSelect(dialogContext, Duration(hours: 1));
+              },
+            ),
+            ListTile(
+              title: Padding(
+                  padding: defaultPadding,
+                  child: Text(
+                    'Every 6 hours',
+                    style: Theme.of(context).textTheme.subtitle1,
+                  )),
+              onTap: () {
+                onSelect(dialogContext, Duration(hours: 6));
+              },
+            ),
+            ListTile(
+              title: Padding(
                 padding: defaultPadding,
                 child: Text(
-                  'Manual Only',
+                  'Every 12 hours',
                   style: Theme.of(context).textTheme.subtitle1,
-                )),
-            onTap: () {
-              store.dispatch(
-                SetKeyBackupInterval(duration: Duration.zero),
-              );
-              Navigator.pop(dialogContext);
-            },
-          ),
-          ListTile(
-            title: Padding(
+                ),
+              ),
+              onTap: () {
+                onSelect(dialogContext, Duration(hours: 12));
+              },
+            ),
+            ListTile(
+              title: Padding(
                 padding: defaultPadding,
                 child: Text(
-                  'Every hour',
+                  'Every day',
                   style: Theme.of(context).textTheme.subtitle1,
-                )),
-            onTap: () {
-              store.dispatch(
-                SetKeyBackupInterval(duration: Duration(hours: 1)),
-              );
-              Navigator.pop(dialogContext);
-            },
-          ),
-          ListTile(
-            title: Padding(
+                ),
+              ),
+              onTap: () {
+                onSelect(dialogContext, Duration(hours: 24));
+              },
+            ),
+            ListTile(
+              title: Padding(
                 padding: defaultPadding,
                 child: Text(
-                  'Every 6 hours',
+                  'Every week',
                   style: Theme.of(context).textTheme.subtitle1,
-                )),
-            onTap: () {
-              store.dispatch(
-                SetKeyBackupInterval(duration: Duration(hours: 6)),
-              );
-              Navigator.pop(dialogContext);
-            },
-          ),
-          ListTile(
-            title: Padding(
-              padding: defaultPadding,
-              child: Text(
-                'Every 12 hours',
-                style: Theme.of(context).textTheme.subtitle1,
+                ),
               ),
+              onTap: () {
+                onSelect(dialogContext, Duration(days: 7));
+              },
             ),
-            onTap: () {
-              store.dispatch(
-                SetKeyBackupInterval(duration: Duration(hours: 12)),
-              );
-              Navigator.pop(dialogContext);
-            },
-          ),
-          ListTile(
-            title: Padding(
-              padding: defaultPadding,
-              child: Text(
-                'Every day',
-                style: Theme.of(context).textTheme.subtitle1,
+            ListTile(
+              title: Padding(
+                padding: defaultPadding,
+                child: Text(
+                  'Once a month',
+                  style: Theme.of(context).textTheme.subtitle1,
+                ),
               ),
-            ),
-            onTap: () {
-              store.dispatch(
-                SetKeyBackupInterval(duration: Duration(hours: 24)),
-              );
-              Navigator.pop(dialogContext);
-            },
-          ),
-          ListTile(
-            title: Padding(
-              padding: defaultPadding,
-              child: Text(
-                'Every week',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ),
-            onTap: () {
-              store.dispatch(
-                SetKeyBackupInterval(duration: Duration(days: 7)),
-              );
-              Navigator.pop(dialogContext);
-            },
-          ),
-          ListTile(
-            title: Padding(
-              padding: defaultPadding,
-              child: Text(
-                'Once a month',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ),
-            onTap: () {
-              store.dispatch(
-                SetKeyBackupInterval(duration: Duration(days: 29)),
-              );
-              Navigator.pop(dialogContext);
-            },
-          )
-        ],
+              onTap: () {
+                onSelect(dialogContext, Duration(days: 29));
+              },
+            )
+          ],
+        ),
       ),
     );
   }
@@ -760,6 +856,15 @@ class PrivacySettingsScreen extends StatelessWidget {
                               ),
                               subtitle: Text(
                                 props.keyBackupSchedule,
+                                style: Theme.of(context).textTheme.caption,
+                              ),
+                              trailing: Text(
+                                formatTimestampFull(
+                                  showTime: true,
+                                  lastUpdateMillis: int.parse(
+                                    props.keyBackupLatest,
+                                  ),
+                                ),
                                 style: Theme.of(context).textTheme.caption,
                               ),
                             ),

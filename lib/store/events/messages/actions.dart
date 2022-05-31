@@ -361,7 +361,7 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       if (hasReply) {
         unencryptedData['m.relates_to'] = {
-          'm.in_reply_to': {'event_id': reply!.id}
+          'm.in_reply_to': {'event_id': reply.id}
         };
 
         pending = formatMessageReply(room, pending, reply);
@@ -369,7 +369,7 @@ ThunkAction<AppState> sendMessageEncrypted({
 
       if (hasReplacement) {
         unencryptedData['m.relates_to'] = {
-          'event_id': related!.id,
+          'event_id': related.id,
           'rel_type': RelationTypes.replace,
         };
       }
@@ -444,7 +444,8 @@ ThunkAction<AppState> sendMessageEncrypted({
   };
 }
 
-Future<bool> isMessageDeletable({required Message message, User? user, Room? room}) async {
+Future<bool> isMessageDeletable(
+    {required Message message, User? user, Room? room}) async {
   try {
     final powerLevels = await MatrixApi.fetchPowerLevels(
       room: room,

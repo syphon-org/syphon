@@ -18,6 +18,14 @@ class SetKeyBackupInterval {
   });
 }
 
+class SetKeyBackupPassword {
+  final String password;
+
+  SetKeyBackupPassword({
+    required this.password,
+  });
+}
+
 ThunkAction<AppState> setKeyBackupInterval(Duration duration) {
   return (Store<AppState> store) async {
     store.dispatch(SetKeyBackupInterval(duration: duration));
