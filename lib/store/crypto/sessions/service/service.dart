@@ -73,11 +73,8 @@ class KeyBackupService {
 
     // add the frequency to the last backup time
     final nextBackup = lastBackup.add(frequency);
-
     // find the amount of time that has passed since the last backup
     final nextBackupDelta = nextBackup.difference(DateTime.now());
-
-    final directory = await resolveBackupDirectory(path: path);
 
     if (DEBUG_MODE) {
       log.json({
@@ -91,6 +88,7 @@ class KeyBackupService {
 
     // if more time has passed, start the backup process
     if (nextBackupDelta.isNegative) {
+      final directory = await resolveBackupDirectory(path: path);
       final completed = await compute(backupSessionKeysThreaded, {
         'directory': directory,
         'password': password,
