@@ -133,7 +133,7 @@
     "title-verification": "التحقق",
     "header-login": "سيطِر على محادثاتك",
     "label-send": "ارسل",
-    "button-leave-chat": "ترك الدردشة",
+    "button-leave-chat": "مغادرة الدردشة",
     "label-back": "الرجوع للخلف",
     "label-close": "اغلاق",
     "button-delete-chat": "حذف الدردشة",
@@ -333,8 +333,14 @@
     "content-remove-screen-lock": "هل أنت متأكد أنك تريد إزالة قفل الشاشة؟ هذا سيزيل أيضاً حماية المخبأ",
     "list-item-settings-dismiss-keyboard": "تجاهل لوحة المفاتيح",
     "list-item-settings-auto-download": "تنزيل تلقائي",
-    "alert-log-out-enable-multiaccount": "يجب عليك تسجيل الخروج/من جلسة العمل الحالية لتمكين الحسابات المتعددة",
+    "alert-log-out-enable-multiaccount": "يجب عليك تسجيل الخروج /n من جلسة العمل الحالية لتمكين الحسابات المتعددة",
     "content-export-session-keys": "أدخل كلمة مرور للنسخ الاحتياطي لمفتاح الجلسة هذا.\n\nيرجى الانتباه إلى أن التصدير قد يستغرق بعض الوقت لإكماله.",
     "content-logout-multiaccount-confirm": "\n\nنظرا لأن لديك حسابات أخرى ، فإن تسجيل الخروج سيحولك إلى جلسة حساب أخرى.",
-    "alert-copied-to-clipboard": "تم نسخها إلى الحافظة"
+    "alert-copied-to-clipboard": "تم نسخها إلى الحافظة",
+    "label-fab-create-dm": "رسالة مباشرة",
+    "title-dialog-key-backup-warning": "تحذير النسخ الاحتياطي الرئيسي",
+    "content-key-backup-warning": "نظرا لمعالجة الخلفية على iOS ، قد يتم تشغيل النسخة الاحتياطية المجدولة أو لا يتم تشغيلها بناء على البطارية وقوة المعالجة وعوامل أخرى.\n\nتأكد دائما من حفظ النسخ الاحتياطية بشكل مناسب.",
+    "label-fab-search": "البحث في المحادثات",
+    "label-fab-create-group": "بدء الدردشة الجماعية",
+    "label-fab-create-public": "بدء الدردشة العامة"
 }
