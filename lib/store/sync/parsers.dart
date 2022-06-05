@@ -155,10 +155,13 @@ Sync parseSync(
     prevBatch: syncDetails.prevBatch,
   );
 
-  if (syncDetails.limited != null) {
-    log.info(
-      '[parseSync] ${roomExisting.id} limited ${syncDetails.limited} lastBatch ${syncDetails.lastBatch != null} prevBatch ${syncDetails.prevBatch != null}',
-    );
+  if (syncDetails.limited ?? false) {
+    log.json({
+      'from': '[parseSync]',
+      'limited': syncDetails.limited,
+      'lastBatch': syncDetails.lastBatch,
+      'prevBatch': syncDetails.prevBatch,
+    });
   }
 
   if (ignoreMessageless) {
@@ -282,27 +285,33 @@ SyncEvents parseEvents(
   if (json['state'] != null) {
     final List<dynamic> stateEventsRaw = json['state']['events'];
 
-    stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)).toList();
+    stateEvents = stateEventsRaw
+        .map((event) => Event.fromMatrix(event, roomId: roomId))
+        .toList();
   }
 
   if (json['invite_state'] != null) {
     final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
-    stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)).toList();
+    stateEvents = stateEventsRaw
+        .map((event) => Event.fromMatrix(event, roomId: roomId))
+        .toList();
   }
 
   if (json['account_data'] != null) {
     final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
-    accountEvents =
-        accountEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)).toList();
+    accountEvents = accountEventsRaw
+        .map((event) => Event.fromMatrix(event, roomId: roomId))
+        .toList();
   }
 
   if (json['ephemeral'] != null) {
     final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
-    ephemeralEvents =
-        ephemeralEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)).toList();
+    ephemeralEvents = ephemeralEventsRaw
+        .map((event) => Event.fromMatrix(event, roomId: roomId))
+        .toList();
   }
 
   if (json['timeline'] != null) {
@@ -555,7 +564,8 @@ SyncStateDetails parseState({
       );
 
       if (otherUsers.isNotEmpty) {
-        roomName = selectDirectRoomName(currentUser, otherUsers, userIdsNew.length);
+        roomName =
+            selectDirectRoomName(currentUser, otherUsers, userIdsNew.length);
         avatarUri = selectDirectRoomAvatar(room, avatarUri, otherUsers);
       }
     }
@@ -570,7 +580,8 @@ SyncStateDetails parseState({
     namePriority: namePriority,
     lastUpdate: lastUpdateNew,
     encryptionEnabled: encryptionEnabled,
-    userIds: userIdsNew, // TODO: extract to pivot table for userIds associated by room
+    userIds:
+        userIdsNew, // TODO: extract to pivot table for userIds associated by room
     users: usersAdd.isNotEmpty ? usersAdd : null,
     leave: leave,
   );

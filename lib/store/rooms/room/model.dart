@@ -220,14 +220,17 @@ class Room implements drift.Insertable<Room> {
     required SyncEphemerals ephemerals,
     required SyncDetails syncDetails,
   }) {
+    final limitedOverwrite = syncDetails.overwrite ?? false ? false : null;
+
+// TODO: fetchMessages makes prevBatch from syncDetails temporarily misassigned
     return this.copyWith(
       // next hash in the timeline
       nextBatch: lastSince,
       // oldest hash in the timeline
-      lastBatch: syncDetails.lastBatch ?? this.lastBatch ?? syncDetails.prevBatch,
+      lastBatch:
+          syncDetails.lastBatch ?? this.lastBatch ?? syncDetails.prevBatch,
       // most recent prev_batch from the last /sync
-      prevBatch: syncDetails.prevBatch, // TODO: fetchMessages makes this temporarily misassigned
-
+      prevBatch: syncDetails.prevBatch,
       name: stateDetails.name,
       topic: stateDetails.topic,
       invite: syncDetails.invite,
@@ -236,7 +239,8 @@ class Room implements drift.Insertable<Room> {
       joinRule: stateDetails.joinRule,
       namePriority: stateDetails.namePriority,
       lastUpdate: messageDetails.lastUpdate ?? stateDetails.lastUpdate,
-      limited: syncDetails.limited ?? messageDetails.limited,
+      limited:
+          limitedOverwrite ?? syncDetails.limited ?? messageDetails.limited,
       encryptionEnabled: this.encryptionEnabled ||
           (stateDetails.encryptionEnabled ?? false) ||
           (messageDetails.encryptionEnabled ?? false),

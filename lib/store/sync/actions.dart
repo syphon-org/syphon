@@ -8,6 +8,7 @@ import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/libs/matrix/errors.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/actions.dart';
 import 'package:syphon/store/events/actions.dart';
@@ -350,14 +351,16 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       final room = sync.room;
       final events = sync.events;
 
-      log.info(
-        // ignore: prefer_interpolation_to_compose_strings
-        '[syncRooms] ${room.name} | ' +
-            'full_synced: $synced | ' +
-            'limited: ${room.limited} | ' +
-            'total new messages: ${events.messages.length} | ' +
-            'roomPrevBatch: ${room.prevBatch}',
-      );
+      if (DEBUG_MODE) {
+        log.json({
+          'from': '[syncRooms]',
+          'room': room.name,
+          'synced': synced,
+          'limited': room.limited,
+          'lastBatch': room.lastBatch,
+          'prevBatch': room.prevBatch,
+        });
+      }
 
       // update various message mutations and meta data
       await store.dispatch(setUsers(sync.users));
@@ -433,13 +436,11 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
           '[syncRooms] ${room.name} LIMITED TRUE - Fetching more messages',
         );
 
-        store.dispatch(
-          fetchMessageEvents(
-            room: room,
-            from: room.prevBatch,
-            overwrite: true,
-          ),
-        );
+        store.dispatch(fetchMessageEvents(
+          room: room,
+          from: room.prevBatch,
+          overwrite: true,
+        ));
       }
 
       // TODO: this should happen immediately and backfill should happen in background
