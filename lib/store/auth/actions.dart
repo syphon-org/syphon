@@ -324,8 +324,6 @@ Device generateDeviceId({String salt = ''}) {
   final defaultId = Random.secure().nextInt(1 << 31).toString();
 
   try {
-    final deviceId = Random.secure().nextInt(1 << 31).toString();
-
     // TODO: enable device persistant sessions to better
     // TODO: keep track of device identity anonymously
     // final deviceInfoPlugin = DeviceInfoPlugin();
@@ -339,7 +337,7 @@ Device generateDeviceId({String salt = ''}) {
     //   deviceId = info.identifierForVendor;
     // }
 
-    // hash it
+    final deviceId = Random.secure().nextInt(1 << 31).toString();
     final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
 
     final deviceIdHash = base64
@@ -348,10 +346,13 @@ Device generateDeviceId({String salt = ''}) {
         .replaceAll(RegExp(r'[^\w]'), '')
         .substring(0, 10);
 
-    return Device(
+    final device = Device(
       deviceId: deviceIdHash,
       displayName: Values.appDisplayName,
     );
+    log.json({'device': device});
+
+    return device;
   } catch (error) {
     log.error('[generateDeviceId] $error');
     return Device(
@@ -385,13 +386,9 @@ ThunkAction<AppState> loginUser() {
       final Device device;
 
       if (msisdn > 0) {
-        device = await store.dispatch(
-          generateDeviceId(salt: msisdn.toString()),
-        );
+        device = generateDeviceId(salt: msisdn.toString());
       } else {
-        device = await store.dispatch(
-          generateDeviceId(salt: username + email),
-        );
+        device = generateDeviceId(salt: username + email);
       }
 
       try {
@@ -497,9 +494,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
         store.dispatch(SetStopgap(stopgap: false));
       });
 
-      final Device device = await store.dispatch(
-        generateDeviceId(salt: username),
-      );
+      final Device device = generateDeviceId(salt: username);
 
       final data = await MatrixApi.loginUserToken(
         protocol: store.state.authStore.protocol,
@@ -904,9 +899,9 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
       final authValue = session != null ? credential!.value : null;
       final authParams = session != null ? credential!.params : null;
 
-      final device = await store.dispatch(generateDeviceId(
+      final device = generateDeviceId(
         salt: store.state.authStore.username,
-      ));
+      );
 
       final data = await MatrixApi.registerUser(
         homeserver: baseUrl,
