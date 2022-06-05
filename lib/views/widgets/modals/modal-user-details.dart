@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -9,6 +8,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/selectors.dart';
@@ -180,7 +180,8 @@ class ModalUserDetails extends StatelessWidget {
                           ),
                             onLongPress: () async  {
                               await Clipboard.setData(ClipboardData(text: props.user.userId));
-                              HapticFeedback.vibrate();
+                              await props.onAddConfirmation('Username copied to clipboard');
+                              Navigator.pop(context);
                             },
                           ),
                         ),
@@ -282,6 +283,7 @@ class _Props extends Equatable {
   final String existingChatId;
   final Map<String, User> users;
   final Function onBlockUser;
+  final Function onAddConfirmation;
   final Function onCreateChatDirect;
 
   const _Props({
@@ -292,6 +294,7 @@ class _Props extends Equatable {
     required this.existingChatId,
     required this.onCreateChatDirect,
     required this.onBlockUser,
+    required this.onAddConfirmation,
   });
 
   @override
@@ -337,6 +340,10 @@ class _Props extends Equatable {
             isDirect: true,
             invites: <User>[user],
           ),
-        )
+        ),
+        onAddConfirmation: (String message) async {
+          await store.dispatch(addConfirmation(
+              message: message));
+        }
       );
 }
