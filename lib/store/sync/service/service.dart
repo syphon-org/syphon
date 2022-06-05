@@ -23,10 +23,12 @@ import 'package:syphon/store/user/model.dart';
 
 /// Background Sync Service (Android Only)
 ///
-/// manages background syncing and notifications on android
+/// Manages background syncing and notifications on android
 ///
-/// TODO: save sync data to be shared with app, currently only
-/// TODO: used for notification updates
+/// NOTE: Currently only works for notifications and not background syncing
+///
+/// TODO: use for background sync and combine cold storage databases
+///
 class SyncService {
   static const service_id = 255;
   static const serviceTimeout = 55; // seconds

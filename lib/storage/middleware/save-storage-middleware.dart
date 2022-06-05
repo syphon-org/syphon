@@ -83,8 +83,6 @@ saveStorageMiddleware(StorageDatabase? storage) {
         final isDrafting = _action.draft != null;
         final isLastRead = _action.lastRead != null;
 
-        // room information (or a room) should be small enought to update frequently
-        // TODO: extract room event keys to a helper class / object to remove large map copies
         if ((isSending || isDrafting || isLastRead) &&
             rooms.containsKey(_action.id)) {
           final room = rooms[_action.id];
@@ -110,7 +108,7 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetReceipts:
         final _action = action as SetReceipts;
         final isSynced = store.state.syncStore.synced;
-        // TODO: the initial sync loads way too many read receipts
+        // NOTE: prevents saving read receipts until a Full Sync is completed
         saveReceipts(_action.receipts ?? {}, storage: storage, ready: isSynced);
         break;
       case SetRoom:

@@ -246,10 +246,7 @@ class ChatScreenState extends State<ChatScreen> {
 
     inputController.clear();
 
-    // TODO: consider keeping this enabled?
-    // if (props.dismissKeyboardEnabled) {
     FocusScope.of(context).unfocus();
-    // }
 
     setState(() {
       sending = false;
@@ -530,7 +527,8 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
                         color: Colors.white,
-                        semanticsLabel: 'Switch to ${Strings.labelSendUnencrypted}',
+                        semanticsLabel:
+                            'Switch to ${Strings.labelSendUnencrypted}',
                       ),
                     ),
                   ),
@@ -563,7 +561,8 @@ class ChatScreenState extends State<ChatScreen> {
                       child: SvgPicture.asset(
                         Assets.iconSendLockSolidBeing,
                         color: Colors.white,
-                        semanticsLabel: 'Switch to ${Strings.labelSendEncrypted}',
+                        semanticsLabel:
+                            'Switch to ${Strings.labelSendEncrypted}',
                       ),
                     ),
                   ),
@@ -593,9 +592,11 @@ class ChatScreenState extends State<ChatScreen> {
             WidgetsBinding.instance.window.devicePixelRatio,
           );
           final keyboardInset = viewInsets.bottom;
-          final closedInputPadding =
-              !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
-          final isScrolling = messagesController.hasClients && messagesController.offset != 0;
+          final closedInputPadding = !inputFieldNode.hasFocus &&
+              Platform.isIOS &&
+              Dimensions.buttonlessHeightiOS < height;
+          final isScrolling =
+              messagesController.hasClients && messagesController.offset != 0;
 
           var inputContainerColor = Colors.white;
           var backgroundColor = Theme.of(context).scaffoldBackgroundColor;
@@ -626,13 +627,16 @@ class ChatScreenState extends State<ChatScreen> {
           );
 
           if (selectedMessage != null) {
-            final isUserSent = props.currentUser.userId == (selectedMessage?.sender ?? '');
+            final isUserSent =
+                props.currentUser.userId == (selectedMessage?.sender ?? '');
             final backgroundColorDark = HSLColor.fromColor(backgroundColor);
 
-            final backgroundLightness =
-                backgroundColorDark.lightness > 0.2 ? backgroundColorDark.lightness : 0.2;
-            backgroundColor =
-                backgroundColorDark.withLightness(backgroundLightness - 0.2).toColor();
+            final backgroundLightness = backgroundColorDark.lightness > 0.2
+                ? backgroundColorDark.lightness
+                : 0.2;
+            backgroundColor = backgroundColorDark
+                .withLightness(backgroundLightness - 0.2)
+                .toColor();
 
             appBar = AppBarMessageOptions(
               user: props.currentUser,
@@ -688,7 +692,8 @@ class ChatScreenState extends State<ChatScreen> {
                           ),
                           Positioned(
                             child: Visibility(
-                              visible: props.room.lastBatch == null && props.messagesLength < 10,
+                              visible: props.room.lastBatch == null &&
+                                  props.messagesLength < 10,
                               child: GestureDetector(
                                 onTap: () => props.onLoadMoreMessages(),
                                 child: Container(
@@ -699,7 +704,9 @@ class ChatScreenState extends State<ChatScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Load more messages',
-                                        style: Theme.of(context).textTheme.bodyText2,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2,
                                       )
                                     ],
                                   ),
@@ -712,15 +719,22 @@ class ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
+                    padding:
+                        EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
                     decoration: BoxDecoration(
                       color: inputContainerColor,
                       boxShadow: isScrolling
-                          ? [BoxShadow(blurRadius: 6, offset: Offset(0, -4), color: Colors.black12)]
+                          ? [
+                              BoxShadow(
+                                  blurRadius: 6,
+                                  offset: Offset(0, -4),
+                                  color: Colors.black12)
+                            ]
                           : [],
                     ),
                     child: AnimatedPadding(
-                      duration: Duration(milliseconds: inputFieldNode.hasFocus ? 225 : 0),
+                      duration: Duration(
+                          milliseconds: inputFieldNode.hasFocus ? 225 : 0),
                       padding: EdgeInsets.only(
                         bottom: closedInputPadding ? 16 : 0,
                       ),
@@ -744,7 +758,9 @@ class ChatScreenState extends State<ChatScreen> {
                                   text: editorController.text,
                                   related: selectedMessage,
                                 ),
-                        onAddMedia: ({required File file, required MessageType type}) =>
+                        onAddMedia: (
+                                {required File file,
+                                required MessageType type}) =>
                             onAddMedia(file, type, props),
                       ),
                     ),
@@ -820,15 +836,18 @@ class _Props extends Equatable {
         chatColorPrimary,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         currentUser: store.state.authStore.currentUser,
         room: selectRoom(id: roomId, state: store.state),
-        showAvatars: selectRoom(id: roomId, state: store.state).totalJoinedUsers > 2 ||
-            roomUsers(store.state, roomId).length > 2,
+        showAvatars:
+            selectRoom(id: roomId, state: store.state).totalJoinedUsers > 2 ||
+                roomUsers(store.state, roomId).length > 2,
         themeType: store.state.settingsStore.themeSettings.themeType,
         userId: store.state.authStore.user.userId,
         roomTypeBadgesEnabled: store.state.settingsStore.roomTypeBadgesEnabled,
-        dismissKeyboardEnabled: store.state.settingsStore.dismissKeyboardEnabled,
+        dismissKeyboardEnabled:
+            store.state.settingsStore.dismissKeyboardEnabled,
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         loading: selectRoom(state: store.state, id: roomId).syncing,
         messagesLength: store.state.eventStore.messages.containsKey(roomId)
@@ -948,8 +967,9 @@ class _Props extends Equatable {
 
           // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
           final messages = store.state.eventStore.messages[room.id] ?? [];
-          final oldest =
-              messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
+          final oldest = messages.isNotEmpty
+              ? selectOldestMessage(messages) ?? Message()
+              : Message();
 
           // fetch messages from the oldest cached batch
           final messagesNew = await store.dispatch(

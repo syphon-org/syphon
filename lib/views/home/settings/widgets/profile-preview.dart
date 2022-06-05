@@ -78,10 +78,6 @@ class ProfilePreview extends StatelessWidget {
       );
 }
 
-///
-/// TODO: Convert to cleaner ViewModel convention
-/// https://github.com/brianegan/flutter_redux/issues/214
-///
 class _Props extends Equatable {
   // ignore: unused_field
   final Store<AppState> _store;

@@ -12,8 +12,6 @@ import 'package:syphon/global/libs/storage/secure-storage.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/sync/service/service.dart';
 
-/// TODO: move database DynamicLibrary init here
-
 ///
 /// Init Platform Dependencies
 ///

@@ -431,6 +431,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
 
       // fetch previous messages since last /sync (a messages gap)
       // room will be marked limited to indicate this
+      // TODO: a backfill should happen in background when processing is available
       if (room.limited && synced) {
         log.warn(
           '[syncRooms] ${room.name} LIMITED TRUE - Fetching more messages',
@@ -442,21 +443,6 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
           overwrite: true,
         ));
       }
-
-      // TODO: this should happen immediately and backfill should happen in background
-      // a recursive sync for the messages gap has now finished
-      //  else if (!roomSynced.limited && roomOld.limited) {
-      //   final messagesSorted = latestMessages(messagesOld);
-
-      //   // wipe all but the latest 25 messages from the cache
-      //   await store.dispatch(addMessages(
-      //     room: roomSynced,
-      //     messages:
-      //         messagesSorted.sublist(0, messagesSorted.length > 25 ? 25 : messagesSorted.length),
-      //     clear: true,
-      //   ));
-      // }
-
     } catch (error) {
       log.error('[syncRoom] $id ${error.toString()}');
 
@@ -482,17 +468,5 @@ ThunkAction<AppState> syncRooms(Map roomData) {
 
       await store.dispatch(syncRoom(roomId, json));
     });
-  };
-}
-
-// TODO: a non-recursive backfill of "limited" room timelines
-ThunkAction<AppState> syncBackfill(
-  String? roomId, {
-  List<String> previousIds = const [],
-}) {
-  return (Store<AppState> store) async {
-    if (previousIds.isEmpty) {
-      return;
-    }
   };
 }

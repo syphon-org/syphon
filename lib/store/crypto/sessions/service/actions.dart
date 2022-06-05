@@ -9,8 +9,6 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/privacy-settings/actions.dart';
 import 'package:syphon/store/settings/privacy-settings/storage.dart';
 
-// TODO: only used for notifications currently
-// TODO: will be used for background sync eventually
 ThunkAction<AppState> startKeyBackupService() {
   return (Store<AppState> store) async {
     final frequency =

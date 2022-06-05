@@ -4,8 +4,6 @@ import 'package:syphon/global/notifications.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/sync/service/service.dart';
 
-// TODO: only used for notifications currently
-// TODO: will be used for background sync eventually
 ThunkAction<AppState> startSyncService() {
   return (Store<AppState> store) async {
     await SyncService.init();

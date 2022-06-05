@@ -321,7 +321,7 @@ ThunkAction<AppState> loadMessageSessionInbound({
       throw 'Unable to find inbound message session for decryption';
     }
 
-    // TODO: add sorting after testing current impl
+    // TODO: add sorting based on last used
     final messageSessions = roomMessageSessions[identityKey]!;
 
     for (final messageSession in messageSessions) {
@@ -668,7 +668,7 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file,
         sessions: messageSessionsActive,
       ));
 
-      // TODO: needs work for on combining them efficiently
+      // TODO: needs work for on combining existing with imported
       // await store.dispatch(SetMessageSessionsInbound(
       //   sessions: combineMessageSesssions(
       //     messageSessions,

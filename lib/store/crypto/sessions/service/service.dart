@@ -85,7 +85,7 @@ class KeyBackupService {
       log.error('[KeyBackupService] completed backup successfully!!');
     }
 
-    // TODO: cannot handle
+    // TODO: does not work on iOS, must work on both android and iOS
     // Workmanager().registerOneOffTask(
     //   service_title, service_title, // Ignored on iOS
     //   initialDelay: Duration.zero,

@@ -682,40 +682,42 @@ ThunkAction<AppState> checkPasswordResetVerification({
   String? password,
 }) {
   return (Store<AppState> store) async {
-    try {
-      final homeserver = store.state.authStore.homeserver.baseUrl;
-      final clientSecret = store.state.authStore.clientSecret;
-      final session = store.state.authStore.authSession;
-      final protocol = store.state.authStore.protocol;
+    return true;
 
-      final data = await MatrixApi.resetPassword(
-        protocol: protocol,
-        homeserver: homeserver,
-        clientSecret: clientSecret,
-        sendAttempt: sendAttempt,
-        passwordNew: password,
-        session: session,
-      );
+    // try {
+    //   final homeserver = store.state.authStore.homeserver.baseUrl;
+    //   final clientSecret = store.state.authStore.clientSecret;
+    //   final session = store.state.authStore.authSession;
+    //   final protocol = store.state.authStore.protocol;
 
-      if (data['errcode'] != null &&
-          data['errcode'] == MatrixErrors.not_authorized) {
-        throw data['error'];
-      }
+    //   final data = await MatrixApi.resetPassword(
+    //     protocol: protocol,
+    //     homeserver: homeserver,
+    //     clientSecret: clientSecret,
+    //     sendAttempt: sendAttempt,
+    //     passwordNew: password,
+    //     session: session,
+    //   );
 
-      await store.dispatch(addConfirmation(
-        message: 'Verification Confirmed',
-      ));
+    //   if (data['errcode'] != null &&
+    //       data['errcode'] == MatrixErrors.not_authorized) {
+    //     throw data['error'];
+    //   }
 
-      store.dispatch(ResetAuthStore());
-      return true;
-    } catch (error) {
-      store.dispatch(addAlert(
-        origin: 'checkPasswordResetVerification',
-        error: error,
-        message: 'Please click the emailed verify link before continuing',
-      ));
-      return false;
-    }
+    //   await store.dispatch(addConfirmation(
+    //     message: 'Verification Confirmed',
+    //   ));
+
+    //   store.dispatch(ResetAuthStore());
+    //   return true;
+    // } catch (error) {
+    //   store.dispatch(addAlert(
+    //     origin: 'checkPasswordResetVerification',
+    //     error: error,
+    //     message: 'Please click the emailed verify link before continuing',
+    //   ));
+    //   return false;
+    // }
   };
 }
 

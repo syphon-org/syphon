@@ -51,7 +51,6 @@ Future<void> saveReceipts(
   required StorageDatabase storage,
   required bool ready,
 }) async {
-  // TODO: the initial sync loads way too many read receipts
   if (!ready) return;
 
   return storage.insertReceiptsBatched(receipts.values.toList());

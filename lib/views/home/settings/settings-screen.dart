@@ -84,7 +84,9 @@ class SettingsScreen extends StatelessWidget {
               leading: IconButton(
                 icon: Icon(Icons.arrow_back, color: Colors.white),
                 tooltip: Strings.labelBack,
-                onPressed: props.authLoading ? null : () => Navigator.pop(context, false),
+                onPressed: props.authLoading
+                    ? null
+                    : () => Navigator.pop(context, false),
               ),
               title: Text(
                 Strings.titleSettings,
@@ -95,7 +97,9 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             body: SingleChildScrollView(
-              physics: props.authLoading ? const NeverScrollableScrollPhysics() : null,
+              physics: props.authLoading
+                  ? const NeverScrollableScrollPhysics()
+                  : null,
               // Use a container of the same height and width
               // to flex dynamically but within a single child scroll
               child: IgnorePointer(
@@ -106,13 +110,15 @@ class SettingsScreen extends StatelessWidget {
                       onTap: props.authLoading
                           ? null
                           : () {
-                              Navigator.pushNamed(context, Routes.settingsProfile);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsProfile);
                             },
                       child: Container(
                         padding: Dimensions.heroPadding,
                         child: ProfilePreview(
                           hasMultiaccounts: false,
-                          onModifyAccounts: () => onToggleAccountBottomSheet(context, props),
+                          onModifyAccounts: () =>
+                              onToggleAccountBottomSheet(context, props),
                         ),
                       ),
                     ),
@@ -127,7 +133,7 @@ class SettingsScreen extends StatelessWidget {
                               Strings.listItemSettingsSms,
                             ),
                             subtitle: Text(
-                              Strings.labelOff, // TODO: add SMS feature
+                              Strings.labelOff,
                               style: TextStyle(fontSize: 14.0),
                             ),
                             leading: Container(
@@ -141,7 +147,8 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, Routes.settingsNotifications);
+                            Navigator.pushNamed(
+                                context, Routes.settingsNotifications);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -154,16 +161,20 @@ class SettingsScreen extends StatelessWidget {
                             Strings.listItemSettingsNotification,
                           ),
                           subtitle: Text(
-                            props.notificationsEnabled! ? Strings.labelOn : Strings.labelOff,
+                            props.notificationsEnabled!
+                                ? Strings.labelOn
+                                : Strings.labelOff,
                             style: TextStyle(fontSize: 14.0),
                           ),
                         ),
                         GestureDetector(
-                          onTapDown: (details) => onNavigatePrivacySettings(context),
+                          onTapDown: (details) =>
+                              onNavigatePrivacySettings(context),
                           child: ListTile(
                             enabled: !props.authLoading,
                             onTap: () {
-                              Navigator.pushNamed(context, Routes.settingsPrivacy);
+                              Navigator.pushNamed(
+                                  context, Routes.settingsPrivacy);
                             },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
@@ -204,7 +215,8 @@ class SettingsScreen extends StatelessWidget {
                             style: Theme.of(context).textTheme.subtitle1,
                           ),
                           subtitle: Text(
-                            Strings.subtitleThemeSettings(props.themeTypeName, props.fontName),
+                            Strings.subtitleThemeSettings(
+                                props.themeTypeName, props.fontName),
                             style: Theme.of(context).textTheme.caption,
                           ),
                         ),
@@ -233,7 +245,8 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, Routes.settingsDevices);
+                            Navigator.pushNamed(
+                                context, Routes.settingsDevices);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -250,7 +263,8 @@ class SettingsScreen extends StatelessWidget {
                         ListTile(
                           enabled: !props.authLoading,
                           onTap: () {
-                            Navigator.pushNamed(context, Routes.settingsAdvanced);
+                            Navigator.pushNamed(
+                                context, Routes.settingsAdvanced);
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
@@ -339,21 +353,26 @@ class _Props extends Equatable {
         accountLoading,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, AppContext context) =>
+      _Props(
         accountLoading: !store.state.cryptoStore.oneTimeKeysStable ||
             !store.state.syncStore.synced ||
             store.state.syncStore.lastSince == null,
         screenLockEnabled: selectScreenLockEnabled(context),
         accountsAvailable: selectAvailableAccounts(store.state),
-        fontName: selectFontNameString(store.state.settingsStore.themeSettings.fontName),
-        themeTypeName: selectThemeTypeString(store.state.settingsStore.themeSettings.themeType),
+        fontName: selectFontNameString(
+            store.state.settingsStore.themeSettings.fontName),
+        themeTypeName: selectThemeTypeString(
+            store.state.settingsStore.themeSettings.themeType),
         loading: store.state.roomStore.loading,
         authLoading: store.state.authStore.loading,
-        notificationsEnabled: store.state.settingsStore.notificationSettings.enabled,
+        notificationsEnabled:
+            store.state.settingsStore.notificationSettings.enabled,
         onDisabled: () => store.dispatch(addInProgress()),
         onLogoutUser: () => store.dispatch(logoutUser()),
         onAddInfo: (message) {
-          store.dispatch(addInfo(origin: 'ModalContextSwitcher', message: message));
+          store.dispatch(
+              addInfo(origin: 'ModalContextSwitcher', message: message));
         },
       );
 }
