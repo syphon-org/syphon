@@ -79,6 +79,7 @@ class SupportedLanguages {
     'cs',
     'de',
     'en',
+    'en-gb',
     'en-Shaw',
     'es',
     'et',
