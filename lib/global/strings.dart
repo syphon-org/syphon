@@ -1,6 +1,20 @@
+import 'dart:math';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+
+const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+Random _rnd = Random();
+
+String randomString(int length) {
+  return String.fromCharCodes(
+    Iterable.generate(
+      length,
+      (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length)),
+    ),
+  );
+}
 
 extension Capitalize on String {
   String capitalize() {
