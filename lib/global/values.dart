@@ -98,6 +98,7 @@ class SupportedLanguages {
     'ru',
     'si',
     'sk',
+    'tok',
     'tr',
     'uk'
   ];
@@ -299,6 +300,7 @@ const isoLangs = {
   'tl': {'name': 'Tagalog', 'nativeName': 'Wikang Tagalog, ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔'},
   'tn': {'name': 'Tswana', 'nativeName': 'Setswana'},
   'to': {'name': 'Tonga (Tonga Islands)', 'nativeName': 'faka Tonga'},
+  'tok': {'name': 'Toki Pona', 'nativeName': 'toki pona'},
   'tr': {'name': 'Turkish', 'nativeName': 'Türkçe'},
   'ts': {'name': 'Tsonga', 'nativeName': 'Xitsonga'},
   'tt': {'name': 'Tatar', 'nativeName': 'татарча, tatarça, تاتارچا‎'},
