@@ -1121,7 +1121,9 @@ ThunkAction<AppState> updateCredential({
 }) {
   return (Store<AppState> store) {
     try {
-      final currentCredential = store.state.authStore.credential!;
+      final currentCredential =
+          store.state.authStore.credential ?? Credential();
+
       store.dispatch(SetCredential(
         credential: currentCredential.copyWith(
           type: type,

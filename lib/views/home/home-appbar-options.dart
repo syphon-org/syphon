@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/hooks.dart';
 import 'package:syphon/store/index.dart';
@@ -62,13 +63,17 @@ class AppBarHomeOptions extends HookWidget implements PreferredSizeWidget {
           confirmText: Strings.buttonConfirmFormal.capitalize(),
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
+            try {
+              await Future.forEach(selectedChats.values, (Room room) async {
+                await dispatch(archiveRoom(room: room));
+              });
+
+              onDismissChatOptions?.call();
+            } catch (error) {
+              log.error(error.toString());
+            }
+
             Navigator.of(dialogContext).pop();
-
-            await Future.forEach(selectedChats.values, (Room room) async {
-              await dispatch(archiveRoom(room: room));
-            });
-
-            onDismissChatOptions?.call();
           },
         ),
       );
@@ -84,14 +89,20 @@ class AppBarHomeOptions extends HookWidget implements PreferredSizeWidget {
           confirmText: Strings.buttonConfirmFormal.capitalize(),
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
-            final _selectedChats = Map<String, Room>.from(selectedChats);
+            try {
+              final _selectedChats = Map<String, Room>.from(selectedChats);
 
-            await Future.forEach<Room>(_selectedChats.values, (Room room) async {
-              await dispatch(leaveRoom(room: room));
-              onToggleChatOptions?.call(room: room);
-            });
+              await Future.forEach<Room>(_selectedChats.values,
+                  (Room room) async {
+                await dispatch(leaveRoom(room: room));
+                onToggleChatOptions?.call(room: room);
+              });
 
-            onDismissChatOptions?.call();
+              onDismissChatOptions?.call();
+            } catch (error) {
+              log.error(error.toString());
+            }
+
             Navigator.of(dialogContext).pop();
           },
         ),

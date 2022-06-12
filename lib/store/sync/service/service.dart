@@ -14,7 +14,7 @@ import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/proxy-settings/model.dart';
-import 'package:syphon/store/sync/parsers.dart';
+import 'package:syphon/store/sync/parsers/parsers.dart';
 import 'package:syphon/store/sync/service/model.dart';
 import 'package:syphon/store/sync/service/parsers.dart';
 import 'package:syphon/store/sync/service/requests.dart';

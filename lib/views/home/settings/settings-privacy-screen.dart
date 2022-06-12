@@ -210,8 +210,6 @@ class PrivacySettingsScreen extends hooks.HookWidget {
         builder: (dialogContext) => DialogConfirmPassword(
           title: Strings.titleConfirmPassword,
           content: Strings.confirmDeactivate,
-          valid: props.valid,
-          loading: props.loading,
           checkLoading: () => store.state.settingsStore.loading,
           checkValid: () =>
               store.state.authStore.credential != null &&

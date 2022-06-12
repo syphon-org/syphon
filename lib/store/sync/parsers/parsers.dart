@@ -155,15 +155,6 @@ Sync parseSync(
     prevBatch: syncDetails.prevBatch,
   );
 
-  if (syncDetails.limited ?? false) {
-    log.json({
-      'from': '[parseSync]',
-      'limited': syncDetails.limited,
-      'lastBatch': syncDetails.lastBatch,
-      'prevBatch': syncDetails.prevBatch,
-    });
-  }
-
   if (ignoreMessageless) {
     if (events.messages.isEmpty) {
       return Sync(
@@ -181,6 +172,7 @@ Sync parseSync(
     room: roomExisting,
     events: events.state,
     currentUser: currentUser,
+    direct: accountData.direct,
   );
 
   final messageDetails = parseMessages(
@@ -188,6 +180,7 @@ Sync parseSync(
     messages: events.messages,
     existingIds: existingIds,
     prevBatch: syncDetails.prevBatch,
+    overwrite: syncDetails.overwrite,
   );
 
   final ephemerals = parseEphemerals(
@@ -204,6 +197,17 @@ Sync parseSync(
     ephemerals: ephemerals,
     syncDetails: syncDetails,
   );
+
+  if (syncDetails.limited ?? false) {
+    log.json({
+      'from': '[parseSync]',
+      'room': room.name,
+      'limited': syncDetails.limited,
+      'messages': events.messages.length,
+      'lastBatch': syncDetails.lastBatch,
+      'prevBatch': syncDetails.prevBatch,
+    });
+  }
 
   return Sync(
     room: room,
@@ -443,13 +447,14 @@ SyncStateDetails parseState({
   required User currentUser,
   required List<Event> events,
   LastUpdateType lastUpdateType = LastUpdateType.Message,
+  bool? direct,
 }) {
   String? roomName;
   String? avatarUri;
   String? topic;
   String? joinRule;
   bool? encryptionEnabled;
-  bool? directNew;
+  bool? directNew = direct;
   int? lastUpdateNew;
   bool? leave;
 
@@ -548,6 +553,15 @@ SyncStateDetails parseState({
   userIdsNew.addAll(usersAdd.keys);
   userIdsNew.removeWhere((id) => userIdsRemove.contains(id));
 
+  log.json({
+    'from': '[isDirect]',
+    'id': room.id,
+    'room': room.name,
+    'isDirect': isDirect,
+    'usersAdd': usersAdd.keys.fold('', (String o, u) => '$o, $u'),
+    'userIdsRemove': userIdsRemove.fold('', (String o, u) => '$o, $u'),
+  });
+
   // generate direct message room names without a explicitly set name
   if (isDirect) {
     // checks to make sure someone didn't name the room after the authed user
@@ -555,13 +569,29 @@ SyncStateDetails parseState({
         currentUser.userId != null &&
         (roomName == currentUser.displayName || roomName == currentUser.userId);
 
-    final noNamePriority = namePriority == 4 && usersAdd.isNotEmpty;
+    final isNameDefault = namePriority == 4 && usersAdd.isNotEmpty;
 
-    if (badRoomName || noNamePriority) {
+    log.json({
+      'from': '[isNameDefault]',
+      'id': room.id,
+      'room': room.name,
+      'badRoomName': badRoomName,
+      'isNameDefault': isNameDefault,
+    });
+
+    if (badRoomName || isNameDefault) {
       // Filter out number of non current users to show preview of total
       final otherUsers = usersAdd.values.where(
         (user) => user.userId != currentUser.userId,
       );
+
+      log.json({
+        'from': '[otherUsers]',
+        'id': room.id,
+        'room': room.name,
+        'isDirect': isDirect,
+        'otherUsers': otherUsers.fold('', (String o, u) => o + u.toString()),
+      });
 
       if (otherUsers.isNotEmpty) {
         roomName =
@@ -595,6 +625,7 @@ SyncMessageDetails parseMessages({
   required List<String> existingIds,
   required Room room,
   String? prevBatch,
+  bool? overwrite,
 }) {
   try {
     bool? limitedNew;
@@ -645,6 +676,16 @@ SyncMessageDetails parseMessages({
       // if a last known batch hasn't been set (full sync is not complete) stop limited pulls
       if (room.lastBatch == null) {
         limitedNew = false;
+      }
+
+      // remove limited status regardless if overwrite enabled
+      if (overwrite ?? false) {
+        limitedNew = false;
+
+        // pull if the room has no messages, but contains them later in the timeline
+        if (messages.isEmpty && existingIds.isEmpty) {
+          limitedNew = true;
+        }
       }
     }
 

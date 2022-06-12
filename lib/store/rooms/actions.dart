@@ -231,15 +231,13 @@ ThunkAction<AppState> fetchDirectRooms() {
 
       // Wait for all room data to be pulled
       // Fetch room state and messages by userId/roomId
-      await Future.wait(
-        directRoomList.map((roomId) async {
-          try {
-            await store.dispatch(fetchRoom(roomId, direct: true));
-          } catch (error) {
-            log.error('[fetchDirectRooms] $error');
-          }
-        }),
-      );
+      await Future.wait(directRoomList.map((roomId) async {
+        try {
+          await store.dispatch(fetchRoom(roomId, direct: true));
+        } catch (error) {
+          log.error('[fetchDirectRooms] $error');
+        }
+      }));
     } catch (error) {
       log.error('[fetchDirectRooms] $error');
     } finally {
@@ -660,7 +658,8 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -728,7 +727,8 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));

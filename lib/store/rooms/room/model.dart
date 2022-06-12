@@ -4,7 +4,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/sync/parsers.dart';
+import 'package:syphon/store/sync/parsers/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -215,7 +215,7 @@ class Room implements drift.Insertable<Room> {
     required SyncDetails syncDetails,
   }) {
     // NOTE: prevents limited fetch calls from recursively pulling messages
-    final limitedOverwrite = syncDetails.overwrite ?? false ? false : null;
+    // final limitedOverwrite = syncDetails.overwrite ?? false ? false : null;
 
     // TODO: fetchMessages makes prevBatch from syncDetails temporarily misassigned
     return this.copyWith(
@@ -234,8 +234,7 @@ class Room implements drift.Insertable<Room> {
       joinRule: stateDetails.joinRule,
       namePriority: stateDetails.namePriority,
       lastUpdate: messageDetails.lastUpdate ?? stateDetails.lastUpdate,
-      limited:
-          limitedOverwrite ?? syncDetails.limited ?? messageDetails.limited,
+      limited: syncDetails.limited ?? messageDetails.limited,
       encryptionEnabled: this.encryptionEnabled ||
           (stateDetails.encryptionEnabled ?? false) ||
           (messageDetails.encryptionEnabled ?? false),

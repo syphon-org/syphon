@@ -21,7 +21,8 @@ class DevicesScreen extends StatefulWidget {
   DeviceViewState createState() => DeviceViewState();
 }
 
-class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen> {
+class DeviceViewState extends State<DevicesScreen>
+    with Lifecycle<DevicesScreen> {
   bool deleting = false;
   List<Device>? selectedDevices;
 
@@ -66,47 +67,47 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
     });
   }
 
-  onDeleteDevices(BuildContext context, List<Device> devices, _Props props) async {
+  onDeleteDevices(
+      BuildContext context, List<Device> devices, _Props props) async {
     final store = StoreProvider.of<AppState>(context);
 
     if (devices.isEmpty) return;
 
-    final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
+    final List<String?> deviceIds =
+        devices.map((device) => device.deviceId).toList();
 
     await store.dispatch(deleteDevices(deviceIds: deviceIds));
 
     final authSession = store.state.authStore.authSession;
-    if (authSession != null) {
-      showDialog(
-        context: context,
-        builder: (dialogContext) => DialogConfirmPassword(
-          title: Strings.titleConfirmPassword,
-          content: Strings.contentDeleteDevices,
-          valid: props.valid,
-          loading: props.loading,
-          checkLoading: () => store.state.settingsStore.loading,
-          checkValid: () =>
-              store.state.authStore.credential != null &&
-              store.state.authStore.credential!.value != null &&
-              store.state.authStore.credential!.value!.isNotEmpty,
-          onChangePassword: (password) {
-            store.dispatch(updateCredential(value: password));
-          },
-          onConfirm: () async {
-            final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
 
-            await store.dispatch(deleteDevices(deviceIds: deviceIds));
+    if (authSession == null) return;
 
-            store.dispatch(resetInteractiveAuth());
-            Navigator.of(dialogContext).pop();
-          },
-          onCancel: () async {
-            store.dispatch(resetInteractiveAuth());
-            Navigator.of(dialogContext).pop();
-          },
-        ),
-      );
-    }
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirmPassword(
+        title: Strings.titleConfirmPassword,
+        content: Strings.contentDeleteDevices,
+        checkLoading: () => store.state.settingsStore.loading,
+        checkValid: () =>
+            store.state.authStore.credential?.value?.isNotEmpty ?? false,
+        onChangePassword: (password) {
+          store.dispatch(updateCredential(value: password));
+        },
+        onConfirm: () async {
+          final List<String?> deviceIds =
+              devices.map((device) => device.deviceId).toList();
+
+          await store.dispatch(deleteDevices(deviceIds: deviceIds));
+
+          store.dispatch(resetInteractiveAuth());
+          Navigator.of(dialogContext).pop();
+        },
+        onCancel: () async {
+          store.dispatch(resetInteractiveAuth());
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    );
   }
 
   Widget buildDeviceOptionsBar(BuildContext context, _Props props) {
@@ -188,9 +189,10 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final sectionBackgroundColor = Theme.of(context).brightness == Brightness.dark
-              ? const Color(AppColors.blackDefault)
-              : const Color(AppColors.whiteDefault);
+          final sectionBackgroundColor =
+              Theme.of(context).brightness == Brightness.dark
+                  ? const Color(AppColors.blackDefault)
+                  : const Color(AppColors.whiteDefault);
 
           Widget currentAppBar = AppBarNormal(title: Strings.titleDevices);
 
@@ -217,9 +219,12 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
                       Color? iconColor;
                       Color? backgroundColor;
                       IconData deviceTypeIcon = Icons.phone_android;
-                      TextStyle textStyle =
-                          Theme.of(context).textTheme.caption!.copyWith(fontSize: 12);
-                      final bool isCurrentDevice = props.currentDeviceId == device.deviceId;
+                      TextStyle textStyle = Theme.of(context)
+                          .textTheme
+                          .caption!
+                          .copyWith(fontSize: 12);
+                      final bool isCurrentDevice =
+                          props.currentDeviceId == device.deviceId;
 
                       if (device.displayName!.contains('Firefox') ||
                           device.displayName!.contains('Mac')) {
@@ -228,8 +233,10 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
                         deviceTypeIcon = Icons.phone_iphone;
                       }
 
-                      if (selectedDevices != null && selectedDevices!.contains(device)) {
-                        backgroundColor = AppColors.hashedColor(device.deviceId);
+                      if (selectedDevices != null &&
+                          selectedDevices!.contains(device)) {
+                        backgroundColor =
+                            AppColors.hashedColor(device.deviceId);
                         backgroundColor = Color(AppColors.greyDefault);
                         textStyle = textStyle.copyWith(color: Colors.white);
                         iconColor = Colors.white;
@@ -341,10 +348,11 @@ class _Props extends Equatable {
             builder: (dialogContext) => DialogTextInput(
               title: Strings.titleRenameDevice,
               content: Strings.contentRenameDevice,
+              randomizeText: true,
               label: device.displayName ?? '',
               onConfirm: (String newDisplayName) async {
-                await store
-                    .dispatch(renameDevice(deviceId: device.deviceId, displayName: newDisplayName));
+                await store.dispatch(renameDevice(
+                    deviceId: device.deviceId, displayName: newDisplayName));
                 store.dispatch(resetInteractiveAuth());
                 Navigator.of(dialogContext).pop();
               },

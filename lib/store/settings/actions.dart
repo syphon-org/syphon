@@ -12,7 +12,6 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/sync/service/actions.dart';
-import 'package:syphon/store/sync/service/service.dart';
 
 class SetPusherToken {
   final String? token;
@@ -152,6 +151,12 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
       );
 
       if (data['errcode'] != null) {
+        final errorCode = data['errcode'];
+
+        if (errorCode == 'M_INVALID_PARAM') {
+          return false;
+        }
+
         throw data['error'];
       }
 

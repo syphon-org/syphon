@@ -16,9 +16,6 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 /// uses the matrix mxc uris and either pulls from cached data
 /// or downloads the image and saves it to cache
 ///
-/// TODO: optimize widget rebuilds, the ViewModel equatable updates
-/// too frequently as is but none of the data is changing
-
 class MatrixImage extends HookWidget {
   const MatrixImage({
     Key? key,

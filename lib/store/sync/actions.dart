@@ -21,7 +21,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/sync/parsers.dart';
+import 'package:syphon/store/sync/parsers/parsers.dart';
 import 'package:syphon/store/sync/service/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 
@@ -181,14 +181,7 @@ ThunkAction<AppState> initialSync() {
     // Start initial sync in background
     await store.dispatch(SetSyncing(syncing: true));
     await store.dispatch(fetchSync());
-
-    final lastSince = store.state.syncStore.lastSince;
-
-    // Fetch All Room Ids - continue showing a sync
-    if (lastSince == null) {
-      await store.dispatch(fetchDirectRooms());
-    }
-
+    await store.dispatch(fetchDirectRooms());
     await store.dispatch(SetSyncing(syncing: false));
   };
 }
@@ -440,7 +433,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
         store.dispatch(fetchMessageEvents(
           room: room,
           from: room.prevBatch,
-          overwrite: true,
+          overwrite: messages.isNotEmpty,
         ));
       }
     } catch (error) {
