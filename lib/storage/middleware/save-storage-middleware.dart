@@ -117,8 +117,10 @@ saveStorageMiddleware(StorageDatabase? storage) {
         saveRooms({room.id: room}, storage: storage);
         break;
       case DeleteMessage:
-      case DeleteOutboxMessage:
         saveMessages([action.message], storage: storage);
+        break;
+      case DeleteOutboxMessage:
+        deleteMessages([action.message], storage: storage);
         break;
       case AddMessages:
         final _action = action as AddMessages;

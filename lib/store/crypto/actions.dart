@@ -167,7 +167,8 @@ ThunkAction<AppState> updateKeySessions({
       );
 
       if (devicesWithoutMessageSessions.isEmpty) {
-        log.info('[updateKeySessions] all device sessions have a message session for room');
+        log.info(
+            '[updateKeySessions] all device sessions have a message session for room');
         return;
       }
 
@@ -242,8 +243,11 @@ ThunkAction<AppState> updateKeySessions({
         },
       ));
     } catch (error) {
-      store
-          .dispatch(addAlert(origin: 'updateKeySessions', message: error.toString(), error: error));
+      store.dispatch(addAlert(
+        origin: 'updateKeySessions',
+        message: error.toString(),
+        error: error,
+      ));
     }
   };
 }

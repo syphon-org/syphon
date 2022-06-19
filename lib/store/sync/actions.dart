@@ -270,7 +270,6 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         final Map<String, dynamic> joinedJson = roomJson['join'] ?? {};
         final Map<String, dynamic> invitesJson = roomJson['invite'] ?? {};
         final Map<String, dynamic> leavesJson = roomJson['leave'] ?? {};
-        // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
 
         // Updates for rooms
         if (joinedJson.isNotEmpty) {
