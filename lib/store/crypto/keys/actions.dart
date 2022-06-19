@@ -461,6 +461,8 @@ ThunkAction<AppState> fetchDeviceKeys({
   List<String?> userIds = const <String>[],
 }) {
   return (Store<AppState> store) async {
+    final Map<String, Map<String, DeviceKey>> deviceKeysNew = {};
+
     try {
       final Map<String, dynamic> userIdMap = Map.fromIterable(
         userIds,
@@ -477,28 +479,27 @@ ThunkAction<AppState> fetchDeviceKeys({
       );
 
       final Map<dynamic, dynamic> deviceKeys = data['device_keys'];
-      final Map<String, Map<String, DeviceKey>> newDeviceKeys = {};
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
           final deviceKey = DeviceKey.fromMatrix(device);
 
-          if (newDeviceKeys[userId] == null) {
-            newDeviceKeys[userId] = {};
+          if (deviceKeysNew[userId] == null) {
+            deviceKeysNew[userId] = {};
           }
 
-          newDeviceKeys[userId]![deviceId] = deviceKey;
+          deviceKeysNew[userId]![deviceId] = deviceKey;
         });
       });
-
-      return newDeviceKeys;
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
         origin: 'fetchDeviceKeys',
       ));
-      return const {};
     }
+
+    log.debug('${deviceKeysNew.runtimeType}');
+    return deviceKeysNew;
   };
 }
 

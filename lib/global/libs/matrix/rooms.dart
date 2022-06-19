@@ -26,7 +26,7 @@ abstract class Rooms {
     int? timeout = 10000,
     String? filter,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/v3/sync';
+    String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
     log.debug(url);
 
