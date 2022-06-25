@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/hooks.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
@@ -20,7 +21,7 @@ class UserProfileArguments {
 class UserProfileScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final dispatch = useDispatch();
+    final dispatch = useDispatch<AppState>();
     final arguments = useScreenArguments<UserProfileArguments>(context)!;
 
     final headerOpacity = useState(1.0);
