@@ -21,9 +21,13 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/containers/media-card.dart';
 import 'package:syphon/views/widgets/lists/list-local-images.dart';
+
+import 'chat-mention.dart';
 
 const DEFAULT_BORDER_RADIUS = 24.0;
 
@@ -450,101 +454,108 @@ class ChatInputState extends State<ChatInput> {
                 ),
               ),
               //////// TEXT FIELD ////////
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Container(
-                    constraints: BoxConstraints(
-                      maxHeight: maxInputHeight,
-                      maxWidth: messageInputWidth,
-                    ),
-                    child: Stack(
-                      children: [
-                        Visibility(
-                          visible: widget.editing,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ButtonText(
-                                text: Strings.buttonSaveMessageEdit,
-                                size: 18.0,
-                                disabled: widget.sending || !isSendable,
-                                onPressed: () => onSubmit(),
-                              ),
-                            ],
-                          ),
+              Column(
+                children: [
+                  Visibility(visible: true,
+                      child: Mention(
+                       data: props.users,)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Container(
+                        constraints: BoxConstraints(
+                          maxHeight: maxInputHeight,
+                          maxWidth: messageInputWidth,
                         ),
-                        Visibility(
-                          visible: !widget.editing,
-                          child: TextField(
-                            maxLines: null,
-                            autocorrect: props.autocorrectEnabled,
-                            enableSuggestions: props.suggestionsEnabled,
-                            textCapitalization: props.textCapitalization,
-                            keyboardType: TextInputType.multiline,
-                            textInputAction:
-                                widget.enterSend ? TextInputAction.send : TextInputAction.newline,
-                            cursorColor: props.inputCursorColor,
-                            focusNode: widget.focusNode,
-                            controller: widget.controller,
-                            onChanged: (text) => onUpdate(text, props: props),
-                            onSubmitted: !isSendable ? null : (text) => onSubmit(),
-                            style: TextStyle(
-                              height: 1.5,
-                              color: props.inputTextColor,
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              hintText: hintText,
-                              suffixIcon: Visibility(
-                                visible: isSendable,
-                                child: IconButton(
-                                  color: Theme.of(context).iconTheme.color,
-                                  onPressed: () => onToggleMediaOptions(),
-                                  icon: Icon(
-                                    Icons.add,
-                                    size: Dimensions.iconSizeLarge,
+                        child: Stack(
+                          children: [
+                            Visibility(
+                              visible: widget.editing,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  ButtonText(
+                                    text: Strings.buttonSaveMessageEdit,
+                                    size: 18.0,
+                                    disabled: widget.sending || !isSendable,
+                                    onPressed: () => onSubmit(),
                                   ),
+                                ],
+                              ),
+                            ),
+                            Visibility(
+                              visible: !widget.editing,
+                              child: TextField(
+                                maxLines: null,
+                                autocorrect: props.autocorrectEnabled,
+                                enableSuggestions: props.suggestionsEnabled,
+                                textCapitalization: props.textCapitalization,
+                                keyboardType: TextInputType.multiline,
+                                textInputAction:
+                                widget.enterSend ? TextInputAction.send : TextInputAction.newline,
+                                cursorColor: props.inputCursorColor,
+                                focusNode: widget.focusNode,
+                                controller: widget.controller,
+                                onChanged: (text) => onUpdate(text, props: props),
+                                onSubmitted: !isSendable ? null : (text) => onSubmit(),
+                                style: TextStyle(
+                                  height: 1.5,
+                                  color: props.inputTextColor,
+                                ),
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  hintText: hintText,
+                                  suffixIcon: Visibility(
+                                    visible: isSendable,
+                                    child: IconButton(
+                                      color: Theme.of(context).iconTheme.color,
+                                      onPressed: () => onToggleMediaOptions(),
+                                      icon: Icon(
+                                        Icons.add,
+                                        size: Dimensions.iconSizeLarge,
+                                      ),
+                                    ),
+                                  ),
+                                  fillColor: props.inputColorBackground,
+                                  contentPadding: Dimensions.inputContentPadding,
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Theme.of(context).colorScheme.secondary,
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                        topRight:
+                                        Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                        bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                        bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                      )),
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Theme.of(context).colorScheme.secondary,
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                        topRight:
+                                        Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                        bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                        bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                      )),
                                 ),
                               ),
-                              fillColor: props.inputColorBackground,
-                              contentPadding: Dimensions.inputContentPadding,
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).colorScheme.secondary,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                    topRight:
-                                        Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                    bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                    bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                  )),
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).colorScheme.secondary,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                    topRight:
-                                        Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                    bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                    bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                  )),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: Dimensions.buttonSendSize,
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: sendButton,
+                      ),
+                      Container(
+                        width: Dimensions.buttonSendSize,
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: sendButton,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -633,6 +644,7 @@ class _Props extends Equatable {
   final bool autocorrectEnabled;
   final bool suggestionsEnabled;
   final TextCapitalization textCapitalization;
+  final List<User?> users;
 
   final Function onSendTyping;
 
@@ -646,6 +658,7 @@ class _Props extends Equatable {
     required this.suggestionsEnabled,
     required this.textCapitalization,
     required this.onSendTyping,
+    required this.users
   });
 
   @override
@@ -656,6 +669,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
+        users: roomUsers(store.state, roomId),
         inputTextColor: selectInputTextColor(store.state.settingsStore.themeSettings.themeType),
         inputCursorColor: selectCursorColor(store.state.settingsStore.themeSettings.themeType),
         inputColorBackground:
