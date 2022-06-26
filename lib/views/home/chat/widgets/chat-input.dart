@@ -90,8 +90,6 @@ class ChatInputState extends State<ChatInput> {
 
   String hintText = Strings.placeholderMatrixUnencrypted;
 
-  PermissionStatus? photoPermissionStatus;
-
   onMounted(_Props props) {
     final draft = props.room.draft;
 
