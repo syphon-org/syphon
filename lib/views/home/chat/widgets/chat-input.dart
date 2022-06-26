@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
@@ -88,6 +89,8 @@ class ChatInputState extends State<ChatInput> {
   Timer? typingNotifierTimeout;
 
   String hintText = Strings.placeholderMatrixUnencrypted;
+
+  PermissionStatus? photoPermissionStatus;
 
   onMounted(_Props props) {
     final draft = props.room.draft;
@@ -208,6 +211,19 @@ class ChatInputState extends State<ChatInput> {
   onAddInProgress() {
     final store = StoreProvider.of<AppState>(context);
     store.dispatch(addInProgress());
+  }
+
+  checkPhotoPermission() async {
+
+    const photosPermission = Permission.photos;
+    final status = await photosPermission.status;
+
+    if (!status.isGranted) {
+      openAppSettings();
+    }else{
+      onAddPhoto();
+    }
+
   }
 
   onAddPhoto() async {
@@ -586,7 +602,7 @@ class ChatInputState extends State<ChatInput> {
                           child: MediaCard(
                             text: Strings.buttonGallery,
                             icon: Icons.photo,
-                            onPress: () => onAddPhoto(),
+                            onPress: () => checkPhotoPermission(),
                           ),
                         ),
                         Padding(
