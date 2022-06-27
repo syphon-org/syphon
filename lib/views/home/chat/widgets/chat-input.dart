@@ -83,6 +83,9 @@ class ChatInput extends StatefulWidget {
 class ChatInputState extends State<ChatInput> {
   ChatInputState() : super();
 
+  bool mention = false;
+  List<User?> users = [];
+
   bool sendable = false;
   bool showAttachments = false;
 
@@ -144,6 +147,34 @@ class ChatInputState extends State<ChatInput> {
     setState(() {
       sendable = text.trim().isNotEmpty;
     });
+
+
+    // mention-dialog
+    mention = false;
+    users = props!.users;
+
+    if (text.startsWith('@')){
+      mention = true;
+
+      setState((){
+        users = users.where((user) {
+          if (user != null){
+            final String searchText = text.toLowerCase();
+
+            if(user.userId != null){
+              return user.userId!.toLowerCase().contains(searchText);
+            }
+            else {
+              return user.displayName!.toLowerCase().contains(searchText);
+            }
+          }
+          else{
+            return false;
+          }
+        }).toList();
+      });
+    }
+
 
     // start an interval for updating typing status
     if (widget.focusNode.hasFocus && typingNotifier == null) {
@@ -456,9 +487,10 @@ class ChatInputState extends State<ChatInput> {
               //////// TEXT FIELD ////////
               Column(
                 children: [
-                  Visibility(visible: true,
-                      child: Mention(
-                       data: props.users,)),
+                  Visibility(visible: showMention,
+                      child: Container(padding: EdgeInsets.symmetric(horizontal: 10), width: MediaQuery.of(context).size.width
+                          - Dimensions.buttonSendSize * 1.5  , child: Mention(
+                        users: users,)),),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,
