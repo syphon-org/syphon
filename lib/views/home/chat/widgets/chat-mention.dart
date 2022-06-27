@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
+import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 
 class Mention extends StatefulWidget{
 
   const Mention({
     Key? key,
-    required this.data
+    required this.users
   }) : super(key: key);
 
-  final List<User?> data;
+  final List<dynamic> users;
 
   @override
   State<StatefulWidget> createState() => MentionState();
@@ -17,28 +21,31 @@ class Mention extends StatefulWidget{
 
 class MentionState extends State<Mention>{
 
-  List<String> images = [
-    "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-    "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-  ];
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       itemBuilder: (buildContext, index){
+        final String userName = formatUsername(widget.users[index] as User);
+
         return Card(
           child: ListTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(images[index]
-
-            ),),
-            title: Text('This is title'),
-            subtitle: Text('This is subtitle'),
+            leading: Avatar(
+                uri: widget.users[index]?.avatarUri,
+                alt:  userName,
+                size: Dimensions.avatarSizeMin,
+                background: AppColors.hashedColor(
+                  userName,
+                ),),
+            title: Text(userName),
+            subtitle: Text(widget.users[index]?.userId),
           ),
         );
       },
-      itemCount: images.length,
+      itemCount: widget.users.length,
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
+      padding: EdgeInsets.symmetric(vertical: 5),
     );
   }
 }
