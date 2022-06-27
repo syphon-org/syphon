@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -166,7 +167,11 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             iconSize: 24.0,
             tooltip: 'Share Chats',
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () {
+              final room = widget.message!.roomId!;
+              final message = widget.message!.id!;
+              Share.share('https://matrix.to/#/$room/$message');
+            },
           ),
         ],
       );
