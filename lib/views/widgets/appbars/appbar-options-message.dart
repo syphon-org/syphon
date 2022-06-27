@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/actions.dart';
