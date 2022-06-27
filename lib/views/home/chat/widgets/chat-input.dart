@@ -300,6 +300,9 @@ class ChatInputState extends State<ChatInput> {
               // account for if editing
               widget.editing && (widget.editorController?.text.isNotEmpty ?? false);
 
+          final bool showMention = mention;
+
+
           Color sendButtonColor = const Color(AppColors.blueBubbly);
 
           if (widget.mediumType == MediumType.plaintext) {
@@ -486,6 +489,7 @@ class ChatInputState extends State<ChatInput> {
               ),
               //////// TEXT FIELD ////////
               Column(
+                crossAxisAlignment:  CrossAxisAlignment.start,
                 children: [
                   Visibility(visible: showMention,
                       child: Container(padding: EdgeInsets.symmetric(horizontal: 10), width: MediaQuery.of(context).size.width
