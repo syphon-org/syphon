@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
+import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/navigation.dart';
 
 class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget {
@@ -159,7 +162,15 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             iconSize: 28.0,
             tooltip: 'Quote and Reply',
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () {
+              final store = StoreProvider.of<AppState>(context);
+              final roomId = widget.message!.roomId!;
+
+              store.dispatch(
+                  selectReply(roomId: roomId, message: widget.message));
+
+              widget.onDismiss?.call();
+            },
           ),
           IconButton(
             icon: Icon(Icons.share),
