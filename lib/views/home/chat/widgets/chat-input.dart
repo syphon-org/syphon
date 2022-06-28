@@ -211,19 +211,6 @@ class ChatInputState extends State<ChatInput> {
     store.dispatch(addInProgress());
   }
 
-  checkPhotoPermission() async {
-
-    const photosPermission = Permission.photos;
-    final status = await photosPermission.status;
-
-    if (!status.isGranted) {
-      openAppSettings();
-    }else{
-      onAddPhoto();
-    }
-
-  }
-
   onAddPhoto() async {
     // TODO: has bug with file path
     // final pickerResult = await ImagePicker().pickImage(
@@ -600,7 +587,15 @@ class ChatInputState extends State<ChatInput> {
                           child: MediaCard(
                             text: Strings.buttonGallery,
                             icon: Icons.photo,
-                            onPress: () => checkPhotoPermission(),
+                            onPress: () async{
+                              const photosPermission = Permission.photos;
+                              final status = await photosPermission.status;
+                              if(!status.isGranted){
+                                openAppSettings();
+                              }else{
+                                onAddPhoto();
+                              }
+                            },
                           ),
                         ),
                         Padding(
