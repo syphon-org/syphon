@@ -492,9 +492,13 @@ class ChatInputState extends State<ChatInput> {
                 crossAxisAlignment:  CrossAxisAlignment.start,
                 children: [
                   Visibility(visible: showMention,
-                      child: Container(padding: EdgeInsets.symmetric(horizontal: 10), width: MediaQuery.of(context).size.width
-                          - Dimensions.buttonSendSize * 1.5  , child: Mention(
-                        users: users,)),),
+                      child: Container(padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Mention(
+                            width: MediaQuery.of(context).size.width
+                          - Dimensions.buttonSendSize * 2,
+                            users: users,
+                            controller: widget.controller,)),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,
