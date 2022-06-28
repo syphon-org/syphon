@@ -10,10 +10,17 @@ class Mention extends StatefulWidget{
 
   const Mention({
     Key? key,
-    required this.users
+    required this.users,
+    required this.width,
+    required this.controller,
+    this.height = 200
   }) : super(key: key);
 
   final List<dynamic> users;
+  final double width;
+  final double height;
+  final TextEditingController controller;
+
 
   @override
   State<StatefulWidget> createState() => MentionState();
@@ -26,12 +33,14 @@ class MentionState extends State<Mention>{
   Widget build(BuildContext context) {
     return ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: 200.0,
+          maxHeight: widget.height,
+          maxWidth: widget.width
         ),
         child: ListView.builder(itemBuilder: (buildContext, index){
           final String userName = formatUsername(widget.users[index] as User);
           return Card(
             child: ListTile(
+              onTap: () => onTab(widget.users[index]),
               leading: Avatar(
                   uri: widget.users[index]?.avatarUri,
                   alt:  userName,
@@ -50,6 +59,10 @@ class MentionState extends State<Mention>{
         physics: ClampingScrollPhysics(),
         padding: EdgeInsets.symmetric(vertical: 5),
     ));
+  }
+
+  onTab(User user){
+    widget.controller.text = user.userId!;
   }
 }
 
