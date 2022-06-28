@@ -24,29 +24,32 @@ class MentionState extends State<Mention>{
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemBuilder: (buildContext, index){
-        final String userName = formatUsername(widget.users[index] as User);
-
-        return Card(
-          child: ListTile(
-            leading: Avatar(
-                uri: widget.users[index]?.avatarUri,
-                alt:  userName,
-                size: Dimensions.avatarSizeMin,
-                background: AppColors.hashedColor(
-                  userName,
-                ),),
-            title: Text(userName),
-            subtitle: Text(widget.users[index]?.userId),
-          ),
-        );
-      },
-      itemCount: widget.users.length,
-      shrinkWrap: true,
-      scrollDirection: Axis.vertical,
-      padding: EdgeInsets.symmetric(vertical: 5),
-    );
+    return ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: 200.0,
+        ),
+        child: ListView.builder(itemBuilder: (buildContext, index){
+          final String userName = formatUsername(widget.users[index] as User);
+          return Card(
+            child: ListTile(
+              leading: Avatar(
+                  uri: widget.users[index]?.avatarUri,
+                  alt:  userName,
+                  size: Dimensions.avatarSizeMin,
+                  background: AppColors.hashedColor(
+                    userName,
+                  ),),
+              title: Text(userName),
+              subtitle: Text(widget.users[index]?.userId),
+            ),
+          );
+        },
+        itemCount: widget.users.length,
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        physics: ClampingScrollPhysics(),
+        padding: EdgeInsets.symmetric(vertical: 5),
+    ));
   }
 }
 
