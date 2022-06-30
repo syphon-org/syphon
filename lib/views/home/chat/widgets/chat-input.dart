@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
@@ -228,6 +229,56 @@ class ChatInputState extends State<ChatInput> {
     widget.onAddMedia(file: file, type: MessageType.image);
 
     onToggleMediaOptions();
+  }
+
+  showDialogForPhotoPermission(BuildContext context){
+    if(Platform.isAndroid) {
+      showDialog(
+        context: context,
+        builder: (ctx) =>
+            AlertDialog(
+              title: Text(Strings.titleDialogPhotoPermission,
+                style: TextStyle(fontWeight: FontWeight.w600),),
+              content: Text(Strings.contentPhotoPermission),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text(Strings.buttonCancel),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    openAppSettings();
+                  },
+                  child: Text(Strings.buttonNext),
+                ),
+              ],
+            ),
+      );
+    }else if(Platform.isIOS){
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: Text(Strings.titleDialogPhotoPermission),
+          content: Text(Strings.contentPhotoPermission),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text(Strings.buttonCancel),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            CupertinoDialogAction(
+              child: Text(Strings.buttonNext),
+              onPressed: (){
+                Navigator.of(context).pop(true);
+                openAppSettings();
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   onAddFile() async {
@@ -591,7 +642,7 @@ class ChatInputState extends State<ChatInput> {
                               const photosPermission = Permission.photos;
                               final status = await photosPermission.status;
                               if(!status.isGranted){
-                                openAppSettings();
+                                showDialogForPhotoPermission(context);
                               }else{
                                 onAddPhoto();
                               }
