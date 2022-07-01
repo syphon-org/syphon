@@ -8,9 +8,9 @@ Note these are also, as most things in software, largely based on subjective opi
 The primary goal of this document is not to impose arbitrary restrictions, but to make writing and maintaining Syphon *simple, accessible, and fun*. We want everyone to be able to meaningfully contribute to the code base no matter your skill level. Let us know what else we can do to continue futher this goal! :)
 
 
-### Akways define UI elements outside the ViewModel
+### Always define UI elements outside the ViewModel
 
-- DO
+- `DO`
 
 ```dart
 
@@ -43,7 +43,7 @@ class IntroSettingsScreen extends StatelessWidget {
   }
 ```
 
-- DON'T
+- `DONT`
 
 ```dart
 
