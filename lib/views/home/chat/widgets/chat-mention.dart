@@ -63,6 +63,8 @@ class MentionState extends State<Mention>{
 
   onTab(User user){
     widget.controller.text = user.userId!;
+    widget.controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: widget.controller.text.length));
   }
 }
 
