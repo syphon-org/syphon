@@ -8,11 +8,12 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class Mention extends StatefulWidget{
 
-  const Mention({
+  Mention({
     Key? key,
     required this.users,
     required this.width,
     required this.controller,
+    this.visible = false,
     this.height = 200
   }) : super(key: key);
 
@@ -20,6 +21,7 @@ class Mention extends StatefulWidget{
   final double width;
   final double height;
   final TextEditingController controller;
+  bool visible;
 
 
   @override
@@ -38,20 +40,22 @@ class MentionState extends State<Mention>{
         ),
         child: ListView.builder(itemBuilder: (buildContext, index){
           final String userName = formatUsername(widget.users[index] as User);
-          return Card(
-            child: ListTile(
-              onTap: () => onTab(widget.users[index]),
-              leading: Avatar(
-                  uri: widget.users[index]?.avatarUri,
-                  alt:  userName,
-                  size: Dimensions.avatarSizeMin,
-                  background: AppColors.hashedColor(
-                    userName,
-                  ),),
-              title: Text(userName),
-              subtitle: Text(widget.users[index]?.userId),
+          return Visibility(
+              visible: widget.visible,
+              child:Card(
+                child: ListTile(
+                  onTap: () => onTab(widget.users[index]),
+                  leading: Avatar(
+                    uri: widget.users[index]?.avatarUri,
+                    alt:  userName,
+                    size: Dimensions.avatarSizeMin,
+                    background: AppColors.hashedColor(
+                      userName,
+                    ),),
+                  title: Text(userName),
+                  subtitle: Text(widget.users[index]?.userId),
             ),
-          );
+          ));
         },
         itemCount: widget.users.length,
         shrinkWrap: true,
@@ -62,9 +66,12 @@ class MentionState extends State<Mention>{
   }
 
   onTab(User user){
-    widget.controller.text = user.userId!;
-    widget.controller.selection = TextSelection.fromPosition(
-        TextPosition(offset: widget.controller.text.length));
+    setState((){
+      widget.controller.text = user.userId!;
+      widget.controller.selection = TextSelection.fromPosition(
+          TextPosition(offset: widget.controller.text.length));
+      widget.visible = false;
+    });
   }
 }
 

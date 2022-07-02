@@ -150,13 +150,12 @@ class ChatInputState extends State<ChatInput> {
 
 
     // mention-dialog
-    mention = false;
-    users = props!.users;
+    setState((){
+      mention = false;
+      users = props!.users;
 
-    if (text.startsWith('@')){
-      mention = true;
-
-      setState((){
+      if (text.startsWith('@')){
+        mention = true;
         users = users.where((user) {
           if (user != null){
             final String searchText = text.toLowerCase();
@@ -172,8 +171,8 @@ class ChatInputState extends State<ChatInput> {
             return false;
           }
         }).toList();
-      });
-    }
+      }
+    });
 
 
     // start an interval for updating typing status
@@ -491,13 +490,13 @@ class ChatInputState extends State<ChatInput> {
               Column(
                 crossAxisAlignment:  CrossAxisAlignment.start,
                 children: [
-                  Visibility(visible: showMention,
-                      child: Container(padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Mention(
-                            width: MediaQuery.of(context).size.width
-                          - Dimensions.buttonSendSize * 2,
-                            users: users,
-                            controller: widget.controller,)),
+                  Container(padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Mention(
+                        visible: showMention,
+                        width: MediaQuery.of(context).size.width - Dimensions.buttonSendSize * 2,
+                        users: users,
+                        controller: widget.controller,
+                      )
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
