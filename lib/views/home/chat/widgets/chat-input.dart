@@ -154,11 +154,12 @@ class ChatInputState extends State<ChatInput> {
       mention = false;
       users = props!.users;
 
-      if (text.startsWith('@')){
+      if (text.startsWith('@') || text.contains(' @')) {
         mention = true;
         users = users.where((user) {
           if (user != null){
-            final String searchText = text.toLowerCase();
+            final String searchText = text.toLowerCase()
+                .substring(text.indexOf('@') + 1, text.length);
 
             if(user.userId != null){
               return user.userId!.toLowerCase().contains(searchText);
