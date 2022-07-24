@@ -172,6 +172,9 @@ class ChatInputState extends State<ChatInput> {
           }
         }).toList();
       }
+      else{
+        users = [];
+      }
     });
 
 
