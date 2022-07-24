@@ -414,7 +414,18 @@ class ChatInputState extends State<ChatInput> {
           }
 
           return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              //////// MENTION DIALOG ////////
+              Container(padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                  child: Mention(
+                    visible: showMention,
+                    width: MediaQuery.of(context).size.width - Dimensions.buttonSendSize * 2.1, // HACK: fix the width of the dialog
+                    users: users,
+                    controller: widget.controller,
+                  )
+              ),
               Visibility(
                 visible: replying,
                 maintainSize: false,
@@ -494,14 +505,6 @@ class ChatInputState extends State<ChatInput> {
               Column(
                 crossAxisAlignment:  CrossAxisAlignment.start,
                 children: [
-                  Container(padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Mention(
-                        visible: showMention,
-                        width: MediaQuery.of(context).size.width - Dimensions.buttonSendSize * 2,
-                        users: users,
-                        controller: widget.controller,
-                      )
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,

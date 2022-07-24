@@ -42,7 +42,7 @@ class MentionState extends State<Mention>{
           final String userName = formatUsername(widget.users[index] as User);
           return Visibility(
               visible: widget.visible,
-              child:Card(
+              child: Card(
                 child: ListTile(
                   onTap: () => onTab(widget.users[index]),
                   leading: Avatar(
