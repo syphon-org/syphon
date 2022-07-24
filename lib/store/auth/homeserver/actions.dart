@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -100,13 +101,22 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
       log.error('[fetchBaseUrl] failed .well-known client query');
 
       try {
-        final response = await MatrixApi.checkHomeserverAlt(
-              protocol: store.state.authStore.protocol,
-              homeserver: homeserver.hostname!,
-            ) ??
-            {};
+        final srvRecord = '_matrix._tcp.${homeserver.hostname!}';
 
-        final baseUrl = (response['m.server'] as String).split(':')[0];
+        final List<RRecord>? records =
+            await DnsUtils.lookupRecord(srvRecord, RRecordType.SRV);
+
+        if (records == null || records.isEmpty) {
+          throw 'no SRV';
+        }
+
+        if (records.length > 1) {
+          log.info(
+              '[fetchBaseUrl] returned multiple SRV records. Using the first.');
+        }
+
+        final response = records.first;
+        final baseUrl = response.data.split(' ')[3];
 
         return homeserver.copyWith(
           valid: true,
@@ -115,8 +125,28 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
         );
       } catch (error) {
         log.error(
-          '[fetchBaseUrl] failed alternative .well-known server query',
+          '[fetchBaseUrl] failed SRV record query',
         );
+
+        try {
+          final response = await MatrixApi.checkHomeserverAlt(
+                protocol: store.state.authStore.protocol,
+                homeserver: homeserver.hostname!,
+              ) ??
+              {};
+
+          final baseUrl = (response['m.server'] as String).split(':')[0];
+
+          return homeserver.copyWith(
+            valid: true,
+            baseUrl: baseUrl,
+            identityUrl: baseUrl,
+          );
+        } catch (error) {
+          log.error(
+            '[fetchBaseUrl] failed alternative .well-known server query',
+          );
+        }
       }
     }
 
