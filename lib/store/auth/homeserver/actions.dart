@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -101,22 +100,23 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
       log.error('[fetchBaseUrl] failed .well-known client query');
 
       try {
-        final srvRecord = '_matrix._tcp.${homeserver.hostname!}';
+        final query = {
+          'name': '_matrix._tcp.${homeserver.hostname!}',
+          'type': 'SRV',
+          'edns_client_subnet': '0.0.0.0/0',
+        };
+        final headers = {'accept': 'application/dns-json'};
+        final dnsUri = Uri.https('cloudflare-dns.com', 'dns-query', query);
 
-        final List<RRecord>? records =
-            await DnsUtils.lookupRecord(srvRecord, RRecordType.SRV);
+        final response = await httpClient.get(dnsUri, headers: headers);
+        final record = jsonDecode(response.body);
 
-        if (records == null || records.isEmpty) {
-          throw 'no SRV';
+        if (record['Answer'] == null) {
+          throw 'no record';
         }
 
-        if (records.length > 1) {
-          log.info(
-              '[fetchBaseUrl] returned multiple SRV records. Using the first.');
-        }
-
-        final response = records.first;
-        final baseUrl = response.data.split(' ')[3];
+        final data = (record['Answer'][0]['data'] as String).split(' ');
+        final baseUrl = data[3];
 
         return homeserver.copyWith(
           valid: true,
