@@ -31,6 +31,10 @@ class HomeScreen extends HookWidget {
       (state) => state.syncStore.lastSince,
     );
 
+    final checkForUpdatesEnabled = useSelector<AppState, bool>(
+            (state) => state.settingsStore.checkForUpdatesEnabled) ??
+        false;
+
     final searchLoading = useSelector<AppState, bool>(
           (state) => state.searchStore.loading,
         ) ??
@@ -203,8 +207,10 @@ class HomeScreen extends HookWidget {
       );
     }
 
-    UpdateChecker.checkForUpdate();
-    if (UpdateChecker.updateAvailable) {}
+    if (checkForUpdatesEnabled) {
+      UpdateChecker.checkForUpdate();
+      if (UpdateChecker.updateAvailable) {}
+    }
 
     return Scaffold(
       appBar: currentAppBar as PreferredSizeWidget?,
