@@ -1,5 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:syphon/global/https.dart';
+import 'package:syphon/store/hooks.dart';
+import 'package:syphon/store/index.dart';
 
 class UpdateChecker {
   static int currentVersion = 0; //TODO
@@ -11,7 +13,13 @@ class UpdateChecker {
       Uri.https('github.com', 'syphon-org/syphon/releases/latest');
 
   static checkForUpdate() async {
-    if (nextCheckNotBefore.isAfter(DateTime.now()) || updateAvailable) {
+    final enabled = useSelector<AppState, bool>(
+            (state) => state.settingsStore.checkForUpdatesEnabled) ??
+        false;
+
+    if (!enabled ||
+        nextCheckNotBefore.isAfter(DateTime.now()) ||
+        updateAvailable) {
       return;
     }
 
