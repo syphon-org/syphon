@@ -229,6 +229,8 @@
   "list-item-advanced-settings-licenses": "Open Source Licenses",
   "list-item-advanced-settings-start-background": "Start Background Service",
   "list-item-advanced-settings-stop-background": "Stop All Services",
+  "list-item-advanced-settings-check-for-updates": "Check GitHub for Syphon updates",
+  "list-item-advanced-settings-check-for-updates-body": "Periodically check GitHub for new releases",
   "list-item-advanced-settings-test-notifications": "Test Notifications",
   "list-item-advanced-settings-test-sync-loop": "Test Background Sync Loop",
   "list-item-advanced-settings-force-function": "Force Function",

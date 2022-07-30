@@ -262,6 +262,10 @@ class Strings {
       tr('list-item-advanced-settings-start-background');
   static final listItemAdvancedSettingsStopBackground =
       tr('list-item-advanced-settings-stop-background');
+  static final listItemAdvancedSettingsCheckForUpdates =
+      tr('list-item-advanced-settings-check-for-updates');
+  static final listItemAdvancedSettingsCheckForUpdatesBody =
+      tr('list-item-advanced-settings-check-for-updates-body');
   static final listItemAdvancedSettingsTestNotifications =
       tr('list-item-advanced-settings-test-notifications');
   static final listItemAdvancedSettingsTestSyncLoop =

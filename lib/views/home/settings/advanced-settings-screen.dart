@@ -24,12 +24,14 @@ import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
 class _Props extends Equatable {
   final bool syncing;
   final bool syncObserverActive;
+  final bool checkForUpdates;
   final String? language;
   final String? lastSince;
   final User currentUser;
   final int syncInterval;
 
   final Function onToggleSyncing;
+  final Function onToggleCheckUpdates;
   final Function onManualSync;
   final Function onForceFullSync;
   final Function onForceFunction;
@@ -38,6 +40,7 @@ class _Props extends Equatable {
 
   const _Props({
     required this.syncing,
+    required this.checkForUpdates,
     required this.language,
     required this.syncObserverActive,
     required this.currentUser,
@@ -46,6 +49,7 @@ class _Props extends Equatable {
     required this.onManualSync,
     required this.onForceFullSync,
     required this.onToggleSyncing,
+    required this.onToggleCheckUpdates,
     required this.onForceFunction,
     required this.onStartBackgroundSync,
     required this.onEditSyncInterval,
@@ -55,6 +59,7 @@ class _Props extends Equatable {
   List<Object?> get props => [
         syncing,
         syncInterval,
+        checkForUpdates,
         lastSince,
         currentUser,
         syncObserverActive,
@@ -62,6 +67,7 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         syncing: store.state.syncStore.syncing,
+        checkForUpdates: store.state.settingsStore.checkForUpdatesEnabled,
         language: store.state.settingsStore.language,
         currentUser: store.state.authStore.user,
         lastSince: store.state.syncStore.lastSince,
@@ -109,6 +115,9 @@ class _Props extends Equatable {
           } else {
             store.dispatch(startSyncObserver());
           }
+        },
+        onToggleCheckUpdates: () {
+          store.dispatch(toggleCheckForUpdates());
         },
         onStartBackgroundSync: () async {
           store.dispatch(startSyncService());
@@ -352,6 +361,21 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                         value: props.syncing ? null : 0,
                       ),
                     ),
+                  ),
+                ),
+                ListTile(
+                  onTap: () => props.onToggleCheckUpdates(),
+                  contentPadding: Dimensions.listPadding,
+                  title: Text(
+                    Strings.listItemAdvancedSettingsCheckForUpdates,
+                  ),
+                  subtitle: Text(
+                    Strings.listItemAdvancedSettingsCheckForUpdatesBody,
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                  trailing: Switch(
+                    value: props.checkForUpdates,
+                    onChanged: (check) => props.onToggleCheckUpdates(),
                   ),
                 ),
                 ListTile(
