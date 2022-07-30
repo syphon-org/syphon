@@ -4,6 +4,7 @@ import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/update-check.dart';
 import 'package:syphon/store/hooks.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -201,6 +202,9 @@ class HomeScreen extends HookWidget {
         onDismissChatOptions: () => onDismissChatOptions(),
       );
     }
+
+    UpdateChecker.checkForUpdate();
+    if (UpdateChecker.updateAvailable) {}
 
     return Scaffold(
       appBar: currentAppBar as PreferredSizeWidget?,
