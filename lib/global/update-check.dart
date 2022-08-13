@@ -1,10 +1,10 @@
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:syphon/global/https.dart';
 import 'package:syphon/store/hooks.dart';
 import 'package:syphon/store/index.dart';
 
 class UpdateChecker {
-  static int currentVersion = 0; //TODO
   static DateTime? lastChecked;
   static DateTime nextCheckNotBefore = DateTime.utc(1970);
   static bool updateAvailable = false;
@@ -22,6 +22,9 @@ class UpdateChecker {
         updateAvailable) {
       return;
     }
+
+    final packageInfo = await PackageInfo.fromPlatform();
+    final currentVersion = int.parse(packageInfo.version.replaceAll('.', ''));
 
     //Extract the build tag from the redirect
     final request = http.Request('Get', latestBuildUri)
