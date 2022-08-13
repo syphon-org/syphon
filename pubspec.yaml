@@ -57,7 +57,7 @@ dependencies:
   mime: ^1.0.0
   path: ^1.8.0
   path_provider: 2.0.9
-  package_info: ^2.0.0
+  package_info_plus: 1.4.2
 
   ### encryption
   olm: ^2.0.0
