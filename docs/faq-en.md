@@ -60,3 +60,15 @@ Like most features in Syphon, notifications are disabled by default.
 ### ...Send Read Receipts?
 
 Like most features in Syphon, Read Receipts are disabled by default and must be enabled in the Settings.
+
+### ...Decrypt past messages?
+
+- Export your keys from Element: 
+  - Settings > Security & Privacy > Cryptography
+  - Export E2E room keys (this will generate element-keys.txt)
+- Send element-key.txt to your phone
+- Import the keys to Syphon:
+  - Settings > Privacy & Security > Encryption Keys
+  - Import Keys (select element-keys.txt)
+
+n.b. Key sharing is [roadmapped](https://syphon.org/roadmap) as part of the `0.3.0` release.
