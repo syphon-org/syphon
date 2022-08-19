@@ -73,7 +73,7 @@
   "subtitle-proxy-use-basic-authentication": "Provide username and password to authenticate with a proxy",
   "subtitle-settings-sync-interval": "Amount of time in seconds the app wait\nbetween syncing",
   "subtitle-settings-sync-toggle": "Toggle syncing with the matrix server",
-  "subtitle-settings-read-receipts": "If read receipts are disabled or private, users will not see solid read indicators for your messages.",
+  "subtitle-settings-read-receipts": "If read receipts are disabled or private, other users will not be able to see when you have read their messages.",
   "subtitle-toggle-autocorrect": "Beware that keyboards may send autocorrect data to third-parties",
   "subtitle-toggle-suggestions": "Beware that keyboards may send suggestions data to third-parties",
   "subtitle-settings-show-membership-events": "Show membership changes within the chat",
