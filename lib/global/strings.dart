@@ -164,6 +164,7 @@ class Strings {
       tr('label-deleted-message'); // 'This message was deleted';
   static final labelOn = tr('label-on'); // 'On';
   static final labelOff = tr('label-off'); // 'Off';
+  static final labelPrivate = tr('label-private');
   static final labelTermsOfService = tr('label-terms-of-service');
   static final labelSearchUnencrypted = tr('label-search-unencrypted');
   static final labelAbout = tr('label-about');
