@@ -101,6 +101,8 @@ class Strings {
   static final subtitleSettingsSyncInterval =
       tr('subtitle-settings-sync-interval');
   static final subtitleSettingsSyncToggle = tr('subtitle-settings-sync-toggle');
+  static final subtitleSettingsReadReceipts =
+      tr('subtitle-settings-read-receipts');
   static final subtitleToggleAutocorrect = tr('subtitle-toggle-autocorrect');
   static final subtitleToggleSuggestions = tr('subtitle-toggle-suggestions');
   static final subtitleShowMembershipEvents =
@@ -200,6 +202,8 @@ class Strings {
       tr('list-item-settings-sync-interval');
   static final listItemSettingsSyncToggle =
       tr('list-item-settings-sync-toggle');
+  static final listItemSettingsReadReceipts =
+      tr('list-item-settings-read-receipts');
 
   static final listItemSettingsLanguage = tr('list-item-settings-language');
   static final listItemSettingsShowMembershipEvents =
