@@ -736,7 +736,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                               'Read Receipts',
                             ),
                             subtitle: Text(
-                              'If read receipts are disabled or hidden, users will not see solid read indicators for your messages.',
+                              'If read receipts are disabled or private, users will not see solid read indicators for your messages.',
                               style: Theme.of(context).textTheme.caption,
                             ),
                             trailing: Text(props.readReceipts),

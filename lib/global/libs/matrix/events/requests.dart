@@ -399,7 +399,7 @@ abstract class Events {
   /// Send Hidden Read Receipt - unstable feature
   ///
   /// https://github.com/matrix-org/matrix-spec-proposals/blob/travis/msc/hidden-read-receipts/proposals/2285-hidden-read-receipts.md
-  static Future<dynamic> sendReadMarkerHidden({
+  static Future<dynamic> sendPrivateReadMarker({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
     String? accessToken,

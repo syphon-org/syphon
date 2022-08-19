@@ -47,10 +47,10 @@ ThunkAction<AppState> sendReadReceipts({
 
       final data;
 
-      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-        log.info('[sendReadReceipts] read receipts hidden');
+      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Private) {
+        log.info('[sendReadReceipts] read receipts set to private');
 
-        data = await MatrixApi.sendReadReceiptHidden(
+        data = await MatrixApi.sendPrivateReadReceipt(
           protocol: store.state.authStore.protocol,
           accessToken: store.state.authStore.user.accessToken,
           homeserver: store.state.authStore.user.homeserver,

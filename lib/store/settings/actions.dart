@@ -242,7 +242,8 @@ ThunkAction<AppState> incrementLanguage() {
   };
 }
 
-Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
+Future<bool> homeserverSupportsPrivateReadReceipts(
+    Store<AppState> store) async {
   final version = await MatrixApi.checkVersion(
     protocol: store.state.authStore.protocol,
     homeserver: store.state.authStore.user.homeserver,
@@ -263,16 +264,16 @@ ThunkAction<AppState> incrementReadReceipts() {
     final nextReceipt = ReadReceiptTypes
         .values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
 
-    if (nextReceipt != ReadReceiptTypes.Hidden) {
+    if (nextReceipt != ReadReceiptTypes.Private) {
       //short-out
       return store.dispatch(SetReadReceipts(
         readReceipts: nextReceipt,
       ));
     }
 
-    if (await homeserverSupportsHiddenReadReceipts(store)) {
+    if (await homeserverSupportsPrivateReadReceipts(store)) {
       return store.dispatch(SetReadReceipts(
-        readReceipts: ReadReceiptTypes.Hidden,
+        readReceipts: ReadReceiptTypes.Private,
       ));
     }
 
