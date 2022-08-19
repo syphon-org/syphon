@@ -226,7 +226,7 @@ String selectReadReceiptsString(ReadReceiptTypes readReceipts) {
       return Strings.labelOff;
 
     case ReadReceiptTypes.On:
-      return Strings.labelOff;
+      return Strings.labelOn;
 
     case ReadReceiptTypes.Private:
       return Strings.labelPrivate;
