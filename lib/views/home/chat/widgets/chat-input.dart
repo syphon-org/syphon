@@ -304,6 +304,22 @@ class ChatInputState extends State<ChatInput> {
             ),
           );
 
+          final takePictureButton = Semantics(
+            button: true,
+            enabled: true,
+            // label: Strings.labelSendUnencrypted,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(48),
+              onTap:(){
+                // print("Hi");
+              },
+              child: CircleAvatar(
+                backgroundColor: sendButtonColor,
+                child: Icon(Icons.camera_alt, color: Colors.white,),
+              ),
+            ),
+          );
+
           if (widget.mediumType == MediumType.encryption) {
             sendButton = Semantics(
               button: true,
@@ -478,67 +494,78 @@ class ChatInputState extends State<ChatInput> {
                         ),
                         Visibility(
                           visible: !widget.editing,
-                          child: TextField(
-                            maxLines: null,
-                            autocorrect: props.autocorrectEnabled,
-                            enableSuggestions: props.suggestionsEnabled,
-                            textCapitalization: props.textCapitalization,
-                            keyboardType: TextInputType.multiline,
-                            textInputAction:
-                                widget.enterSend ? TextInputAction.send : TextInputAction.newline,
-                            cursorColor: props.inputCursorColor,
-                            focusNode: widget.focusNode,
-                            controller: widget.controller,
-                            onChanged: (text) => onUpdate(text, props: props),
-                            onSubmitted: !isSendable ? null : (text) => onSubmit(),
-                            style: TextStyle(
-                              height: 1.5,
-                              color: props.inputTextColor,
-                            ),
-                            decoration: InputDecoration(
-                              filled: true,
-                              hintText: hintText,
-                              suffixIcon: Visibility(
-                                visible: isSendable,
-                                child: IconButton(
-                                  color: Theme.of(context).iconTheme.color,
-                                  onPressed: () => onToggleMediaOptions(),
-                                  icon: Icon(
-                                    Icons.add,
-                                    size: Dimensions.iconSizeLarge,
+                          child: SizedBox(
+                            width: showAttachments ? width - 120 : width,
+                            child: TextField(
+                              maxLines: null,
+                              autocorrect: props.autocorrectEnabled,
+                              enableSuggestions: props.suggestionsEnabled,
+                              textCapitalization: props.textCapitalization,
+                              keyboardType: TextInputType.multiline,
+                              textInputAction:
+                                  widget.enterSend ? TextInputAction.send : TextInputAction.newline,
+                              cursorColor: props.inputCursorColor,
+                              focusNode: widget.focusNode,
+                              controller: widget.controller,
+                              onChanged: (text) => onUpdate(text, props: props),
+                              onSubmitted: !isSendable ? null : (text) => onSubmit(),
+                              style: TextStyle(
+                                height: 1.5,
+                                color: props.inputTextColor,
+                              ),
+                              decoration: InputDecoration(
+                                filled: true,
+                                hintText: hintText,
+                                suffixIcon: Visibility(
+                                  visible: isSendable,
+                                  child: IconButton(
+                                    color: Theme.of(context).iconTheme.color,
+                                    onPressed: () => onToggleMediaOptions(),
+                                    icon: Icon(
+                                      Icons.add,
+                                      size: Dimensions.iconSizeLarge,
+                                    ),
                                   ),
                                 ),
+                                fillColor: props.inputColorBackground,
+                                contentPadding: Dimensions.inputContentPadding,
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Theme.of(context).colorScheme.secondary,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      topRight:
+                                          Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                      bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                    )),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Theme.of(context).colorScheme.secondary,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      topRight:
+                                          Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                      bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                    )),
                               ),
-                              fillColor: props.inputColorBackground,
-                              contentPadding: Dimensions.inputContentPadding,
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).colorScheme.secondary,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                    topRight:
-                                        Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                    bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                    bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                  )),
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).colorScheme.secondary,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                    topRight:
-                                        Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                    bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                    bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                  )),
                             ),
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  Visibility(
+                    visible: showAttachments,
+                    child: Container(
+                      width: Dimensions.buttonSendSize,
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: takePictureButton,
                     ),
                   ),
                   Container(
