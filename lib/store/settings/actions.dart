@@ -251,6 +251,22 @@ Future<bool> homeserverSupportsPrivateReadReceipts(
 
   final unstableFeatures = version['unstable_features'];
 
+  //TODO: update when this hits a spec version
+  return unstableFeatures != null &&
+      unstableFeatures.containsKey('org.matrix.msc2285.stable') &&
+      unstableFeatures['org.matrix.msc2285.stable'];
+}
+
+@Deprecated('Due to be unsupported as of Synapse v1.67.0')
+Future<bool> homeserverSupportsUnstablePrivateReadReceipts(
+    Store<AppState> store) async {
+  final version = await MatrixApi.checkVersion(
+    protocol: store.state.authStore.protocol,
+    homeserver: store.state.authStore.user.homeserver,
+  );
+
+  final unstableFeatures = version['unstable_features'];
+
   return unstableFeatures != null &&
       unstableFeatures.containsKey('org.matrix.msc2285') &&
       unstableFeatures['org.matrix.msc2285'];
