@@ -62,7 +62,11 @@ class MentionState extends State<Mention> {
 
   onTab(User user) {
     setState(() {
-      widget.controller.text = '${widget.controller.text.replaceAll("@", "")} ${user.userId}'; // replace duplicate @ with empty string
+      final textLength = widget.controller.text.length;
+
+      widget.controller.text = '${widget.controller.text.substring(0,
+          textLength - 1)} ${user.userId}'; // avoid duplicate @
+
       widget.controller.selection = TextSelection.fromPosition(
           TextPosition(offset: widget.controller.text.length));
       widget.visible = false;
