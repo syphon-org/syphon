@@ -6,6 +6,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/models.dart';
 
 class SetReceipts {
@@ -56,6 +57,8 @@ ThunkAction<AppState> sendReadReceipts({
           homeserver: store.state.authStore.user.homeserver,
           roomId: room!.id,
           messageId: message!.id,
+          stable:
+              await homeserverSupportsPrivateReadReceipts(store), //@deprecated
         );
       } else {
         data = await MatrixApi.sendReadReceipts(

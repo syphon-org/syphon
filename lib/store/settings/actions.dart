@@ -287,7 +287,8 @@ ThunkAction<AppState> incrementReadReceipts() {
       ));
     }
 
-    if (await homeserverSupportsPrivateReadReceipts(store)) {
+    if (await homeserverSupportsPrivateReadReceipts(store) ||
+        await homeserverSupportsUnstablePrivateReadReceipts(store)) {
       return store.dispatch(SetReadReceipts(
         readReceipts: ReadReceiptTypes.Private,
       ));

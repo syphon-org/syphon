@@ -396,7 +396,7 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /// Send Hidden Read Receipt - stable feature
+  /// Send Hidden Read Receipt
   ///
   /// https://github.com/matrix-org/matrix-spec-proposals/pull/2285
   static Future<dynamic> sendPrivateReadMarker({
@@ -405,9 +405,13 @@ abstract class Events {
     String? accessToken,
     String? roomId,
     String? messageId,
+    @Deprecated('Due to be unsupported as of Synapse v1.67.0')
+        bool stable = true,
   }) async {
     final String url =
-        '$protocol$homeserver/_matrix/client/v3/rooms/$roomId/receipt/m.read.private/$messageId';
+        '$protocol$homeserver/_matrix/client/v3/rooms/$roomId/receipt/'
+        '${stable ? 'm.read.private' : 'org.matrix.msc2285.read.private'}' //@deprecated
+        '/$messageId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
