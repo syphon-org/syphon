@@ -405,8 +405,6 @@ abstract class Events {
     String? accessToken,
     String? roomId,
     String? messageId,
-    String? lastRead,
-    bool readAll = true,
   }) async {
     final String url =
         '$protocol$homeserver/_matrix/client/v3/rooms/$roomId/receipt/m.read.private/$messageId';
