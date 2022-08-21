@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId "org.tether.tether"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -57,18 +57,18 @@ android {
         }
     }
 
-    signingConfigs {
-       release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile file(keystoreProperties['storeFile'])
-           storePassword keystoreProperties['storePassword']
-       }
-   }
+//    signingConfigs {
+//       release {
+//           keyAlias keystoreProperties['keyAlias']
+//           keyPassword keystoreProperties['keyPassword']
+//           storeFile file(keystoreProperties['storeFile'])
+//           storePassword keystoreProperties['storePassword']
+//       }
+//   }
    buildTypes {
-       release {
-           signingConfig signingConfigs.release
-       }
+//       release {
+//           signingConfig signingConfigs.release
+//       }
        debug {
             signingConfig signingConfigs.debug
         }

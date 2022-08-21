@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/home/chat/take_picture_screen.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/containers/media-card.dart';
 import 'package:syphon/views/widgets/lists/list-local-images.dart';
@@ -241,6 +243,16 @@ class ChatInputState extends State<ChatInput> {
     widget.onAddMedia(file: file, type: MessageType.file);
   }
 
+  Future<void> openCamera() async {
+    final cameras = await availableCameras();
+    final firstCamera = cameras.first;
+    print(firstCamera.name);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TakePictureScreen(camera: firstCamera)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
@@ -312,6 +324,7 @@ class ChatInputState extends State<ChatInput> {
               borderRadius: BorderRadius.circular(48),
               onTap:(){
                 // print("Hi");
+                openCamera();
               },
               child: CircleAvatar(
                 backgroundColor: sendButtonColor,

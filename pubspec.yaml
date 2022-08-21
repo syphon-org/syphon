@@ -129,6 +129,7 @@ dependencies:
   # TODO: potential overrides
   sqlite3: ^1.5.1
   path_provider_linux: ^2.1.5
+  camera: ^0.10.0+1
 
 dev_dependencies:
   build_config: ^1.0.0
