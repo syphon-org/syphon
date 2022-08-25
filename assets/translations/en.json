@@ -344,5 +344,11 @@
   "tooltip-profile-settings": "Profile and Settings",
   "tooltip-search-chats": "Search Chats",
   "tooltip-search-unencrypted": "Search Unencrypted",
-  "tooltip-cancel-reply": "Cancel Reply"
+  "tooltip-cancel-reply": "Cancel Reply",
+  "tooltip-message-details": "Message Details",
+  "tooltip-delete-message": "Delete Message",
+  "tooltip-edit-message": "Edit Message",
+  "tooltip-copy-message-content": "Copy Message Content",
+  "tooltip-quote-and-reply": "Quote and Reply",
+  "tooltip-share-chats": "Share Chats"
 }

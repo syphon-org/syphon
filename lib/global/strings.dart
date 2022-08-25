@@ -93,9 +93,7 @@ class Strings {
       tr('title-dialog-enter-new-screen-lock-pin');
   static final titleDialogVerifyNewScreenLockPin =
       tr('title-dialog-verify-new-screen-lock-pin');
-  static final titleDialogPhotoPermission =
-  tr('title-dialog-photo-permission');
-
+  static final titleDialogPhotoPermission = tr('title-dialog-photo-permission');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -543,4 +541,10 @@ class Strings {
   static final tooltipSearchUnencrypted = tr('tooltip-search-unencrypted');
   static final tooltipCancelReply = tr('tooltip-cancel-reply');
   static final tooltipSearchUsers = tr('tooltip-search-users');
+  static final tooltipMessageDetails = tr('tooltip-message-details');
+  static final tooltipDeleteMessage = tr('tooltip-delete-message');
+  static final tooltipEditMessage = tr('tooltip-edit-message');
+  static final tooltipCopyMessageContent = tr('tooltip-copy-message-content');
+  static final tooltipQuoteAndReply = tr('tooltip-quote-and-reply');
+  static final tooltipShareChats = tr('tooltip-share-chats');
 }
