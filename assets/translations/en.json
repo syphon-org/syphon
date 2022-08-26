@@ -347,6 +347,8 @@
   "semantics-image-password-reset": "Person resting arm ontop a letter with a checkbox inside",
   "semantics-create-public-room": "Create A Public Room",
   "semantics-image-password-update": "User thinking up a password in a swirl of wind",
+  "semantics-close-actions-ring": "Close Actions Ring",
+  "semantics-open-actions-ring": "Open Actions Ring",
   "label-proxy-host": "Hostname",
   "label-proxy-port": "Port",
   "label-proxy-username": "Username",

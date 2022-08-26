@@ -538,6 +538,8 @@ class Strings {
   static final semanticsCreatePublicRoom = tr('semantics-create-public-room');
   static final semanticsImagePasswordUpdate =
       tr('semantics-image-password-update');
+  static final semanticsCloseActionsRing = tr('semantics-close-actions-ring');
+  static final semanticsOpenActionsRing = tr('semantics-open-actions-ring');
 
   // Labels
   static final labelProxyHost = tr('label-proxy-host');
