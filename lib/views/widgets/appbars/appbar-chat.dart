@@ -184,7 +184,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                Strings.listItemMuteForDays(7);
+                Strings.listItemMuteForDays(7),
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
