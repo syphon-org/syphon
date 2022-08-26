@@ -247,10 +247,10 @@ class ChatInputState extends State<ChatInput> {
     final cameras = await availableCameras();
     final firstCamera = cameras.first;
     print(firstCamera.name);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => TakePictureScreen(camera: firstCamera)),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => TakePictureScreen(camera: firstCamera)),
+    // );
   }
 
   @override
