@@ -387,31 +387,31 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     const PopupMenuItem<ChatOptions>(
                       enabled: false,
                       value: ChatOptions.search,
-                      child: Text('Search'),
+                      child: Text('Search'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       enabled: false,
                       value: ChatOptions.allMedia,
-                      child: Text('All Media'),
+                      child: Text('All Media'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.chatSettings,
-                      child: Text('Chat Settings'),
+                      child: Text('Chat Settings'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.inviteFriends,
-                      child: Text('Invite Friends'),
+                      child: Text('Invite Friends'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.muteNotifications,
-                      child: Text('Mute Notifications'),
+                      child: Text('Mute Notifications'), //TODO i18n
                     ),
                   ];
 
                   if (widget.room.direct) {
                     menu.add(const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.blockUser,
-                      child: Text('Block User'),
+                      child: Text('Block User'), //TODO i18n
                     ));
                   }
 

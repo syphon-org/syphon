@@ -547,6 +547,14 @@ class Strings {
   static final labelPassword = tr('label-password');
   static final labelDefault = tr('label-default');
 
+  static final popupMenuItemSearch = tr('popup-menu-item-search');
+  static final popupMenuItemAllMedia = tr('popup-menu-item-all-media');
+  static final popupMenuItemChatSettings = tr('popup-menu-item-chat-settings');
+  static final popupMenuItemInviteFriends =
+      tr('popup-menu-item-invite-friends');
+  static final popupMenuItemMuteNotifications =
+      tr('popup-menu-item-mute-notifications');
+
   // Tooltips
   static final tooltipProfileAndSettings = tr('tooltip-profile-settings');
   static final tooltipSearchChats = tr('tooltip-search-chats');
