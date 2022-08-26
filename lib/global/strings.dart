@@ -94,6 +94,7 @@ class Strings {
   static final titleDialogVerifyNewScreenLockPin =
       tr('title-dialog-verify-new-screen-lock-pin');
   static final titleDialogPhotoPermission = tr('title-dialog-photo-permission');
+  static final titleDialogBlockUser = tr('title-dialog-block-user');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -178,6 +179,8 @@ class Strings {
   static final labelCurrentPassword = tr('label-current-password');
   static final labelNewPassword = tr('label-new-password');
   static final labelConfirmNewPassword = tr('label-confirm-new-password');
+  static final labelAlways = tr('label-always');
+  static final labelSearch = tr('label-search');
 
   static final labelFabSearch = tr('label-fab-search');
   static final labelFabCreateDM = tr('label-fab-create-dm');
@@ -289,6 +292,13 @@ class Strings {
       tr('list-item-chat-detail-privacy-status');
   static final listItemChatDetailViewKey = tr('list-item-chat-detail-view-key');
 
+  static final listItemMuteForOneHour = tr('list-item-mute-for-one-hour');
+  static String listItemMuteForHours(int? hours) =>
+      tr('list-item-mute-for-hours', args: ['$hours']);
+  static final listItemMuteForOneDay = tr('list-item-mute-for-one-day');
+  static String listItemMuteForDays(int? days) =>
+      tr('list-item-mute-for-days', args: ['$days']);
+
   // Buttons
   static final buttonLogin = tr('button-login');
   static final buttonNext = tr('button-next');
@@ -399,6 +409,8 @@ class Strings {
   static final contentKeyExportWarning =
       tr('content-dialog-devices-key-export');
   static final contentPhotoPermission = tr('content-dialog-photo-permission');
+  static String contentBlockUser(String? user) =>
+      tr('content-dialog-block-user', args: ['$user']);
   static final contentEmailRequirement = tr('content-signup-email-requirement');
   static final contentEmailVerification =
       tr('content-signup-email-verification');

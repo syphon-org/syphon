@@ -106,9 +106,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
-        title: 'Block User',
-        content:
-            'If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.',
+        title: Strings.titleDialogBlockUser,
+        content: Strings.contentBlockUser(user!.displayName),
         onConfirm: () async {
           await props.onBlockUser(user.userId);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -147,7 +146,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
                 padding: defaultPadding,
                 child: Text(
-                  'Mute for 1 hour',
+                  Strings.listItemMuteForOneHour,
                   style: Theme.of(context).textTheme.subtitle1,
                 )),
             onTap: () {
@@ -159,7 +158,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 8 hours',
+                Strings.listItemMuteForHours(8),
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -172,7 +171,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 1 day',
+                Strings.listItemMuteForOneDay,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -185,7 +184,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 7 days',
+                Strings.listItemMuteForDays(7);
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -198,7 +197,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Always',
+                Strings.labelAlways,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
