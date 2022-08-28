@@ -28,22 +28,18 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   void initState() {
     super.initState();
-    // To display the current output from the Camera,
-    // create a CameraController.
+
     _controller = CameraController(
-      // Get a specific camera from the list of available cameras.
       widget.camera,
-      // Define the resolution to use.
       ResolutionPreset.medium,
     );
 
-    // Next, initialize the controller. This returns a Future.
+    // initialize the controller. This returns a Future.
     _initializeControllerFuture = _controller.initialize();
   }
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
     _controller.dispose();
     super.dispose();
   }
@@ -97,32 +93,27 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           )
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {
-      //     takePicture();
-      //   },
-      //   child: const Icon(Icons.camera_alt),
-      // ),
+
     );
   }
 
-  void takePicture() async {
+  Future<void> takePicture() async {
     try {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
       if (!mounted) return;
 
-      // If the picture was taken, display it on a new screen.
-      await Navigator.of(context).push(
+      _controller.dispose();
+
+      await Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => DisplayPictureScreen(
-            // Pass the automatically generated path to
-            // the DisplayPictureScreen widget.
             imagePath: image.path,
             onAddMedia: widget.onAddMedia,
           ),
         ),
       );
+
     } catch (e) {
       print(e);
     }
@@ -131,7 +122,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 }
 
 
-// A widget that displays the picture taken by the user.
+
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
   final Function({
@@ -147,7 +138,7 @@ class DisplayPictureScreen extends StatelessWidget {
       body: Image.file(File(imagePath)),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          onAddPhoto();
+          await onAddPhoto();
           Navigator.pop(context);
         },
         child: Icon(Icons.send),
@@ -155,19 +146,11 @@ class DisplayPictureScreen extends StatelessWidget {
     );
   }
 
-  onAddPhoto() async {
-    // final pickerResult = await ImagePicker().getImage(
-    //   source: ImageSource.gallery,
-    // );
-    // if (pickerResult == null) return;
-
-    final pickerResult = Image.file(File(imagePath));
+   Future<void> onAddPhoto() async {
 
     final file = File(imagePath);
-
     await onAddMedia(file: file, type: MessageType.image);
 
-    // onToggleMediaOptions();
   }
 
 }

@@ -379,7 +379,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   onAddMedia(File file, MessageType type, _Props props) async {
-    Navigator.pushNamed(
+    await Navigator.pushNamed(
       context,
       Routes.chatMediaPreview,
       arguments: MediaPreviewArguments(
