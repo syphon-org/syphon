@@ -342,5 +342,7 @@
     "label-fab-search": "Ricerca nelle discussioni",
     "label-fab-create-public": "Avvia una discussione pubblica",
     "label-fab-create-group": "Avvia una discussione di gruppo",
-    "content-key-backup-warning": "A causa dell'elaborazione in sfondo su iOS, il backup pianificato può essere eseguito o meno in base alla batteria, alla potenza di elaborazione e ad altri fattori.\n\nAssicurati sempre che i vostri backup vengano salvati in modo appropriato."
+    "content-key-backup-warning": "A causa dell'elaborazione in sfondo su iOS, il backup pianificato può essere eseguito o meno in base alla batteria, alla potenza di elaborazione e ad altri fattori.\n\nAssicurati sempre che i vostri backup vengano salvati in modo appropriato.",
+    "title-dialog-photo-permission": "Autorizzazione richiesta",
+    "content-dialog-photo-permission": "L'autorizzazione alle foto è necessaria per accedere alla galleria. Volete continuare con le impostazioni dell'app?"
 }
