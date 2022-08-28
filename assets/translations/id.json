@@ -342,5 +342,7 @@
     "label-fab-search": "Cari Obrolan",
     "label-fab-create-group": "Mulai Obrolan Grup",
     "label-fab-create-public": "Mulai Obrolan Publik",
-    "content-key-backup-warning": "Karena pemrosesan latar belakang di iOS, cadangan terjadwalmu mungkin tidak terjadi karena faktor baterai, daya pemrosesan, dan lain-lain.\n\nSelalu pastikan cadanganmu disimpan dengan benar."
+    "content-key-backup-warning": "Karena pemrosesan latar belakang di iOS, cadangan terjadwalmu mungkin tidak terjadi karena faktor baterai, daya pemrosesan, dan lain-lain.\n\nSelalu pastikan cadanganmu disimpan dengan benar.",
+    "title-dialog-photo-permission": "Izin Dibutuhkan",
+    "content-dialog-photo-permission": "Izin Foto dibutuhkan untuk mengakses galeri. Apakah Anda ingin lanjut ke setelan aplikasi?"
 }
