@@ -246,10 +246,11 @@ class ChatInputState extends State<ChatInput> {
   Future<void> openCamera() async {
     final cameras = await availableCameras();
     final firstCamera = cameras.first;
+    final secondaryCamera = cameras[1];
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) =>
-          TakePictureScreen(camera: firstCamera, onAddMedia: widget.onAddMedia,)
+          TakePictureScreen(onAddMedia: widget.onAddMedia, cameras: cameras,)
       ),
     );
   }

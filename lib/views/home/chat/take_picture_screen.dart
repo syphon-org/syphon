@@ -8,10 +8,13 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     super.key,
-    required this.camera, required this.onAddMedia,
+    required this.cameras, required this.onAddMedia,
   });
 
-  final CameraDescription camera;
+  // final CameraDescription camera;
+  // final CameraDescription secondaryCamera;
+  final List<CameraDescription> cameras;
+
   final Function({
   required File file,
   required MessageType type,
@@ -30,7 +33,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     super.initState();
 
     _controller = CameraController(
-      widget.camera,
+      widget.cameras.first,
       ResolutionPreset.medium,
     );
 
@@ -49,52 +52,109 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     return Scaffold(
       body: Column(
         children: [
-          FutureBuilder<void>(
-            future: _initializeControllerFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return CameraPreview(_controller);
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
+          Expanded(
+            child: FutureBuilder<void>(
+              future: _initializeControllerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return CameraPreview(_controller);
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
           ),
-          Container(
-            color: Colors.black,
-            width: double.infinity,
-            height: 100,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    takePicture();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.all(20),
-                    primary: Colors.blue, // <-- Button color
-                    onPrimary: Colors.red, // <-- Splash color
+          Positioned(
+            bottom: 0,
+            child: Container(
+              color: Colors.black,
+              width: double.infinity,
+              height: 80,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      takePicture();
+                    },
+                    child: Container(
+                      width: 70,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        border: Border.all(width: 2, color: Colors.white),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: FractionallySizedBox(
+                          heightFactor: 0.9, // Adjust those two for the white space
+                          widthFactor: 0.9,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  child: Icon(Icons.camera_alt, color: Colors.white),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.all(20),
-                    primary: Colors.blue, // <-- Button color
-                    onPrimary: Colors.red, // <-- Splash color
-                  ),
-                  child: Icon(Icons.menu, color: Colors.white),
-                )
-              ],
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      border: Border.all(width: 2, color: Colors.white),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.flip_camera_android_rounded, color: Colors.white),
+                      onPressed: (){
+                        _toggleCameraLens();
+                      },
+                    ),
+                  )
+
+                ],
+              ),
             ),
           )
         ],
       ),
 
     );
+  }
+
+  void _toggleCameraLens() {
+    // get current lens direction (front / rear)
+    final lensDirection = _controller.description.lensDirection;
+    CameraDescription newDescription;
+    if (lensDirection == CameraLensDirection.front) {
+      newDescription = widget.cameras.firstWhere((description) => description
+          .lensDirection == CameraLensDirection.back);
+    }
+    else {
+      newDescription = widget.cameras.firstWhere((description) => description
+          .lensDirection == CameraLensDirection.front);
+    }
+
+    if (newDescription != null) {
+      _initCamera(newDescription);
+    }
+    else {
+      print('Asked camera not available');
+    }
+  }
+
+  Future<void> _initCamera(CameraDescription description) async{
+    _controller = CameraController(description, ResolutionPreset.max, enableAudio: true);
+
+    try{
+      await _controller.initialize();
+      // to notify the widgets that camera has been initialized and now camera preview can be done
+      setState((){});
+    }
+    catch(e){
+      print(e);
+    }
   }
 
   Future<void> takePicture() async {
