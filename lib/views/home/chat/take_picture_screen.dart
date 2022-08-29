@@ -50,6 +50,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Column(
         children: [
           Expanded(
@@ -140,7 +141,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       _initCamera(newDescription);
     }
     else {
-      print('Asked camera not available');
+      print('Camera not available');
     }
   }
 
@@ -163,53 +164,20 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       final image = await _controller.takePicture();
       if (!mounted) return;
 
-      _controller.dispose();
+      // _controller.dispose();
 
-      await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(
-            imagePath: image.path,
-            onAddMedia: widget.onAddMedia,
-          ),
-        ),
-      );
+      await onAddPhoto(image.path);
+      Navigator.pop(context);
 
     } catch (e) {
       print(e);
     }
   }
 
-}
-
-
-
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-  final Function({
-  required File file,
-  required MessageType type,
-  }) onAddMedia;
-
-  const DisplayPictureScreen({super.key, required this.imagePath, required this.onAddMedia});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Image.file(File(imagePath)),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await onAddPhoto();
-          Navigator.pop(context);
-        },
-        child: Icon(Icons.send),
-      ),
-    );
-  }
-
-   Future<void> onAddPhoto() async {
+  Future<void> onAddPhoto(String imagePath) async {
 
     final file = File(imagePath);
-    await onAddMedia(file: file, type: MessageType.image);
+    await widget.onAddMedia(file: file, type: MessageType.image);
 
   }
 
