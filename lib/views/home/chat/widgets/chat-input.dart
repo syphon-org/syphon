@@ -149,17 +149,18 @@ class ChatInputState extends State<ChatInput> {
     });
 
     // mention-dialog
-    setState(() {
-      final int cursorPos = widget.controller.selection.baseOffset;
-      users = props!.users;
+    final int cursorPos = widget.controller.selection.baseOffset;
+    users = props!.users;
 
       if(cursorPos > 0) {
-        if(text[cursorPos - 1] == '@' && !mention) {
-          mention = true;
-        }
-        else if (text[cursorPos - 1] == ' ') {
-          mention = false;
-        }
+        setState((){
+          if(text[cursorPos - 1] == '@' && !mention) {
+            mention = true;
+          }
+          else if (text[cursorPos - 1] == ' ') {
+            mention = false;
+          }
+        });
       }
 
       if (mention) {
@@ -181,7 +182,6 @@ class ChatInputState extends State<ChatInput> {
       } else {
         users = [];
       }
-    });
 
     // start an interval for updating typing status
     if (widget.focusNode.hasFocus && typingNotifier == null) {
