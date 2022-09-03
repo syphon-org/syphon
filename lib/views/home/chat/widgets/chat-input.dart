@@ -152,14 +152,16 @@ class ChatInputState extends State<ChatInput> {
     users = props!.users;
 
       if(cursorPos > 0) {
-        setState((){
           if(text[cursorPos - 1] == '@' && !mention) {
-            mention = true;
+            setState((){
+                mention = true;
+            });
           }
           else if (text[cursorPos - 1] == ' ') {
-            mention = false;
+            setState((){
+                mention = false;
+            });
           }
-        });
       }
 
       if (mention) {
