@@ -150,16 +150,24 @@ class ChatInputState extends State<ChatInput> {
 
     // mention-dialog
     setState(() {
-      mention = false;
+      final int cursorPos = widget.controller.selection.baseOffset;
       users = props!.users;
 
-      if (text.startsWith('@') || text.contains(' @')) {
-        mention = true;
+      if(cursorPos > 0) {
+        if(text[cursorPos - 1] == '@' && !mention) {
+          mention = true;
+        }
+        else if (text[cursorPos - 1] == ' ') {
+          mention = false;
+        }
+      }
+
+      if (mention) {
         users = users.where((user) {
           if (user != null) {
             final String searchText = text
                 .toLowerCase()
-                .substring(text.indexOf('@') + 1, text.length);
+                .substring(text.lastIndexOf('@') + 1, text.length);
 
             if (user.userId != null) {
               return user.userId!.toLowerCase().contains(searchText);
