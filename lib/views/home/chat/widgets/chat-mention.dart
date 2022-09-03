@@ -29,8 +29,10 @@ class MentionState extends State<Mention> {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-        constraints:
-            BoxConstraints(maxHeight: widget.height, maxWidth: widget.width),
+        constraints: BoxConstraints(
+            maxHeight: widget.height,
+            maxWidth: widget.width
+        ),
         child: ListView.builder(
           itemBuilder: (buildContext, index) {
             final String userName = formatUsername(widget.users[index] as User);

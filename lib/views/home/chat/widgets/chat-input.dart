@@ -23,11 +23,10 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/views/home/chat/widgets/chat-mention.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/containers/media-card.dart';
 import 'package:syphon/views/widgets/lists/list-local-images.dart';
-
-import 'chat-mention.dart';
 
 const DEFAULT_BORDER_RADIUS = 24.0;
 
