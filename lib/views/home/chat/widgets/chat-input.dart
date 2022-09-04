@@ -148,41 +148,32 @@ class ChatInputState extends State<ChatInput> {
     });
 
     // mention-dialog
-    final int cursorPos = widget.controller.selection.baseOffset;
     users = props!.users;
 
-      if(cursorPos > 0) {
-          if(text[cursorPos - 1] == '@' && !mention) {
-            setState((){
-                mention = true;
-            });
-          }
-          else if (text[cursorPos - 1] == ' ') {
-            setState((){
-                mention = false;
-            });
-          }
-      }
+    final cursorPos = widget.controller.selection.baseOffset;
+    final subString = text.substring(0, cursorPos);
 
-      if (mention) {
-        users = users.where((user) {
-          if (user != null) {
-            final String searchText = text
-                .toLowerCase()
-                .substring(text.lastIndexOf('@') + 1, text.length);
+    mention = false;
 
-            if (user.userId != null) {
-              return user.userId!.toLowerCase().contains(searchText);
-            } else {
-              return user.displayName!.toLowerCase().contains(searchText);
-            }
-          } else {
-            return false;
-          }
-        }).toList();
-      } else {
-        users = [];
-      }
+    final RegExp mentionExpEnd = RegExp(
+      r'\B@\w+$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+
+    final match = mentionExpEnd.firstMatch(subString);
+
+    if(match != null){
+      final mention = subString.substring(match.start, match.end);
+      final mentionName = mention.substring(1, mention.length);
+
+      users = users.where((user) => user!.displayName!.toLowerCase().contains(mentionName.toLowerCase())).toList();
+
+      setState(() {
+        this.mention = users.isNotEmpty;
+      });
+    }
+
 
     // start an interval for updating typing status
     if (widget.focusNode.hasFocus && typingNotifier == null) {
