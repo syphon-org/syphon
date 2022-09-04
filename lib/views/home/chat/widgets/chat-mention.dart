@@ -63,15 +63,23 @@ class MentionState extends State<Mention> {
   }
 
   onTab(User user) {
-    setState(() {
-      final textLength = widget.controller.text.length;
       final text = widget.controller.text;
+      final cursorPos = widget.controller.selection.baseOffset;
 
-      widget.controller.text = '${text.substring(0, text.lastIndexOf("@"))} ${user.userId}';
+      final subText = text.substring(0, cursorPos);
 
+      final RegExp mentionExpEnd = RegExp(
+        r'\B@\w+$',
+        caseSensitive: false,
+        multiLine: false,
+      );
+
+      widget.controller.text = subText.replaceAll(mentionExpEnd, '${user.userId} ') + text.substring(cursorPos);
       widget.controller.selection = TextSelection.fromPosition(
-          TextPosition(offset: widget.controller.text.length));
-      widget.visible = false;
-    });
+          TextPosition(offset: widget.controller.text.length)); // move cursor to end
+
+      setState(() {
+        widget.visible = false;
+      });
   }
 }
