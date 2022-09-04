@@ -65,7 +65,6 @@ class MentionState extends State<Mention> {
   onTab(User user) {
       final text = widget.controller.text;
       final cursorPos = widget.controller.selection.baseOffset;
-
       final subText = text.substring(0, cursorPos);
 
       final RegExp mentionExpEnd = RegExp(
