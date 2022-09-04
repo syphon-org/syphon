@@ -149,11 +149,10 @@ class ChatInputState extends State<ChatInput> {
 
     // mention-dialog
     users = props!.users;
+    mention = false;
 
     final cursorPos = widget.controller.selection.baseOffset;
     final subString = text.substring(0, cursorPos);
-
-    mention = false;
 
     final RegExp mentionExpEnd = RegExp(
       r'\B@\w+$',
