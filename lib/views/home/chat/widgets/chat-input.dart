@@ -163,7 +163,7 @@ class ChatInputState extends State<ChatInput> {
 
     final match = mentionExpEnd.firstMatch(subString);
 
-    if(match != null){
+    if (match != null) {
       final mention = subString.substring(match.start, match.end);
       final mentionName = mention.substring(1, mention.length);
 
@@ -174,12 +174,10 @@ class ChatInputState extends State<ChatInput> {
                 .contains(mentionName.toLowerCase());
       }).toList();
 
-
       setState(() {
         this.mention = users.isNotEmpty;
       });
     }
-
 
     // start an interval for updating typing status
     if (widget.focusNode.hasFocus && typingNotifier == null) {
