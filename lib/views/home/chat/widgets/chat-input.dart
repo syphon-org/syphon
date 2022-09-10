@@ -168,7 +168,10 @@ class ChatInputState extends State<ChatInput> {
       final mentionName = mention.substring(1, mention.length);
 
       users = props.users.where((user) {
-        return user!.displayName!.toLowerCase().contains(mentionName.toLowerCase());
+        return user != null &&
+            user!.displayName!
+                .toLowerCase()
+                .contains(mentionName.toLowerCase());
       }).toList();
 
 
