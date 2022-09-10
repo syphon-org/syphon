@@ -15,7 +15,7 @@ class Mention extends StatefulWidget {
       this.height = 200})
       : super(key: key);
 
-  final List<dynamic> users;
+  final List<User> users;
   final double width;
   final double height;
   final TextEditingController controller;
@@ -35,14 +35,14 @@ class MentionState extends State<Mention> {
         ),
         child: ListView.builder(
           itemBuilder: (buildContext, index) {
-            final String userName = formatUsername(widget.users[index] as User);
+            final String userName = formatUsername(widget.users[index]);
             return Visibility(
                 visible: widget.visible,
                 child: Card(
                   child: ListTile(
                     onTap: () => onTab(widget.users[index]),
                     leading: Avatar(
-                      uri: widget.users[index]?.avatarUri,
+                      uri: widget.users[index].avatarUri,
                       alt: userName,
                       size: Dimensions.avatarSizeMin,
                       background: AppColors.hashedColor(
@@ -50,7 +50,7 @@ class MentionState extends State<Mention> {
                       ),
                     ),
                     title: Text(userName),
-                    subtitle: Text(widget.users[index]?.userId),
+                    subtitle: Text(widget.users[index].userId!),
                   ),
                 ));
           },

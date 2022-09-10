@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -166,7 +167,10 @@ class ChatInputState extends State<ChatInput> {
       final mention = subString.substring(match.start, match.end);
       final mentionName = mention.substring(1, mention.length);
 
-      users = users.where((user) => user!.displayName!.toLowerCase().contains(mentionName.toLowerCase())).toList();
+      users = props.users.where((user) {
+        return user!.displayName!.toLowerCase().contains(mentionName.toLowerCase());
+      }).toList();
+
 
       setState(() {
         this.mention = users.isNotEmpty;
@@ -425,7 +429,7 @@ class ChatInputState extends State<ChatInput> {
                     width: MediaQuery.of(context).size.width -
                         Dimensions.buttonSendSize *
                             2.1, // HACK: fix the width of the dialog
-                    users: users,
+                    users: users.whereNotNull().toList(),
                     controller: widget.controller,
                   )),
               Visibility(
