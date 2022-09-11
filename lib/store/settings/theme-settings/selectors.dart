@@ -224,13 +224,10 @@ String selectReadReceiptsString(ReadReceiptTypes readReceipts) {
   switch (readReceipts) {
     case ReadReceiptTypes.On:
       return Strings.labelOn;
-
     case ReadReceiptTypes.Off:
       return Strings.labelOff;
-
     case ReadReceiptTypes.Private:
       return Strings.labelPrivate;
-
     default: //I've not been coded for this one yet
       return readReceipts.name;
   }
