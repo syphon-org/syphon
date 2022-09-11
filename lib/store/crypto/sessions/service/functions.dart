@@ -56,8 +56,8 @@ Future<bool> backupSessionKeys({
   required Map<String, Map<String, DeviceKey>> deviceKeys,
   required Map<String, Map<String, List<MessageSession>>> messageSessions,
 }) async {
-  if (DEBUG_MODE) {
-    log.json({
+  if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+    log.jsonDebug({
       'directory': directory,
       'password': password,
       'deviceKeys': deviceKeys,
@@ -115,9 +115,8 @@ Future<bool> backupSessionKeys({
     }
   }
 
-  // for debugging only
-  if (DEBUG_MODE) {
-    log.json({
+  if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+    log.jsonDebug({
       'context': 'worker',
       'sessionData': sessionData,
     });
@@ -139,9 +138,8 @@ Future<bool> backupSessionKeys({
 
   await file.writeAsString(encryptedExport);
 
-  // for debugging only
-  if (DEBUG_MODE) {
-    log.json({
+  if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+    log.jsonDebug({
       'context': 'worker',
       'status': 'completed',
     });

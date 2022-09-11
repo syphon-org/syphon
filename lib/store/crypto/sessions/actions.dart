@@ -536,11 +536,11 @@ ThunkAction<AppState> exportSessionKeys(String password) {
       }
 
       // for debugging only
-      // if (DEBUG_MODE) {
-      //   log.json({
-      //     'sessionData': sessionData,
-      //   });
-      // }
+      if (DEBUG_MODE && DEBUG_OLM_MODE) {
+        log.jsonDebug({
+          'sessionData': sessionData,
+        });
+      }
 
       // encrypt exported session keys
       final String encryptedExport = await compute(encryptSessionKeysThreaded, {
@@ -619,14 +619,14 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file,
         final sessionIndexNew = inboundSession.first_known_index();
 
         // for debugging only
-        // if (DEBUG_MODE) {
-        //   final sessionIdNew = inboundSession.session_id();
+        if (DEBUG_MODE && DEBUG_OLM_MODE) {
+          final sessionIdNew = inboundSession.session_id();
 
-        //   log.json({
-        //     'sessionIdNew': sessionIdNew,
-        //     'sessionIndexNew': sessionIndexNew,
-        //   });
-        // }
+          log.jsonDebug({
+            'sessionIdNew': sessionIdNew,
+            'sessionIndexNew': sessionIndexNew,
+          });
+        }
 
         final messageSession = MessageSession(
           index: sessionIndexNew,
