@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/libs/updater/update-check.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/hooks.dart';
 import 'package:syphon/store/index.dart';
@@ -20,6 +22,7 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-bar-expanding.dart';
 import 'package:syphon/views/widgets/containers/fabs/fab-ring.dart';
+import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class HomeScreen extends HookWidget {
@@ -31,8 +34,10 @@ class HomeScreen extends HookWidget {
       (state) => state.syncStore.lastSince,
     );
 
-    final checkForUpdatesEnabled =
-        useSelector<AppState, bool>((state) => state.settingsStore.checkForUpdatesEnabled) ?? false;
+    final checkForUpdatesEnabled = useSelector<AppState, bool>(
+          (state) => state.settingsStore.checkForUpdatesEnabled,
+        ) ??
+        false;
 
     final searchLoading = useSelector<AppState, bool>(
           (state) => state.searchStore.loading,
@@ -72,6 +77,38 @@ class HomeScreen extends HookWidget {
     final searchFocusNode = useFocusNode();
 
     useEffect(() {
+      checkAppUpdate() async {
+        if (checkForUpdatesEnabled) {
+          final hasUpdate = await UpdateChecker.checkHasUpdate();
+          if (hasUpdate) {
+            await showDialog(
+              context: context,
+              builder: (dialogContext) => DialogConfirm(
+                title: Strings.titleDialogRemoteUpdate.capitalize(),
+                content: Strings.contentDialogRemoteUpdate(UpdateChecker.latestVersion),
+                confirmStyle: TextStyle(color: Color(AppColors.cyanSyphon)),
+                confirmText: Strings.buttonConfirmFormal.capitalize(),
+                onDismiss: () async {
+                  await UpdateChecker.markDismissed(UpdateChecker.latestVersion);
+                  Navigator.pop(dialogContext);
+                },
+                onConfirm: () async {
+                  await UpdateChecker.markUpdated(UpdateChecker.latestVersion);
+
+                  try {
+                    log.info('Download or redirect to APK here'); // TODO:
+                  } catch (error) {
+                    log.error(error.toString());
+                  }
+
+                  Navigator.of(dialogContext).pop();
+                },
+              ),
+            );
+          }
+        }
+      }
+
       checkTermsTimestamp() async {
         final firstLoginMillis = await loadTermsAgreement();
         final firstLoginTimestamp = DateTime.fromMillisecondsSinceEpoch(firstLoginMillis);
@@ -80,6 +117,7 @@ class HomeScreen extends HookWidget {
         }
       }
 
+      checkAppUpdate();
       checkTermsTimestamp();
       return null;
     }, []);
@@ -204,11 +242,6 @@ class HomeScreen extends HookWidget {
         onToggleChatOptions: (room) => onToggleChatOptions(room: room),
         onDismissChatOptions: () => onDismissChatOptions(),
       );
-    }
-
-    if (checkForUpdatesEnabled) {
-      UpdateChecker.checkForUpdate();
-      if (UpdateChecker.updateAvailable) {}
     }
 
     return Scaffold(
