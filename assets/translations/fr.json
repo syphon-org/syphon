@@ -60,7 +60,7 @@
     "button-deactivate": "désactiver",
     "button-confirm-verification": "confirmer la vérification",
     "button-send-verification": "envoyer le courriel de vérification",
-    "button-block-user": "bloquer l'utilisateur",
+    "button-block-user": "Bloquer l'utilisateur",
     "button-delete-keys": "supprimer les clés",
     "button-enable": "activer",
     "button-confirm-formal": "confirmer",
@@ -132,7 +132,7 @@
     "header-signup-username": "Créer un nom d'utilisateur",
     "header-intro": "La vie privée et la liberté\nsans les inconvénients.",
     "header-login": "reprenez la discussion",
-    "button-leave-chat": "quitter la discussion",
+    "button-leave-chat": "Quitter la discussion",
     "label-close": "fermer",
     "button-text-invite": "Inviter des amis",
     "button-chat-details": "informations sur le salon",
@@ -336,5 +336,11 @@
     "content-export-session-keys-enter-password": "Saisissez un mot de passe pour crypter vos clés de session.",
     "content-import-session-keys": "Saisissez le mot de passe pour cette importation de clé de session.\n\nVeuillez noter que l'importation peut prendre un certain temps.",
     "semantics-image-password-update": "Utilisateur imaginant un mot de passe dans un tourbillon de vent",
-    "alert-copied-to-clipboard": "Copié dans le presse-papiers"
+    "alert-copied-to-clipboard": "Copié dans le presse-papiers",
+    "label-fab-search": "Recherche de discussions",
+    "label-fab-create-dm": "Message direct",
+    "label-fab-create-group": "Commencer une discussion de groupe",
+    "label-fab-create-public": "Commencer une discussion publique",
+    "content-key-backup-warning": "En raison du traitement en arrière-plan sur iOS, votre sauvegarde programmée peut ou non se déclencher en fonction de la batterie, de la puissance de traitement et d'autres facteurs.\n\nAssurez-vous toujours que vos sauvegardes sont enregistrées de manière appropriée.",
+    "title-dialog-key-backup-warning": "Avertissement concernant la sauvegarde des clés"
 }
