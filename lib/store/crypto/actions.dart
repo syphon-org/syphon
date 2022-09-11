@@ -8,6 +8,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/actions.dart';
@@ -160,11 +161,15 @@ ThunkAction<AppState> updateKeySessions({
         ),
       );
 
-      log.json({'updateKeySessions': 'HIT'});
+      if (DEBUG_MODE && DEBUG_OLM_MODE) {
+        log.jsonDebug({'updateKeySessions': 'HIT'});
+      }
 
       store.dispatch(setDeviceKeys(deviceKeysRoomUsers));
 
-      log.json({'updateKeySessions': 'SET'});
+      if (DEBUG_MODE && DEBUG_OLM_MODE) {
+        log.jsonDebug({'updateKeySessions': 'SET'});
+      }
 
       // get deviceKeys for every user present in the chat
       final devicesWithoutMessageSessions = filterDevicesWithoutMessageSessions(

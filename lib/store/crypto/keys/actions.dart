@@ -498,7 +498,6 @@ ThunkAction<AppState> fetchDeviceKeys({
       ));
     }
 
-    log.debug('${deviceKeysNew.runtimeType}');
     return deviceKeysNew;
   };
 }

@@ -4,6 +4,7 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
@@ -449,20 +450,18 @@ class Sync {
         (msg) => msg.timestamp > room.lastUpdate,
       );
 
-      log.json({
-        'roomId': room.name,
-        'latestMessage': latestMessage,
-        'messagesTotal': messages.length,
-      });
-
       if (latestMessage != null) {
         lastUpdateNew = latestMessage.timestamp;
       }
 
-      log.json({
-        'roomId': room.name,
-        'lastUpdateNew': lastUpdateNew,
-      });
+      if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+        log.jsonDebug({
+          'roomId': room.name,
+          'latestMessage': latestMessage,
+          'messagesTotal': messages.length,
+          'lastUpdateNew': lastUpdateNew,
+        });
+      }
 
       // limited indicates need to fetch additional data for room timelines
       if (room.limited) {
@@ -621,8 +620,8 @@ class Sync {
       return sync;
     }
 
-    if (room.limited) {
-      log.json({
+    if (DEBUG_MODE && room.limited) {
+      log.jsonDebug({
         'from': '[parseSync]',
         'room': room.name,
         'limited': room.limited,

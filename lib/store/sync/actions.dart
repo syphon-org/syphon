@@ -343,8 +343,8 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       final room = sync.room;
       final events = sync.events;
 
-      if (DEBUG_MODE) {
-        log.json({
+      if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+        log.jsonDebug({
           'from': '[syncRooms]',
           'room': room.name,
           'synced': synced,
@@ -408,8 +408,8 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
         ),
       );
 
-      if (DEBUG_MODE) {
-        log.json({
+      if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+        log.jsonDebug({
           'room': room,
         });
       }

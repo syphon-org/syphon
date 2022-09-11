@@ -69,6 +69,8 @@ class Values {
 // ignore: non_constant_identifier_names
 const bool DEBUG_MODE = !kReleaseMode;
 const bool SHOW_BORDERS = false;
+const bool DEBUG_PAYLOADS_MODE = false;
+const bool DEBUG_OLM_MODE = false;
 
 class SupportedLanguages {
   static const defaultLang = 'en';

@@ -1,12 +1,12 @@
 start: 
-	flutter run # -d <device_id>
+	make builder && flutter run # -d <device_id>
 start-fresh: 
 	flutter run --no-fast-start # -d <device_id>
 devices: 
 	flutter devices
 install: 
 	flutter pub get
-build: 
+builder: 
 	make install && flutter pub run build_runner build --delete-conflicting-outputs
 watch: 
 	flutter pub run build_runner watch --delete-conflicting-outputs

@@ -28,8 +28,6 @@ abstract class Rooms {
   }) async {
     String url = '$protocol$homeserver/_matrix/client/r0/sync';
 
-    log.debug(url);
-
     final fullSync = since == null && filter == null;
 
     // Params
