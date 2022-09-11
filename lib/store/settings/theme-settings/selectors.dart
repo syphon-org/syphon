@@ -222,11 +222,11 @@ double? selectAppBarElevation(ThemeType themeTypeNew) {
 
 String selectReadReceiptsString(ReadReceiptTypes readReceipts) {
   switch (readReceipts) {
-    case ReadReceiptTypes.Off:
-      return Strings.labelOff;
-
     case ReadReceiptTypes.On:
       return Strings.labelOn;
+
+    case ReadReceiptTypes.Off:
+      return Strings.labelOff;
 
     case ReadReceiptTypes.Private:
       return Strings.labelPrivate;
