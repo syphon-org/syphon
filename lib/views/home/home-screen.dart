@@ -7,6 +7,7 @@ import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/libs/updater/update-check.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:syphon/store/hooks.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -97,6 +98,7 @@ class HomeScreen extends HookWidget {
 
                   try {
                     log.info('Download or redirect to APK here'); // TODO:
+                    await launchUrl(UpdateChecker.latestBuildUri.toString());
                   } catch (error) {
                     log.error(error.toString());
                   }
