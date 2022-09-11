@@ -106,9 +106,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
-        title: 'Block User',
-        content:
-            'If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.',
+        title: Strings.titleDialogBlockUser,
+        content: Strings.contentBlockUser(user!.displayName),
         onConfirm: () async {
           await props.onBlockUser(user.userId);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -147,7 +146,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
                 padding: defaultPadding,
                 child: Text(
-                  'Mute for 1 hour',
+                  Strings.listItemMuteForOneHour,
                   style: Theme.of(context).textTheme.subtitle1,
                 )),
             onTap: () {
@@ -159,7 +158,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 8 hours',
+                Strings.listItemMuteForHours(8),
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -172,7 +171,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 1 day',
+                Strings.listItemMuteForOneDay,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -185,7 +184,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 7 days',
+                Strings.listItemMuteForDays(7),
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -198,7 +197,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Always',
+                Strings.labelAlways,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -388,31 +387,31 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     const PopupMenuItem<ChatOptions>(
                       enabled: false,
                       value: ChatOptions.search,
-                      child: Text('Search'),
+                      child: Text('Search'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       enabled: false,
                       value: ChatOptions.allMedia,
-                      child: Text('All Media'),
+                      child: Text('All Media'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.chatSettings,
-                      child: Text('Chat Settings'),
+                      child: Text('Chat Settings'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.inviteFriends,
-                      child: Text('Invite Friends'),
+                      child: Text('Invite Friends'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.muteNotifications,
-                      child: Text('Mute Notifications'),
+                      child: Text('Mute Notifications'), //TODO i18n
                     ),
                   ];
 
                   if (widget.room.direct) {
                     menu.add(const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.blockUser,
-                      child: Text('Block User'),
+                      child: Text('Block User'), //TODO i18n
                     ));
                   }
 

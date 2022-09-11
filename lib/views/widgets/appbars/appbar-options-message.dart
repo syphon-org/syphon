@@ -102,7 +102,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.info),
-            tooltip: 'Message Details',
+            tooltip: Strings.tooltipMessageDetails,
             color: Colors.white,
             onPressed: () {
               Navigator.pushNamed(
@@ -122,7 +122,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             child: IconButton(
               icon: Icon(Icons.delete),
               iconSize: 28.0,
-              tooltip: 'Delete Message',
+              tooltip: Strings.tooltipDeleteMessage,
               color: Colors.white,
               onPressed: () {
                 widget.onDelete?.call();
@@ -135,7 +135,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             child: IconButton(
               icon: Icon(Icons.edit_rounded),
               iconSize: 28.0,
-              tooltip: 'Edit Message',
+              tooltip: Strings.tooltipEditMessage,
               color: Colors.white,
               onPressed: () {
                 widget.onEdit?.call();
@@ -147,7 +147,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             child: IconButton(
               icon: Icon(Icons.content_copy),
               iconSize: 22.0,
-              tooltip: 'Copy Message Content',
+              tooltip: Strings.tooltipCopyMessageContent,
               color: Colors.white,
               onPressed: () {
                 Clipboard.setData(
@@ -163,7 +163,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
           IconButton(
             icon: Icon(Icons.reply),
             iconSize: 28.0,
-            tooltip: 'Quote and Reply',
+            tooltip: Strings.tooltipQuoteAndReply,
             color: Colors.white,
             onPressed: () async {
               final store = StoreProvider.of<AppState>(context);
@@ -179,7 +179,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
           IconButton(
             icon: Icon(Icons.share),
             iconSize: 24.0,
-            tooltip: 'Share Chats',
+            tooltip: Strings.tooltipShareChats,
             color: Colors.white,
             onPressed: () {
               final room = widget.message!.roomId!;
