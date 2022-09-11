@@ -72,12 +72,12 @@ class FabRing extends StatelessWidget {
             fabOpenIcon: Icon(
               Icons.bubble_chart,
               size: Dimensions.iconSizeLarge,
-              semanticLabel: 'Open Actions Ring',
+              semanticLabel: Strings.semanticsOpenActionsRing,
               color: Colors.white,
             ),
             fabCloseIcon: Icon(
               Icons.close,
-              semanticLabel: 'Close Actions Ring',
+              semanticLabel: Strings.semanticsCloseActionsRing,
               color: Colors.white,
             ),
             fabColor: props.primaryColor,

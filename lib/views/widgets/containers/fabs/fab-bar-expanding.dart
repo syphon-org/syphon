@@ -91,13 +91,13 @@ class FabBarExpanding extends StatelessWidget {
           ],
           activeChild: Icon(
             Icons.close,
-            semanticLabel: 'Close Actions Ring',
+            semanticLabel: Strings.semanticsCloseActionsRing,
             color: Colors.white,
           ),
           child: Icon(
             Icons.bubble_chart,
             size: Dimensions.iconSizeLarge,
-            semanticLabel: 'Open Actions Ring',
+            semanticLabel: Strings.semanticsOpenActionsRing,
             color: Colors.white,
           ),
         ),

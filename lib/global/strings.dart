@@ -93,9 +93,8 @@ class Strings {
       tr('title-dialog-enter-new-screen-lock-pin');
   static final titleDialogVerifyNewScreenLockPin =
       tr('title-dialog-verify-new-screen-lock-pin');
-  static final titleDialogPhotoPermission =
-  tr('title-dialog-photo-permission');
-
+  static final titleDialogPhotoPermission = tr('title-dialog-photo-permission');
+  static final titleDialogBlockUser = tr('title-dialog-block-user');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -104,6 +103,8 @@ class Strings {
   static final subtitleSettingsSyncInterval =
       tr('subtitle-settings-sync-interval');
   static final subtitleSettingsSyncToggle = tr('subtitle-settings-sync-toggle');
+  static final subtitleSettingsReadReceipts =
+      tr('subtitle-settings-read-receipts');
   static final subtitleToggleAutocorrect = tr('subtitle-toggle-autocorrect');
   static final subtitleToggleSuggestions = tr('subtitle-toggle-suggestions');
   static final subtitleShowMembershipEvents =
@@ -165,6 +166,7 @@ class Strings {
       tr('label-deleted-message'); // 'This message was deleted';
   static final labelOn = tr('label-on'); // 'On';
   static final labelOff = tr('label-off'); // 'Off';
+  static final labelPrivate = tr('label-private');
   static final labelTermsOfService = tr('label-terms-of-service');
   static final labelSearchUnencrypted = tr('label-search-unencrypted');
   static final labelAbout = tr('label-about');
@@ -180,6 +182,8 @@ class Strings {
   static final labelCurrentPassword = tr('label-current-password');
   static final labelNewPassword = tr('label-new-password');
   static final labelConfirmNewPassword = tr('label-confirm-new-password');
+  static final labelAlways = tr('label-always');
+  static final labelSearch = tr('label-search');
 
   static final labelFabSearch = tr('label-fab-search');
   static final labelFabCreateDM = tr('label-fab-create-dm');
@@ -203,6 +207,8 @@ class Strings {
       tr('list-item-settings-sync-interval');
   static final listItemSettingsSyncToggle =
       tr('list-item-settings-sync-toggle');
+  static final listItemSettingsReadReceipts =
+      tr('list-item-settings-read-receipts');
 
   static final listItemSettingsLanguage = tr('list-item-settings-language');
   static final listItemSettingsShowMembershipEvents =
@@ -294,6 +300,13 @@ class Strings {
   static final listItemChatDetailPrivacyStatus =
       tr('list-item-chat-detail-privacy-status');
   static final listItemChatDetailViewKey = tr('list-item-chat-detail-view-key');
+
+  static final listItemMuteForOneHour = tr('list-item-mute-for-one-hour');
+  static String listItemMuteForHours(int? hours) =>
+      tr('list-item-mute-for-hours', args: ['$hours']);
+  static final listItemMuteForOneDay = tr('list-item-mute-for-one-day');
+  static String listItemMuteForDays(int? days) =>
+      tr('list-item-mute-for-days', args: ['$days']);
 
   // Buttons
   static final buttonLogin = tr('button-login');
@@ -405,6 +418,8 @@ class Strings {
   static final contentKeyExportWarning =
       tr('content-dialog-devices-key-export');
   static final contentPhotoPermission = tr('content-dialog-photo-permission');
+  static String contentBlockUser(String? user) =>
+      tr('content-dialog-block-user', args: ['$user']);
   static final contentEmailRequirement = tr('content-signup-email-requirement');
   static final contentEmailVerification =
       tr('content-signup-email-verification');
@@ -532,6 +547,8 @@ class Strings {
   static final semanticsCreatePublicRoom = tr('semantics-create-public-room');
   static final semanticsImagePasswordUpdate =
       tr('semantics-image-password-update');
+  static final semanticsCloseActionsRing = tr('semantics-close-actions-ring');
+  static final semanticsOpenActionsRing = tr('semantics-open-actions-ring');
 
   // Labels
   static final labelProxyHost = tr('label-proxy-host');
@@ -541,10 +558,24 @@ class Strings {
   static final labelPassword = tr('label-password');
   static final labelDefault = tr('label-default');
 
+  static final popupMenuItemSearch = tr('popup-menu-item-search');
+  static final popupMenuItemAllMedia = tr('popup-menu-item-all-media');
+  static final popupMenuItemChatSettings = tr('popup-menu-item-chat-settings');
+  static final popupMenuItemInviteFriends =
+      tr('popup-menu-item-invite-friends');
+  static final popupMenuItemMuteNotifications =
+      tr('popup-menu-item-mute-notifications');
+
   // Tooltips
   static final tooltipProfileAndSettings = tr('tooltip-profile-settings');
   static final tooltipSearchChats = tr('tooltip-search-chats');
   static final tooltipSearchUnencrypted = tr('tooltip-search-unencrypted');
   static final tooltipCancelReply = tr('tooltip-cancel-reply');
   static final tooltipSearchUsers = tr('tooltip-search-users');
+  static final tooltipMessageDetails = tr('tooltip-message-details');
+  static final tooltipDeleteMessage = tr('tooltip-delete-message');
+  static final tooltipEditMessage = tr('tooltip-edit-message');
+  static final tooltipCopyMessageContent = tr('tooltip-copy-message-content');
+  static final tooltipQuoteAndReply = tr('tooltip-quote-and-reply');
+  static final tooltipShareChats = tr('tooltip-share-chats');
 }

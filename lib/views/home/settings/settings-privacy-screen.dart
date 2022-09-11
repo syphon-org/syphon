@@ -734,10 +734,10 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                             onTap: () => props.onIncrementReadReceipts(),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
-                              'Read Receipts',
+                              Strings.listItemSettingsReadReceipts,
                             ),
                             subtitle: Text(
-                              'If read receipts are disabled or hidden, users will not see solid read indicators for your messages.',
+                              Strings.subtitleSettingsReadReceipts,
                               style: Theme.of(context).textTheme.caption,
                             ),
                             trailing: Text(props.readReceipts),
