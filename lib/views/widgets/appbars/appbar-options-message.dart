@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/selectors.dart';
+import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
@@ -27,6 +30,7 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
     this.isUserSent = false,
     this.onCopy,
     this.onDelete,
+    this.onReply,
     this.onEdit,
     this.onDismiss,
     required this.user,
@@ -48,6 +52,7 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
 
   final Function? onCopy;
   final Function? onEdit;
+  final Function? onReply;
   final Function? onDelete;
   final Function? onDismiss;
 
@@ -160,7 +165,16 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
             iconSize: 28.0,
             tooltip: 'Quote and Reply',
             color: Colors.white,
-            onPressed: () {},
+            onPressed: () async {
+              final store = StoreProvider.of<AppState>(context);
+              final roomId = widget.message!.roomId!;
+
+              store.dispatch(selectReply(roomId: roomId, message: widget.message));
+
+              widget.onDismiss?.call();
+
+              widget.onReply?.call();
+            },
           ),
           IconButton(
             icon: Icon(Icons.share),
