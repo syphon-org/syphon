@@ -79,36 +79,39 @@ class HomeScreen extends HookWidget {
 
     useEffect(() {
       checkAppUpdate() async {
-        if (checkForUpdatesEnabled) {
-          final hasUpdate = await UpdateChecker.checkHasUpdate();
-          if (hasUpdate) {
-            await showDialog(
-              context: context,
-              builder: (dialogContext) => DialogConfirm(
-                title: Strings.titleDialogRemoteUpdate.capitalize(),
-                content: Strings.contentDialogRemoteUpdate(UpdateChecker.latestVersion),
-                confirmStyle: TextStyle(color: Color(AppColors.cyanSyphon)),
-                confirmText: Strings.buttonConfirmFormal.capitalize(),
-                onDismiss: () async {
-                  await UpdateChecker.markDismissed(UpdateChecker.latestVersion);
-                  Navigator.pop(dialogContext);
-                },
-                onConfirm: () async {
-                  await UpdateChecker.markUpdated(UpdateChecker.latestVersion);
+        // ignore if not enabled
+        if (!checkForUpdatesEnabled) return;
 
-                  try {
-                    log.info('Download or redirect to APK here'); // TODO:
-                    await launchUrl(UpdateChecker.latestBuildUri.toString());
-                  } catch (error) {
-                    log.error(error.toString());
-                  }
+        final hasUpdate = await UpdateChecker.checkHasUpdate();
 
-                  Navigator.of(dialogContext).pop();
-                },
-              ),
-            );
-          }
-        }
+        // ignore if no update is present
+        if (!hasUpdate) return;
+
+        await showDialog(
+          context: context,
+          builder: (dialogContext) => DialogConfirm(
+            title: Strings.titleDialogRemoteUpdate.capitalize(),
+            content: Strings.contentDialogRemoteUpdate(UpdateChecker.latestVersion),
+            confirmStyle: TextStyle(color: Color(AppColors.cyanSyphon)),
+            confirmText: Strings.buttonConfirmFormal.capitalize(),
+            onDismiss: () async {
+              await UpdateChecker.markDismissed(UpdateChecker.latestVersion);
+              Navigator.pop(dialogContext);
+            },
+            onConfirm: () async {
+              await UpdateChecker.markUpdated(UpdateChecker.latestVersion);
+
+              try {
+                log.info('Download or redirect to APK here'); // TODO:
+                await launchUrl(UpdateChecker.latestBuildUri.toString());
+              } catch (error) {
+                log.error(error.toString());
+              }
+
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+        );
       }
 
       checkTermsTimestamp() async {
