@@ -212,7 +212,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
-      log.info('[fetchSync] *** starting fetch direct rooms *** ');
+      log.info('[fetchDirectRooms] *** fetch direct rooms *** ');
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,

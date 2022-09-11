@@ -350,7 +350,6 @@ Device generateDeviceId({String salt = ''}) {
       deviceId: deviceIdHash,
       displayName: Values.appDisplayName,
     );
-    log.json({'device': device});
 
     return device;
   } catch (error) {

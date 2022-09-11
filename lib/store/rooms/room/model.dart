@@ -4,7 +4,6 @@ import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/sync/parsers/parsers.dart';
 import 'package:syphon/store/user/model.dart';
 
 part 'model.g.dart';
@@ -35,9 +34,12 @@ class Room implements drift.Insertable<Room> {
   final bool hidden;
   final bool archived;
 
+  // oldest batch in timeline
   final String? lastBatch; // oldest batch in timeline
-  final String? prevBatch; // most recent prev_batch (not the lastBatch)
-  final String? nextBatch; // most recent next_batch
+  // most recent batch from the last /sync
+  final String? prevBatch;
+  // next batch - or lastSince - in the timeline
+  final String? nextBatch;
 
   final int lastRead;
   final int lastUpdate;
@@ -196,56 +198,6 @@ class Room implements drift.Insertable<Room> {
     } catch (error) {
       return Room(id: json['room_id']);
     }
-  }
-
-  //
-  // setting all room values here exposes how many different
-  // event types can affect the room state in Matrix. Matrix can certainly
-  // be a bit all over the place with defining where and when a property is
-  // set, but the below is necessary to observe this explicitly
-  //
-  // NOTE: if you can clean up a reconciliation, DO IT BUT BE CAREFUL
-  //
-  Room fromSync({
-    required String? lastSince,
-    required SyncAccountData accountData,
-    required SyncStateDetails stateDetails,
-    required SyncMessageDetails messageDetails,
-    required SyncEphemerals ephemerals,
-    required SyncDetails syncDetails,
-  }) {
-    // NOTE: prevents limited fetch calls from recursively pulling messages
-    // final limitedOverwrite = syncDetails.overwrite ?? false ? false : null;
-
-    // TODO: fetchMessages makes prevBatch from syncDetails temporarily misassigned
-    return this.copyWith(
-      // next hash in the timeline
-      nextBatch: lastSince,
-      // oldest hash in the timeline
-      lastBatch:
-          syncDetails.lastBatch ?? this.lastBatch ?? syncDetails.prevBatch,
-      // most recent prev_batch from the last /sync
-      prevBatch: syncDetails.prevBatch,
-      name: stateDetails.name,
-      topic: stateDetails.topic,
-      invite: syncDetails.invite,
-      direct: accountData.direct ?? stateDetails.direct,
-      avatarUri: stateDetails.avatarUri,
-      joinRule: stateDetails.joinRule,
-      namePriority: stateDetails.namePriority,
-      lastUpdate: messageDetails.lastUpdate ?? stateDetails.lastUpdate,
-      limited: syncDetails.limited ?? messageDetails.limited,
-      encryptionEnabled: this.encryptionEnabled ||
-          (stateDetails.encryptionEnabled ?? false) ||
-          (messageDetails.encryptionEnabled ?? false),
-      userTyping: ephemerals.userTyping,
-      usersTyping: ephemerals.usersTyping,
-      totalJoinedUsers: syncDetails.totalMembers,
-      lastRead: ephemerals.lastRead,
-
-      // TODO: extract to pivot table for userIds associated by room
-      userIds: (stateDetails.userIds ?? {}).toList(),
-    );
   }
 
   // allows converting to message companion type for saving through drift

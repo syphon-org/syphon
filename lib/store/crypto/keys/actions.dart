@@ -232,11 +232,13 @@ ThunkAction<AppState> signOneTimeKeys(Map? oneTimeKeys) {
 /// *** Dendrite *** does not return current key counts
 /// through /sync _unless_ they change
 ///
-ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeyCounts) {
+ThunkAction<AppState> updateOneTimeKeyCounts(
+    Map<String, int> oneTimeKeyCounts) {
   return (Store<AppState> store) async {
     final currentKeyCounts = store.state.cryptoStore.oneTimeKeysCounts;
 
-    log.info('[updateOneTimeKeyCounts] $oneTimeKeyCounts, current $currentKeyCounts');
+    log.info(
+        '[updateOneTimeKeyCounts] $oneTimeKeyCounts, current $currentKeyCounts');
 
     // Confirm user has access token
     final accessToken = store.state.authStore.user.accessToken;
@@ -336,7 +338,8 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
     } catch (error) {
       store.dispatch(addAlert(
           error: error,
-          message: 'Failed to updated one time keys, please let us know at https://syphon.org',
+          message:
+              'Failed to updated one time keys, please let us know at https://syphon.org',
           origin: 'updateOneTimeKeys'));
     }
   };
@@ -361,7 +364,8 @@ ThunkAction<AppState> claimOneTimeKeys({
           }
 
           // add device ID to userID claims
-          claims[deviceKey.userId][deviceKey.deviceId] = Algorithms.signedcurve25519;
+          claims[deviceKey.userId][deviceKey.deviceId] =
+              Algorithms.signedcurve25519;
 
           return claims;
         },
@@ -372,7 +376,9 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
-        log.info('[claimOneTimeKeys] all key sharing sessions per device are ready');
+        log.info(
+          '[claimOneTimeKeys] all key sharing sessions per device are ready',
+        );
         return true;
       }
 
@@ -384,8 +390,12 @@ ThunkAction<AppState> claimOneTimeKeys({
         oneTimeKeys: claimKeysPayload,
       );
 
-      if (claimKeysResponse['errcode'] != null || claimKeysResponse['failures'].isNotEmpty) {
-        throw claimKeysResponse['error'];
+      if (claimKeysResponse['errcode'] != null ||
+          claimKeysResponse['failures'].isNotEmpty) {
+        log.json({
+          'error': claimKeysResponse,
+        });
+        throw claimKeysResponse['errcode'];
       }
 
       final oneTimeKeysClaimed = claimKeysResponse['one_time_keys'];
@@ -420,7 +430,8 @@ ThunkAction<AppState> claimOneTimeKeys({
         if (oneTimeKey == null) return;
 
         final userId = oneTimeKey.userId;
-        final deviceKey = store.state.cryptoStore.deviceKeys[userId!]![deviceId]!;
+        final deviceKey =
+            store.state.cryptoStore.deviceKeys[userId!]![deviceId]!;
         final identityKeyId = Keys.identityKeyId(deviceId: deviceKey.deviceId);
         final identityKey = deviceKey.keys![identityKeyId];
 
@@ -450,6 +461,8 @@ ThunkAction<AppState> fetchDeviceKeys({
   List<String?> userIds = const <String>[],
 }) {
   return (Store<AppState> store) async {
+    final Map<String, Map<String, DeviceKey>> deviceKeysNew = {};
+
     try {
       final Map<String, dynamic> userIdMap = Map.fromIterable(
         userIds,
@@ -466,28 +479,26 @@ ThunkAction<AppState> fetchDeviceKeys({
       );
 
       final Map<dynamic, dynamic> deviceKeys = data['device_keys'];
-      final Map<String, Map<String, DeviceKey>> newDeviceKeys = {};
 
       deviceKeys.forEach((userId, devices) {
         devices.forEach((deviceId, device) {
           final deviceKey = DeviceKey.fromMatrix(device);
 
-          if (newDeviceKeys[userId] == null) {
-            newDeviceKeys[userId] = {};
+          if (deviceKeysNew[userId] == null) {
+            deviceKeysNew[userId] = {};
           }
 
-          newDeviceKeys[userId]![deviceId] = deviceKey;
+          deviceKeysNew[userId]![deviceId] = deviceKey;
         });
       });
-
-      return newDeviceKeys;
     } catch (error) {
       store.dispatch(addAlert(
         error: error,
         origin: 'fetchDeviceKeys',
       ));
-      return const {};
     }
+
+    return deviceKeysNew;
   };
 }
 

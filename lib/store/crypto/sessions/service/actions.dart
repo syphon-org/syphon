@@ -44,8 +44,8 @@ ThunkAction<AppState> startKeyBackupService() {
     // find the amount of time that has passed since the last backup
     final nextBackupDelta = nextBackup.difference(DateTime.now());
 
-    if (DEBUG_MODE) {
-      log.json({
+    if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+      log.jsonDebug({
         'frequency': frequency.toString(),
         'lastBackup': lastBackup.toIso8601String(),
         'nextBackup': nextBackup.toIso8601String(),
