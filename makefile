@@ -15,6 +15,11 @@ uninstall:
 format: 
 	flutter dartfmt --line-length=120 .
 
+# environment
+setup:
+	make builder && git submodule update --init --recursive
+
+# building
 build-release-ios: 
 	flutter build ipa  --release # open under xcworkspace, not xcodeproj
 build-release-macos: 
@@ -41,8 +46,6 @@ log-android:
 	adb logcat ActivityManager:I flutter:I *:S
 
 # configuration and troubleshooting
-init-repo: 
-	git submodule update --init --recursive
 reset-xcode: 
 	defaults delete com.apple.dt.Xcode
 dev-tools: 
