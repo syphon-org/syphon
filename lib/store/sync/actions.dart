@@ -51,16 +51,16 @@ class SetSyncing {
 }
 
 class SetSynced {
+  final int? backoff;
   final bool? synced;
   final bool? syncing;
   final String? lastSince;
-  final int? backoff;
 
   SetSynced({
     this.synced,
     this.syncing,
-    this.lastSince,
     this.backoff,
+    this.lastSince,
   });
 }
 
@@ -270,7 +270,6 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         final Map<String, dynamic> joinedJson = roomJson['join'] ?? {};
         final Map<String, dynamic> invitesJson = roomJson['invite'] ?? {};
         final Map<String, dynamic> leavesJson = roomJson['leave'] ?? {};
-        // final Map<String, dynamic> rawLeft = data['rooms']['leave'];
 
         // Updates for rooms
         if (joinedJson.isNotEmpty) {
@@ -325,18 +324,18 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
     final lastSince = store.state.syncStore.lastSince;
 
     try {
-      final roomOld = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
-      final messagesOld = store.state.eventStore.messages[id] ?? [];
+      final currentRoom = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+      final currentMessages = store.state.eventStore.messages[id] ?? [];
 
       final sync = await parseSyncThreaded(
         json: json,
-        room: roomOld,
         user: user,
+        room: currentRoom,
         lastSince: lastSince,
-        existingIds: messagesOld.map((m) => m.id ?? '').toList(),
+        currentMessageIds: currentMessages.map((m) => m.id ?? '').toList(),
       );
 
-      if (sync.leave ?? false) {
+      if (sync.details.leave ?? false) {
         return store.dispatch(RemoveRoom(roomId: id));
       }
 
@@ -344,8 +343,8 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       final room = sync.room;
       final events = sync.events;
 
-      if (DEBUG_MODE) {
-        log.json({
+      if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+        log.jsonDebug({
           'from': '[syncRooms]',
           'room': room.name,
           'synced': synced,
@@ -369,7 +368,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       final messages = await store.dispatch(
         mutateMessages(
           messages: events.messages,
-          existing: messagesOld,
+          existing: currentMessages,
         ),
       ) as List<Message>;
 
@@ -405,9 +404,15 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
         addMessages(
           roomId: room.id,
           messages: messages,
-          clear: sync.overwrite ?? false,
+          clear: sync.details.overwrite ?? false,
         ),
       );
+
+      if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+        log.jsonDebug({
+          'room': room,
+        });
+      }
 
       // update room
       store.dispatch(SetRoom(room: room));

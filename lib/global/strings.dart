@@ -93,6 +93,9 @@ class Strings {
       tr('title-dialog-enter-new-screen-lock-pin');
   static final titleDialogVerifyNewScreenLockPin =
       tr('title-dialog-verify-new-screen-lock-pin');
+  static final titleDialogPhotoPermission =
+  tr('title-dialog-photo-permission');
+
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -401,6 +404,7 @@ class Strings {
   static final contentRenameDevice = tr('content-dialog-device-rename');
   static final contentKeyExportWarning =
       tr('content-dialog-devices-key-export');
+  static final contentPhotoPermission = tr('content-dialog-photo-permission');
   static final contentEmailRequirement = tr('content-signup-email-requirement');
   static final contentEmailVerification =
       tr('content-signup-email-verification');
