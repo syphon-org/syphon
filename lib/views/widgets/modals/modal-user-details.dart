@@ -342,8 +342,7 @@ class _Props extends Equatable {
           ),
         ),
         onAddConfirmation: (String message) async {
-          await store.dispatch(addConfirmation(
-              message: message));
+          await store.dispatch(addConfirmation(message: message));
         }
       );
 }
