@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:syphon/global/algos.dart';
 
 import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'model.dart';
 
@@ -220,7 +221,16 @@ double? selectAppBarElevation(ThemeType themeTypeNew) {
 }
 
 String selectReadReceiptsString(ReadReceiptTypes readReceipts) {
-  return enumToString(readReceipts);
+  switch (readReceipts) {
+    case ReadReceiptTypes.On:
+      return Strings.labelOn;
+    case ReadReceiptTypes.Off:
+      return Strings.labelOff;
+    case ReadReceiptTypes.Private:
+      return Strings.labelPrivate;
+    default: //I've not been coded for this one yet
+      return readReceipts.name;
+  }
 }
 
 String selectFontNameString(FontName fontName) {
