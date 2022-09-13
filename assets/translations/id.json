@@ -353,5 +353,19 @@
     "list-item-mute-for-hours": "Bisukan selama {} jam",
     "title-dialog-block-user": "Blokir Pengguna",
     "list-item-mute-for-days": "Bisukan selama {} hari",
-    "list-item-settings-read-receipts": "Laporan Dibaca"
+    "list-item-settings-read-receipts": "Laporan Dibaca",
+    "popup-menu-item-invite-friends": "Undang Teman",
+    "popup-menu-item-chat-settings": "Pengaturan Obrolan",
+    "popup-menu-item-mute-notifications": "Bisukan Notifikasi",
+    "semantics-close-actions-ring": "Tutup Cincin Tindakan",
+    "content-dialog-block-user": "Jika Anda memblokir {}, Anda tidak akan dapat melihat pesan mereka dan Anda akan keluar langsung dari obrolan ini.",
+    "popup-menu-item-all-media": "Semua Media",
+    "semantics-open-actions-ring": "Buka Cincin Tindakan",
+    "tooltip-message-details": "Detail Pesan",
+    "tooltip-delete-message": "Hapus Pesan",
+    "tooltip-edit-message": "Edit Pesan",
+    "tooltip-copy-message-content": "Salin Konten Pesan",
+    "tooltip-quote-and-reply": "Kutip dan Balas",
+    "tooltip-share-chats": "Bagikan Obrolan",
+    "popup-menu-item-search": "Cari"
 }
