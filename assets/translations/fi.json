@@ -6,7 +6,7 @@
     "title-view-devices": "Laitteet",
     "title-view-settings": "Asetukset",
     "title-view-theming": "Ulkonäkö",
-    "title-view-privacy": "Yksityisyys",
+    "title-view-privacy": "Yksityisyys ja turvallisuus",
     "title-view-homeserver-search": "Etsi kotipalvelimesi",
     "title-view-profile": "Määritä profiilisi",
     "title-proxy-password": "Muokkaa välityspalvelimen salasanaa",
@@ -36,5 +36,11 @@
     "tooltip-cancel-reply": "Peruuta vastaus",
     "semantics-create-public-room": "Luo julkinen huone",
     "label-email": "Sähköposti",
-    "button-send-verification": "lähetä vahvistussähköposti"
+    "button-send-verification": "lähetä vahvistussähköposti",
+    "header-update-password": "Päivitä salasana",
+    "button-text-agreement": "Hyväksyn",
+    "title-proxy-use-proxy": "Käytä välityspalvelinta",
+    "title-view-chat-users": "Kaikki chat-käyttäjät",
+    "title-view-create-group": "Luo ryhmäkeskustelu",
+    "title-view-advanced": "Edistynyt"
 }
