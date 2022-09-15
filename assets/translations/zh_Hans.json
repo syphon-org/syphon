@@ -44,5 +44,6 @@
     "title-view-profile": "设置个人资料",
     "title-search-unencrypted": "未加密搜索",
     "title-confirm-lock-overlay": "请确认密码.",
-    "label-searching": "搜索…"
+    "label-searching": "搜索…",
+    "label-email": "电子邮件"
 }
