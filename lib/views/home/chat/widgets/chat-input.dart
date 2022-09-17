@@ -22,7 +22,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
-import 'package:syphon/views/home/chat/take_picture_screen.dart';
+import 'package:syphon/views/home/chat/camera_screen.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/containers/media-card.dart';
 import 'package:syphon/views/widgets/lists/list-local-images.dart';
@@ -245,12 +245,10 @@ class ChatInputState extends State<ChatInput> {
 
   Future<void> openCamera() async {
     final cameras = await availableCameras();
-    final firstCamera = cameras.first;
-    final secondaryCamera = cameras[1];
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) =>
-          TakePictureScreen(onAddMedia: widget.onAddMedia, cameras: cameras,)
+          CameraScreen(onAddMedia: widget.onAddMedia, cameras: cameras,)
       ),
     );
   }

@@ -4,15 +4,14 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 // import 'package:image_picker/image_picker.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
 
-class TakePictureScreen extends StatefulWidget {
-  const TakePictureScreen({
+class CameraScreen extends StatefulWidget {
+  const CameraScreen({
     super.key,
     required this.cameras, required this.onAddMedia,
   });
 
-  // final CameraDescription camera;
-  // final CameraDescription secondaryCamera;
   final List<CameraDescription> cameras;
 
   final Function({
@@ -21,10 +20,10 @@ class TakePictureScreen extends StatefulWidget {
   }) onAddMedia;
 
   @override
-  TakePictureScreenState createState() => TakePictureScreenState();
+  CameraScreenState createState() => CameraScreenState();
 }
 
-class TakePictureScreenState extends State<TakePictureScreen> {
+class CameraScreenState extends State<CameraScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
 
@@ -129,20 +128,20 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     final lensDirection = _controller.description.lensDirection;
     CameraDescription newDescription;
     if (lensDirection == CameraLensDirection.front) {
-      newDescription = widget.cameras.firstWhere((description) => description
-          .lensDirection == CameraLensDirection.back);
+      newDescription = widget.cameras.firstWhere((description) =>
+        description.lensDirection == CameraLensDirection.back);
     }
     else {
-      newDescription = widget.cameras.firstWhere((description) => description
-          .lensDirection == CameraLensDirection.front);
+      newDescription = widget.cameras.firstWhere((description) =>
+        description.lensDirection == CameraLensDirection.front);
     }
 
-    if (newDescription != null) {
-      _initCamera(newDescription);
+    if(newDescription == null){
+      log.error('camera not available');
+      return;
     }
-    else {
-      print('Camera not available');
-    }
+
+    _initCamera(newDescription);
   }
 
   Future<void> _initCamera(CameraDescription description) async{
@@ -153,8 +152,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       // to notify the widgets that camera has been initialized and now camera preview can be done
       setState((){});
     }
-    catch(e){
-      print(e);
+    catch(error){
+      log.error(error.toString());
     }
   }
 
@@ -169,8 +168,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       await onAddPhoto(image.path);
       Navigator.pop(context);
 
-    } catch (e) {
-      print(e);
+    } catch (error) {
+      log.error(error.toString());
     }
   }
 
