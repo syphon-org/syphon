@@ -85,7 +85,7 @@ steps:
       # Modify the existing release and add the android apk
       - go install code.gitea.io/tea@latest
       - tea login add -u https://git.syphon.org -n syphon-bot
-      - tea releases create --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz
+      - tea releases create --draft true --tag "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --target ${DRONE_COMMIT_SHA} --repo syphon-org/syphon --title "${DRONE_BRANCH}-$(echo $DRONE_COMMIT_SHA | cut -c1-7)-linux" --asset ./syphon.$(echo $DRONE_COMMIT_SHA | cut -c1-7).linux.x64.tar.gz
 ---
 #kind: pipeline
 #type: docker
