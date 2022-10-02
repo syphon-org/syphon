@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
@@ -89,7 +90,6 @@ class ChatInputState extends State<ChatInput> {
 
   String hintText = Strings.placeholderMatrixUnencrypted;
 
-  @protected
   onMounted(_Props props) {
     final draft = props.room.draft;
 
@@ -173,9 +173,7 @@ class ChatInputState extends State<ChatInput> {
         });
       });
     }
-    if (widget.onUpdateMessage != null) {
-      widget.onUpdateMessage!(text);
-    }
+    widget.onUpdateMessage?.call(text);
   }
 
   onToggleMediaOptions() {
@@ -201,16 +199,11 @@ class ChatInputState extends State<ChatInput> {
     setState(() {
       sendable = false;
     });
-
-    if (widget.onSubmitMessage != null) {
-      widget.onSubmitMessage!();
-    }
+    widget.onSubmitMessage?.call();
   }
 
   onCancelReply() {
-    if (widget.onCancelReply != null) {
-      widget.onCancelReply!();
-    }
+    widget.onCancelReply?.call();
   }
 
   onAddInProgress() {
@@ -235,6 +228,33 @@ class ChatInputState extends State<ChatInput> {
     widget.onAddMedia(file: file, type: MessageType.image);
 
     onToggleMediaOptions();
+  }
+
+  showDialogForPhotoPermission(BuildContext context){
+    showDialog(
+      context: context,
+      builder: (ctx) =>
+          AlertDialog(
+            title: Text(Strings.titleDialogPhotoPermission,
+              style: TextStyle(fontWeight: FontWeight.w600),),
+            content: Text(Strings.contentPhotoPermission),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+                child: Text(Strings.buttonCancel),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  openAppSettings();
+                },
+                child: Text(Strings.buttonNext),
+              ),
+            ],
+          ),
+    );
   }
 
   onAddFile() async {
@@ -273,11 +293,11 @@ class ChatInputState extends State<ChatInput> {
               // account for if editing
               widget.editing && (widget.editorController?.text.isNotEmpty ?? false);
 
-          Color sendButtonColor = const Color(Colours.blueBubbly);
+          Color sendButtonColor = const Color(AppColors.blueBubbly);
 
           if (widget.mediumType == MediumType.plaintext) {
             hintText = Strings.placeholderMatrixUnencrypted;
-            sendButtonColor = Color(Colours.greyDark);
+            sendButtonColor = Color(AppColors.greyDark);
           }
 
           if (widget.mediumType == MediumType.encryption) {
@@ -287,7 +307,7 @@ class ChatInputState extends State<ChatInput> {
 
           // if the button is disabled, make it more transparent to indicate that
           if (widget.sending) {
-            sendButtonColor = Color(Colours.greyDisabled);
+            sendButtonColor = Color(AppColors.greyDisabled);
           }
 
           var sendButton = Semantics(
@@ -594,7 +614,15 @@ class ChatInputState extends State<ChatInput> {
                           child: MediaCard(
                             text: Strings.buttonGallery,
                             icon: Icons.photo,
-                            onPress: () => onAddPhoto(),
+                            onPress: () async{
+                              const photosPermission = Permission.photos;
+                              final status = await photosPermission.status;
+                              if(!status.isGranted){
+                                showDialogForPhotoPermission(context);
+                              }else{
+                                onAddPhoto();
+                              }
+                            },
                           ),
                         ),
                         Padding(

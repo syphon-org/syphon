@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
@@ -36,6 +35,15 @@ import 'package:syphon/views/intro/signup/signup-screen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
 import 'home/settings/settings-intro-screen.dart';
+
+// helper hook for extracting navigation params
+T? useScreenArguments<T>(BuildContext context) {
+  return ModalRoute.of(context)?.settings.arguments as T;
+}
+
+T? useArguments<T>(BuildContext context) {
+  return useMemoized(() => ModalRoute.of(context)?.settings.arguments as T, [context]);
+}
 
 class NavigationService {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -104,7 +112,7 @@ class Routes {
   // Chats and Messages
   static const chat = '/home/chat';
   static const chatUsers = '/home/chat/users';
-  static const chatDetails = '/home/chat/details';
+  static const chatSettings = '/home/chat/details';
   static const chatMediaPreview = '/home/chat/media';
   static const messageDetails = '/home/message/details';
 
@@ -137,20 +145,20 @@ class NavigationProvider {
         Routes.reset: (BuildContext context) => const ResetPasswordScreen(),
         Routes.searchHomeservers: (BuildContext context) => const SearchHomeserverScreen(),
         Routes.verification: (BuildContext context) => const VerificationScreen(),
-        Routes.home: (BuildContext context) => const HomeScreen(),
+        Routes.home: (BuildContext context) => HomeScreen(),
         Routes.chat: (BuildContext context) => const ChatScreen(),
-        Routes.chatDetails: (BuildContext context) => const ChatDetailsScreen(),
+        Routes.chatSettings: (BuildContext context) => const ChatSettingsScreen(),
         Routes.chatMediaPreview: (BuildContext context) => const MediaPreviewScreen(),
         Routes.messageDetails: (BuildContext context) => const MessageDetailsScreen(),
         Routes.chatUsers: (BuildContext context) => const ChatUsersDetailScreen(),
         Routes.searchUsers: (BuildContext context) => const SearchUserScreen(),
-        Routes.userDetails: (BuildContext context) => const UserProfileScreen(),
+        Routes.userDetails: (BuildContext context) => UserProfileScreen(),
         Routes.userInvite: (BuildContext context) => const InviteUsersScreen(),
         Routes.searchChats: (BuildContext context) => const ChatSearchScreen(),
         Routes.searchGroups: (BuildContext context) => const GroupSearchScreen(),
         Routes.groupCreate: (BuildContext context) => const CreateGroupScreen(),
         Routes.groupCreatePublic: (BuildContext context) => const CreatePublicGroupScreen(),
-        Routes.settingsProfile: (BuildContext context) => const ProfileScreen(),
+        Routes.settingsProfile: (BuildContext context) => ProfileScreen(),
         Routes.settingsNotifications: (BuildContext context) => const NotificationSettingsScreen(),
         Routes.settingsLanguages: (BuildContext context) => const LanguageSettingsScreen(),
         Routes.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),
@@ -159,7 +167,7 @@ class NavigationProvider {
         Routes.licenses: (BuildContext context) =>
             const LicensePage(applicationName: Values.appName),
         Routes.settingsPrivacy: (BuildContext context) => const PrivacySettingsScreen(),
-        Routes.settingsChat: (BuildContext context) => const ChatsSettingsScreen(),
+        Routes.settingsChat: (BuildContext context) => const SettingsChatsScreen(),
         Routes.settingsTheme: (BuildContext context) => const ThemeSettingsScreen(),
         Routes.settingsDevices: (BuildContext context) => DevicesScreen(),
         Routes.settings: (BuildContext context) => const SettingsScreen(),

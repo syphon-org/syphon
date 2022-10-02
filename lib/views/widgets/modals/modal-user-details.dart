@@ -1,13 +1,14 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/selectors.dart';
@@ -19,6 +20,7 @@ import 'package:syphon/views/home/search/search-chats-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
+
 
 class ModalUserDetails extends StatelessWidget {
   const ModalUserDetails({
@@ -77,14 +79,14 @@ class ModalUserDetails extends StatelessWidget {
         title: Strings.listItemUserDetailsStartChat(user.displayName),
         content: Strings.confirmStartChat,
         onStartChat: () async {
-          final roomIdNew = await props.onCreateChatDirect(user: user) ?? '';
+          final String roomIdNew = await props.onCreateChatDirect(user: user) ?? '';
           Navigator.pop(dialogContext);
 
           if (nested != null && nested!) {
             Navigator.pop(dialogContext);
           }
 
-          if (roomIdNew) {
+          if (roomIdNew.isNotEmpty) {
             Navigator.popAndPushNamed(
               context,
               Routes.chat,
@@ -144,7 +146,7 @@ class ModalUserDetails extends StatelessWidget {
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
                             background: props.user.avatarUri == null
-                                ? Colours.hashedColorUser(props.user)
+                                ? AppColors.hashedColorUser(props.user)
                                 : null,
                           ),
                         ),
@@ -170,11 +172,17 @@ class ModalUserDetails extends StatelessWidget {
                       children: <Widget>[
                         Flexible(
                           // wrapped with flexible to allow ellipsis
-                          child: Text(
+                          child: InkWell(child: Text(
                             props.user.userId ?? '',
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                            onLongPress: () async  {
+                              await Clipboard.setData(ClipboardData(text: props.user.userId));
+                              await props.onAddConfirmation('Username copied to clipboard');
+                              Navigator.pop(context);
+                            },
                           ),
                         ),
                       ],
@@ -275,6 +283,7 @@ class _Props extends Equatable {
   final String existingChatId;
   final Map<String, User> users;
   final Function onBlockUser;
+  final Function onAddConfirmation;
   final Function onCreateChatDirect;
 
   const _Props({
@@ -285,6 +294,7 @@ class _Props extends Equatable {
     required this.existingChatId,
     required this.onCreateChatDirect,
     required this.onBlockUser,
+    required this.onAddConfirmation,
   });
 
   @override
@@ -331,5 +341,8 @@ class _Props extends Equatable {
             invites: <User>[user],
           ),
         ),
+        onAddConfirmation: (String message) async {
+          await store.dispatch(addConfirmation(message: message));
+        }
       );
 }

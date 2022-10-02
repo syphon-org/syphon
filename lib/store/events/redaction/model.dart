@@ -24,7 +24,6 @@ class Redaction extends Event {
     prevBatch,
     timestamp,
     content,
-    data,
     this.redactId,
   }) : super(
           id: id,
@@ -64,7 +63,6 @@ class Redaction extends Event {
         timestamp: timestamp ?? this.timestamp,
         content: content ?? this.content,
         redactId: redactId ?? this.redactId,
-        data: data,
       );
 
   @override

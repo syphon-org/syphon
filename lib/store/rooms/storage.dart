@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/database.dart';
 import 'package:syphon/store/rooms/room/model.dart';
@@ -8,6 +11,16 @@ import 'package:syphon/store/rooms/room/schema.dart';
 ///
 extension RoomQueries on StorageDatabase {
   Future<void> insertRooms(List<Room> rooms) {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          this.rooms,
+          rooms,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(this.rooms, rooms),
     );
@@ -30,7 +43,8 @@ extension RoomQueries on StorageDatabase {
         .getSingle();
   }
 
-  Future<List<Room>> selectRooms(List<String> ids, {int offset = 0, int limit = 0}) {
+  Future<List<Room>> selectRooms(List<String> ids,
+      {int offset = 0, int limit = 0}) {
     return (select(rooms)
           ..where((tbl) => tbl.id.isIn(ids))
           ..limit(limit, offset: offset))
@@ -77,7 +91,7 @@ Future<Map<String, Room>> loadRooms({
 
   try {
     final loaded = await storage.selectRoomsAll();
-    printInfo('[rooms] loaded ${loaded.length.toString()}');
+    log.info('[rooms] loaded ${loaded.length.toString()}');
 
     rooms = Map<String, Room>.fromIterable(
       loaded,
@@ -87,7 +101,7 @@ Future<Map<String, Room>> loadRooms({
       },
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadRooms');
+    log.error(error.toString(), title: 'loadRooms');
   }
 
   return rooms;

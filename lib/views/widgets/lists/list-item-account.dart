@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -74,7 +74,7 @@ class ListItemAccount extends StatelessWidget {
               uri: user.avatarUri,
               alt: user.displayName ?? user.userId,
               size: Dimensions.avatarSizeMin,
-              background: Colours.hashedColorUser(user),
+              background: AppColors.hashedColorUser(user),
             ),
             title: Text(
               user.userId!,

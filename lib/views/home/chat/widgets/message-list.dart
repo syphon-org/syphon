@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/store/events/actions.dart';
 import 'package:syphon/store/events/messages/actions.dart';
@@ -70,7 +70,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
 
     setState(() {
       for (final message in messages) {
-        final userColor = Colours.hashedColor(message.sender);
+        final userColor = AppColors.hashedColor(message.sender);
         colorMap[message.sender ?? ''] = userColor;
         luminanceMap[message.sender ?? ''] = userColor.computeLuminance();
       }
@@ -84,7 +84,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
     try {
       store.dispatch(selectReply(roomId: roomId, message: message));
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
     }
   }
 
@@ -96,7 +96,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
     try {
       store.dispatch(sendMessageExisting(roomId: roomId, message: message));
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
     }
   }
 
@@ -226,6 +226,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                       selectedMessageId: selectedMessageId,
                       avatarUri: avatarUri,
                       displayName: displayName,
+                      currentName: props.currentUser.userId,
                       themeType: props.themeType,
                       color: props.chatColorPrimary ?? color,
                       luminance: luminance,

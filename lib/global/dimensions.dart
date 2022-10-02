@@ -78,8 +78,7 @@ class Dimensions {
   static const double paddingContainer = 16;
 
   // Padding EdgeInsets
-  static const modalEdgeInsets =
-      EdgeInsets.symmetric(vertical: 12, horizontal: 24);
+  static const modalEdgeInsets = EdgeInsets.symmetric(vertical: 12, horizontal: 24);
 
   static const inputContentPadding = EdgeInsets.symmetric(
     vertical: 4.0,
@@ -178,12 +177,6 @@ class Dimensions {
   static double modalHeightDefault(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return size.height * 0.4;
-  }
-
-  // Action Rin
-  static double actionRingDefaultWidth(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return size.width < 400 ? size.width : size.width * 0.9;
   }
 
   // * Device Specific *

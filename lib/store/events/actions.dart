@@ -170,7 +170,7 @@ ThunkAction<AppState> loadMessagesCached({
 
       return messagesStored;
     } catch (error) {
-      printError('[fetchMessageEvents] $error');
+      log.error('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -191,18 +191,17 @@ ThunkAction<AppState> fetchMessageEvents({
   String? from,
   int timestamp = 0,
   int loadLimit = DEFAULT_LOAD_LIMIT,
-  bool? override,
+  bool? overwrite,
 }) {
   return (Store<AppState> store) async {
     try {
       final cached = await store.dispatch(
-        loadMessagesCached(room: room, batch: from, limit: loadLimit, timestamp: timestamp),
+        loadMessagesCached(
+            room: room, batch: from, limit: loadLimit, timestamp: timestamp),
       ) as List<Message>;
 
       // known cached messages for this batch will be loaded
-      if (cached.isNotEmpty) {
-        return;
-      }
+      if (cached.isNotEmpty) return [];
 
       final oldest = cached.isEmpty;
 
@@ -231,20 +230,23 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // reuse the logic for syncing
       // end will be null if no more batches are available to fetch
-      await store.dispatch(syncRooms({
-        room.id: {
+      await store.dispatch(syncRoom(
+        room.id,
+        {
+          'overwrite': overwrite,
           'timeline': {
             'events': messages,
             'curr_batch': start,
             'last_batch': oldest ? end ?? from : null,
             'prev_batch': end,
             'limited': end == start || end == null ? false : null,
-            'override': override,
           }
         },
-      }));
+      ));
+
+      return messages;
     } catch (error) {
-      printError('[fetchMessageEvents] error $error');
+      log.error('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -270,15 +272,13 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
         throw stateEvents['error'];
       }
 
-      await store.dispatch(syncRooms({
-        room.id: {
-          'state': {
-            'events': stateEvents,
-          },
+      await store.dispatch(syncRoom(room.id, {
+        'state': {
+          'events': stateEvents,
         },
       }));
     } catch (error) {
-      printError('[fetchStateEvents] $error');
+      log.error('[fetchStateEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -326,7 +326,8 @@ ThunkAction<AppState> selectReply({
 }
 
 /// Delete Room Event (For Outbox, Local, and Remote)
-ThunkAction<AppState> deleteMessage({required Message message, required Room room}) {
+ThunkAction<AppState> deleteMessage(
+    {required Message message, required Room room}) {
   return (Store<AppState> store) async {
     try {
       if (message.pending || message.failed) {
@@ -362,17 +363,18 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
         throw 'Failed to delete message, try again soon';
       }
 
-      // TODO: confirm - 2021
       // deleted messages returned remotely will have empty 'body' fields
       final messageDeleted = message.copyWith(body: '', url: null);
 
       if (room.encryptionEnabled) {
-        return store.dispatch(AddMessagesDecrypted(roomId: room.id, messages: [messageDeleted]));
+        return store.dispatch(
+            AddMessagesDecrypted(roomId: room.id, messages: [messageDeleted]));
       } else {
-        return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
+        return store
+            .dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
       }
     } catch (error) {
-      printError('[deleteMessage] $error');
+      log.error('[deleteMessage] $error');
     }
   };
 }

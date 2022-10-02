@@ -4,10 +4,9 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -120,7 +119,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                             size: Dimensions.avatarSizeMin,
                             url: homeserver.photoUrl,
                             alt: homeserver.hostname,
-                            background: Colours.hashedColor(homeserver.hostname),
+                            background: AppColors.hashedColor(homeserver.hostname),
                           ),
                           title: Text(
                             homeserver.hostname!,
@@ -238,7 +237,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                           size: Dimensions.avatarSizeMin,
                           url: props.homeserver.photoUrl,
                           background: props.searchText.isNotEmpty
-                              ? Colours.hashedColor(props.searchText)
+                              ? AppColors.hashedColor(props.searchText)
                               : Colors.grey,
                         ),
                         title: Text(

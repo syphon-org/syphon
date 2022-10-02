@@ -9,9 +9,9 @@ class ProxySettings extends Equatable {
   final String host;
   final String port;
 
-  final bool authenticationEnabled; // proxy authentication enabled
   final String username; // proxy username
   final String password; // proxy password
+  final bool authenticationEnabled; // proxy authentication enabled
 
   const ProxySettings({
     this.enabled = false,
@@ -51,6 +51,5 @@ class ProxySettings extends Equatable {
 
   Map<String, dynamic> toJson() => _$ProxySettingsToJson(this);
 
-  factory ProxySettings.fromJson(Map<String, dynamic> json) =>
-      _$ProxySettingsFromJson(json);
+  factory ProxySettings.fromJson(Map<String, dynamic> json) => _$ProxySettingsFromJson(json);
 }

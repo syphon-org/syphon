@@ -6,6 +6,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/models.dart';
 
 class SetReceipts {
@@ -40,25 +41,26 @@ ThunkAction<AppState> sendReadReceipts({
 }) {
   return (Store<AppState> store) async {
     try {
-      // Skip if typing indicators are disabled
+      // Skip if Read Receipts are disabled
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
-        return printInfo('[sendReadReceipts] read receipts disabled');
+        return log.info('[sendReadReceipts] read receipts disabled');
       }
 
       final data;
 
-      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-        printInfo('[sendReadReceipts] read receipts hidden');
+      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Private) {
+        log.info('[sendReadReceipts] read receipts set to private');
 
-        data = await MatrixApi.sendReadReceiptHidden(
+        data = await MatrixApi.sendPrivateReadReceipt(
           protocol: store.state.authStore.protocol,
           accessToken: store.state.authStore.user.accessToken,
           homeserver: store.state.authStore.user.homeserver,
           roomId: room!.id,
           messageId: message!.id,
+          stable:
+              await homeserverSupportsPrivateReadReceipts(store), //@deprecated
         );
-      }
-      else {
+      } else {
         data = await MatrixApi.sendReadReceipts(
           protocol: store.state.authStore.protocol,
           accessToken: store.state.authStore.user.accessToken,
@@ -73,9 +75,9 @@ ThunkAction<AppState> sendReadReceipts({
         throw data['error'];
       }
 
-      printInfo('[sendReadReceipts] sent ${message.id} $data');
+      log.info('[sendReadReceipts] sent ${message.id} $data');
     } catch (error) {
-      printInfo('[sendReadReceipts] failed $error');
+      log.info('[sendReadReceipts] failed $error');
     }
   };
 }
@@ -93,7 +95,7 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicatorsEnabled) {
-        printInfo('[sendTyping] typing indicators disabled');
+        log.info('[sendTyping] typing indicators disabled');
         return;
       }
 
@@ -110,7 +112,7 @@ ThunkAction<AppState> sendTyping({
         throw data['error'];
       }
     } catch (error) {
-      printError('[sendTyping] $error');
+      log.error('[sendTyping] $error');
     }
   };
 }

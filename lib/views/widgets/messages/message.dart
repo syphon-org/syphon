@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:swipeable/swipeable.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
@@ -21,6 +21,7 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 import 'package:syphon/views/widgets/input/text-field-edit.dart';
+import 'package:syphon/views/widgets/messages/reaction-row.dart';
 import 'package:syphon/views/widgets/messages/styles.dart';
 
 const MESSAGE_MARGIN_VERTICAL_LARGE = 6.0;
@@ -42,6 +43,7 @@ class MessageWidget extends StatelessWidget {
     this.selectedMessageId,
     this.avatarUri,
     this.displayName,
+    this.currentName,
     this.themeType = ThemeType.Light,
     this.fontSize = 14.0,
     this.timeFormat = TimeFormat.hr12,
@@ -72,6 +74,7 @@ class MessageWidget extends StatelessWidget {
   final String? avatarUri;
   final String? selectedMessageId;
   final String? displayName;
+  final String? currentName;
 
   final Message message;
   final ThemeType themeType;
@@ -85,94 +88,19 @@ class MessageWidget extends StatelessWidget {
   final Function? onToggleReaction;
   final void Function(Message)? onLongPress;
 
-  buildReactions(BuildContext context, MainAxisAlignment alignment) {
-    final reactionsMap = message.reactions.fold<Map<String, int>>(
-      {},
-      (mapped, reaction) => mapped
-        ..update(
-          reaction.body ?? '',
-          (value) => (value + 1),
-          ifAbsent: () => 1,
-        ),
-    );
-
-    final reactionKeys = reactionsMap.keys;
-    final reactionCounts = reactionsMap.values;
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      itemCount: reactionKeys.length,
-      scrollDirection: Axis.horizontal,
-      clipBehavior: Clip.antiAlias,
-      itemBuilder: (BuildContext context, int index) {
-        final reactionKey = reactionKeys.elementAt(index);
-        final reactionCount = reactionCounts.elementAt(index);
-        return GestureDetector(
-          onTap: () {
-            if (onToggleReaction != null) {
-              onToggleReaction!(reactionKey);
-            }
-          },
-          child: Container(
-            width: reactionCount > 1 ? 48 : 32,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Color(Colours.greyDefault),
-              borderRadius: BorderRadius.circular(Dimensions.iconSize),
-              border: Border.all(
-                color: Colors.white,
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  reactionKey,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.subtitle1!.color,
-                    height: 1.35,
-                  ),
-                ),
-                Visibility(
-                  visible: reactionCount > 1,
-                  child: Container(
-                    padding: EdgeInsets.only(left: 3),
-                    child: Text(
-                      reactionCount.toString(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.subtitle1!.color,
-                        height: 1.35,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  buildReactionsInput(BuildContext context, MainAxisAlignment alignment, bool isUserSent) {
+  buildReactionsInput(
+    BuildContext context,
+    MainAxisAlignment alignment, {
+    bool isUserSent = false,
+  }) {
     final buildEmojiButton = GestureDetector(
-      onTap: () {
-        if (onInputReaction != null) {
-          onInputReaction!();
-        }
-      },
+      onTap: () => onInputReaction?.call(),
       child: ClipRRect(
         child: Container(
           width: 36,
           height: Dimensions.iconSizeLarge,
           decoration: BoxDecoration(
-            color: Color(Colours.greyDefault),
+            color: Color(AppColors.greyDefault),
             borderRadius: BorderRadius.circular(Dimensions.iconSizeLarge),
             border: Border.all(
               color: Colors.white,
@@ -188,19 +116,16 @@ class MessageWidget extends StatelessWidget {
       ),
     );
 
+    final reactionRow = ReactionRow(
+      // key: Key(message.reactions.length.toString()),
+      reactions: message.reactions,
+    );
+
     // swaps order in row if user sent
     return Row(
       mainAxisAlignment: alignment,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: isUserSent
-          ? [
-              buildEmojiButton,
-              buildReactions(context, alignment),
-            ]
-          : [
-              buildReactions(context, alignment),
-              buildEmojiButton,
-            ],
+      children: isUserSent ? [buildEmojiButton, reactionRow] : [reactionRow, buildEmojiButton],
     );
   }
 
@@ -228,12 +153,19 @@ class MessageWidget extends StatelessWidget {
   onViewFullscreen(
     BuildContext context, {
     required Uint8List bytes,
+    required String? eventId,
+    required String? roomId,
     String filename = 'Matrix Image',
   }) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => MediaFullScreen(title: filename, bytes: bytes),
+        builder: (_) => MediaFullScreen(
+          title: filename,
+          bytes: bytes,
+          eventId: eventId,
+          roomId: roomId,
+        ),
       ),
     );
   }
@@ -252,13 +184,14 @@ class MessageWidget extends StatelessWidget {
     final removePadding = isMedia || (isEditing && selected);
 
     var textColor = Colors.white;
+    Color anchorColor = Colors.blue;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
     var luminance = this.luminance;
 
     var indicatorColor = Theme.of(context).iconTheme.color;
     var indicatorIconColor = Theme.of(context).iconTheme.color;
     var replyColor = color;
-    var bubbleColor = color ?? Colours.hashedColor(message.sender);
+    var bubbleColor = color ?? AppColors.hashedColor(message.sender);
     var bubbleBorder = BorderRadius.circular(16);
     var alignmentMessage = MainAxisAlignment.start;
     var alignmentReaction = MainAxisAlignment.start;
@@ -338,15 +271,15 @@ class MessageWidget extends StatelessWidget {
 
     if (isUserSent) {
       if (themeType == ThemeType.Dark) {
-        bubbleColor = Color(Colours.greyDark);
+        bubbleColor = Color(AppColors.greyDark);
         luminance = 0.2;
       } else if (themeType != ThemeType.Light) {
-        bubbleColor = Color(Colours.greyDarkest);
+        bubbleColor = Color(AppColors.greyDarkest);
         luminance = bubbleColor.computeLuminance();
         luminance = 0.2;
       } else {
-        textColor = const Color(Colours.blackFull);
-        bubbleColor = const Color(Colours.greyLightest);
+        textColor = const Color(AppColors.blackFull);
+        bubbleColor = const Color(AppColors.greyLightest);
         luminance = 0.85;
       }
 
@@ -381,10 +314,16 @@ class MessageWidget extends StatelessWidget {
       fontStyle = FontStyle.italic;
     }
 
+    if (message.hasLink) {
+      if (bubbleColor.delta(Colors.blue) > 0.85) {
+        anchorColor = Color(AppColors.blueDark);
+      }
+    }
+
     // efficent way to check if Matrix message is a reply
     if (body.isNotEmpty && body[0] == '>') {
       final isLight = (luminance ?? 0.0) > 0.5;
-      replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.85 : 0.25).toColor();
+      replyColor = HSLColor.fromColor(bubbleColor).withLightness(isLight ? 0.5 : 0.25).toColor();
     }
 
     return Swipeable(
@@ -407,8 +346,14 @@ class MessageWidget extends StatelessWidget {
               mainAxisAlignment: alignmentMessage,
               // ignore: avoid_redundant_argument_values
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: const <Widget>[
-                Icon(Icons.reply, size: Dimensions.iconSizeLarge),
+              children: <Widget>[
+                Transform(
+                  transform: isUserSent ? Matrix4.rotationY(-185) : Matrix4.rotationY(0),
+                  child: Icon(
+                    Icons.reply,
+                    size: Dimensions.iconSizeLarge,
+                  ),
+                )
               ],
             ),
           ),
@@ -464,7 +409,7 @@ class MessageWidget extends StatelessWidget {
                               uri: avatarUri,
                               alt: message.sender,
                               size: Dimensions.avatarSizeMessage,
-                              background: Colours.hashedColor(message.sender),
+                              background: AppColors.hashedColor(message.sender),
                             ),
                           ),
                         ),
@@ -496,7 +441,7 @@ class MessageWidget extends StatelessWidget {
                                         : 8,
                               ),
                               margin: EdgeInsets.only(
-                                bottom: hasReactions ? 14 : 0,
+                                bottom: hasReactions ? 18 : 0,
                               ),
                               decoration: BoxDecoration(
                                 color: bubbleColor,
@@ -546,8 +491,11 @@ class MessageWidget extends StatelessWidget {
                                             .autoDownloadEnabled,
                                         fit: BoxFit.cover,
                                         rebuild: true,
-                                        onPressImage: (Uint8List bytes) =>
-                                            onViewFullscreen(context, filename: body, bytes: bytes),
+                                        onPressImage: (Uint8List bytes) => onViewFullscreen(context,
+                                            filename: body,
+                                            bytes: bytes,
+                                            eventId: message.id,
+                                            roomId: message.roomId),
                                         width: Dimensions.mediaSizeMaxMessage,
                                         height: Dimensions.mediaSizeMaxMessage,
                                         fallbackColor: Colors.transparent,
@@ -573,6 +521,7 @@ class MessageWidget extends StatelessWidget {
                                         onTapLink: (text, href, title) =>
                                             onConfirmLink(context, href),
                                         styleSheet: MarkdownStyleSheet(
+                                          a: TextStyle(color: anchorColor),
                                           blockquote: TextStyle(
                                             backgroundColor: bubbleColor,
                                           ),
@@ -580,8 +529,8 @@ class MessageWidget extends StatelessWidget {
                                             color: replyColor,
                                             borderRadius: const BorderRadius.only(
                                               //TODO: shape similar to bubbleBorder
-                                              topLeft: Radius.circular(12),
-                                              topRight: Radius.circular(12),
+                                              topLeft: Radius.circular(4),
+                                              topRight: Radius.circular(4),
                                               bottomLeft: Radius.circular(4),
                                               bottomRight: Radius.circular(4),
                                             ),
@@ -761,7 +710,7 @@ class MessageWidget extends StatelessWidget {
                                   child: buildReactionsInput(
                                     context,
                                     alignmentReaction,
-                                    isUserSent,
+                                    isUserSent: isUserSent,
                                   ),
                                 ),
                               ),
@@ -775,9 +724,10 @@ class MessageWidget extends StatelessWidget {
                                 child: Container(
                                   height: Dimensions.iconSize,
                                   transform: Matrix4.translationValues(0.0, 4.0, 0.0),
-                                  child: buildReactions(
-                                    context,
-                                    alignmentReaction,
+                                  child: ReactionRow(
+                                    key: Key(message.reactions.length.toString()),
+                                    reactions: message.reactions,
+                                    onToggleReaction: onToggleReaction,
                                   ),
                                 ),
                               ),

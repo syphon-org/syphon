@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
@@ -15,12 +16,26 @@ import 'package:syphon/store/events/redaction/model.dart';
 ///
 extension MessageQueries on StorageDatabase {
   Future<void> insertMessagesBatched(List<Message> messages) {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          this.messages,
+          messages,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(
         this.messages,
         messages,
       ),
     );
+  }
+
+  Future<void> deleteMessages(List<String> messageIds) {
+    return (delete(messages)..where((tbl) => tbl.id.isIn(messageIds))).go();
   }
 
   ///
@@ -34,7 +49,10 @@ extension MessageQueries on StorageDatabase {
   Future<List<Message>> selectMessagesIds(List<String> messageIds) {
     return (select(messages)
           ..where((tbl) => tbl.id.isIn(messageIds))
-          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)]))
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
+          ]))
         .get();
   }
 
@@ -53,9 +71,13 @@ extension MessageQueries on StorageDatabase {
     int limit = DEFAULT_LOAD_LIMIT,
   }) {
     return (select(messages)
-          ..where(
-              (tbl) => tbl.roomId.equals(roomId) & tbl.timestamp.isSmallerOrEqualValue(timestamp))
-          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
+          ..where((tbl) =>
+              tbl.roomId.equals(roomId) &
+              tbl.timestamp.isSmallerOrEqualValue(timestamp))
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
+          ])
           ..limit(limit, offset: offset))
         .get();
   }
@@ -70,7 +92,10 @@ extension MessageQueries on StorageDatabase {
       {int offset = 0, int limit = DEFAULT_LOAD_LIMIT}) {
     return (select(messages)
           ..where((tbl) => tbl.roomId.equals(roomId))
-          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
+          ])
           ..limit(limit, offset: offset))
         .get();
   }
@@ -118,14 +143,23 @@ Future<void> saveMessages(
   await storage.insertMessagesBatched(messages);
 }
 
+Future<void> deleteMessages(
+  List<Message> messages, {
+  required StorageDatabase storage,
+}) async {
+  await storage.deleteMessages(messages.map((e) => e.id!).toList());
+}
+
 Future<void> saveMessagesRedacted(
   List<Redaction> redactions, {
   required StorageDatabase storage,
 }) async {
-  final messageIds = redactions.map((redaction) => redaction.redactId ?? '').toList();
+  final messageIds =
+      redactions.map((redaction) => redaction.redactId ?? '').toList();
   final messages = await storage.selectMessagesIds(messageIds);
 
-  final messagesUpdated = messages.map((message) => message.copyWith(body: null)).toList();
+  final messagesUpdated =
+      messages.map((message) => message.copyWith(body: null)).toList();
   await storage.insertMessagesBatched(messagesUpdated);
 }
 
@@ -158,7 +192,7 @@ Future<List<Message>> loadMessages({
       limit: limit,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    log.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
@@ -177,7 +211,7 @@ Future<List<Message>> loadMessagesRoom(
       limit: limit,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    log.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
@@ -200,6 +234,16 @@ Future<List<Message>> searchMessagesStored(
 //
 extension DecryptedQueries on StorageDatabase {
   Future<void> insertDecryptedBatched(List<Message> decrypted) {
+    // HACK: temporary to account for sqlite versions without UPSERT
+    if (Platform.isLinux) {
+      return batch(
+        (batch) => batch.insertAll(
+          this.decrypted,
+          decrypted,
+          mode: InsertMode.insertOrReplace,
+        ),
+      );
+    }
     return batch(
       (batch) => batch.insertAllOnConflictUpdate(
         this.decrypted,
@@ -223,9 +267,13 @@ extension DecryptedQueries on StorageDatabase {
     int limit = DEFAULT_LOAD_LIMIT,
   }) {
     return (select(decrypted)
-          ..where(
-              (tbl) => tbl.roomId.equals(roomId) & tbl.timestamp.isSmallerOrEqualValue(timestamp))
-          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
+          ..where((tbl) =>
+              tbl.roomId.equals(roomId) &
+              tbl.timestamp.isSmallerOrEqualValue(timestamp))
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
+          ])
           ..limit(limit, offset: offset))
         .get();
   }
@@ -237,7 +285,10 @@ extension DecryptedQueries on StorageDatabase {
   }) {
     return (select(decrypted)
           ..where((tbl) => tbl.roomId.equals(roomId))
-          ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
+          ])
           ..limit(limit, offset: offset))
         .get();
   }
@@ -279,7 +330,7 @@ Future<List<Message>> loadDecrypted({
   try {
     return storage.selectDecrypted(roomId);
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    log.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
@@ -287,9 +338,10 @@ Future<List<Message>> loadDecrypted({
 ///
 /// Load Decrypted Room
 ///
-/// TODO: convert to cache only ephemeral runner
 /// that decrypts on the fly only after loading messages
 /// from cold storage -> redux
+///
+/// TODO: convert to cache only ephemeral runner
 ///
 Future<List<Message>> loadDecryptedRoom(
   String roomId, {
@@ -298,7 +350,7 @@ Future<List<Message>> loadDecryptedRoom(
   int limit = DEFAULT_LOAD_LIMIT, // default amount loaded
 }) async {
   try {
-    // TODO: remove after 0.2.3 (sync overhaul)
+    // TODO: needs more testing to remove, not pulling correctly
     if (true) {
       return storage.selectDecryptedAll(roomId);
     }
@@ -309,7 +361,7 @@ Future<List<Message>> loadDecryptedRoom(
       limit: limit,
     );
   } catch (error) {
-    printError(error.toString(), title: 'loadMessages');
+    log.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }

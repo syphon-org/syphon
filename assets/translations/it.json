@@ -35,7 +35,7 @@
     "label-call-hangup": "L'utente ha terminato una chiamata vocale",
     "label-message-matrix-unencrypted": "Messaggio Matrix (non criptato)",
     "button-login-sso": "accesso singolo",
-    "button-leave-chat": "lascia la discussione",
+    "button-leave-chat": "Lascia la discussione",
     "button-archive-chat": "archivia la discussione",
     "button-chat-details": "dettagli della discussione",
     "button-text-agreement": "Accetto",
@@ -93,7 +93,7 @@
     "button-confirm-alt": "OK",
     "button-confirm-formal": "conferma",
     "button-enable": "attiva",
-    "button-block-user": "blocca l'utente",
+    "button-block-user": "Blocca l'utente",
     "button-cancel": "annulla",
     "button-text-signup-question": "Non hai un nome utente?",
     "button-text-create-group": "Nuovo gruppo",
@@ -335,5 +335,14 @@
     "alert-log-out-enable-multiaccount": "Devi uscire dalla tua sessione\\ncorrente per abilitare i multiaccount",
     "content-import-session-keys-enter-password": "Inserisci la password per questa importazione di chiavi di sessione.",
     "semantics-image-password-update": "Utente che pensa a una password in un turbine di vento",
-    "content-logout-multiaccount-confirm": "\n\nDato che hai altri account, il logout ti farà passare a un'altra sessione di account."
+    "content-logout-multiaccount-confirm": "\n\nDato che hai altri account, il logout ti farà passare a un'altra sessione di account.",
+    "alert-copied-to-clipboard": "Copiato negli appunti",
+    "title-dialog-key-backup-warning": "Avviso di backup della chiave",
+    "label-fab-create-dm": "Messaggio diretto",
+    "label-fab-search": "Ricerca nelle discussioni",
+    "label-fab-create-public": "Avvia una discussione pubblica",
+    "label-fab-create-group": "Avvia una discussione di gruppo",
+    "content-key-backup-warning": "A causa dell'elaborazione in sfondo su iOS, il backup pianificato può essere eseguito o meno in base alla batteria, alla potenza di elaborazione e ad altri fattori.\n\nAssicurati sempre che i vostri backup vengano salvati in modo appropriato.",
+    "title-dialog-photo-permission": "Autorizzazione richiesta",
+    "content-dialog-photo-permission": "L'autorizzazione alle foto è necessaria per accedere alla galleria. Volete continuare con le impostazioni dell'app?"
 }

@@ -32,3 +32,4 @@
 - [ ] All associated issues have been linked to PR
 - [ ] All necessary changes made to the documentation
 - [ ] Parties interested in these changes have been notified
+- [ ] Linter has been run on all code in the PR

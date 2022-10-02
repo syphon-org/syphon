@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
@@ -74,7 +74,7 @@ class ListUserBubbles extends StatelessWidget {
                       uri: user.avatarUri,
                       alt: user.displayName ?? user.userId,
                       size: Dimensions.avatarSize,
-                      background: Colours.hashedColorUser(user),
+                      background: AppColors.hashedColorUser(user),
                     ),
                   ),
                 ),

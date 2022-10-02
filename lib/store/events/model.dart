@@ -18,7 +18,8 @@ class Event {
   final String? sender;
   final String? stateKey;
   final String? batch;
-  final String? prevBatch; // the end batch token after syncing / fetching these messages
+  final String?
+      prevBatch; // the end batch token after syncing / fetching these messages
 
   // When the event arrived on the server
   @JsonKey(defaultValue: 0)
@@ -75,7 +76,7 @@ class Event {
   factory Event.fromMatrix(
     Map<String, dynamic> json, {
     String? roomId,
-    String? batch,
+    String? currBatch,
     String? prevBatch,
   }) {
     // HACK: redact is the only matrix event with unique top level data values
@@ -91,7 +92,7 @@ class Event {
       timestamp: json['origin_server_ts'] as int? ?? 0,
       content: json['content'] as dynamic,
       data: data,
-      batch: batch,
+      batch: currBatch,
       prevBatch: prevBatch,
     );
   }

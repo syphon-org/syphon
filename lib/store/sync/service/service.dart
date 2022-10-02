@@ -6,22 +6,30 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:syphon/global/https.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
-import 'package:syphon/store/sync/background/model.dart';
-import 'package:syphon/store/sync/background/parsers.dart';
-import 'package:syphon/store/sync/background/requests.dart';
-import 'package:syphon/store/sync/background/storage.dart';
-import 'package:syphon/store/sync/parsers.dart';
+import 'package:syphon/store/settings/proxy-settings/model.dart';
+import 'package:syphon/store/sync/parsers/parsers.dart';
+import 'package:syphon/store/sync/service/model.dart';
+import 'package:syphon/store/sync/service/parsers.dart';
+import 'package:syphon/store/sync/service/requests.dart';
+import 'package:syphon/store/sync/service/storage.dart';
 import 'package:syphon/store/user/model.dart';
 
 /// Background Sync Service (Android Only)
-/// static class for managing service through app lifecycle
-class BackgroundSync {
+///
+/// Manages background syncing and notifications on android
+///
+/// NOTE: Currently only works for notifications and not background syncing
+///
+/// TODO: use for background sync and combine cold storage databases
+///
+class SyncService {
   static const service_id = 255;
   static const serviceTimeout = 55; // seconds
 
@@ -30,6 +38,7 @@ class BackgroundSync {
   static const lastSinceKey = 'lastSince';
   static const roomNamesKey = 'roomNamesKey';
   static const currentUserKey = 'currentUserKey';
+  static const proxySettingsKey = 'proxySettingsKey';
   static const notificationSettingsKey = 'notificationSettings';
   static const notificationsUncheckedKey = 'notificationsUnchecked';
 
@@ -37,7 +46,7 @@ class BackgroundSync {
     try {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
-      printError('[BackgroundSync.init] $error');
+      log.error('[SyncService.init] $error');
       return false;
     }
   }
@@ -48,24 +57,32 @@ class BackgroundSync {
     User? currentUser,
     Map<String, String?>? roomNames,
     NotificationSettings? settings,
+    ProxySettings? proxySettings,
   }) async {
     // android only background sync
     if (!Platform.isAndroid) return;
 
-    log.info('[BackgroundSync] starting');
+    log.info('[SyncService] starting');
 
     final secureStorage = FlutterSecureStorage();
 
     // only write here if one does not exist
-    if (!await secureStorage.containsKey(key: BackgroundSync.lastSinceKey)) {
-      await secureStorage.write(key: BackgroundSync.lastSinceKey, value: lastSince);
+    if (!await secureStorage.containsKey(key: SyncService.lastSinceKey)) {
+      await secureStorage.write(
+          key: SyncService.lastSinceKey, value: lastSince);
     }
 
     await Future.wait([
-      secureStorage.write(key: BackgroundSync.protocolKey, value: protocol),
-      secureStorage.write(key: BackgroundSync.roomNamesKey, value: jsonEncode(roomNames)),
-      secureStorage.write(key: BackgroundSync.notificationSettingsKey, value: jsonEncode(settings)),
-      secureStorage.write(key: BackgroundSync.currentUserKey, value: jsonEncode(currentUser)),
+      secureStorage.write(key: SyncService.protocolKey, value: protocol),
+      secureStorage.write(
+          key: SyncService.roomNamesKey, value: jsonEncode(roomNames)),
+      secureStorage.write(
+          key: SyncService.currentUserKey, value: jsonEncode(currentUser)),
+      secureStorage.write(
+          key: SyncService.proxySettingsKey, value: jsonEncode(proxySettings)),
+      secureStorage.write(
+          key: SyncService.notificationSettingsKey,
+          value: jsonEncode(settings)),
     ]);
 
     await AndroidAlarmManager.periodic(
@@ -86,7 +103,7 @@ class BackgroundSync {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      log.error('[BackgroundSync] $error');
+      log.error('[SyncService] $error');
     }
   }
 }
@@ -97,9 +114,7 @@ class BackgroundSync {
 /// Same as below, but works in compute / isolates outside alarm_services
 ///
 /// TODO: not working off main thread - due to secure storage and flutter widget binding
-Future notificationJobThreaded(Map params) async {
-  return notificationJob();
-}
+Future notificationJobThreaded(Map params) async => notificationJob();
 
 ///
 /// Notification Job (Android Only)
@@ -114,16 +129,32 @@ Future notificationJob() async {
     User currentUser;
     String? protocol;
     String? lastSince;
+    ProxySettings proxySettings;
 
     try {
       final secureStorage = FlutterSecureStorage();
-      protocol = await secureStorage.read(key: BackgroundSync.protocolKey);
-      lastSince = await secureStorage.read(key: BackgroundSync.lastSinceKey);
-
-      final _userString = await secureStorage.read(key: BackgroundSync.currentUserKey);
+      protocol = await secureStorage.read(key: SyncService.protocolKey);
+      lastSince = await secureStorage.read(key: SyncService.lastSinceKey);
+      final _proxySettingsString =
+          await secureStorage.read(key: SyncService.proxySettingsKey);
+      final _userString =
+          await secureStorage.read(key: SyncService.currentUserKey);
       currentUser = User.fromJson(jsonDecode(_userString ?? '{}'));
+      proxySettings =
+          ProxySettings.fromJson(jsonDecode(_proxySettingsString ?? '{}'));
     } catch (error) {
       return log.threaded('[notificationJob] decode error $error');
+    }
+
+    if (proxySettings.enabled) {
+      try {
+        httpClient = createClient(proxySettings: proxySettings);
+      } catch (error) {
+        log.error(error.toString());
+        throw Exception(
+          'Failed to initialize proxy settings, aborting background notifications service',
+        );
+      }
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -131,7 +162,8 @@ Future notificationJob() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (String? payload) {
-        log.threaded('[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload');
+        log.threaded(
+            '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload');
         return Future.value(true);
       },
     );
@@ -141,12 +173,12 @@ Future notificationJob() async {
     }
 
     showBackgroundServiceNotification(
-      notificationId: BackgroundSync.service_id,
+      notificationId: SyncService.service_id,
       pluginInstance: pluginInstance,
     );
 
     final cutoff = DateTime.now().add(
-      Duration(seconds: BackgroundSync.serviceTimeout),
+      Duration(seconds: SyncService.serviceTimeout),
     );
 
     while (DateTime.now().isBefore(cutoff)) {
@@ -242,23 +274,25 @@ Future backgroundSync({
     await Future.forEach(roomsJson.keys, (String roomId) async {
       final roomJson = roomsJson[roomId];
 
-      // Don't parse room if there are no message events found
-      final events = parseEvents(roomJson);
+      final currentRoom = Room(id: roomId);
+      final currentUser = User(userId: currentUserId);
 
-      if (events.messages.isEmpty) {
+      // TODO: QA extensively
+      final sync = parseSync(
+        json: roomJson,
+        lastSince: lastSince,
+        currentRoom: currentRoom,
+        currentUser: currentUser,
+        currentMessageIds: [], // existing ids
+        ignoreMessageless: true,
+      );
+
+      if (sync.events.messages.isEmpty) {
         return;
       }
 
-      final details = parseDetails(roomJson);
-
-      final room = Room(id: roomId).fromEvents(
-        events: events,
-        currentUser: User(userId: currentUserId),
-        lastSince: lastSince,
-        limited: details.limited,
-        lastBatch: details.lastBatch,
-        prevBatch: details.prevBatch,
-      );
+      final room = sync.room;
+      final events = sync.events;
 
       final chatOptions = settings.notificationOptions;
       final hasOptions = chatOptions.containsKey(roomId);
@@ -286,7 +320,8 @@ Future backgroundSync({
       }
 
       // Make sure the room name exists in the cache
-      if (!roomNames.containsKey(roomId) || roomNames[roomId] == Values.EMPTY_CHAT) {
+      if (!roomNames.containsKey(roomId) ||
+          roomNames[roomId] == Values.EMPTY_CHAT) {
         roomNames = await updateRoomNames(
           protocol: protocol,
           homeserver: homeserver,
@@ -358,7 +393,8 @@ Future backgroundSync({
       ///
       /// All other Notifications styles
       ///
-      await Future.forEach(notifications, (NotificationContent notification) async {
+      await Future.forEach(notifications,
+          (NotificationContent notification) async {
         await showMessageNotification(
           id: uncheckedMessages.isEmpty ? 0 : null,
           body: notification.body,
@@ -369,7 +405,7 @@ Future backgroundSync({
       });
     });
   } catch (error) {
-    log.threaded('[BackgroundSync] $error');
+    log.threaded('[SyncService] $error');
   }
 }
 
@@ -396,10 +432,11 @@ Future notificationSyncTEST() async {
 
     try {
       final secureStorage = FlutterSecureStorage();
-      protocol = await secureStorage.read(key: BackgroundSync.protocolKey);
-      lastSince = await secureStorage.read(key: BackgroundSync.lastSinceKey);
+      protocol = await secureStorage.read(key: SyncService.protocolKey);
+      lastSince = await secureStorage.read(key: SyncService.lastSinceKey);
       currentUser = User.fromJson(
-        jsonDecode(await secureStorage.read(key: BackgroundSync.currentUserKey) ?? '{}'),
+        jsonDecode(
+            await secureStorage.read(key: SyncService.currentUserKey) ?? '{}'),
       );
     } catch (error) {
       return log.threaded('[notificationSyncTEST] $error');

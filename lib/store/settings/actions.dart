@@ -4,8 +4,6 @@ import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/auth/actions.dart';
@@ -13,69 +11,7 @@ import 'package:syphon/store/auth/credential/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/store/settings/models.dart';
-import 'package:syphon/store/settings/storage.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/sync/background/service.dart';
-
-class SetThemeType {
-  final ThemeType themeType;
-  SetThemeType(this.themeType);
-}
-
-class SetPrimaryColor {
-  final int? color;
-  SetPrimaryColor({this.color});
-}
-
-class SetAvatarShape {
-  final AvatarShape? avatarShape;
-  SetAvatarShape({this.avatarShape});
-}
-
-class SetMainFabType {
-  final MainFabType? fabType;
-  SetMainFabType({this.fabType});
-}
-
-class SetMainFabLocation {
-  final MainFabLocation? fabLocation;
-  SetMainFabLocation({this.fabLocation});
-}
-
-class SetAccentColor {
-  final int? color;
-  SetAccentColor({this.color});
-}
-
-class SetAppBarColor {
-  final int? color;
-  SetAppBarColor({this.color});
-}
-
-class SetFontName {
-  final FontName? fontName;
-  SetFontName({this.fontName});
-}
-
-class SetFontSize {
-  final FontSize? fontSize;
-  SetFontSize({this.fontSize});
-}
-
-class SetMessageSize {
-  final MessageSize? messageSize;
-  SetMessageSize({this.messageSize});
-}
-
-class SetRoomPrimaryColor {
-  final int? color;
-  final String? roomId;
-
-  SetRoomPrimaryColor({
-    this.color,
-    this.roomId,
-  });
-}
+import 'package:syphon/store/sync/service/actions.dart';
 
 class SetPusherToken {
   final String? token;
@@ -111,6 +47,11 @@ class SetPollTimeout {
   });
 }
 
+class SetReadReceipts {
+  final ReadReceiptTypes? readReceipts;
+  SetReadReceipts({this.readReceipts});
+}
+
 class ToggleEnterSend {}
 
 class ToggleAutocorrect {}
@@ -121,8 +62,6 @@ class ToggleAutoDownload {}
 
 class ToggleDismissKeyboard {}
 
-class ToggleRoomTypeBadges {}
-
 class ToggleMembershipEvents {}
 
 class ToggleNotifications {}
@@ -130,11 +69,6 @@ class ToggleNotifications {}
 class ToggleTypingIndicators {}
 
 class ToggleTimeFormat {}
-
-class SetReadReceipts {
-  final ReadReceiptTypes? readReceipts;
-  SetReadReceipts({this.readReceipts});
-}
 
 class LogAppAgreement {}
 
@@ -155,12 +89,13 @@ ThunkAction<AppState> fetchDevices() {
       }
 
       final List<dynamic> jsonDevices = data['devices'];
-      final List<Device> devices =
-          jsonDevices.map((jsonDevice) => Device.fromMatrix(jsonDevice)).toList();
+      final List<Device> devices = jsonDevices
+          .map((jsonDevice) => Device.fromMatrix(jsonDevice))
+          .toList();
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
-      printError('[fetchRooms] error: $error');
+      log.error('[fetchRooms] $error');
     } finally {
       store.dispatch(SetLoadingSettings(loading: false));
     }
@@ -201,7 +136,8 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
     try {
       store.dispatch(SetLoadingSettings(loading: true));
 
-      final currentCredential = store.state.authStore.credential ?? Credential();
+      final currentCredential =
+          store.state.authStore.credential ?? Credential();
 
       final data = await MatrixApi.deleteDevices(
         protocol: store.state.authStore.protocol,
@@ -215,6 +151,12 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
       );
 
       if (data['errcode'] != null) {
+        final errorCode = data['errcode'];
+
+        if (errorCode == 'M_INVALID_PARAM') {
+          return false;
+        }
+
         throw data['error'];
       }
 
@@ -237,7 +179,8 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
 }
 
 /// Rename a single device
-ThunkAction<AppState> renameDevice({String? deviceId, String? displayName, bool? disableLoading}) {
+ThunkAction<AppState> renameDevice(
+    {String? deviceId, String? displayName, bool? disableLoading}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoadingSettings(loading: true));
@@ -274,117 +217,10 @@ ThunkAction<AppState> renameDevice({String? deviceId, String? displayName, bool?
   };
 }
 
-/// Send in a hex value to be used as the primary color
+/// Log the timestamp of the accepted TOS
 ThunkAction<AppState> acceptAgreement() {
   return (Store<AppState> store) async {
     store.dispatch(LogAppAgreement());
-  };
-}
-
-/// Send in a hex value to be used as the primary color
-ThunkAction<AppState> setPrimaryColor(int color) {
-  return (Store<AppState> store) async {
-    store.dispatch(SetPrimaryColor(color: color));
-  };
-}
-
-/// Send in a hex value to be used as the secondary color
-ThunkAction<AppState> setAccentColor(int color) {
-  return (Store<AppState> store) async {
-    store.dispatch(SetAccentColor(color: color));
-  };
-}
-
-/// Send in a hex value to be used as the app bar color
-ThunkAction<AppState> updateAppBarColor(int color) {
-  return (Store<AppState> store) async {
-    store.dispatch(SetAppBarColor(color: color));
-  };
-}
-
-/// Iterate over FontNames on action
-ThunkAction<AppState> incrementFontType() {
-  return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.themeSettings;
-    final fontNameIndex = FontName.values.indexOf(currentTheme.fontName);
-
-    store.dispatch(SetFontName(
-      fontName: FontName.values[(fontNameIndex + 1) % FontName.values.length],
-    ));
-  };
-}
-
-/// Iterate over FontSizes on action
-ThunkAction<AppState> incrementFontSize() {
-  return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.themeSettings;
-    final fontSizeIndex = FontSize.values.indexOf(currentTheme.fontSize);
-
-    store.dispatch(SetFontSize(
-      fontSize: FontSize.values[(fontSizeIndex + 1) % FontSize.values.length],
-    ));
-  };
-}
-
-/// Iterate over MessageSizes on action
-ThunkAction<AppState> incrementMessageSize() {
-  return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.themeSettings;
-    final messageSizeIndex = MessageSize.values.indexOf(currentTheme.messageSize);
-
-    store.dispatch(SetMessageSize(
-      messageSize: MessageSize.values[(messageSizeIndex + 1) % MessageSize.values.length],
-    ));
-  };
-}
-
-/// Iterate over ThemeTypes on action
-ThunkAction<AppState> incrementThemeType() {
-  return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.themeSettings;
-    final themeTypeIndex = ThemeType.values.indexOf(currentTheme.themeType);
-    final nextThemeType = ThemeType.values[(themeTypeIndex + 1) % ThemeType.values.length];
-
-    // update system navbar theme to match
-    setSystemTheme(nextThemeType);
-
-    store.dispatch(SetThemeType(nextThemeType));
-  };
-}
-
-/// Iterate over AvatarShapes on action
-ThunkAction<AppState> incrementAvatarShape() {
-  return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.themeSettings;
-    final avatarShapeIndex = AvatarShape.values.indexOf(currentTheme.avatarShape);
-
-    store.dispatch(SetAvatarShape(
-      avatarShape: AvatarShape.values[(avatarShapeIndex + 1) % AvatarShape.values.length],
-    ));
-  };
-}
-
-/// Iterate over AvatarShapes on action
-ThunkAction<AppState> incrementFabType() {
-  return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.themeSettings;
-    final fabTypeIndex = MainFabType.values.indexOf(currentTheme.mainFabType);
-
-    store.dispatch(SetMainFabType(
-      fabType: MainFabType.values[(fabTypeIndex + 1) % MainFabType.values.length],
-    ));
-  };
-}
-
-/// Iterate over AvatarShapes on action
-ThunkAction<AppState> incrementFabLocation() {
-  return (Store<AppState> store) async {
-    final currentTheme = store.state.settingsStore.themeSettings;
-    final fabTypeIndex = MainFabLocation.values.indexOf(currentTheme.mainFabLocation);
-
-    store.dispatch(SetMainFabLocation(
-      fabLocation: MainFabLocation.values[(fabTypeIndex + 1) % MainFabLocation.values.length],
-    ));
   };
 }
 
@@ -406,7 +242,28 @@ ThunkAction<AppState> incrementLanguage() {
   };
 }
 
-Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
+///Supported since Spec v1.4
+///https://spec.matrix.org/v1.4/client-server-api/#private-read-receipts
+Future<bool> homeserverSupportsPrivateReadReceipts(
+    Store<AppState> store) async {
+  final version = await MatrixApi.checkVersion(
+    protocol: store.state.authStore.protocol,
+    homeserver: store.state.authStore.user.homeserver,
+  );
+
+  final supportedVersions = version['versions'];
+  final unstableFeatures = version['unstable_features'];
+
+  //TODO: deprecate unstableFeatures check
+  return (supportedVersions.contains('v1.4')) ||
+      unstableFeatures != null &&
+          unstableFeatures.containsKey('org.matrix.msc2285.stable') &&
+          unstableFeatures['org.matrix.msc2285.stable'];
+}
+
+@Deprecated('Due to be unsupported as of Synapse v1.67.0')
+Future<bool> homeserverSupportsUnstablePrivateReadReceipts(
+    Store<AppState> store) async {
   final version = await MatrixApi.checkVersion(
     protocol: store.state.authStore.protocol,
     homeserver: store.state.authStore.user.homeserver,
@@ -414,32 +271,36 @@ Future<bool> homeserverSupportsHiddenReadReceipts(Store<AppState> store) async {
 
   final unstableFeatures = version['unstable_features'];
 
-  return unstableFeatures != null
-         && unstableFeatures.containsKey('org.matrix.msc2285')
-         && unstableFeatures['org.matrix.msc2285'];
+  return unstableFeatures != null &&
+      unstableFeatures.containsKey('org.matrix.msc2285') &&
+      unstableFeatures['org.matrix.msc2285'];
 }
 
 ThunkAction<AppState> incrementReadReceipts() {
   return (Store<AppState> store) async {
-    final readReceiptsIndex = ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
+    final readReceiptsIndex =
+        ReadReceiptTypes.values.indexOf(store.state.settingsStore.readReceipts);
 
-    final nextReceipt = ReadReceiptTypes.values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
+    final nextReceipt = ReadReceiptTypes
+        .values[(readReceiptsIndex + 1) % ReadReceiptTypes.values.length];
 
-    if (nextReceipt != ReadReceiptTypes.Hidden) { //short-out
+    if (nextReceipt != ReadReceiptTypes.Private) {
+      //short-out
       return store.dispatch(SetReadReceipts(
         readReceipts: nextReceipt,
       ));
     }
 
-    if (await homeserverSupportsHiddenReadReceipts(store)) {
+    if (await homeserverSupportsPrivateReadReceipts(store) ||
+        await homeserverSupportsUnstablePrivateReadReceipts(store)) {
       return store.dispatch(SetReadReceipts(
-        readReceipts: ReadReceiptTypes.Hidden,
+        readReceipts: ReadReceiptTypes.Private,
       ));
     }
 
     return store.dispatch(SetReadReceipts(
-      readReceipts: ReadReceiptTypes.values[(readReceiptsIndex + 2) %
-          ReadReceiptTypes.values.length],
+      readReceipts: ReadReceiptTypes
+          .values[(readReceiptsIndex + 2) % ReadReceiptTypes.values.length],
     ));
   };
 }
@@ -486,12 +347,6 @@ ThunkAction<AppState> toggleSuggestions() {
   };
 }
 
-ThunkAction<AppState> toggleRoomTypeBadges() {
-  return (Store<AppState> store) async {
-    store.dispatch(ToggleRoomTypeBadges());
-  };
-}
-
 ThunkAction<AppState> toggleMembershipEvents() {
   return (Store<AppState> store) async {
     store.dispatch(ToggleMembershipEvents());
@@ -517,41 +372,9 @@ ThunkAction<AppState> toggleNotifications() {
     final enabled = store.state.settingsStore.notificationSettings.enabled;
 
     if (enabled) {
-      store.dispatch(startNotifications());
+      store.dispatch(startSyncService());
     } else {
-      store.dispatch(stopNotifications());
+      store.dispatch(stopSyncService());
     }
-  };
-}
-
-ThunkAction<AppState> startNotifications() {
-  return (Store<AppState> store) async {
-    await BackgroundSync.init();
-
-    final Map<String, String?> roomNames = store.state.roomStore.rooms.map(
-      (roomId, room) => MapEntry(roomId, room.name),
-    );
-
-    await BackgroundSync.start(
-      roomNames: roomNames,
-      protocol: store.state.authStore.protocol,
-      lastSince: store.state.syncStore.lastSince,
-      currentUser: store.state.authStore.currentUser,
-      settings: store.state.settingsStore.notificationSettings,
-    );
-
-    showBackgroundServiceNotification(
-      notificationId: BackgroundSync.service_id,
-      pluginInstance: globalNotificationPluginInstance!,
-    );
-  };
-}
-
-ThunkAction<AppState> stopNotifications() {
-  return (Store<AppState> store) async {
-    BackgroundSync.stop();
-    dismissAllNotifications(
-      pluginInstance: globalNotificationPluginInstance,
-    );
   };
 }

@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
 import 'package:image_picker/image_picker.dart';
-
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
@@ -11,9 +9,11 @@ class ModalImageOptions extends StatelessWidget {
   const ModalImageOptions({
     Key? key,
     this.onSetNewAvatar,
+    this.onRemoveAvatar,
   }) : super(key: key);
 
   final Function? onSetNewAvatar;
+  final Function? onRemoveAvatar;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -64,9 +64,7 @@ class ModalImageOptions extends StatelessWidget {
                 if (image == null) return;
 
                 final File imageFile = File(image.path);
-                if (onSetNewAvatar != null) {
-                  onSetNewAvatar!(image: imageFile);
-                }
+                onSetNewAvatar?.call(image: imageFile);
 
                 Navigator.pop(context);
               },
@@ -94,15 +92,15 @@ class ModalImageOptions extends StatelessWidget {
 
                 final File imageFile = File(image.path);
 
-                if (onSetNewAvatar != null) {
-                  onSetNewAvatar!(image: imageFile);
-                }
+                onSetNewAvatar?.call(image: imageFile);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              onTap: () => Navigator.pop(context),
-              enabled: false,
+              onTap: () async {
+                await onRemoveAvatar?.call();
+                Navigator.pop(context);
+              },
               leading: Container(
                 padding: EdgeInsets.all(4),
                 child: Icon(

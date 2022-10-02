@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
@@ -69,7 +69,8 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
       setState(() {
         encryption = false;
       });
-    } else { // If toggling the encryption on, show warning
+    } else {
+      // If toggling the encryption on, show warning
       return showDialog(
         context: context,
         barrierDismissible: false,
@@ -122,7 +123,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
 
           if (name != null && name!.isNotEmpty) {
             avatarWidget = CircleAvatar(
-              backgroundColor: Colours.hashedColor(name),
+              backgroundColor: AppColors.hashedColor(name),
               child: Text(
                 formatInitialsLong(name),
                 style: TextStyle(
@@ -222,7 +223,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                     boxShadow: const [
                                                       BoxShadow(
                                                         blurRadius: 6,
-                                                        offset: Offset(0, 0),
+                                                        offset: Offset.zero,
                                                         color: Colors.black54,
                                                       )
                                                     ],

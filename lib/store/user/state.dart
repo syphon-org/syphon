@@ -48,6 +48,5 @@ class UserStore extends Equatable {
       );
   Map<String, dynamic> toJson() => _$UserStoreToJson(this);
 
-  factory UserStore.fromJson(Map<String, dynamic> json) =>
-      _$UserStoreFromJson(json);
+  factory UserStore.fromJson(Map<String, dynamic> json) => _$UserStoreFromJson(json);
 }

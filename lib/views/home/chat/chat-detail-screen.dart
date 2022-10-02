@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
@@ -39,24 +39,21 @@ class ChatDetailsArguments {
   });
 }
 
-class ChatDetailsScreen extends StatefulWidget {
-  const ChatDetailsScreen({Key? key}) : super(key: key);
+class ChatSettingsScreen extends StatefulWidget {
+  const ChatSettingsScreen({Key? key}) : super(key: key);
 
   @override
-  ChatDetailsState createState() => ChatDetailsState();
+  ChatSettingsState createState() => ChatSettingsState();
 }
 
-class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetailsScreen> {
-  ChatDetailsState() : super();
+class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSettingsScreen> {
+  ChatSettingsState() : super();
 
   final ScrollController scrollController = ScrollController(
     initialScrollOffset: 0,
   );
 
-  final double headerSize = 54;
-
   double headerOpacity = 1;
-  List<User>? usersList;
 
   @override
   void initState() {
@@ -93,7 +90,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
   @override
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final arguments = ModalRoute.of(context)!.settings.arguments as ChatDetailsArguments?;
+    final arguments = useScreenArguments<ChatDetailsArguments>(context);
 
     if (arguments?.roomId == null) return;
 
@@ -172,7 +169,7 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
         ModalRoute.of(context)!.settings.arguments as ChatDetailsArguments?;
 
     final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
-        ? Color(Colours.greyLightest)
+        ? Color(AppColors.greyLightest)
         : Theme.of(context).scaffoldBackgroundColor;
 
     return StoreConnector<AppState, _Props>(
@@ -499,37 +496,35 @@ class ChatDetailsState extends State<ChatDetailsScreen> with Lifecycle<ChatDetai
                         ),
                       ),
                       CardSection(
-                        child: Container(
-                          child: Column(
-                            children: [
-                              Visibility(
-                                visible: props.room.direct,
-                                child: ListTile(
-                                  onTap: () => onBlockUser(
-                                    context: context,
-                                    props: props,
-                                  ),
-                                  contentPadding: contentPadding,
-                                  title: Text(
-                                    Strings.buttonBlockUser,
-                                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                                          color: Colors.redAccent,
-                                        ),
-                                  ),
+                        child: Column(
+                          children: [
+                            Visibility(
+                              visible: props.room.direct,
+                              child: ListTile(
+                                onTap: () => onBlockUser(
+                                  context: context,
+                                  props: props,
                                 ),
-                              ),
-                              ListTile(
-                                onTap: () => onLeaveChat(props),
                                 contentPadding: contentPadding,
                                 title: Text(
-                                  Strings.buttonLeaveChat,
+                                  Strings.buttonBlockUser,
                                   style: Theme.of(context).textTheme.subtitle1!.copyWith(
                                         color: Colors.redAccent,
                                       ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            ListTile(
+                              onTap: () => onLeaveChat(props),
+                              contentPadding: contentPadding,
+                              title: Text(
+                                Strings.buttonLeaveChat,
+                                style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                      color: Colors.redAccent,
+                                    ),
+                              ),
+                            ),
+                          ],
                         ),
                       )
                     ],

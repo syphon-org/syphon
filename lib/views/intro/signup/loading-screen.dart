@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
@@ -27,7 +27,7 @@ class LoadingScreen extends StatelessWidget {
           child: Container(
             height: height,
             width: width,
-            color: Color(Colours.whiteDefault),
+            color: Color(AppColors.whiteDefault),
             child: Flex(
               direction: Axis.vertical,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +60,7 @@ class LoadingScreen extends StatelessWidget {
           child: Container(
             height: height,
             width: width,
-            color: Color(Colours.cyanSyphon),
+            color: Color(AppColors.cyanSyphon),
             child: Flex(
               direction: Axis.vertical,
               mainAxisAlignment: MainAxisAlignment.center,

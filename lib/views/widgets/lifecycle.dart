@@ -11,7 +11,7 @@ mixin Lifecycle<T extends StatefulWidget> on State<T> {
   @override
   void initState() {
     // NOTE: SchedulerBinding still needed in screen child views vs. didDepsChange()
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       onMounted();
     });
 

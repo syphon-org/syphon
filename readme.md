@@ -10,13 +10,16 @@ a privacy centric matrix client - now in open alpha*
  
 <p align='center'>
     <a href='https://play.google.com/store/apps/details?id=org.tether.tether'>
-        <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='assets/external/en_badge_web_generic.png' />
+        <img  height="56"  alt='Get it on Google Play' style="padding-right:8px;" src='assets/external/en_badge_web_generic.png'/>
     </a>
-    <a href='https://apps.apple.com/us/app/syphon/id1496285352'>
+    <a href='https://apps.apple.com/app/syphon/id1496285352'>
         <img height="56" alt='Download on the App Store' style="padding-right:8px;" src='assets/external/download_on_the_app_store.svg'/>
     </a>
     <a href='https://f-droid.org/packages/org.tether.tether/'>
         <img height="56" src="assets/external/get-it-on-fdroid.png">
+    </a>
+    <a href='https://flathub.org/apps/details/org.syphon.Syphon'>
+        <img height='56' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/>
     </a>
 </p>
 
@@ -91,13 +94,15 @@ Syphon will always be a not for profit, community driven application.
 ## 🏗️ Building
 You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster one can get people contributing, the easier it will be for others to maintain or oversee a tool that does not exploit the user.
 
-### general
-- you'll to do several things to setup the environment for Syphon
+### workstation
+- workstation independent setup for Syphon development
     - install flutter (stable channel for all platforms)
     - install necessary third party sdks and tooling
         - ios -> xcode
         - android -> android studio
-    - install cmake version for workstation platform (for olm/megolm)
+    - install cmake from cli through android studio platform tools (for olm/megolm)
+          - ```sdkmanager --install "cmake;3.10.2.4988404"```
+    - (alternate) install cmake version from donwload per workstation platform
         - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 
         - [linux](https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh)
         - [windows](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
@@ -112,16 +117,24 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - ```flutter pub run build_runner build```
 
 ### ios/android
+0. install android studio
+0. install latest commandline tools through android studio gui
+0. confirm `sdkmanager` is available in your path
+0. pull the latest cmake, NDK, and other dependencies
+  - ```sdkmanager --install "ndk;21.4.7075529"```
+  - ```sdkmanager --install "cmake;3.10.2.4988404"```
 0. pull dependencies needed 
-   - ```flutter pub get```
+  - ```flutter pub get```
 1. generate json conversion for models
-   - ```flutter pub run build_runner build --delete-conflicting-outputs```
+  - ```flutter pub run build_runner build --delete-conflicting-outputs```
 2. generate json conversion for models
-   - ```flutter run```
+  - ```flutter run```
 
 ### macos  
 1. ```flutter config --enable-macos-desktop```
 2. ```brew install libolm``` to install native olm dependencies
+3. copy the dylib - not the soft links - to the macos folder
+  - `cp /opt/homebrew/Cellar/libolm/libolm.3.x.x.dylib ./macos/libolm.3.x.x.dylib`
 3. follow instructions for linking the dylib generated from brew to the Syphon project
   - refer to [macos dylib linking guide](https://flutter.dev/docs/development/platform-integration/c-interop#compiled-dynamic-library-macos)
 4. ```flutter build macos``` to build the .app bundle

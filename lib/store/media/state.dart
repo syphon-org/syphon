@@ -42,17 +42,14 @@ class MediaStore extends Equatable {
         (k, e) => MapEntry(k, e as String),
       ),
       mediaCache: (json['mediaCache'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(
-            k, Uint8List.fromList((e as List).map((e) => e as int).toList())),
+        (k, e) => MapEntry(k, Uint8List.fromList((e as List).map((e) => e as int).toList())),
       ),
     );
   }
 
   Map<String, dynamic> toJson() => _$MediaStoreToJson(this);
-  Map<String, dynamic> _$MediaStoreToJson(MediaStore instance) =>
-      <String, dynamic>{
-        'mediaCache':
-            instance.mediaCache.map((key, value) => MapEntry(key, value)),
+  Map<String, dynamic> _$MediaStoreToJson(MediaStore instance) => <String, dynamic>{
+        'mediaCache': instance.mediaCache.map((key, value) => MapEntry(key, value)),
         'mediaChecks': instance.mediaStatus,
       };
 }

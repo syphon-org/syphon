@@ -16,8 +16,6 @@ import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/storage/converters.dart';
 import 'package:syphon/storage/index.dart';
-// ignore: unused_import
-import 'package:syphon/storage/migrations/5.update.messages.dart';
 import 'package:syphon/storage/models.dart';
 import 'package:syphon/store/auth/schema.dart';
 import 'package:syphon/store/crypto/schema.dart';
@@ -44,7 +42,7 @@ void _openOnIOS() {
   try {
     open.overrideFor(OperatingSystem.iOS, () => DynamicLibrary.process());
   } catch (error) {
-    printError(error.toString());
+    log.error(error.toString());
   }
 }
 
@@ -52,7 +50,7 @@ void _openOnAndroid() {
   try {
     open.overrideFor(OperatingSystem.android, () => DynamicLibrary.open('libsqlcipher.so'));
   } catch (error) {
-    printError(error.toString());
+    log.error(error.toString());
   }
 }
 
@@ -61,6 +59,7 @@ void _openOnLinux() {
     open.overrideFor(OperatingSystem.linux, () => DynamicLibrary.open('libsqlcipher.so'));
     return;
   } catch (_) {
+    log.error(_.toString());
     try {
       // fallback to sqlite if unavailable
       final scriptDir = File(Platform.script.toFilePath()).parent;
@@ -69,7 +68,7 @@ void _openOnLinux() {
 
       open.overrideFor(OperatingSystem.linux, () => lib);
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
       rethrow;
     }
   }
@@ -142,7 +141,7 @@ void _openDatabaseBackground(DatabaseInfo info) {
     () => DatabaseConnection.fromExecutor(
       NativeDatabase(
         File(info.path),
-        logStatements: false, // DEBUG_MODE,
+        logStatements: false,
         setup: (rawDb) {
           rawDb.execute("PRAGMA key = '${info.key}';");
         },
@@ -172,10 +171,6 @@ Future<DriftIsolate> spawnDatabaseIsolate(AppContext context, {String pin = Valu
   return await receivePort.first as DriftIsolate;
 }
 
-///
-/// TODO: needs to work with multiaccounts
-/// https://drift.simonbinder.eu/docs/advanced-features/isolates/
-///
 StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.empty}) {
   final connection = DatabaseConnection.delayed(
     () async {
@@ -196,7 +191,7 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
 
     return NativeDatabase(
       File(info.path),
-      logStatements: false, // DEBUG_MODE,
+      logStatements: false,
       setup: (rawDb) {
         rawDb.execute("PRAGMA key = '${info.key}';");
       },
@@ -228,7 +223,7 @@ class StorageDatabase extends _$StorageDatabase {
 
   // you should bump this number whenever you change or add a table definition.
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -236,7 +231,11 @@ class StorageDatabase extends _$StorageDatabase {
           return m.createAll();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          printInfo('[MIGRATION] VERSION $from to $to');
+          log.info('[MIGRATION] VERSION $from to $to');
+          if (from == 8) {
+            await m.addColumn(messages, messages.hasLink);
+            await m.addColumn(messages, decrypted.hasLink);
+          }
           if (from == 7) {
             await m.createTable(keySessions);
             await m.createTable(messageSessions);

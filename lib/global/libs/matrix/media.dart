@@ -184,6 +184,10 @@ class MatrixMedia {
 
     return json.decode(mediaUploadResponse.body);
   }
+
+  static String buildMessageUrl({String? roomId, String? eventId}) {
+    return 'https://matrix.to/#/$roomId/$eventId';
+  }
 }
 
 dynamic buildMediaDownloadRequest({

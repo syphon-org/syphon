@@ -335,5 +335,12 @@
     "content-logout-multiaccount-confirm": "\n\nDa Sie noch andere Konten haben, werden Sie beim Abmelden zu einer anderen Kontositzung wechseln.",
     "semantics-image-password-update": "Benutzer denkt sich in einem Windhauch ein Passwort aus",
     "content-export-session-keys": "Geben Sie ein Passwort für diese Sitzungsschlüsselsicherung ein.\n\nBitte beachten Sie, dass der Export eine gewisse Zeit in Anspruch nehmen kann.",
-    "title-dialog-confirm-deactivate-account-final": "Kontodeaktivierung final bestätigen"
+    "title-dialog-confirm-deactivate-account-final": "Kontodeaktivierung final bestätigen",
+    "alert-copied-to-clipboard": "In die Zwischenablage kopiert",
+    "label-fab-create-dm": "Direkte Nachricht",
+    "label-fab-search": "Chats durchsuchen",
+    "label-fab-create-group": "Gruppenchat starten",
+    "label-fab-create-public": "Öffentlichen Chat starten",
+    "content-key-backup-warning": "Aufgrund der Hintergrundverarbeitung unter iOS kann es sein, dass Ihre geplante Sicherung je nach Akku, Verarbeitungsleistung und anderen Faktoren nicht ausgeführt wird.\n\nVergewissern Sie sich immer, dass Ihre Backups ordnungsgemäß gespeichert werden.",
+    "title-dialog-key-backup-warning": "Warnung vor Schlüsselsicherung"
 }

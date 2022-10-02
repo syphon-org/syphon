@@ -42,7 +42,7 @@ class Prelock extends StatefulWidget {
   const Prelock({
     required this.enabled,
     required this.appContext,
-    this.backgroundLockLatency = const Duration(seconds: 0),
+    this.backgroundLockLatency = Duration.zero,
   });
 
   static restart(BuildContext context) {
@@ -75,7 +75,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     locked = widget.enabled;
     enabled = widget.enabled;
@@ -89,7 +89,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     if (!locked) {
       await _onLoadStorage();
 
-      printInfo('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+      log.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushReplacement(
         PageRouteBuilder(
@@ -119,7 +119,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
 
     backgroundLockLatencyTimer?.cancel();
 
@@ -187,7 +187,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     } else {
       await _onLoadStorage();
 
-      printInfo('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+      log.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushAndRemoveUntil(
         PageRouteBuilder(

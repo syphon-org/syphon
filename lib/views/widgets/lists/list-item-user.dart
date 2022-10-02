@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syphon/global/assets.dart';
 
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 
 import 'package:syphon/store/user/model.dart';
@@ -111,7 +111,7 @@ class ListItemUser extends StatelessWidget {
                     alt: user.displayName ?? user.userId,
                     selected: selected,
                     size: Dimensions.avatarSizeMin,
-                    background: !real ? null : Colours.hashedColor(formatUsername(user)),
+                    background: !real ? null : AppColors.hashedColor(formatUsername(user)),
                   ),
                 ],
               ),
@@ -125,7 +125,7 @@ class ListItemUser extends StatelessWidget {
               user.userId!,
               style: Theme.of(context).textTheme.caption!.merge(
                     TextStyle(
-                      color: loading ? Color(Colours.greyDisabled) : null,
+                      color: loading ? Color(AppColors.greyDisabled) : null,
                     ),
                   ),
             ),

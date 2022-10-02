@@ -7,37 +7,36 @@ import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
 class FabBarExpanding extends StatelessWidget {
+  final bool showLabels;
   final Alignment? alignment;
 
   const FabBarExpanding({
     Key? key,
     this.alignment,
+    this.showLabels = false,
   }) : super(key: key);
 
-  @protected
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, Routes.searchGroups);
   }
 
-  @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, Routes.searchUsers);
   }
 
-  @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, Routes.groupCreate);
   }
 
-  @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     Navigator.pushNamed(context, Routes.groupCreatePublic);
@@ -50,12 +49,11 @@ class FabBarExpanding extends StatelessWidget {
         builder: (context, props) => SpeedDial(
           overlayOpacity: 0.4,
           switchLabelPosition: alignment == Alignment.bottomLeft,
-          // childrenButtonSize: 64.0,
           childMargin: EdgeInsets.symmetric(vertical: 16),
           spacing: 8,
           children: <SpeedDialChild>[
             SpeedDialChild(
-              label: 'Create A Public Chat',
+              label: showLabels ? Strings.labelFabCreatePublic : null,
               backgroundColor: props.primaryColor,
               onTap: () => onNavigateToCreateGroupPublic(context),
               child: SvgPicture.asset(
@@ -64,8 +62,7 @@ class FabBarExpanding extends StatelessWidget {
               ),
             ),
             SpeedDialChild(
-              label: 'Create Group',
-              labelStyle: TextStyle(),
+              label: showLabels ? Strings.labelFabCreateGroup : null,
               backgroundColor: props.primaryColor,
               onTap: () => onNavigateToCreateGroup(context),
               child: SvgPicture.asset(
@@ -74,16 +71,16 @@ class FabBarExpanding extends StatelessWidget {
               ),
             ),
             SpeedDialChild(
-              label: 'Direct Message',
+              label: showLabels ? Strings.labelFabCreateDM : null,
               backgroundColor: props.primaryColor,
               onTap: () => onNavigateToDraft(context),
               child: SvgPicture.asset(
-                Assets.iconPersonAddBeing,
+                Assets.iconMessageCircleBeing,
                 color: Colors.white,
               ),
             ),
             SpeedDialChild(
-              label: 'Search Public Chats',
+              label: showLabels ? Strings.labelFabSearch : null,
               backgroundColor: props.primaryColor,
               onTap: () => onNavigateToPublicSearch(context),
               child: SvgPicture.asset(
@@ -94,13 +91,13 @@ class FabBarExpanding extends StatelessWidget {
           ],
           activeChild: Icon(
             Icons.close,
-            semanticLabel: 'Close Actions Ring',
+            semanticLabel: Strings.semanticsCloseActionsRing,
             color: Colors.white,
           ),
           child: Icon(
             Icons.bubble_chart,
             size: Dimensions.iconSizeLarge,
-            semanticLabel: 'Open Actions Ring',
+            semanticLabel: Strings.semanticsOpenActionsRing,
             color: Colors.white,
           ),
         ),

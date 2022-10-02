@@ -7,13 +7,14 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
+import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
@@ -45,24 +46,22 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
 
   @override
   onMounted() async {
-    final params = ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments;
+    final params = useScreenArguments<MediaPreviewArguments>(context);
 
     try {
-      final firstImage = params.mediaList.first;
+      final firstImage = params?.mediaList.first;
 
       setState(() {
         currentImage = firstImage;
       });
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
     }
   }
 
-  @protected
   onConfirm(_Props props) async {
-    final params = ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments;
-
-    await params.onConfirmSend();
+    final params = useScreenArguments<MediaPreviewArguments>(context);
+    await params?.onConfirmSend();
     Navigator.pop(context);
   }
 
@@ -71,7 +70,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)?.settings.arguments as MediaPreviewArguments).roomId,
+          useScreenArguments<MediaPreviewArguments>(context)?.roomId,
         ),
         builder: (context, props) {
           final encryptionEnabled = props.room.encryptionEnabled;
@@ -134,7 +133,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                             onTap: sending ? null : () => onConfirm(props),
                             child: CircleAvatar(
                               backgroundColor: sending
-                                  ? Color(Colours.greyDisabled)
+                                  ? Color(AppColors.greyDisabled)
                                   : Theme.of(context).colorScheme.primary,
                               child: sending
                                   ? Padding(

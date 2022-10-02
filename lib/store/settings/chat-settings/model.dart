@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/store/settings/notification-settings/options/types.dart';
 
 part 'model.g.dart';
@@ -31,7 +31,7 @@ class ChatSetting extends Equatable {
     required this.roomId,
     this.language = 'English',
     this.smsEnabled = false,
-    this.primaryColor = Colours.greyDefault,
+    this.primaryColor = AppColors.greyDefault,
     this.notificationOptions,
   });
 

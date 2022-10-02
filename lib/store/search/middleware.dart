@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:redux/redux.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/database.dart';
@@ -22,8 +20,7 @@ searchMiddleware(StorageDatabase? coldStorage) {
     next(action);
 
     if (coldStorage == null) {
-      printWarning('storage is null, skipping saving cold storage data!!!',
-          title: 'searchMiddleware');
+      log.warn('storage is null, skipping saving cold storage data!!!', title: 'searchMiddleware');
       return;
     }
 

@@ -4,10 +4,6 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-List<Room> availableRooms(List<Room> rooms) {
-  return List.from(rooms.where((room) => !room.hidden));
-}
-
 String formatRoomName({required Room room}) {
   final name = room.name!;
   return name.length > 22 ? '${name.substring(0, 22)}...' : name;

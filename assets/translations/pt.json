@@ -79,7 +79,7 @@
     "title-dialog-delete-keys": "Confirmar a eliminação das chaves",
     "title-view-profile": "Configurar o seu perfil",
     "title-view-homeserver-search": "Encontrar o seu servidor local",
-    "title-view-privacy": "Privacidade",
+    "title-view-privacy": "Privacidade e segurança",
     "title-view-settings-chat": "Conversas",
     "title-view-invite": "Convidar",
     "title-view-advanced": "Avançado",
@@ -172,5 +172,15 @@
     "title-proxy-host": "Alterar o host do proxy",
     "title-proxy-port": "Alterar a porta do proxy",
     "label-call-hangup": "O utilizador terminou uma chamada de voz",
-    "label-call-invite": "O utilizador convidou-o para uma chamada de voz"
+    "label-call-invite": "O utilizador convidou-o para uma chamada de voz",
+    "header-general": "Geral",
+    "header-media": "Média",
+    "header-ordering": "Ordenação",
+    "header-media-auto-download": "Descarregar média automáticamente",
+    "header-update-password": "Atualizar palavra-passe",
+    "title-confirm-lock-overlay": "Confirme o código de acesso.",
+    "title-lock-overlay": "Por favor introduza o código de acesso.",
+    "title-proxy-use-basic-authentication": "Usar autenticação de proxy",
+    "title-proxy-username": "Alterar nome de utilizador do proxy",
+    "title-proxy-password": "Alterar palavra-passe do proxy"
 }

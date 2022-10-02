@@ -1,7 +1,7 @@
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/libs/matrix/devices.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/libs/matrix/events.dart';
+import 'package:syphon/global/libs/matrix/events/requests.dart';
 import 'package:syphon/global/libs/matrix/media.dart';
 import 'package:syphon/global/libs/matrix/notifications.dart';
 import 'package:syphon/global/libs/matrix/rooms.dart';
@@ -53,7 +53,7 @@ abstract class MatrixApi {
   static const sendMessage = Events.sendMessage;
   static const sendReaction = Events.sendReaction;
   static const sendReadReceipts = Events.sendReadMarkers;
-  static const sendReadReceiptHidden = Events.sendReadMarkerHidden;
+  static const sendPrivateReadReceipt = Events.sendPrivateReadMarker;
   static const sendEventToDevice = Events.sendEventToDevice;
   static const sendMessageEncrypted = Events.sendMessageEncrypted;
   static const fetchStateEvents = Events.fetchStateEvents;
@@ -79,6 +79,7 @@ abstract class MatrixApi {
   static const uploadMedia = MatrixMedia.uploadMedia;
   static const fetchMediaThreaded = MatrixMedia.fetchMediaThreaded;
   static const fetchThumbnailThreaded = MatrixMedia.fetchThumbnailThreaded;
+  static const buildMessageUrl = MatrixMedia.buildMessageUrl;
 
   // Device Management
   static const fetchDevices = Devices.fetchDevices;

@@ -380,7 +380,7 @@ abstract class Auth {
 
       return await json.decode(response.body);
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
       rethrow;
     }
   }

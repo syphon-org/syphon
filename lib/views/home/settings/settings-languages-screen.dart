@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
-
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
-
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
@@ -28,7 +26,7 @@ class LanguageSettingsScreen extends StatelessWidget {
                   itemCount: props.languagesAll.length,
                   itemBuilder: (BuildContext context, int index) {
                     final language = props.languagesAll[index];
-                    final names = DisplayName.isoLangs[language]!;
+                    final names = isoLangs[language]!;
                     final displayName = names['name'];
                     final nativeName = names['nativeName'];
 

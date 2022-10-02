@@ -106,9 +106,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
       context: context,
       barrierDismissible: true,
       builder: (context) => DialogConfirm(
-        title: 'Block User',
-        content:
-            'If you block ${user!.displayName}, you will not be able to see their messages and you will immediately leave this chat.',
+        title: Strings.titleDialogBlockUser,
+        content: Strings.contentBlockUser(user!.displayName),
         onConfirm: () async {
           await props.onBlockUser(user.userId);
           Navigator.popUntil(context, (route) => route.isFirst);
@@ -147,7 +146,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
                 padding: defaultPadding,
                 child: Text(
-                  'Mute for 1 hour',
+                  Strings.listItemMuteForOneHour,
                   style: Theme.of(context).textTheme.subtitle1,
                 )),
             onTap: () {
@@ -159,7 +158,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 8 hours',
+                Strings.listItemMuteForHours(8),
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -172,7 +171,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 1 day',
+                Strings.listItemMuteForOneDay,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -185,7 +184,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Mute for 7 days',
+                Strings.listItemMuteForDays(7),
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -198,7 +197,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             title: Padding(
               padding: defaultPadding,
               child: Text(
-                'Always',
+                Strings.labelAlways,
                 style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
@@ -215,7 +214,8 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.room.id),
+        converter: (Store<AppState> store) =>
+            _Props.mapStateToProps(store, widget.room.id),
         builder: (context, props) => AppBar(
           titleSpacing: 0.0,
           automaticallyImplyLeading: false,
@@ -234,7 +234,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                 onTap: () {
                   Navigator.pushNamed(
                     context,
-                    Routes.chatDetails,
+                    Routes.chatSettings,
                     arguments: ChatDetailsArguments(
                       roomId: widget.room.id,
                       title: widget.room.name,
@@ -328,7 +328,10 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                 child: Text(
                   widget.room.name!,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.white),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1!
+                      .copyWith(color: Colors.white),
                 ),
               ),
             ],
@@ -361,7 +364,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     case ChatOptions.chatSettings:
                       Navigator.pushNamed(
                         context,
-                        Routes.chatDetails,
+                        Routes.chatSettings,
                         arguments: ChatDetailsArguments(
                           roomId: widget.room.id,
                           title: widget.room.name,
@@ -384,31 +387,31 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                     const PopupMenuItem<ChatOptions>(
                       enabled: false,
                       value: ChatOptions.search,
-                      child: Text('Search'),
+                      child: Text('Search'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       enabled: false,
                       value: ChatOptions.allMedia,
-                      child: Text('All Media'),
+                      child: Text('All Media'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.chatSettings,
-                      child: Text('Chat Settings'),
+                      child: Text('Chat Settings'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.inviteFriends,
-                      child: Text('Invite Friends'),
+                      child: Text('Invite Friends'), //TODO i18n
                     ),
                     const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.muteNotifications,
-                      child: Text('Mute Notifications'),
+                      child: Text('Mute Notifications'), //TODO i18n
                     ),
                   ];
 
                   if (widget.room.direct) {
                     menu.add(const PopupMenuItem<ChatOptions>(
                       value: ChatOptions.blockUser,
-                      child: Text('Block User'),
+                      child: Text('Block User'), //TODO i18n
                     ));
                   }
 
@@ -438,7 +441,8 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
+      _Props(
         currentUser: store.state.authStore.user,
         roomUsers: (store.state.roomStore.rooms[roomId]?.userIds ?? [])
             .map((id) => store.state.userStore.users[id])
@@ -454,7 +458,8 @@ class _Props extends Equatable {
           ));
         },
         onToggleNotifications: () {
-          store.dispatch(toggleChatNotifications(roomId: roomId!, enabled: false));
+          store.dispatch(
+              toggleChatNotifications(roomId: roomId!, enabled: false));
         },
       );
 }

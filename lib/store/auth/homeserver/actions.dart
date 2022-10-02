@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/global/assets.dart';
@@ -88,7 +87,8 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
       }
 
       if (identityUrl != null) {
-        identityUrl = (response['m.identity_server']['base_url'] as String).replaceAll('https://', '');
+        identityUrl =
+            (response['m.identity_server']['base_url'] as String).replaceAll('https://', '');
       }
 
       return homeserver.copyWith(
@@ -97,7 +97,7 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
         identityUrl: identityUrl,
       );
     } catch (error) {
-      printError('[fetchBaseUrl] failed .well-known client query');
+      log.error('[fetchBaseUrl] failed .well-known client query');
 
       try {
         final response = await MatrixApi.checkHomeserverAlt(
@@ -114,7 +114,7 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
           identityUrl: baseUrl,
         );
       } catch (error) {
-        printError(
+        log.error(
           '[fetchBaseUrl] failed alternative .well-known server query',
         );
       }
@@ -132,7 +132,7 @@ ThunkAction<AppState> fetchServerVersion({required Homeserver homeserver}) {
     try {
       final response = await MatrixApi.checkVersion(
             protocol: store.state.authStore.protocol,
-            homeserver: homeserver.hostname!,
+            homeserver: homeserver.hostname,
           ) ??
           {};
 

@@ -8,13 +8,13 @@ String formatSender(String sender) {
   return sender.replaceAll('@', '').split(':')[0];
 }
 
-String formatUserId(String displayName, {String homeserver = Values.homeserverDefault}) {
+String formatUserId(String displayName,
+    {String homeserver = Values.homeserverDefault}) {
   return '@$displayName:$homeserver';
 }
 
 String findLocale(String language, {required BuildContext context}) {
-  // TODO: remove length > 2 - accounting for pre 0.2 users
-  if (language.isEmpty || language.length > 2) {
+  if (language.isEmpty) {
     return Localizations.localeOf(context).languageCode;
   }
 
@@ -25,7 +25,9 @@ String findLocale(String language, {required BuildContext context}) {
 // a -> A
 String formatInitials(String? word) {
   final wordUppercase = (word ?? '').toUpperCase();
-  return wordUppercase.length > 1 ? wordUppercase.substring(0, 2) : wordUppercase;
+  return wordUppercase.length > 1
+      ? wordUppercase.substring(0, 2)
+      : wordUppercase;
 }
 
 String formatInitialsLong(String? fullword) {
@@ -53,7 +55,8 @@ String formatInitialsLong(String? fullword) {
     return initials.toUpperCase();
   }
 
-  final initials = word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);
+  final initials =
+      word.length > 1 ? word.substring(0, 2) : word.substring(0, 1);
 
   return initials.toUpperCase();
 }
@@ -66,10 +69,10 @@ String formatTimestampFull({
   if (lastUpdateMillis == 0) return '';
 
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
-  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm';
+  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm a';
 
   return DateFormat(
-    showTime ? 'MMM d $hourFormat a' : 'MMM d yyyy',
+    showTime ? 'MMM d $hourFormat' : 'MMM d yyyy',
   ).format(timestamp);
 }
 
@@ -83,20 +86,20 @@ String formatTimestamp({
 
   final timestamp = DateTime.fromMillisecondsSinceEpoch(lastUpdateMillis);
   final sinceLastUpdate = DateTime.now().difference(timestamp);
-  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm';
+  final hourFormat = timeFormat == TimeFormat.hr24 ? 'H:mm' : 'h:mm a';
 
   if (sinceLastUpdate.inDays > 365) {
     return DateFormat(
-      showTime ? 'MMM d $hourFormat a' : 'MMM d yyyy',
+      showTime ? 'MMM d $hourFormat' : 'MMM d yyyy',
     ).format(timestamp);
   } else if (sinceLastUpdate.inDays > 6) {
     // Abbreviated month and day number - Jan 1
     return DateFormat(
-      showTime ? 'MMM d $hourFormat a' : 'MMM d',
+      showTime ? 'MMM d $hourFormat' : 'MMM d',
     ).format(timestamp);
   } else if (sinceLastUpdate.inDays > 0) {
     // Abbreviated weekday - Fri
-    return DateFormat(showTime ? 'E $hourFormat a' : 'E').format(timestamp);
+    return DateFormat(showTime ? 'E $hourFormat' : 'E').format(timestamp);
   } else if (sinceLastUpdate.inHours > 0) {
     // Abbreviated hours since - 1h
     return '${sinceLastUpdate.inHours}h';
@@ -112,9 +115,11 @@ String formatTimestamp({
 }
 
 formatUsernameHint({required String homeserver, String? username}) {
-  final usernameFormatted = username != null && username.isNotEmpty ? username : 'username';
-  final alias =
-      homeserver.isNotEmpty ? '@$usernameFormatted:$homeserver' : '@$usernameFormatted:matrix.org';
+  final usernameFormatted =
+      username != null && username.isNotEmpty ? username : 'username';
+  final alias = homeserver.isNotEmpty
+      ? '@$usernameFormatted:$homeserver'
+      : '@$usernameFormatted:matrix.org';
 
   return alias.replaceFirst('@', '', 1);
 }

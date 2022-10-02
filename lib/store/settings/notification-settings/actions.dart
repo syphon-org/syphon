@@ -2,9 +2,9 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/model.dart';
 import 'package:syphon/store/settings/notification-settings/options/types.dart';
+import 'package:syphon/store/sync/service/actions.dart';
 
 class MuteChatNotifications {
   final String roomId;
@@ -99,8 +99,7 @@ ThunkAction<AppState> incrementToggleType() {
     ));
 
     // Reset notification background thread
-    await store.dispatch(stopNotifications());
-    store.dispatch(startNotifications());
+    await store.dispatch(resetSyncService());
   };
 }
 
@@ -124,7 +123,6 @@ ThunkAction<AppState> incrementStyleType() {
     ));
 
     // Reset notification background thread
-    await store.dispatch(stopNotifications());
-    store.dispatch(startNotifications());
+    await store.dispatch(resetSyncService());
   };
 }

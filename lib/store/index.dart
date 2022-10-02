@@ -160,6 +160,7 @@ Future<Store<AppState>> initStore(
     storage: CacheStorage(cache: cache),
     serializer: CacheSerializer(cache: cache, preloaded: preloaded),
     shouldSave: cacheMiddleware,
+    throttleDuration: Duration(milliseconds: 500),
   );
 
   // Finally load persisted store
@@ -176,7 +177,7 @@ Future<Store<AppState>> initStore(
       initialState = existingState ?? await persistor.load();
     }
   } catch (error) {
-    printError('[persistor.load] error $error');
+    log.error('[persistor.load] $error');
   }
 
   final store = Store<AppState>(

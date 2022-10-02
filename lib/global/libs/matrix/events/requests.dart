@@ -396,26 +396,29 @@ abstract class Events {
     return await json.decode(response.body);
   }
 
-  /// Send Hidden Read Receipt - unstable feature
+  /// Send Hidden Read Receipt
   ///
-  /// https://github.com/matrix-org/matrix-spec-proposals/blob/travis/msc/hidden-read-receipts/proposals/2285-hidden-read-receipts.md
-  static Future<dynamic> sendReadMarkerHidden({
+  /// https://github.com/matrix-org/matrix-spec-proposals/pull/2285
+  static Future<dynamic> sendPrivateReadMarker({
     String? protocol = 'https://',
     String? homeserver = Values.homeserverDefault,
     String? accessToken,
     String? roomId,
     String? messageId,
-    String? lastRead,
-    bool readAll = true,
+    @Deprecated('Due to be unsupported as of Synapse v1.67.0')
+        bool stable = true,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/receipt/m.read.private/$messageId';
+    final String url =
+        '$protocol$homeserver/_matrix/client/v3/rooms/$roomId/receipt/'
+        '${stable ? 'm.read.private' : 'org.matrix.msc2285.read.private'}' //@deprecated
+        '/$messageId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
     };
 
-    final Map body = { };
+    final Map body = {};
 
     final response = await httpClient.post(
       Uri.parse(url),
@@ -435,8 +438,7 @@ abstract class Events {
     String? roomId,
     String? eventId,
     String? txnId,
-
-  })async{
+  }) async {
     final String url = '$protocol$homeserver/_matrix/client/r0/rooms/$roomId/redact/$eventId/';
 
     final Map<String, String> headers = {
@@ -446,11 +448,11 @@ abstract class Events {
 
     final Map body = {};
 
-    final response = await httpClient.put(Uri.parse(url), headers:  headers, body: json.encode(body));
+    final response =
+        await httpClient.put(Uri.parse(url), headers: headers, body: json.encode(body));
 
     return await json.decode(
       response.body,
     );
   }
-
 }

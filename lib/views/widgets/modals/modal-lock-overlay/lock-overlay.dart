@@ -120,9 +120,7 @@ class _LockOverlayState extends State<LockOverlay> {
   }
 
   void error() {
-    if (widget.onError != null) {
-      widget.onError!(retries);
-    }
+    widget.onError?.call(retries);
 
     if (widget.maxRetries >= 1 && widget.maxRetries <= retries) {
       widget.onMaxRetires!(retries);
@@ -181,11 +179,9 @@ class _LockOverlayState extends State<LockOverlay> {
         });
       }
 
-      if (widget.onConfirmed != null) {
-        widget.onConfirmed!(
-          lockController.confirmedInput.isEmpty ? currentInput : lockController.confirmedInput,
-        );
-      }
+      widget.onConfirmed?.call(
+        lockController.confirmedInput.isEmpty ? currentInput : lockController.confirmedInput,
+      );
 
       if (unlocking || widget.confirmMode) return;
 

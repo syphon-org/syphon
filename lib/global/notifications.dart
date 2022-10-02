@@ -77,7 +77,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
      */
   }
 
-  printInfo('[initNotifications] successfully initialized $pluginInstance');
+  log.info('[initNotifications] successfully initialized $pluginInstance');
   return pluginInstance;
 }
 

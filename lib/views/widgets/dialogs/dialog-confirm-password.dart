@@ -1,18 +1,17 @@
 // ignore_for_file: unused_field
 
 import 'package:flutter/material.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
-class DialogConfirmPassword extends StatefulWidget {
+class DialogConfirmPassword extends HookWidget {
   const DialogConfirmPassword({
     Key? key,
-    required this.title, // i18n Strings isn't a constant. You gotta pass it in
-    required this.content, // i18n Strings isn't a constant. You gotta pass it in
-    this.valid = true,
-    this.loading = false,
+    required this.title,
+    required this.content,
     this.checkValid,
     this.checkLoading,
     this.onCancel,
@@ -20,12 +19,6 @@ class DialogConfirmPassword extends StatefulWidget {
     this.onChangePassword,
   }) : super(key: key);
 
-  // TODO: figure out why these don't work, but in dialog-confirm it does
-  // TODO: was previously stateless and that didn't help, worth trying again though
-  final bool valid;
-  final bool loading;
-
-  // TODO: remove after above works
   final Function? checkValid;
   final Function? checkLoading;
 
@@ -37,21 +30,15 @@ class DialogConfirmPassword extends StatefulWidget {
   final Function? onChangePassword;
 
   @override
-  State<DialogConfirmPassword> createState() => _DialogConfirmPasswordState();
-}
-
-class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
-  var _valid = false;
-  var _loading = false;
-
-  @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double defaultWidgetScaling = width * 0.725;
 
-    final loading =
-        widget.loading || (widget.checkLoading != null ? widget.checkLoading!() : false);
-    final valid = widget.valid || (widget.checkValid != null ? widget.checkValid!() : false);
+    final validLocal = useState(false);
+    final loadingLocal = useState(false);
+
+    final valid = (checkValid?.call() ?? false) || validLocal.value;
+    final loading = (checkLoading?.call() ?? false) || loadingLocal.value;
 
     return SimpleDialog(
       shape: RoundedRectangleBorder(
@@ -68,7 +55,7 @@ class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
         right: 16,
         bottom: 16,
       ),
-      title: Text(widget.title),
+      title: Text(title),
       children: <Widget>[
         Column(
           children: <Widget>[
@@ -80,7 +67,7 @@ class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
                 left: 8,
               ),
               child: Text(
-                widget.content,
+                content,
                 textAlign: TextAlign.start,
                 style: Theme.of(context).textTheme.caption,
               ),
@@ -97,12 +84,9 @@ class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
               ),
               child: TextField(
                 onChanged: (password) {
-                  if (widget.onChangePassword == null) return;
-                  widget.onChangePassword!(password);
+                  onChangePassword?.call(password);
 
-                  setState(() {
-                    _valid = password.isNotEmpty;
-                  });
+                  validLocal.value = password.isNotEmpty;
                 },
                 obscureText: true,
                 decoration: InputDecoration(
@@ -124,13 +108,7 @@ class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             TextButton(
-              onPressed: !loading
-                  ? () {
-                      if (widget.onCancel != null) {
-                        widget.onCancel!();
-                      }
-                    }
-                  : null,
+              onPressed: !loading ? () => onCancel?.call() : null,
               child: Text(
                 Strings.buttonCancel,
               ),
@@ -139,18 +117,15 @@ class _DialogConfirmPasswordState extends State<DialogConfirmPassword> {
               onPressed: !valid
                   ? null
                   : () {
-                      if (widget.onConfirm != null) {
-                        widget.onConfirm!();
-
-                        setState(() {
-                          _loading = true;
-                        });
-                      }
+                      onConfirm?.call();
+                      loadingLocal.value = true;
                     },
               child: !loading
                   ? Text(Strings.buttonConfirmFormal,
                       style: TextStyle(
-                        color: valid ? Theme.of(context).primaryColor : Color(Colours.greyDisabled),
+                        color: valid
+                            ? Theme.of(context).primaryColor
+                            : Color(AppColors.greyDisabled),
                       ))
                   : LoadingIndicator(),
             ),

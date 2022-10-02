@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 
 import 'package:syphon/global/dimensions.dart';
 
@@ -32,13 +32,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
   Widget build(BuildContext context) => Opacity(
         opacity: widget.disabled ? 0.4 : opacity,
         child: GestureDetector(
-          onTap: widget.disabled
-              ? null
-              : () {
-                  if (widget.onPressed != null) {
-                    widget.onPressed!();
-                  }
-                },
+          onTap: widget.disabled ? null : () => widget.onPressed?.call(),
           onTapDown: (details) => setState(() {
             opacity = 0.4;
           }),
@@ -72,7 +66,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
                       letterSpacing: 0.8,
                       color: () {
                         if (widget.disabled) {
-                          return Color(Colours.greyLight);
+                          return Color(AppColors.greyLight);
                         }
                         if (widget.color != null) {
                           return widget.color;

@@ -11,56 +11,51 @@ typedef PrintError = void Function(String message, {String? title});
 
 void _printThreaded(String content, {String? title}) {
   if (DEBUG_MODE) {
-    print(content);
+    final output = title != null ? '[$title] $content' : content;
+    print('[bg   ] $output');
   }
 }
 
 void _printInfo(String content, {String? title}) {
-  final output = title != null ? '[$title] $content' : content;
   if (DEBUG_MODE) {
-    print(output);
+    final output = title != null ? '[$title] $content' : content;
+    print('[info ] $output');
   }
 }
 
 void _printWarning(String content, {String? title}) {
-  final output = title != null ? '[$title] $content' : content;
   if (DEBUG_MODE) {
-    print(output);
+    final output = title != null ? '[$title] $content' : content;
+    print('[warn ] $output');
   }
 }
 
 void _printError(String content, {String? title}) {
-  final output = title != null ? '[$title] $content' : content;
   if (DEBUG_MODE) {
-    print(output);
+    final output = title != null ? '[$title] $content' : content;
+    print('[ERROR] $output');
   }
 }
 
 void _printRelease(String content, {String? title}) {
   final output = title != null ? '[$title] $content' : content;
-  print(output);
+  print('[prod ] $output');
 }
 
 void _printDebug(String content, {String? title}) {
-  final output = title != null ? '[$title] $content' : content;
   if (DEBUG_MODE) {
-    debugPrint(output);
+    final output = title != null ? '[$title] $content' : content;
+    print('[DEBUG] $output');
   }
 }
 
 void _printJson(Map? jsonMap) {
-  final JsonEncoder encoder = JsonEncoder.withIndent('  ');
-  final String prettyEvent = encoder.convert(jsonMap);
   if (DEBUG_MODE) {
+    final JsonEncoder encoder = JsonEncoder.withIndent('  ');
+    final String prettyEvent = encoder.convert(jsonMap);
     debugPrint(prettyEvent, wrapWidth: 2048);
   }
 }
-
-PrintJson printJson = _printJson;
-PrintDebug printInfo = _printInfo;
-PrintDebug printDebug = _printDebug;
-PrintError printError = _printError;
-PrintError printWarning = _printWarning;
 
 // NOTE: start using this for better tab completion
 // ignore: camel_case_types
@@ -72,4 +67,5 @@ class log {
   static threaded(String content, {String? title}) => _printThreaded(content, title: title);
   static release(String content, {String? title}) => _printRelease(content, title: title);
   static json(Map? json) => _printJson(json);
+  static jsonDebug(Map? json) => _printJson(json);
 }

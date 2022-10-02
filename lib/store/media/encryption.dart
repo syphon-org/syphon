@@ -88,7 +88,7 @@ Future<File?> encryptMedia({
 
     return await encryptFile.writeAsBytes(encryptedMedia.bytes, flush: true);
   } catch (error) {
-    printError(error.toString());
+    log.error(error.toString());
     return null;
   }
 }
@@ -107,7 +107,7 @@ Future<Uint8List?> decryptMediaData({
 
     return cipher.decrypt(Encrypted.fromBase64(base64.encode(localData)), iv: ivUsed);
   } catch (error) {
-    printError(error.toString());
+    log.error(error.toString());
     rethrow;
   }
 }

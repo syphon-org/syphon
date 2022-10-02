@@ -1,16 +1,13 @@
 import 'dart:typed_data';
 
-import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
+import 'package:syphon/store/hooks.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/media/actions.dart';
 import 'package:syphon/store/media/model.dart';
-import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 ///
@@ -19,10 +16,27 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 /// uses the matrix mxc uris and either pulls from cached data
 /// or downloads the image and saves it to cache
 ///
-/// TODO: optimize widget rebuilds, the ViewModel equatable updates
-/// too frequently as is but none of the data is changing
-///
-class MatrixImage extends StatefulWidget {
+class MatrixImage extends HookWidget {
+  const MatrixImage({
+    Key? key,
+    required this.mxcUri,
+    this.width = Dimensions.avatarSizeMin,
+    this.height = Dimensions.avatarSizeMin,
+    this.size,
+    this.strokeWidth = Dimensions.strokeWidthThin,
+    this.imageType,
+    this.loadingPadding = 0,
+    this.fit = BoxFit.fill,
+    this.thumbnail = true,
+    this.autodownload = true,
+    this.rebuild = true,
+    this.forceLoading = false,
+    this.fallbackColor = Colors.grey,
+    this.fallback,
+    this.fileName = '',
+    this.onPressImage,
+  }) : super(key: key);
+
   final String? mxcUri;
   final String? imageType;
   final String fileName;
@@ -44,176 +58,130 @@ class MatrixImage extends StatefulWidget {
 
   final Function(Uint8List bytes)? onPressImage;
 
-  const MatrixImage({
-    Key? key,
-    required this.mxcUri,
-    this.width = Dimensions.avatarSizeMin,
-    this.height = Dimensions.avatarSizeMin,
-    this.size,
-    this.strokeWidth = Dimensions.strokeWidthThin,
-    this.imageType,
-    this.loadingPadding = 0,
-    this.fit = BoxFit.fill,
-    this.thumbnail = true,
-    this.autodownload = true,
-    this.rebuild = true,
-    this.forceLoading = false,
-    this.fallbackColor = Colors.grey,
-    this.fallback,
-    this.fileName = '',
-    this.onPressImage,
-  }) : super(key: key);
-
   @override
-  MatrixImageState createState() => MatrixImageState();
-}
+  Widget build(BuildContext context) {
+    final dispatch = useDispatch<AppState>();
 
-class MatrixImageState extends State<MatrixImage> with Lifecycle<MatrixImage> {
-  Uint8List? finalUriData;
+    final bool isMediaCached = useSelector<AppState, bool?>(
+          (state) => state.mediaStore.mediaCache.containsKey(mxcUri),
+        ) ??
+        false;
 
-  bool localLoading = false;
+    final String? mediaStatus = useSelector<AppState, String?>(
+      (state) => state.mediaStore.mediaStatus[mxcUri],
+    );
 
-  @override
-  void onMounted({bool rebuild = true}) {
-    final store = StoreProvider.of<AppState>(context);
-    final mediaCache = store.state.mediaStore.mediaCache;
+    final Uint8List? mediaCached = useSelector<AppState, Uint8List?>(
+      (state) => state.mediaStore.mediaCache[mxcUri],
+    );
 
-    if (!mediaCache.containsKey(widget.mxcUri) && widget.autodownload) {
-      store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
+    final loadingLocal = useRef<bool>(false);
+    final mediaCachedLocal = useState<Uint8List?>(null);
+
+    useEffect(() {
+      if (!isMediaCached && autodownload) {
+        dispatch(fetchMedia(mxcUri: mxcUri, thumbnail: thumbnail));
+      }
+
+      // Attempts to reduce framerate drop in chat details
+      // not sure this actually works as it still drops on scroll
+      if (isMediaCached && rebuild) {
+        mediaCachedLocal.value = mediaCached;
+      }
+
+      return null;
+    }, []);
+
+    onManualLoad() async {
+      loadingLocal.value = true;
+      await dispatch(fetchMedia(mxcUri: mxcUri, thumbnail: thumbnail));
+      loadingLocal.value = false;
     }
 
-    // Attempts to reduce framerate drop in chat details
-    // not sure this actually works as it still drops on scroll
-    if (rebuild && mediaCache.containsKey(widget.mxcUri)) {
-      finalUriData = mediaCache[widget.mxcUri!];
-    }
-  }
+    final failed =
+        mediaStatus != null && mediaStatus == MediaStatus.FAILURE.value;
+    final loading = forceLoading || !isMediaCached || loadingLocal.value;
 
-  // TODO: potentially revert to didChangeDependencies
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    onMounted(rebuild: true);
-  }
-
-  onManualLoad() async {
-    final store = StoreProvider.of<AppState>(context);
-    localLoading = true;
-    await store.dispatch(fetchMedia(mxcUri: widget.mxcUri, thumbnail: widget.thumbnail));
-    localLoading = false;
-  }
-
-  @override
-  Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
-      distinct: true,
-      converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.mxcUri),
-      builder: (context, props) {
-        final failed = props.mediaStatus != null && props.mediaStatus == MediaStatus.FAILURE.value;
-        final loading = widget.forceLoading || !props.exists;
-
-        // allows user option to manually load images on tap
-        if (!widget.autodownload && !props.exists && !localLoading) {
-          return TouchableOpacity(
-            behavior: HitTestBehavior.translucent,
-            onTap: () => onManualLoad(),
-            child: Container(
-              padding: EdgeInsets.all(widget.loadingPadding),
-              width: widget.size ?? widget.width,
-              height: widget.size ?? widget.height,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.photo,
-                    size: Dimensions.avatarSizeLarge,
+    // allows user option to manually load images on tap
+    if (!autodownload && !isMediaCached && !loadingLocal.value) {
+      return TouchableOpacity(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => onManualLoad(),
+        child: Container(
+          padding: EdgeInsets.all(loadingPadding),
+          width: size ?? width,
+          height: size ?? height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.photo,
+                size: Dimensions.avatarSizeLarge,
+                color: Colors.white,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(
+                  Strings.labelDownloadImage,
+                  style: TextStyle(
                     color: Colors.white,
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text(
-                      Strings.labelDownloadImage,
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          );
-        }
-
-        if (failed) {
-          return CircleAvatar(
-            radius: 24,
-            backgroundColor: widget.fallbackColor,
-            child: widget.fallback ??
-                Icon(
-                  Icons.photo,
-                  color: Colors.white,
-                ),
-          );
-        }
-
-        if (loading) {
-          return Container(
-              width: widget.size ?? widget.width,
-              height: widget.size ?? widget.height,
-              child: Padding(
-                padding: EdgeInsets.all(widget.loadingPadding),
-                child: CircularProgressIndicator(
-                  strokeWidth: widget.strokeWidth * 1.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).colorScheme.secondary,
-                  ),
-                  value: null,
-                ),
-              ));
-        }
-
-        final imageBytes = props.mediaCache ?? finalUriData!;
-
-        if (widget.onPressImage != null) {
-          return GestureDetector(
-              onTap: () => widget.onPressImage!(imageBytes),
-              child: Image(
-                width: widget.width,
-                height: widget.height,
-                fit: widget.fit,
-                image: MemoryImage(imageBytes),
-              ));
-        }
-
-        return Image(
-          width: widget.width,
-          height: widget.height,
-          fit: widget.fit,
-          image: MemoryImage(imageBytes),
-        );
-      });
-}
-
-class _Props extends Equatable {
-  final bool exists;
-  final String? mediaStatus;
-  final Uint8List? mediaCache;
-
-  const _Props({
-    required this.exists,
-    required this.mediaStatus,
-    required this.mediaCache,
-  });
-
-  @override
-  List<Object?> get props => [
-        exists,
-        mediaStatus,
-        mediaCache,
-      ];
-
-  static _Props mapStateToProps(Store<AppState> store, String? mxcUri) => _Props(
-        exists: store.state.mediaStore.mediaCache[mxcUri] != null,
-        mediaCache: store.state.mediaStore.mediaCache[mxcUri],
-        mediaStatus: store.state.mediaStore.mediaStatus[mxcUri],
+            ],
+          ),
+        ),
       );
+    }
+
+    if (failed) {
+      return CircleAvatar(
+        radius: 24,
+        backgroundColor: fallbackColor,
+        child: fallback ??
+            Icon(
+              Icons.photo,
+              color: Colors.white,
+            ),
+      );
+    }
+
+    if (loading) {
+      return Container(
+        width: size ?? width,
+        height: size ?? height,
+        child: Padding(
+          padding: EdgeInsets.all(loadingPadding),
+          child: CircularProgressIndicator(
+            strokeWidth: strokeWidth * 1.5,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Theme.of(context).colorScheme.secondary,
+            ),
+            value: null,
+          ),
+        ),
+      );
+    }
+
+    final imageBytes = mediaCached ?? mediaCachedLocal.value!;
+
+    if (onPressImage != null) {
+      return GestureDetector(
+        onTap: () => onPressImage!(imageBytes),
+        child: Image(
+          width: width,
+          height: height,
+          fit: fit,
+          image: MemoryImage(imageBytes),
+        ),
+      );
+    }
+
+    return Image(
+      width: width,
+      height: height,
+      fit: fit,
+      image: MemoryImage(imageBytes),
+    );
+  }
 }

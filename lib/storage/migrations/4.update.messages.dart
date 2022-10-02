@@ -9,7 +9,7 @@ extension Version4 on StorageDatabase {
           return m.createAll();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          printInfo('[MIGRATION] VERSION $from to $to');
+          log.info('[MIGRATION] VERSION $from to $to');
           if (from == 3) {
             await m.renameColumn(messages, 'filename', messages.file);
             await m.addColumn(messages, messages.url);

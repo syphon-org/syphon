@@ -151,7 +151,7 @@ ThunkAction<AppState> fetchRoom(
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      printError('[fetchRoom] $roomId $error');
+      log.error('[fetchRoom] $roomId $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
@@ -166,7 +166,7 @@ ThunkAction<AppState> fetchRoom(
 ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
-      printInfo('[fetchRooms] *** starting fetch all rooms *** ');
+      log.info('[fetchRooms] *** starting fetch all rooms *** ');
       final data = await MatrixApi.fetchRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -187,7 +187,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
             await store.dispatch(fetchRoom(room.id, fetchState: syncState));
             await store.dispatch(fetchRoomMembers(room: room));
           } catch (error) {
-            printError('[fetchRoom(s)] ${room.id} $error');
+            log.error('[fetchRoom(s)] ${room.id} $error');
           } finally {
             store.dispatch(UpdateRoom(id: room.id, syncing: false));
           }
@@ -195,7 +195,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
       );
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
-      printError('[fetchRoom(s)] $error');
+      log.error('[fetchRoom(s)] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -212,7 +212,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
-      printInfo('[fetchSync] *** starting fetch direct rooms *** ');
+      log.info('[fetchDirectRooms] *** fetch direct rooms *** ');
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -231,17 +231,15 @@ ThunkAction<AppState> fetchDirectRooms() {
 
       // Wait for all room data to be pulled
       // Fetch room state and messages by userId/roomId
-      await Future.wait(
-        directRoomList.map((roomId) async {
-          try {
-            await store.dispatch(fetchRoom(roomId, direct: true));
-          } catch (error) {
-            printError('[fetchDirectRooms] $error');
-          }
-        }),
-      );
+      await Future.wait(directRoomList.map((roomId) async {
+        try {
+          await store.dispatch(fetchRoom(roomId, direct: true));
+        } catch (error) {
+          log.error('[fetchDirectRooms] $error');
+        }
+      }));
     } catch (error) {
-      printError('[fetchDirectRooms] $error');
+      log.error('[fetchDirectRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -292,7 +290,7 @@ ThunkAction<AppState> fetchRoomMembers({
         ),
       );
     } catch (error) {
-      printError('[updateRoom] $error');
+      log.error('[updateRoom] $error');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -306,6 +304,7 @@ ThunkAction<AppState> fetchRoomMembers({
 /// otherwise it will appear like the room does
 /// not exist for the seconds between the response from
 /// matrix and caching in the app
+///
 ThunkAction<AppState> createRoom({
   String? name,
   String? alias,
@@ -345,16 +344,6 @@ ThunkAction<AppState> createRoom({
       // Create a room object with a new room id
       room = Room(id: data['room_id']);
 
-      // Add invites to the user list beforehand
-      final userInviteMap = Map<String, User>.fromIterable(
-        invites,
-        key: (user) => user.userId,
-        value: (user) => user,
-      );
-
-      // generate user invite map to cache recent users
-      room = room.copyWith(usersTEMP: userInviteMap);
-
       if (isDirect) {
         final User directUser = invites[0];
         room = room.copyWith(
@@ -365,11 +354,6 @@ ThunkAction<AppState> createRoom({
             directUser.userId!,
             currentUser.userId!,
           ] as List<String>,
-          // ignore: unnecessary_cast
-          usersTEMP: {
-            directUser.userId!: directUser,
-            currentUser.userId!: currentUser,
-          } as Map<String, User>,
         );
 
         await store.dispatch(toggleDirectRoom(room: room, enabled: true));
@@ -573,7 +557,7 @@ ThunkAction<AppState> toggleDirectRoom({
       // Refresh room information with toggle enabled
       await store.dispatch(fetchRoom(room.id, direct: enabled));
     } catch (error) {
-      printError('[toggleDirectRoom] $error');
+      log.error('[toggleDirectRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -674,7 +658,8 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -742,7 +727,8 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom =
+          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));
@@ -805,7 +791,7 @@ ThunkAction<AppState> removeRoom({Room? room}) {
 
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      printError('[removeRoom] $error');
+      log.error('[removeRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -853,7 +839,7 @@ ThunkAction<AppState> leaveRoom({Room? room}) {
 
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      printError('[leaveRoom] $error');
+      log.error('[leaveRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -867,7 +853,7 @@ ThunkAction<AppState> archiveRoom({Room? room}) {
     try {
       store.dispatch(AddArchive(roomId: room!.id));
     } catch (error) {
-      printError('[archiveRoom] $error');
+      log.error('[archiveRoom] $error');
     }
   };
 }

@@ -48,18 +48,9 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
     return ThemeData(
       // Main Colors
       primaryColor: primaryColor,
-      primaryColorBrightness: brightness,
       primaryColorDark: primaryColor,
       primaryColorLight: primaryColor,
-      // TODO: remove when secondary / primary color scheme works for Switch() widgets
-      // ignore: deprecated_member_use
-      accentColor: secondaryColor,
       brightness: brightness,
-      colorScheme: ThemeData().colorScheme.copyWith(
-            primary: primaryColor,
-            secondary: secondaryColor,
-            brightness: brightness,
-          ),
 
       // Core UI
       appBarTheme: AppBarTheme(
@@ -141,6 +132,15 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
           fontWeight: titleWeight,
         ),
       ),
+      colorScheme: ThemeData()
+          .colorScheme
+          .copyWith(
+            primary: primaryColor,
+            secondary: secondaryColor,
+            brightness: brightness,
+          )
+          .copyWith(secondary: secondaryColor),
     );
   }
+  return null;
 }

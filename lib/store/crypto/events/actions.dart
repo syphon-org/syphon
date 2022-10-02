@@ -34,7 +34,8 @@ ThunkAction<AppState> encryptMessageContent({
 }) {
   return (Store<AppState> store) async {
     // Load and deserialize session
-    final olm.OutboundGroupSession outboundMessageSession = await store.dispatch(
+    final olm.OutboundGroupSession outboundMessageSession =
+        await store.dispatch(
       loadMessageSessionOutbound(roomId: roomId),
     );
 
@@ -117,7 +118,7 @@ ThunkAction<AppState> backfillDecryptMessages(
         messages: decrypted,
       ));
     } catch (error) {
-      printError('[syncDevice] error $error');
+      log.error('[syncDevice] $error');
     }
   };
 }
@@ -153,7 +154,7 @@ ThunkAction<AppState> decryptMessages(
 
             decryptedAll.add(decryptedMessage);
           } catch (error) {
-            printError('[decryptMessage] $error');
+            log.warn('[decryptMessage] $error');
 
             if (!sentKeyRequest && verified) {
               sentKeyRequest = true;
@@ -167,7 +168,7 @@ ThunkAction<AppState> decryptMessages(
 
         return decryptedAll;
       } catch (error) {
-        printError(
+        log.error(
           '[decryptMessage(s)] ${room.name ?? 'Unknown Room'} ${error.toString()}',
         );
       } finally {
@@ -208,7 +209,8 @@ ThunkAction<AppState> decryptMessage({
 
     // Decrypt the payload with the session
     final currentIndex = messageSession.index;
-    final session = olm.InboundGroupSession()..unpickle(roomId, messageSession.serialized);
+    final session = olm.InboundGroupSession()
+      ..unpickle(roomId, messageSession.serialized);
 
     final payloadDecrypted = session.decrypt(ciphertext);
     final payloadScrubbed = payloadDecrypted.plaintext
@@ -218,7 +220,8 @@ ThunkAction<AppState> decryptMessage({
     final messageIndexNew = payloadDecrypted.message_index;
 
     // protection against replay attacks
-    if ((messageIndexNew <= currentIndex && currentIndex != 0) && !forceDecryption) {
+    if ((messageIndexNew <= currentIndex && currentIndex != 0) &&
+        !forceDecryption) {
       throw '[decryptMessage] messageIndex invalid $messageIndexNew <= $currentIndex';
     }
 
@@ -286,7 +289,8 @@ ThunkAction<AppState> encryptKeyContent({
     final userCurrent = store.state.authStore.user;
     final deviceId = userCurrent.deviceId!;
     final userOlmAccount = store.state.cryptoStore.olmAccount!;
-    final currentIdentityKeys = await json.decode(userOlmAccount.identity_keys());
+    final currentIdentityKeys =
+        await json.decode(userOlmAccount.identity_keys());
     final currentFingerprint = currentIdentityKeys[Algorithms.ed25519];
 
     // pull recipient key data and id
@@ -472,7 +476,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 backfillDecryptMessages(roomId);
               }
             } catch (error) {
-              printError('[decryptKeyEvent] [ERROR] $error');
+              log.error('[decryptKeyEvent] [ERROR] $error');
             }
 
             break;

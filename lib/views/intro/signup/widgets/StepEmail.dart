@@ -37,7 +37,6 @@ class EmailStepState extends State<EmailStep> {
     onMounted();
   }
 
-  @protected
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
     emailController.text = store.state.authStore.email;

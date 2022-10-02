@@ -10,7 +10,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colours.dart';
+import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
@@ -153,15 +153,13 @@ class ChatScreenState extends State<ChatScreen> {
     final store = StoreProvider.of<AppState>(context);
 
     try {
-      printInfo('TESTING');
       await store.dispatch(
         backfillDecryptMessages(
           props.room.id,
         ),
       );
-      printInfo('WHAT');
     } catch (error) {
-      printError(error.toString());
+      log.error(error.toString());
     }
   }
 
@@ -205,6 +203,7 @@ class ChatScreenState extends State<ChatScreen> {
         mediumType = MediumType.encryption;
       });
       props.onUpdateDeviceKeys();
+      onAttemptDecryption(props);
     }
   }
 
@@ -247,10 +246,7 @@ class ChatScreenState extends State<ChatScreen> {
 
     inputController.clear();
 
-    // TODO: consider keeping this enabled?
-    // if (props.dismissKeyboardEnabled) {
     FocusScope.of(context).unfocus();
-    // }
 
     setState(() {
       sending = false;
@@ -380,6 +376,10 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       sending = false;
     });
+  }
+
+  onFocusChatInput() {
+    inputFieldNode.requestFocus();
   }
 
   onAddMedia(File file, MessageType type, _Props props) async {
@@ -527,7 +527,7 @@ class ChatScreenState extends State<ChatScreen> {
                   Container(
                     padding: EdgeInsets.only(right: 8),
                     child: CircleAvatar(
-                      backgroundColor: const Color(Colours.greyDisabled),
+                      backgroundColor: const Color(AppColors.greyDisabled),
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
                         color: Colors.white,
@@ -585,13 +585,13 @@ class ChatScreenState extends State<ChatScreen> {
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          (ModalRoute.of(context)!.settings.arguments as ChatScreenArguments).roomId,
+          useScreenArguments<ChatScreenArguments>(context)?.roomId,
         ),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
           final viewInsets = EdgeInsets.fromWindowPadding(
-            WidgetsBinding.instance!.window.viewInsets,
-            WidgetsBinding.instance!.window.devicePixelRatio,
+            WidgetsBinding.instance.window.viewInsets,
+            WidgetsBinding.instance.window.devicePixelRatio,
           );
           final keyboardInset = viewInsets.bottom;
           final closedInputPadding =
@@ -632,8 +632,7 @@ class ChatScreenState extends State<ChatScreen> {
 
             final backgroundLightness =
                 backgroundColorDark.lightness > 0.2 ? backgroundColorDark.lightness : 0.2;
-            backgroundColor =
-                backgroundColorDark.withLightness(backgroundLightness - 0.2).toColor();
+            backgroundColor = backgroundColorDark.withLightness(backgroundLightness - 0.2).toColor();
 
             appBar = AppBarMessageOptions(
               user: props.currentUser,
@@ -641,6 +640,7 @@ class ChatScreenState extends State<ChatScreen> {
               message: selectedMessage,
               isUserSent: isUserSent,
               onEdit: () => onToggleEdit(),
+              onReply: () => onFocusChatInput(),
               onDismiss: () => onToggleSelectedMessage(null),
               onDelete: () => props.onDeleteMessage(
                 room: props.room,
@@ -944,22 +944,23 @@ class _Props extends Equatable {
             toggleRoomEncryption(room: room),
           );
         },
-        onLoadMoreMessages: () {
+        onLoadMoreMessages: () async {
           final room = selectRoom(state: store.state, id: roomId);
 
           // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
           final messages = store.state.eventStore.messages[room.id] ?? [];
-          final oldest =
-              messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
+          final oldest = messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
 
           // fetch messages from the oldest cached batch
-          return store.dispatch(
+          final messagesNew = await store.dispatch(
             fetchMessageEvents(
               room: room,
               from: oldest.prevBatch,
               timestamp: oldest.timestamp,
             ),
           );
+
+          log.debug('Found messages ${messagesNew.length}');
         },
       );
 }

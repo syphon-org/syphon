@@ -23,10 +23,15 @@ import 'package:syphon/store/media/storage.dart';
 import 'package:syphon/store/rooms/actions.dart';
 import 'package:syphon/store/rooms/storage.dart';
 import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/store/settings/chat-settings/actions.dart';
 import 'package:syphon/store/settings/notification-settings/actions.dart';
+import 'package:syphon/store/settings/privacy-settings/actions.dart';
+import 'package:syphon/store/settings/privacy-settings/storage.dart';
 import 'package:syphon/store/settings/proxy-settings/actions.dart';
+import 'package:syphon/store/settings/storage-settings/actions.dart';
 import 'package:syphon/store/settings/storage.dart';
-import 'package:syphon/store/sync/background/storage.dart';
+import 'package:syphon/store/settings/theme-settings/actions.dart';
+import 'package:syphon/store/sync/service/storage.dart';
 import 'package:syphon/store/user/actions.dart';
 import 'package:syphon/store/user/storage.dart';
 
@@ -45,7 +50,7 @@ saveStorageMiddleware(StorageDatabase? storage) {
     next(action);
 
     if (storage == null) {
-      printWarning('storage is null, skipping saving cold storage data!!!',
+      log.warn('storage is null, skipping saving cold storage data!!!',
           title: 'storageMiddleware');
       return;
     }
@@ -64,8 +69,8 @@ saveStorageMiddleware(StorageDatabase? storage) {
         final _action = action as UpdateMediaCache;
 
         // dont save decrypted images
-        final decrypting =
-            store.state.mediaStore.mediaStatus[_action.mxcUri] == MediaStatus.DECRYPTING.value;
+        final decrypting = store.state.mediaStore.mediaStatus[_action.mxcUri] ==
+            MediaStatus.DECRYPTING.value;
         if (decrypting) return;
 
         saveMedia(_action.mxcUri, _action.data,
@@ -78,9 +83,8 @@ saveStorageMiddleware(StorageDatabase? storage) {
         final isDrafting = _action.draft != null;
         final isLastRead = _action.lastRead != null;
 
-        // room information (or a room) should be small enought to update frequently
-        // TODO: extract room event keys to a helper class / object to remove large map copies
-        if ((isSending || isDrafting || isLastRead) && rooms.containsKey(_action.id)) {
+        if ((isSending || isDrafting || isLastRead) &&
+            rooms.containsKey(_action.id)) {
           final room = rooms[_action.id];
           saveRoom(room!, storage: storage);
         }
@@ -104,7 +108,7 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case SetReceipts:
         final _action = action as SetReceipts;
         final isSynced = store.state.syncStore.synced;
-        // TODO: the initial sync loads way too many read receipts
+        // NOTE: prevents saving read receipts until a Full Sync is completed
         saveReceipts(_action.receipts ?? {}, storage: storage, ready: isSynced);
         break;
       case SetRoom:
@@ -113,8 +117,10 @@ saveStorageMiddleware(StorageDatabase? storage) {
         saveRooms({room.id: room}, storage: storage);
         break;
       case DeleteMessage:
-      case DeleteOutboxMessage:
         saveMessages([action.message], storage: storage);
+        break;
+      case DeleteOutboxMessage:
+        deleteMessages([action.message], storage: storage);
         break;
       case AddMessages:
         final _action = action as AddMessages;
@@ -151,13 +157,22 @@ saveStorageMiddleware(StorageDatabase? storage) {
       case ToggleProxy:
       case SetProxyHost:
       case SetProxyPort:
+      case SetKeyBackupInterval:
+      case SetKeyBackupLocation:
       case ToggleProxyAuthentication:
       case SetProxyUsername:
       case SetProxyPassword:
+      case SetLastBackupMillis:
         saveSettings(store.state.settingsStore, storage: storage);
         break;
+      case SetKeyBackupPassword:
+        final _action = action as SetKeyBackupPassword;
+        saveBackupPassword(password: _action.password);
+        break;
       case LogAppAgreement:
-        saveTermsAgreement(timestamp: int.parse(store.state.settingsStore.alphaAgreement ?? '0'));
+        saveTermsAgreement(
+            timestamp:
+                int.parse(store.state.settingsStore.alphaAgreement ?? '0'));
         break;
       case SetOlmAccountBackup:
       case SetDeviceKeysOwned:

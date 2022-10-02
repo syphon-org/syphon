@@ -22,28 +22,24 @@ class FabCircleExpanding extends StatelessWidget {
     this.alignment,
   }) : super(key: key);
 
-  @protected
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
     Navigator.pushNamed(context, Routes.searchGroups);
   }
 
-  @protected
   onNavigateToDraft(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
     Navigator.pushNamed(context, Routes.searchUsers);
   }
 
-  @protected
   onNavigateToCreateGroup(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
     Navigator.pushNamed(context, Routes.groupCreate);
   }
 
-  @protected
   onNavigateToCreateGroupPublic(context) {
     HapticFeedback.lightImpact();
     fabKey!.currentState!.toggle(open: false);
@@ -233,7 +229,9 @@ class FabBarContainerState extends State<FabBarContainer> with SingleTickerProvi
     final children = <Widget>[];
     final count = widget.children.length;
     final step = 90.0 / (count - 1);
-    for (var i = 0, angleInDegrees = 0.0; i < count; i++, angleInDegrees += step) {
+
+    var angleInDegrees = 0.0;
+    for (var i = 0; i < count; i++, angleInDegrees += step) {
       children.add(
         _ExpandingActionButton(
           directionInDegrees: angleInDegrees,
@@ -301,7 +299,7 @@ class _ExpandingActionButton extends StatelessWidget {
           bottom: 4.0 + offset.dy,
           child: Transform.rotate(
             angle: (1.0 - progress.value) * math.pi / 2,
-            child: child!,
+            child: child,
           ),
         );
       },

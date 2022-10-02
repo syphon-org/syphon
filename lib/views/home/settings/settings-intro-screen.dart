@@ -77,7 +77,7 @@ class IntroSettingsScreen extends StatelessWidget {
 
       if (!status.isGranted) {
         return store.dispatch(addAlert(
-          origin: 'exportSessionKeys',
+          origin: 'onExportSessionKeys',
           message: Strings.alertStorageAccessRequiredForKeys,
         ));
       }
@@ -189,12 +189,14 @@ class IntroSettingsScreen extends StatelessWidget {
                               ),
                               trailing: Switch(
                                 value: props.proxyAuthenticationEnabled,
-                                onChanged: (toggle) => props.onToggleProxyAuthentication(),
+                                onChanged: (toggle) =>
+                                    props.onToggleProxyAuthentication(),
                               ),
                             ),
                           ),
                           Visibility(
-                            visible: props.proxyEnabled && props.proxyAuthenticationEnabled,
+                            visible: props.proxyEnabled &&
+                                props.proxyAuthenticationEnabled,
                             child: ListTile(
                               dense: true,
                               onTap: () => props.onEditProxyUsername(context),
@@ -213,7 +215,8 @@ class IntroSettingsScreen extends StatelessWidget {
                             ),
                           ),
                           Visibility(
-                            visible: props.proxyEnabled && props.proxyAuthenticationEnabled,
+                            visible: props.proxyEnabled &&
+                                props.proxyAuthenticationEnabled,
                             child: ListTile(
                               dense: true,
                               onTap: () => props.onEditProxyPassword(context),
@@ -237,13 +240,16 @@ class IntroSettingsScreen extends StatelessWidget {
                     CardSection(
                       child: Column(
                         children: [
-                          Container(
-                            width: width,
-                            padding: Dimensions.listPadding,
-                            child: Text(
-                              'Key Management Testing',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.subtitle2,
+                          Visibility(
+                            visible: DEBUG_MODE,
+                            child: Container(
+                              width: width,
+                              padding: Dimensions.listPadding,
+                              child: Text(
+                                'Key Management Testing',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.subtitle2,
+                              ),
                             ),
                           ),
                           Visibility(
@@ -335,7 +341,8 @@ class _Props extends Equatable {
         proxyEnabled: store.state.settingsStore.proxySettings.enabled,
         host: store.state.settingsStore.proxySettings.host,
         port: store.state.settingsStore.proxySettings.port,
-        proxyAuthenticationEnabled: store.state.settingsStore.proxySettings.authenticationEnabled,
+        proxyAuthenticationEnabled:
+            store.state.settingsStore.proxySettings.authenticationEnabled,
         username: store.state.settingsStore.proxySettings.username,
         password: store.state.settingsStore.proxySettings.password,
         onToggleProxy: () async {
@@ -353,7 +360,9 @@ class _Props extends Equatable {
               content: Strings.contentProxyHost,
               label: Strings.labelProxyHost,
               initialValue: store.state.settingsStore.proxySettings.host,
-              inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+              inputFormatters: [
+                FilteringTextInputFormatter.singleLineFormatter
+              ],
               onCancel: () async {
                 Navigator.of(dialogContext).pop();
               },
@@ -398,7 +407,9 @@ class _Props extends Equatable {
               content: Strings.contentProxyUsername,
               label: Strings.labelProxyUsername,
               initialValue: store.state.settingsStore.proxySettings.username,
-              inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+              inputFormatters: [
+                FilteringTextInputFormatter.singleLineFormatter
+              ],
               onCancel: () async {
                 Navigator.of(dialogContext).pop();
               },
@@ -419,7 +430,9 @@ class _Props extends Equatable {
               content: Strings.contentProxyPassword,
               label: Strings.labelProxyPassword,
               initialValue: store.state.settingsStore.proxySettings.password,
-              inputFormatters: [FilteringTextInputFormatter.singleLineFormatter],
+              inputFormatters: [
+                FilteringTextInputFormatter.singleLineFormatter
+              ],
               obscureText: true,
               onCancel: () async {
                 Navigator.of(dialogContext).pop();
