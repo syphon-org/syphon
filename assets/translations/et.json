@@ -56,7 +56,7 @@
     "button-confirm-alt": "sobib",
     "button-confirm": "selge lugu",
     "button-confirm-formal": "kinnita",
-    "button-leave-chat": "lahku vestlusest",
+    "button-leave-chat": "Lahku vestlusest",
     "button-delete-chat": "kustuta vestlus",
     "button-archive-chat": "arhiveeri vestlus",
     "button-select-all": "vali kõik",
@@ -66,7 +66,7 @@
     "button-text-signup-question": "Sul veel pole kasutajanimi olemas?",
     "button-text-login": "Logi sisse",
     "button-delete-keys": "kustuta võtmed",
-    "button-block-user": "blokeeri kasutaja",
+    "button-block-user": "Blokeeri kasutaja",
     "button-send-verification": "verifitseerimiseks saada e-kiri",
     "button-confirm-verification": "kinnita verifitseerimine",
     "button-text-settings": "Seadistused",
@@ -144,5 +144,14 @@
     "content-logout-multiaccount-confirm": "\n\nKuna sul on ka teisi kasutajakontosid, siis väljalogimisel võetakse mõnu muu konto kasutusele.",
     "content-import-session-keys": "Sessioonivõtmete importimiseks palun sisesta salasõna.\n\nPalun arvesta, et järgnev andmete import võib natuke aega võtta.",
     "content-export-session-keys-enter-password": "Sisesta salasõna, millega soovid oma sessioonivõtmeid krüptida.",
-    "content-import-session-keys-enter-password": "Sisesta salasõna, millega soovid oma sessioonivõtmeid importida."
+    "content-import-session-keys-enter-password": "Sisesta salasõna, millega soovid oma sessioonivõtmeid importida.",
+    "title-dialog-accept-invite": "Kas võtad kutse vastu?",
+    "title-dialog-chat-color": "Vali vestluse värv",
+    "title-dialog-sync-interval": "Muuda sünkroniseerimise välpa",
+    "title-dialog-chat-with-user": "Vestle kasutajaga {}",
+    "title-dialog-attempt-chat-with-user": "Proovi vestelda kasutajaga {}",
+    "title-user-verification": "Kasutaja verifitseerimine",
+    "header-update-password": "Uuenda salasõna",
+    "title-dialog-email-requirement-verified": "E-posti aadressi kinnitamine",
+    "title-dialog-email-requirement": "E-posti aadress on nõutud"
 }
