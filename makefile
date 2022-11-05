@@ -22,6 +22,8 @@ setup:
 # building
 build-release-ios: 
 	flutter build ipa  --release # open under xcworkspace, not xcodeproj
+build-release-linux: 
+	flutter pub run build_runner build --delete-conflicting-outputs && flutter build linux --release
 build-release-macos: 
 	flutter pub run build_runner build --delete-conflicting-outputs && flutter build macos --release
 build-release-android: 
