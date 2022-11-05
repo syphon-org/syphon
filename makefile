@@ -29,6 +29,14 @@ build-release-macos:
 build-release-android: 
 	flutter pub run build_runner build --delete-conflicting-outputs && flutter build apk --release
 
+# releasing
+bundle-release-linux:
+	cp -aL /usr/lib/x86_64-linux-gnu/libjsoncpp.so* build/linux/x64/release/bundle/lib/
+	cp -aL /usr/lib/x86_64-linux-gnu/libsqlite3.so build/linux/x64/release/bundle/lib/
+	cp -aL /usr/lib/x86_64-linux-gnu/libsqlcipher.so build/linux/x64/release/bundle/lib/
+	tar -cvzf syphon.nightly.linux.x64.tar.gz -C build/linux/x64/release/bundle .
+	shasum -a 256 ./syphon.nightly.linux.x64.tar.gz
+
 # mobile development commands
 setup-ios: 
 	pod install && flutter precache --ios
