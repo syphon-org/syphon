@@ -363,8 +363,8 @@
     "popup-menu-item-search": "Ricerca",
     "popup-menu-item-chat-settings": "Impostazioni discussione",
     "popup-menu-item-mute-notifications": "Disattiva il suono per le notifiche",
-    "semantics-close-actions-ring": "Chiudi l'anello delle azioni",
-    "semantics-open-actions-ring": "Apri l'anello delle azioni",
+    "semantics-close-actions-ring": "Chiudi Anello Azioni",
+    "semantics-open-actions-ring": "Apri Anello Azioni",
     "tooltip-edit-message": "Modifica il messaggio",
     "tooltip-quote-and-reply": "Cita e rispondi",
     "tooltip-share-chats": "Condividi le chat"
