@@ -42,5 +42,21 @@
     "title-proxy-use-proxy": "Käytä välityspalvelinta",
     "title-view-chat-users": "Kaikki chat-käyttäjät",
     "title-view-create-group": "Luo ryhmäkeskustelu",
-    "title-view-advanced": "Edistynyt"
+    "title-view-advanced": "Edistynyt",
+    "tooltip-copy-message-content": "Kopioi viestin sisältö",
+    "tooltip-message-details": "Viestin tiedot",
+    "tooltip-delete-message": "Poista viesti",
+    "tooltip-quote-and-reply": "Lainaa ja vastaa",
+    "tooltip-share-chats": "Jaa keskustelut",
+    "label-send-unencrypted": "Lähetä salaamaton viesti",
+    "label-default": "Oletus",
+    "label-show-attachment-options": "Avaa liitetiedostovaihtoehdot",
+    "label-send-encrypted": "Lähetä salattu viesti",
+    "header-media-auto-download": "Median automaattinen lataus",
+    "header-general": "Yleiset",
+    "header-ordering": "Järjestys",
+    "header-media": "Media",
+    "tooltip-edit-message": "Muokkaa viestiä",
+    "popup-menu-item-search": "Hae",
+    "popup-menu-item-all-media": "Kaikki mediat"
 }
