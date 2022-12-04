@@ -69,6 +69,8 @@ class Values {
 // ignore: non_constant_identifier_names
 const bool DEBUG_MODE = !kReleaseMode;
 const bool SHOW_BORDERS = false;
+const bool DEBUG_PAYLOADS_MODE = false;
+const bool DEBUG_OLM_MODE = false;
 
 class SupportedLanguages {
   static const defaultLang = 'en';
@@ -98,6 +100,7 @@ class SupportedLanguages {
     'ru',
     'si',
     'sk',
+    'tok',
     'tr',
     'uk'
   ];
@@ -160,7 +163,9 @@ const isoLangs = {
   'da': {'name': 'Danish', 'nativeName': 'dansk'},
   'dv': {'name': 'Divehi; Dhivehi; Maldivian;', 'nativeName': 'ދިވެހި'},
   'nl': {'name': 'Dutch', 'nativeName': 'Nederlands, Vlaams'},
-  'en': {'name': 'English', 'nativeName': 'English'},
+  'en': {'name': 'English (USA)', 'nativeName': 'English (USA)'},
+  'en-gb': {'name': 'English (England)', 'nativeName': 'English (England)'},
+  'en-Shaw': {'name': 'English (Shavian)', 'nativeName': '𐑖𐑱𐑝𐑾𐑯'},
   'eo': {'name': 'Esperanto', 'nativeName': 'Esperanto'},
   'et': {'name': 'Estonian', 'nativeName': 'eesti, eesti keel'},
   'ee': {'name': 'Ewe', 'nativeName': 'Eʋegbe'},
@@ -299,6 +304,7 @@ const isoLangs = {
   'tl': {'name': 'Tagalog', 'nativeName': 'Wikang Tagalog, ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔'},
   'tn': {'name': 'Tswana', 'nativeName': 'Setswana'},
   'to': {'name': 'Tonga (Tonga Islands)', 'nativeName': 'faka Tonga'},
+  'tok': {'name': 'Toki Pona', 'nativeName': 'toki pona'},
   'tr': {'name': 'Turkish', 'nativeName': 'Türkçe'},
   'ts': {'name': 'Tsonga', 'nativeName': 'Xitsonga'},
   'tt': {'name': 'Tatar', 'nativeName': 'татарча, tatarça, تاتارچا‎'},

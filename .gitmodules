@@ -4,3 +4,6 @@
 [submodule "windows/olm"]
 	path = windows/olm
 	url = https://gitlab.matrix.org/matrix-org/olm.git
+[submodule "android/olm"]
+	path = android/olm
+	url = https://gitlab.matrix.org/matrix-org/olm.git

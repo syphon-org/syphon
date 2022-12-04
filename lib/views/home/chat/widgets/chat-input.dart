@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
@@ -229,6 +230,33 @@ class ChatInputState extends State<ChatInput> {
     widget.onAddMedia(file: file, type: MessageType.image);
 
     onToggleMediaOptions();
+  }
+
+  showDialogForPhotoPermission(BuildContext context){
+    showDialog(
+      context: context,
+      builder: (ctx) =>
+          AlertDialog(
+            title: Text(Strings.titleDialogPhotoPermission,
+              style: TextStyle(fontWeight: FontWeight.w600),),
+            content: Text(Strings.contentPhotoPermission),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+                child: Text(Strings.buttonCancel),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  openAppSettings();
+                },
+                child: Text(Strings.buttonNext),
+              ),
+            ],
+          ),
+    );
   }
 
   onAddFile() async {
@@ -626,7 +654,15 @@ class ChatInputState extends State<ChatInput> {
                           child: MediaCard(
                             text: Strings.buttonGallery,
                             icon: Icons.photo,
-                            onPress: () => onAddPhoto(),
+                            onPress: () async{
+                              const photosPermission = Permission.photos;
+                              final status = await photosPermission.status;
+                              if(!status.isGranted){
+                                showDialogForPhotoPermission(context);
+                              }else{
+                                onAddPhoto();
+                              }
+                            },
                           ),
                         ),
                         Padding(

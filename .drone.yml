@@ -12,7 +12,7 @@ trigger:
     - push
 steps:
   - name: build linux
-    image: cirrusci/flutter:3.0.1
+    image: cirrusci/flutter:3.0.5
     commands:
       # Install dependencies
       - apt-get update -y
@@ -57,7 +57,7 @@ trigger:
     - push
 steps:
   - name: build linux
-    image: cirrusci/flutter:3.0.1
+    image: cirrusci/flutter:3.0.5
     commands:
       # Install dependencies
       - apt-get update -y
@@ -101,7 +101,7 @@ steps:
 #    - push
 #steps:
 #  - name: build linux
-#    image: cirrusci/flutter:3.0.1
+#    image: cirrusci/flutter:3.0.5
 #    commands:
 #      # Install dependencies
 #      - apt-get update -y
@@ -142,7 +142,7 @@ trigger:
     - push
 steps:
   - name: build android
-    image: cirrusci/flutter:3.0.1
+    image: cirrusci/flutter:3.0.5
     commands:
       # Keep track of the time when build was started
       - echo $(date -Iseconds) > BUILD_START_TIME
@@ -193,7 +193,7 @@ trigger:
     - push
 steps:
   - name: build android
-    image: cirrusci/flutter:3.0.1
+    image: cirrusci/flutter:3.0.5
     commands:
       # Keep track of the time when build was started
       - echo $(date -Iseconds) > BUILD_START_TIME
