@@ -11,5 +11,6 @@
     "title-verification": "ベリフィケーション",
     "title-view-search-groups": "",
     "title-view-delete-devices": "デバイスの取り外し確認",
-    "title-view-devices": "デバイス"
+    "title-view-devices": "デバイス",
+    "label-email": "電子メール"
 }
