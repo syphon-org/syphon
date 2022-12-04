@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/assets.dart';
@@ -83,11 +83,9 @@ class ChatInput extends StatefulWidget {
 class ChatInputState extends State<ChatInput> {
   ChatInputState() : super();
 
-  bool mention = false;
-  List<User?> users = [];
-
   bool sendable = false;
   bool showAttachments = false;
+  List<User> mentioned = [];
 
   double keyboardHeight = 0;
 
@@ -143,39 +141,37 @@ class ChatInputState extends State<ChatInput> {
     }
   }
 
-  onUpdate(String text, {_Props? props}) {
+  onUpdateInputText(String text, {_Props? props}) {
     setState(() {
       sendable = text.trim().isNotEmpty;
     });
 
-    // mention-dialog
-    users = props!.users;
-    mention = false;
+    final cursorPosition = widget.controller.selection.baseOffset;
+    final cursorTextPrior = text.substring(0, cursorPosition);
 
-    final cursorPos = widget.controller.selection.baseOffset;
-    final subString = text.substring(0, cursorPos);
-
-    final RegExp mentionExpEnd = RegExp(
-      r'\B@\w+$',
+    final RegExp mentionExpanded = RegExp(
+      r'\B@\w+$', // match all text after an @ symbol but before the end of the line / space
       caseSensitive: false,
       multiLine: false,
     );
 
-    final match = mentionExpEnd.firstMatch(subString);
+    final match = mentionExpanded.firstMatch(cursorTextPrior);
 
+    // find matches for mentions
     if (match != null) {
-      final mention = subString.substring(match.start, match.end);
+      final mention = cursorTextPrior.substring(match.start, match.end);
       final mentionName = mention.substring(1, mention.length);
 
-      users = props.users.where((user) {
-        return user != null &&
-            user!.displayName!
-                .toLowerCase()
-                .contains(mentionName.toLowerCase());
+      final usersMentioned = (props?.users ?? []).where((user) {
+        return user.displayName!.toLowerCase().contains(mentionName.toLowerCase());
       }).toList();
 
       setState(() {
-        this.mention = users.isNotEmpty;
+        mentioned = usersMentioned;
+      });
+    } else {
+      setState(() {
+        mentioned = [];
       });
     }
 
@@ -210,6 +206,7 @@ class ChatInputState extends State<ChatInput> {
         });
       });
     }
+
     widget.onUpdateMessage?.call(text);
   }
 
@@ -267,6 +264,34 @@ class ChatInputState extends State<ChatInput> {
     onToggleMediaOptions();
   }
 
+  showDialogForPhotoPermission(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          Strings.titleDialogPhotoPermission,
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        content: Text(Strings.contentPhotoPermission),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text(Strings.buttonCancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              openAppSettings();
+            },
+            child: Text(Strings.buttonNext),
+          ),
+        ],
+      ),
+    );
+  }
+
   onAddFile() async {
     final pickerResult = await FilePicker.platform.pickFiles(
       type: FileType.any,
@@ -282,8 +307,7 @@ class ChatInputState extends State<ChatInput> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) =>
-            _Props.mapStateToProps(store, widget.roomId),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.roomId),
         onInitialBuild: onMounted,
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -292,24 +316,18 @@ class ChatInputState extends State<ChatInput> {
 
           // dynamic dimensions
           final double messageInputWidth = width - 72;
-          final bool replying =
-              widget.quotable != null && widget.quotable!.sender != null;
+          final bool replying = widget.quotable != null && widget.quotable!.sender != null;
           final bool loading = widget.sending;
-          final double maxInputHeight =
-              replying ? height * 0.45 : height * 0.65;
-          final double maxMediaHeight =
-              keyboardHeight > 0 ? keyboardHeight : height * 0.38;
+          final double maxInputHeight = replying ? height * 0.45 : height * 0.65;
+          final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight : height * 0.38;
 
-          final imageHeight = keyboardHeight > 0
-              ? maxMediaHeight * 0.65
-              : imageWidth; // 2 images in view
+          final imageHeight = keyboardHeight > 0 ? maxMediaHeight * 0.65 : imageWidth; // 2 images in view
 
           final isSendable = (sendable && !widget.sending) ||
               // account for if editing
-              widget.editing &&
-                  (widget.editorController?.text.isNotEmpty ?? false);
+              widget.editing && (widget.editorController?.text.isNotEmpty ?? false);
 
-          final bool showMention = mention;
+          final bool showMention = mentioned.isNotEmpty;
 
           Color sendButtonColor = const Color(AppColors.blueBubbly);
 
@@ -425,13 +443,13 @@ class ChatInputState extends State<ChatInput> {
               //////// MENTION DIALOG ////////
               Container(
                   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                  child: Mention(
+                  child: MentionDialog(
                     visible: showMention,
                     width: MediaQuery.of(context).size.width -
-                        Dimensions.buttonSendSize *
-                            2.1, // HACK: fix the width of the dialog
-                    users: users.whereNotNull().toList(),
+                        Dimensions.buttonSendSize * 2.1, // HACK: fix the width of the dialog
+                    users: mentioned,
                     controller: widget.controller,
+                    onComplete: () => onUpdateInputText(widget.controller.text, props: props),
                   )),
               Visibility(
                 visible: replying,
@@ -460,41 +478,31 @@ class ChatInputState extends State<ChatInput> {
                             ),
                             decoration: InputDecoration(
                               filled: true,
-                              labelText:
-                                  replying ? widget.quotable!.sender : '',
-                              labelStyle: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary),
-                              contentPadding: Dimensions.inputContentPadding
-                                  .copyWith(right: 36),
+                              labelText: replying ? widget.quotable!.sender : '',
+                              labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                              contentPadding: Dimensions.inputContentPadding.copyWith(right: 36),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
+                                  color: Theme.of(context).colorScheme.secondary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft:
-                                      Radius.circular(!replying ? 24 : 0),
-                                  bottomRight:
-                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
+                                  bottomRight: Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
+                                  color: Theme.of(context).colorScheme.secondary,
                                   width: 1,
                                 ),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(24),
                                   topRight: Radius.circular(24),
-                                  bottomLeft:
-                                      Radius.circular(!replying ? 24 : 0),
-                                  bottomRight:
-                                      Radius.circular(!replying ? 24 : 0),
+                                  bottomLeft: Radius.circular(!replying ? 24 : 0),
+                                  bottomRight: Radius.circular(!replying ? 24 : 0),
                                 ),
                               ),
                             ),
@@ -556,16 +564,13 @@ class ChatInputState extends State<ChatInput> {
                                 enableSuggestions: props.suggestionsEnabled,
                                 textCapitalization: props.textCapitalization,
                                 keyboardType: TextInputType.multiline,
-                                textInputAction: widget.enterSend
-                                    ? TextInputAction.send
-                                    : TextInputAction.newline,
+                                textInputAction:
+                                    widget.enterSend ? TextInputAction.send : TextInputAction.newline,
                                 cursorColor: props.inputCursorColor,
                                 focusNode: widget.focusNode,
                                 controller: widget.controller,
-                                onChanged: (text) =>
-                                    onUpdate(text, props: props),
-                                onSubmitted:
-                                    !isSendable ? null : (text) => onSubmit(),
+                                onChanged: (text) => onUpdateInputText(text, props: props),
+                                onSubmitted: !isSendable ? null : (text) => onSubmit(),
                                 style: TextStyle(
                                   height: 1.5,
                                   color: props.inputTextColor,
@@ -585,45 +590,28 @@ class ChatInputState extends State<ChatInput> {
                                     ),
                                   ),
                                   fillColor: props.inputColorBackground,
-                                  contentPadding:
-                                      Dimensions.inputContentPadding,
+                                  contentPadding: Dimensions.inputContentPadding,
                                   focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
+                                        color: Theme.of(context).colorScheme.secondary,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(!replying
-                                            ? DEFAULT_BORDER_RADIUS
-                                            : 0),
-                                        topRight: Radius.circular(!replying
-                                            ? DEFAULT_BORDER_RADIUS
-                                            : 0),
-                                        bottomLeft: Radius.circular(
-                                            DEFAULT_BORDER_RADIUS),
-                                        bottomRight: Radius.circular(
-                                            DEFAULT_BORDER_RADIUS),
+                                        topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                        topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                        bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                        bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
                                       )),
                                   border: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
+                                        color: Theme.of(context).colorScheme.secondary,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(!replying
-                                            ? DEFAULT_BORDER_RADIUS
-                                            : 0),
-                                        topRight: Radius.circular(!replying
-                                            ? DEFAULT_BORDER_RADIUS
-                                            : 0),
-                                        bottomLeft: Radius.circular(
-                                            DEFAULT_BORDER_RADIUS),
-                                        bottomRight: Radius.circular(
-                                            DEFAULT_BORDER_RADIUS),
+                                        topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                        topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                        bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                        bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
                                       )),
                                 ),
                               ),
@@ -658,8 +646,7 @@ class ChatInputState extends State<ChatInput> {
                       Container(
                         constraints: BoxConstraints(
                           maxWidth: width,
-                          maxHeight:
-                              imageHeight, // HACK: figure out why it overflows on Nexus 5x
+                          maxHeight: imageHeight, // HACK: figure out why it overflows on Nexus 5x
                         ),
                         child: ListLocalImages(
                           imageSize: imageWidth,
@@ -679,7 +666,15 @@ class ChatInputState extends State<ChatInput> {
                           child: MediaCard(
                             text: Strings.buttonGallery,
                             icon: Icons.photo,
-                            onPress: () => onAddPhoto(),
+                            onPress: () async {
+                              const photosPermission = Permission.photos;
+                              final status = await photosPermission.status;
+                              if (!status.isGranted) {
+                                showDialogForPhotoPermission(context);
+                              } else {
+                                onAddPhoto();
+                              }
+                            },
                           ),
                         ),
                         Padding(
@@ -726,7 +721,7 @@ class _Props extends Equatable {
   final bool autocorrectEnabled;
   final bool suggestionsEnabled;
   final TextCapitalization textCapitalization;
-  final List<User?> users;
+  final List<User> users;
 
   final Function onSendTyping;
 
@@ -751,18 +746,13 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String roomId) => _Props(
         room: selectRoom(id: roomId, state: store.state),
         users: roomUsers(store.state, roomId),
-        inputTextColor: selectInputTextColor(
-            store.state.settingsStore.themeSettings.themeType),
-        inputCursorColor: selectCursorColor(
-            store.state.settingsStore.themeSettings.themeType),
-        inputColorBackground: selectInputBackgroundColor(
-            store.state.settingsStore.themeSettings.themeType),
+        inputTextColor: selectInputTextColor(store.state.settingsStore.themeSettings.themeType),
+        inputCursorColor: selectCursorColor(store.state.settingsStore.themeSettings.themeType),
+        inputColorBackground: selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: store.state.settingsStore.autocorrectEnabled,
         suggestionsEnabled: store.state.settingsStore.suggestionsEnabled,
-        textCapitalization: Platform.isIOS
-            ? TextCapitalization.sentences
-            : TextCapitalization.none,
+        textCapitalization: Platform.isIOS ? TextCapitalization.sentences : TextCapitalization.none,
         onSendTyping: ({typing, roomId}) => store.dispatch(
           sendTyping(typing: typing, roomId: roomId),
         ),

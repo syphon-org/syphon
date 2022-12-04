@@ -35,9 +35,12 @@ List<User> selectKnownUsers(AppState state) {
   return List.from(latestUsers);
 }
 
-List<User?> roomUsers(AppState state, String? roomId) {
+List<User> roomUsers(AppState state, String? roomId) {
   final room = state.roomStore.rooms[roomId!] ?? Room(id: roomId);
-  return room.userIds.map((userId) => state.userStore.users[userId]).toList();
+  return List<User>.from(room.userIds
+      .map((userId) => state.userStore.users[userId])
+      .where((userValid) => userValid != null)
+      .toList());
 }
 
 Map<String, User> messageUsers({required AppState state, String? roomId}) {
@@ -89,7 +92,6 @@ List<User?> searchUsersLocal(
   }
 
   return List.from(users.where(
-    (user) =>
-        (user!.displayName ?? '').contains(searchText) || (user.userId ?? '').contains(searchText),
+    (user) => (user!.displayName ?? '').contains(searchText) || (user.userId ?? '').contains(searchText),
   ));
 }
