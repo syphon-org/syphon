@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId "org.tether.tether"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

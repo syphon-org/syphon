@@ -72,5 +72,7 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+    <string>Camera access is needed to take picture.</string>
 </dict>
 </plist>
