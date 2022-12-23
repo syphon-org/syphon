@@ -79,7 +79,7 @@
     "subtitle-settings-sync-toggle": "切换与matrix服务器的同步",
     "title-dialog-photo-permission": "需要授权",
     "subtitle-proxy-use-basic-authentication": "提供用户名和密码用于认证代理服务器",
-    "subtitle-settings-sync-interval": "同步的间隔时间\n以秒为单位",
+    "subtitle-settings-sync-interval": "两次同步间隔的时间\n以秒为单位",
     "subtitle-theme-settings": "主题 {}、字体 {}",
     "header-media-auto-download": "自动下载媒体",
     "label-search-homeservers": "搜索主服务器…",
