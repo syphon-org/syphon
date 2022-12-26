@@ -2,21 +2,20 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({
-    super.key,
-    required this.cameras, required this.onAddMedia,
+    required this.cameras,
+    required this.onAddMedia,
   });
 
   final List<CameraDescription> cameras;
 
   final Function({
-  required File file,
-  required MessageType type,
+    required File file,
+    required MessageType type,
   }) onAddMedia;
 
   @override
@@ -74,7 +73,7 @@ class CameraScreenState extends State<CameraScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       takePicture();
                     },
                     child: Container(
@@ -98,7 +97,6 @@ class CameraScreenState extends State<CameraScreen> {
                       ),
                     ),
                   ),
-
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.black,
@@ -107,19 +105,17 @@ class CameraScreenState extends State<CameraScreen> {
                     ),
                     child: IconButton(
                       icon: Icon(Icons.flip_camera_android_rounded, color: Colors.white),
-                      onPressed: (){
+                      onPressed: () {
                         _toggleCameraLens();
                       },
                     ),
                   )
-
                 ],
               ),
             ),
           )
         ],
       ),
-
     );
   }
 
@@ -128,15 +124,14 @@ class CameraScreenState extends State<CameraScreen> {
     final lensDirection = _controller.description.lensDirection;
     CameraDescription newDescription;
     if (lensDirection == CameraLensDirection.front) {
-      newDescription = widget.cameras.firstWhere((description) =>
-        description.lensDirection == CameraLensDirection.back);
-    }
-    else {
-      newDescription = widget.cameras.firstWhere((description) =>
-        description.lensDirection == CameraLensDirection.front);
+      newDescription =
+          widget.cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.back);
+    } else {
+      newDescription =
+          widget.cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.front);
     }
 
-    if(newDescription == null){
+    if (newDescription == null) {
       log.error('camera not available');
       return;
     }
@@ -144,15 +139,14 @@ class CameraScreenState extends State<CameraScreen> {
     _initCamera(newDescription);
   }
 
-  Future<void> _initCamera(CameraDescription description) async{
+  Future<void> _initCamera(CameraDescription description) async {
     _controller = CameraController(description, ResolutionPreset.max, enableAudio: true);
 
-    try{
+    try {
       await _controller.initialize();
       // to notify the widgets that camera has been initialized and now camera preview can be done
-      setState((){});
-    }
-    catch(error){
+      setState(() {});
+    } catch (error) {
       log.error(error.toString());
     }
   }
@@ -167,17 +161,13 @@ class CameraScreenState extends State<CameraScreen> {
 
       await onAddPhoto(image.path);
       Navigator.pop(context);
-
     } catch (error) {
       log.error(error.toString());
     }
   }
 
   Future<void> onAddPhoto(String imagePath) async {
-
     final file = File(imagePath);
     await widget.onAddMedia(file: file, type: MessageType.image);
-
   }
-
 }
