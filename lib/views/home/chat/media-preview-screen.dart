@@ -89,87 +89,89 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                 ),
               ],
             ),
-            body: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 24),
-                  child: currentImage == null
-                      ? Container()
-                      : Image.file(
-                          currentImage!,
-                          height: imageHeight,
-                          fit: BoxFit.contain,
+            body: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(top: 24),
+                    child: currentImage == null
+                        ? Container()
+                        : Image.file(
+                            currentImage!,
+                            height: imageHeight,
+                            fit: BoxFit.contain,
+                          ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 24, right: 12, bottom: 32),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(right: 8),
+                          child: Text(
+                            encryptionEnabled
+                                ? Strings.titleSendMediaMessage
+                                : Strings.titleSendMediaMessageUnencrypted,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                                  fontWeight: FontWeight.w400,
+                                ),
+                          ),
                         ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 24, right: 12, bottom: 32),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(right: 8),
-                        child: Text(
-                          encryptionEnabled
-                              ? Strings.titleSendMediaMessage
-                              : Strings.titleSendMediaMessageUnencrypted,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.subtitle2?.copyWith(
-                                fontWeight: FontWeight.w400,
-                              ),
-                        ),
-                      ),
-                      Container(
-                        width: Dimensions.buttonSendSize * 1.15,
-                        height: Dimensions.buttonSendSize * 1.15,
-                        padding: EdgeInsets.symmetric(vertical: 4),
-                        child: Semantics(
-                          button: true,
-                          enabled: true,
-                          label: Strings.labelSendEncrypted,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(48),
-                            onTap: sending ? null : () => onConfirm(props),
-                            child: CircleAvatar(
-                              backgroundColor: sending
-                                  ? Color(AppColors.greyDisabled)
-                                  : Theme.of(context).colorScheme.primary,
-                              child: sending
-                                  ? Padding(
-                                      padding: EdgeInsets.all(4),
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: Dimensions.strokeWidthThin * 1.5,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary
-                                                      .computeLuminance() >
-                                                  0.6
-                                              ? Colors.black
-                                              : Colors.white,
+                        Container(
+                          width: Dimensions.buttonSendSize * 1.15,
+                          height: Dimensions.buttonSendSize * 1.15,
+                          padding: EdgeInsets.symmetric(vertical: 4),
+                          child: Semantics(
+                            button: true,
+                            enabled: true,
+                            label: Strings.labelSendEncrypted,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(48),
+                              onTap: sending ? null : () => onConfirm(props),
+                              child: CircleAvatar(
+                                backgroundColor: sending
+                                    ? Color(AppColors.greyDisabled)
+                                    : Theme.of(context).colorScheme.primary,
+                                child: sending
+                                    ? Padding(
+                                        padding: EdgeInsets.all(4),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: Dimensions.strokeWidthThin * 1.5,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary
+                                                        .computeLuminance() >
+                                                    0.6
+                                                ? Colors.black
+                                                : Colors.white,
+                                          ),
+                                          value: null,
                                         ),
-                                        value: null,
+                                      )
+                                    : Container(
+                                        margin: EdgeInsets.only(left: 2, top: 3),
+                                        child: SvgPicture.asset(
+                                          encryptionEnabled
+                                              ? Assets.iconSendLockSolidBeing
+                                              : Assets.iconSendUnlockBeing,
+                                          color: Colors.white,
+                                          semanticsLabel: Strings.labelSendEncrypted,
+                                        ),
                                       ),
-                                    )
-                                  : Container(
-                                      margin: EdgeInsets.only(left: 2, top: 3),
-                                      child: SvgPicture.asset(
-                                        encryptionEnabled
-                                            ? Assets.iconSendLockSolidBeing
-                                            : Assets.iconSendUnlockBeing,
-                                        color: Colors.white,
-                                        semanticsLabel: Strings.labelSendEncrypted,
-                                      ),
-                                    ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
