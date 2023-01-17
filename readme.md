@@ -195,6 +195,3 @@ decoration: BoxDecoration(
 ),
 ```
 - understanding why olm chose the world 'pickle' for serialization, [its from python](https://gitlab.matrix.org/matrix-org/olm/-/tree/master/python)
-
-## from those who made it possible
-lub youu
