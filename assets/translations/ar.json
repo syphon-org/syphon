@@ -333,7 +333,7 @@
     "content-remove-screen-lock": "هل أنت متأكد أنك تريد إزالة قفل الشاشة؟ هذا سيزيل أيضاً حماية المخبأ",
     "list-item-settings-dismiss-keyboard": "تجاهل لوحة المفاتيح",
     "list-item-settings-auto-download": "تنزيل تلقائي",
-    "alert-log-out-enable-multiaccount": "يجب تسجيل الخروج من الجلسة الحالية \\ n لتمكين الحسابات المتعددة",
+    "alert-log-out-enable-multiaccount": "يجب عليك تسجيل الخروج من جلسة العمل/n الحالية لتمكين الحسابات المتعددة",
     "content-export-session-keys": "أدخل كلمة مرور للنسخ الاحتياطي لمفتاح الجلسة هذا.\n\nيرجى الانتباه إلى أن التصدير قد يستغرق بعض الوقت لإكماله.",
     "content-logout-multiaccount-confirm": "\n\nنظرا لأن لديك حسابات أخرى ، فإن تسجيل الخروج سيحولك إلى جلسة حساب أخرى.",
     "alert-copied-to-clipboard": "تم نسخها إلى الحافظة",
