@@ -357,6 +357,7 @@ class _Props extends Equatable {
         language,
         fontName,
         fontSize,
+        messageSize,
         avatarShape,
         roomTypeBadgesEnabled,
         mainFabType,
