@@ -185,6 +185,7 @@ class MessageWidget extends StatelessWidget {
 
     var textColor = Colors.white;
     Color anchorColor = Colors.blue;
+    var backgroundColor = Theme.of(context).scaffoldBackgroundColor;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
     var luminance = this.luminance;
 
@@ -529,10 +530,10 @@ class MessageWidget extends StatelessWidget {
                                             color: replyColor,
                                             borderRadius: const BorderRadius.only(
                                               //TODO: shape similar to bubbleBorder
-                                              topLeft: Radius.circular(4),
-                                              topRight: Radius.circular(4),
-                                              bottomLeft: Radius.circular(4),
-                                              bottomRight: Radius.circular(4),
+                                              topLeft: Radius.circular(12),
+                                              topRight: Radius.circular(12),
+                                              bottomLeft: Radius.circular(12),
+                                              bottomRight: Radius.circular(12),
                                             ),
                                           ),
                                           p: TextStyle(
@@ -541,6 +542,12 @@ class MessageWidget extends StatelessWidget {
                                             fontWeight: FontWeight.w300,
                                             fontSize:
                                                 Theme.of(context).textTheme.subtitle2!.fontSize,
+                                          ),
+                                          codeblockDecoration: ShapeDecoration(
+                                            color: backgroundColor,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
                                           ),
                                         ),
                                       ),
