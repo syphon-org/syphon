@@ -68,9 +68,12 @@ android {
    buildTypes {
        release {
            signingConfig signingConfigs.release
+           resValue "string", "app_name", "Syphon"
        }
        debug {
             signingConfig signingConfigs.debug
+            resValue "string", "app_name", "Syphon Debug"
+            applicationIdSuffix ".debug"
         }
    }
     externalNativeBuild {
