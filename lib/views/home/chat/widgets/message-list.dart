@@ -17,6 +17,7 @@ import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/chat-settings/selectors.dart';
 import 'package:syphon/store/settings/models.dart';
 import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -228,6 +229,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                       displayName: displayName,
                       currentName: props.currentUser.userId,
                       themeType: props.themeType,
+                      messageSize: selectMessageSizeDouble(props.messageSize),
                       color: props.chatColorPrimary ?? color,
                       luminance: luminance,
                       timeFormat: props.timeFormat,
@@ -262,6 +264,7 @@ class _Props extends Equatable {
   final Room room;
   final User currentUser;
   final ThemeType themeType;
+  final MessageSize messageSize;
   final TimeFormat timeFormat;
   final Map<String, User> users;
   final List<Message> messages;
@@ -271,6 +274,7 @@ class _Props extends Equatable {
   const _Props({
     required this.room,
     required this.themeType,
+    required this.messageSize,
     required this.users,
     required this.messages,
     required this.messagesRaw,
@@ -290,6 +294,7 @@ class _Props extends Equatable {
         timeFormat:
             store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
         themeType: store.state.settingsStore.themeSettings.themeType,
+        messageSize: store.state.settingsStore.themeSettings.messageSize,
         currentUser: store.state.authStore.user,
         chatColorPrimary: selectBubbleColor(store, roomId),
         room: selectRoom(id: roomId, state: store.state),

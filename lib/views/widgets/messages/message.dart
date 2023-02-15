@@ -46,6 +46,7 @@ class MessageWidget extends StatelessWidget {
     this.currentName,
     this.themeType = ThemeType.Light,
     this.fontSize = 14.0,
+    this.messageSize = 12.0,
     this.timeFormat = TimeFormat.hr12,
     this.color,
     this.luminance = 0.0,
@@ -67,6 +68,7 @@ class MessageWidget extends StatelessWidget {
 
   final int lastRead;
   final double fontSize;
+  final double messageSize;
   final TimeFormat timeFormat;
 
   final Color? color;
@@ -464,7 +466,7 @@ class MessageWidget extends StatelessWidget {
                                       child: Text(
                                         displayName ?? formatSender(message.sender!),
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: messageSize,
                                           color: textColor,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -539,8 +541,7 @@ class MessageWidget extends StatelessWidget {
                                             color: textColor,
                                             fontStyle: fontStyle,
                                             fontWeight: FontWeight.w300,
-                                            fontSize:
-                                                Theme.of(context).textTheme.subtitle2!.fontSize,
+                                            fontSize: messageSize,
                                           ),
                                         ),
                                       ),
@@ -595,7 +596,7 @@ class MessageWidget extends StatelessWidget {
                                               child: Text(
                                                 status,
                                                 style: TextStyle(
-                                                  fontSize: 12,
+                                                  fontSize: messageSize,
                                                   color: textColor,
                                                   fontWeight: FontWeight.w100,
                                                 ),
