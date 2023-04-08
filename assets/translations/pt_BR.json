@@ -247,5 +247,9 @@
     "list-item-mute-for-one-day": "Mutar por 1 dia",
     "list-item-mute-for-days": "Mutar por {} dias",
     "list-item-user-details-start-chat": "Chat com {}",
-    "list-item-mute-for-hours": "Mutar por {} horas"
+    "list-item-mute-for-hours": "Mutar por {} horas",
+    "label-call-invite": "O usuário convidou você para uma chamada de voz",
+    "list-item-settings-auto-download": "Download automático",
+    "label-version": "Versão",
+    "label-call-hangup": "O usuário encerrou uma chamada de voz"
 }
