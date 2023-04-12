@@ -4,7 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/media/model.dart';
 
-class EncryptInfoToJsonConverter extends TypeConverter<EncryptInfo?, String> {
+class EncryptInfoToJsonConverter extends NullAwareTypeConverter<EncryptInfo?, String> {
   const EncryptInfoToJsonConverter();
 
   @override

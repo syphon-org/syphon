@@ -5,7 +5,7 @@ import 'package:syphon/storage/converters.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-class MessageToJsonConverter extends TypeConverter<Message?, String> {
+class MessageToJsonConverter extends NullAwareTypeConverter<Message?, String> {
   const MessageToJsonConverter();
 
   @override

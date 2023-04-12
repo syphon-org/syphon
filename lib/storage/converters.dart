@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 
-class MapToJsonConverter extends TypeConverter<Map<String, dynamic>?, String> {
+class MapToJsonConverter extends NullAwareTypeConverter<Map<String, dynamic>?, String> {
   const MapToJsonConverter();
 
   @override
