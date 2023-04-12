@@ -17,6 +17,18 @@ class MessageToJsonConverter extends NullAwareTypeConverter<Message?, String> {
   String? mapToSql(Message? value) {
     return json.encode(value);
   }
+
+  @override
+  Message? requireFromSql(String fromDb) {
+    // TODO: implement requireFromSql
+    throw UnimplementedError();
+  }
+
+  @override
+  String requireToSql(Message? value) {
+    // TODO: implement requireToSql
+    throw UnimplementedError();
+  }
 }
 
 ///

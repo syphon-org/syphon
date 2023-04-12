@@ -16,6 +16,18 @@ class EncryptInfoToJsonConverter extends NullAwareTypeConverter<EncryptInfo?, St
   String? mapToSql(EncryptInfo? value) {
     return json.encode(value);
   }
+
+  @override
+  EncryptInfo? requireFromSql(String fromDb) {
+    // TODO: implement requireFromSql
+    throw UnimplementedError();
+  }
+
+  @override
+  String requireToSql(EncryptInfo? value) {
+    // TODO: implement requireToSql
+    throw UnimplementedError();
+  }
 }
 
 ///

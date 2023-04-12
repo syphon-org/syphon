@@ -14,6 +14,18 @@ class MapToJsonConverter extends NullAwareTypeConverter<Map<String, dynamic>?, S
   String? mapToSql(Map<String, dynamic>? value) {
     return json.encode(value);
   }
+
+  @override
+  Map<String, dynamic>? requireFromSql(String fromDb) {
+    // TODO: implement requireFromSql
+    throw UnimplementedError();
+  }
+
+  @override
+  String requireToSql(Map<String, dynamic>? value) {
+    // TODO: implement requireToSql
+    throw UnimplementedError();
+  }
 }
 
 class ListToTextConverter extends TypeConverter<List<String>, String> {
@@ -31,5 +43,17 @@ class ListToTextConverter extends TypeConverter<List<String>, String> {
     } catch (error) {
       return '[]';
     }
+  }
+
+  @override
+  List<String> fromSql(String fromDb) {
+    // TODO: implement fromSql
+    throw UnimplementedError();
+  }
+
+  @override
+  String toSql(List<String> value) {
+    // TODO: implement toSql
+    throw UnimplementedError();
   }
 }
