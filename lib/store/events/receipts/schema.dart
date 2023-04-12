@@ -37,7 +37,7 @@ class MapToReadConverter extends TypeConverter<Map<String, dynamic>?, String> {
 @UseRowClass(Receipt)
 class Receipts extends Table {
   // Event Base Date
-  TextColumn get eventId => text().customConstraint('UNIQUE')();
+  TextColumn get eventId => text().unique()();
   IntColumn get latestRead => integer().nullable()();
   TextColumn get userReads => text().map(const MapToReadConverter()).nullable()();
 

@@ -37,7 +37,7 @@ class EncryptInfoToJsonConverter extends NullAwareTypeConverter<EncryptInfo?, St
 ///
 @UseRowClass(Media)
 class Medias extends Table {
-  TextColumn get mxcUri => text().customConstraint('UNIQUE')();
+  TextColumn get mxcUri => text().unique()();
   BlobColumn get data => blob().nullable()();
   TextColumn get type => text().nullable()();
   TextColumn get info => text().map(const EncryptInfoToJsonConverter()).nullable()();

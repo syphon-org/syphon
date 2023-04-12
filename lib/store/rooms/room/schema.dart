@@ -40,7 +40,7 @@ class MessageToJsonConverter extends NullAwareTypeConverter<Message?, String> {
 class Rooms extends Table {
   // TextColumn get id => text().clientDefault(() => _uuid.v4())();
 
-  TextColumn get id => text().customConstraint('UNIQUE')();
+  TextColumn get id => text().unique()();
   TextColumn get name => text().nullable()();
   TextColumn get alias => text().nullable()();
   TextColumn get homeserver => text().nullable()();
