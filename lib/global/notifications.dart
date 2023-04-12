@@ -27,7 +27,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
   Function? onResume,
   Function? onMessage,
   Function? onSaveToken,
-  Future<dynamic> Function(String?)? onSelectNotification,
+  Future<dynamic> Function(NotificationResponse)? onSelectNotification,
   Future<dynamic> Function(int, String?, String?, String?)? onDidReceiveLocalNotification,
 }) async {
   // Currently mobile only
@@ -40,7 +40,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
     'ic_launcher_foreground',
   );
 
-  final initializationSettingsIOS = IOSInitializationSettings(
+  final initializationSettingsIOS = DarwinInitializationSettings(
     requestSoundPermission: false,
     requestBadgePermission: false,
     requestAlertPermission: false,
@@ -56,7 +56,7 @@ Future<FlutterLocalNotificationsPlugin?> initNotifications({
 
   await pluginInstance.initialize(
     initializationSettings,
-    onSelectNotification: onSelectNotification,
+    onDidReceiveNotificationResponse: onSelectNotification,
   );
 
   if (Platform.isIOS) {
@@ -144,7 +144,7 @@ Future showBackgroundServiceNotification({
 
   final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
-    iOS: IOSNotificationDetails(),
+    iOS: DarwinNotificationDetails(),
   );
 
   await pluginInstance.show(
@@ -235,7 +235,7 @@ Future showMessageNotification({
 
   final platformChannelSpecifics = NotificationDetails(
     android: androidPlatformChannelSpecifics,
-    iOS: IOSNotificationDetails(),
+    iOS: DarwinNotificationDetails(),
   );
 
   await pluginInstance.show(
@@ -322,7 +322,7 @@ Future showDebugNotification({
   String customMessage = 'Example Notification',
   FlutterLocalNotificationsPlugin? pluginInstance,
 }) async {
-  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
+  final iOSPlatformChannelSpecifics = DarwinNotificationDetails();
 
   final androidPlatformChannelSpecifics = AndroidNotificationDetails(
     Values.channel_id,
