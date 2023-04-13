@@ -1,17 +1,19 @@
 PODS:
+  - camera_avfoundation (0.0.1):
+    - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
     - ReachabilitySwift
   - device_info (0.0.1):
     - Flutter
-  - DKImagePickerController/Core (4.3.2):
+  - DKImagePickerController/Core (4.3.4):
     - DKImagePickerController/ImageDataManager
     - DKImagePickerController/Resource
-  - DKImagePickerController/ImageDataManager (4.3.2)
-  - DKImagePickerController/PhotoGallery (4.3.2):
+  - DKImagePickerController/ImageDataManager (4.3.4)
+  - DKImagePickerController/PhotoGallery (4.3.4):
     - DKImagePickerController/Core
     - DKPhotoGallery
-  - DKImagePickerController/Resource (4.3.2)
+  - DKImagePickerController/Resource (4.3.4)
   - DKPhotoGallery (0.0.17):
     - DKPhotoGallery/Core (= 0.0.17)
     - DKPhotoGallery/Model (= 0.0.17)
@@ -57,25 +59,25 @@ PODS:
   - FMDB/standard (2.7.5)
   - image_picker (0.0.1):
     - Flutter
-  - libwebp (1.2.1):
-    - libwebp/demux (= 1.2.1)
-    - libwebp/mux (= 1.2.1)
-    - libwebp/webp (= 1.2.1)
-  - libwebp/demux (1.2.1):
+  - libwebp (1.2.3):
+    - libwebp/demux (= 1.2.3)
+    - libwebp/mux (= 1.2.3)
+    - libwebp/webp (= 1.2.3)
+  - libwebp/demux (1.2.3):
     - libwebp/webp
-  - libwebp/mux (1.2.1):
+  - libwebp/mux (1.2.3):
     - libwebp/demux
-  - libwebp/webp (1.2.1)
+  - libwebp/webp (1.2.3)
   - local_image_provider (0.0.1):
     - Flutter
   - Mantle (2.2.0):
     - Mantle/extobjc (= 2.2.0)
   - Mantle/extobjc (2.2.0)
-  - OLMKit (3.1.0):
-    - OLMKit/olmc (= 3.1.0)
-    - OLMKit/olmcpp (= 3.1.0)
-  - OLMKit/olmc (3.1.0)
-  - OLMKit/olmcpp (3.1.0)
+  - OLMKit (3.2.12):
+    - OLMKit/olmc (= 3.2.12)
+    - OLMKit/olmcpp (= 3.2.12)
+  - OLMKit/olmc (3.2.12)
+  - OLMKit/olmcpp (3.2.12)
   - package_info (0.0.1):
     - Flutter
   - path_provider_ios (0.0.1):
@@ -83,12 +85,12 @@ PODS:
   - "permission_handler (5.1.0+2)":
     - Flutter
   - ReachabilitySwift (5.0.0)
-  - SDWebImage (5.10.0):
-    - SDWebImage/Core (= 5.10.0)
-  - SDWebImage/Core (5.10.0)
-  - SDWebImageWebPCoder (0.8.4):
+  - SDWebImage (5.13.4):
+    - SDWebImage/Core (= 5.13.4)
+  - SDWebImage/Core (5.13.4)
+  - SDWebImageWebPCoder (0.9.1):
     - libwebp (~> 1.0)
-    - SDWebImage/Core (~> 5.10)
+    - SDWebImage/Core (~> 5.13)
   - share_plus (0.0.1):
     - Flutter
   - shared_preferences_ios (0.0.1):
@@ -96,15 +98,15 @@ PODS:
   - sqflite (0.0.2):
     - Flutter
     - FMDB (>= 2.7.5)
-  - SQLCipher (4.5.1):
-    - SQLCipher/standard (= 4.5.1)
-  - SQLCipher/common (4.5.1)
-  - SQLCipher/standard (4.5.1):
+  - SQLCipher (4.5.2):
+    - SQLCipher/standard (= 4.5.2)
+  - SQLCipher/common (4.5.2)
+  - SQLCipher/standard (4.5.2):
     - SQLCipher/common
   - sqlcipher_flutter_libs (0.0.1):
     - Flutter
     - SQLCipher (~> 4.5.0)
-  - SwiftyGif (5.3.0)
+  - SwiftyGif (5.4.3)
   - uni_links (0.0.1):
     - Flutter
   - url_launcher_ios (0.0.1):
@@ -115,6 +117,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
@@ -154,6 +157,8 @@ SPEC REPOS:
     - SwiftyGif
 
 EXTERNAL SOURCES:
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/ios"
   device_info:
@@ -200,9 +205,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/workmanager/ios"
 
 SPEC CHECKSUMS:
+  camera_avfoundation: 07c77549ea54ad95d8581be86617c094a46280d9
   connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
-  DKImagePickerController: b5eb7f7a388e4643264105d648d01f727110fc3d
+  DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   emoji_picker_flutter: df19dac03a2b39ac667dc8d1da939ef3a9e21347
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
@@ -213,22 +219,22 @@ SPEC CHECKSUMS:
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_picker: 541dcbb3b9cf32d87eacbd957845d8651d6c62c3
-  libwebp: 98a37e597e40bfdb4c911fc98f2c53d0b12d05fc
+  libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   local_image_provider: 05b1af32561482c0ca5a440fbc7f489ad818c962
   Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
-  OLMKit: 4ee0159d63feeb86d836fdcfefe418e163511639
+  OLMKit: da115f16582e47626616874e20f7bb92222c7a51
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
-  SDWebImage: 9169792e9eec3e45bba2a0c02f74bf8bd922d1ee
-  SDWebImageWebPCoder: f93010f3f6c031e2f8fb3081ca4ee6966c539815
+  SDWebImage: e5cc87bf736e60f49592f307bdf9e157189298a3
+  SDWebImageWebPCoder: 18503de6621dd2c420d680e33d46bf8e1d5169b0
   share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
-  SQLCipher: 712e8416685e8e575b9b0706ffee71678b2fdcf8
+  SQLCipher: f5b4857434158b571a3ed3b10b3b43cd18ef5f67
   sqlcipher_flutter_libs: 87686ab669dda991b2f384e4bcbb04b93e19c8fe
-  SwiftyGif: e466e86c660d343357ab944a819a101c4127cb40
+  SwiftyGif: 6c3eafd0ce693cad58bb63d2b2fb9bacb8552780
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
   webview_flutter: 3603125dfd3bcbc9d8d418c3f80aeecf331c068b
