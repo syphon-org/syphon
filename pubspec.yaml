@@ -54,10 +54,10 @@ dependencies:
   redux_thunk: ^0.4.0
   redux_persist: ^0.9.0
   redux_persist_flutter: ^0.9.0
-  flutter_redux: ^0.8.2
+  flutter_redux: ^0.10.0
   mime: ^1.0.0
   path: ^1.8.0
-  path_provider: 2.0.9
+  path_provider: ^2.0.14
   package_info: ^2.0.0
 
   ### encryption
@@ -65,7 +65,7 @@ dependencies:
   crypto: ^3.0.1
   encrypt: ^5.0.0
   cryptography: ^2.0.5
-  canonical_json: 1.1.0
+  canonical_json: ^1.1.1
 
   ### cache/storage
   sembast: ^3.0.1
@@ -74,17 +74,17 @@ dependencies:
   sqflite_common_ffi: ^2.0.0
   sqlcipher_flutter_libs: ^0.5.1
   sqlcipher_library_windows: ^1.0.1
-  flutter_secure_storage: ^5.0.2
-  drift: ^1.0.0
+  flutter_secure_storage: ^8.0.0
+  drift: ^2.6.0
 
   ### services
   http: ^0.13.1
   html: ^0.15.0
   intl: ^0.17.0
-  connectivity_plus: ^2.0.2
+  connectivity_plus: ^3.0.4
   http_parser: ^4.0.0
   easy_localization: ^3.0.0
-  flutter_dotenv: ^4.0.0-nullsafety.0
+  flutter_dotenv: ^5.0.2
   android_alarm_manager_plus: ^2.0.3
   workmanager: 0.5.0 
   # background_fetch: 1.1.0
@@ -95,32 +95,32 @@ dependencies:
   swipeable: ^1.1.0
   cupertino_icons: ^1.0.2
   url_launcher: ^6.0.3
-  flutter_svg: ^0.22.0
+  flutter_svg: ^2.0.5
   flutter_keyboard_visibility: ^5.0.3
   flutter_markdown: ^0.6.6
   webview_flutter: ^2.0.13
   touchable_opacity: ^1.2.0
-  smooth_page_indicator: ^0.3.0-nullsafety.0
-  flutter_local_notifications: ^9.0.0
-  flutter_colorpicker: ^0.6.0
+  smooth_page_indicator: ^1.0.1
+  flutter_local_notifications: ^14.0.0-dev.2
+  flutter_colorpicker: ^1.0.3
   palette_generator: ^0.3.0
   emoji_picker_flutter: ^1.0.3
-  flutter_speed_dial: ^4.2.0
+  flutter_speed_dial: ^6.2.0
   fab_circular_menu: ^1.0.2
-  flutter_screen_lock: ^4.0.0
-  photo_view: 0.13.0
-  vector_math: 2.1.2
-  flutter_hooks: 0.18.4
-  font_awesome_flutter: 10.1.0
+  flutter_screen_lock: ^4.0.4 # TODO: this is very old
+  photo_view: ^0.14.0
+  vector_math: 2.1.4
+  flutter_hooks: ^0.18.6
+  font_awesome_flutter: ^10.4.0
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ## media
-  file_picker: ^4.1.1
+  file_picker: ^5.2.7
   image_picker: ^0.8.4
-  permission_handler: ^8.3.0
-  local_image_provider: 4.2.0 
-  flutter_image_compress: 1.1.0
-  share_plus: 4.0.3
+  permission_handler: ^10.2.0
+  local_image_provider: ^4.3.0 
+  flutter_image_compress: ^1.1.3
+  share_plus: ^6.3.2
 
   ### data
   uuid: ^3.0.4
@@ -135,10 +135,10 @@ dependencies:
 dev_dependencies:
   build_config: ^1.0.0
   build_runner: ^2.1.4
-  drift_dev: ^1.0.2
-  lint: ^1.5.3
+  drift_dev: ^2.6.0
+  lint: ^2.0.1
   json_serializable: ^6.1.3
-  flutter_launcher_icons: ^0.9.0
+  flutter_launcher_icons: ^0.13.0
   test: any
 
 # TODO: remove when similar functionality is merged

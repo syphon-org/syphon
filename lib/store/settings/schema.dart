@@ -7,7 +7,7 @@ import 'package:syphon/storage/converters.dart';
 /// Meant to store all setting state in _cold storage_
 ///
 class Settings extends Table {
-  TextColumn get id => text().customConstraint('UNIQUE')();
+  TextColumn get id => text().unique()();
   TextColumn get store => text().map(const MapToJsonConverter()).nullable()();
 
   @override

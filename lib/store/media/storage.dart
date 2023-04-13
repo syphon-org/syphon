@@ -35,7 +35,7 @@ extension MediaQueries on StorageDatabase {
   }
 
   Future<List<Media>> selectMedias(List<String?> mxcUris) {
-    return (select(medias)..where((tbl) => tbl.mxcUri.isIn(mxcUris))).get();
+    return (select(medias)..where((tbl) => tbl.mxcUri.isIn(mxcUris as Iterable<String>))).get();
   }
 
   Future<List<Media>> selectMediaAll() {

@@ -5,4 +5,4 @@ targets:
       drift_dev:
         options:
           generate_connect_constructor: true
-          compact_query_methods: true
+#          compact_query_methods: true
