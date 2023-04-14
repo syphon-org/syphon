@@ -9,25 +9,13 @@ class MessageToJsonConverter extends NullAwareTypeConverter<Message?, String> {
   const MessageToJsonConverter();
 
   @override
-  Message? mapToDart(String? fromDb) {
+  Message? requireFromSql(String fromDb) {
     return Message.fromJson(jsonDecode(fromDb ?? '{}') ?? {});
   }
 
   @override
-  String? mapToSql(Message? value) {
-    return json.encode(value);
-  }
-
-  @override
-  Message? requireFromSql(String fromDb) {
-    // TODO: implement requireFromSql
-    throw UnimplementedError();
-  }
-
-  @override
   String requireToSql(Message? value) {
-    // TODO: implement requireToSql
-    throw UnimplementedError();
+    return json.encode(value);
   }
 }
 
