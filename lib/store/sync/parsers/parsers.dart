@@ -570,8 +570,7 @@ class Sync {
 
       readReceiptsNew.forEach((key, value) {
         if (value.userReadsMapped!.containsKey(currentUser.userId)) {
-          final int readTimestamp =
-              int.parse(value.userReadsMapped![currentUser.userId]);
+          final int readTimestamp = value.userReadsMapped![currentUser.userId];
 
           if (readTimestamp > lastReadUpdated) {
             lastReadUpdated = readTimestamp;
