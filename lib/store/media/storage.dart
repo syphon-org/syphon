@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/storage/database.dart';
@@ -35,7 +36,8 @@ extension MediaQueries on StorageDatabase {
   }
 
   Future<List<Media>> selectMedias(List<String?> mxcUris) {
-    return (select(medias)..where((tbl) => tbl.mxcUri.isIn(List.from(mxcUris))))
+    return (select(medias)
+          ..where((tbl) => tbl.mxcUri.isIn(mxcUris.whereNotNull().toList())))
         .get();
   }
 
