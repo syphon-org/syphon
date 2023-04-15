@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId "org.tether.tether"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -68,9 +68,12 @@ android {
    buildTypes {
        release {
            signingConfig signingConfigs.release
+           resValue "string", "app_name", "Syphon"
        }
        debug {
             signingConfig signingConfigs.debug
+            resValue "string", "app_name", "Syphon Debug"
+            applicationIdSuffix ".debug"
         }
    }
     externalNativeBuild {

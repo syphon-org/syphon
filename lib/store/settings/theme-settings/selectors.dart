@@ -314,6 +314,17 @@ String selectMessageSizeString(MessageSize messageSize) {
   return enumToString(messageSize);
 }
 
+double selectMessageSizeDouble(MessageSize messageSize) {
+  switch (messageSize) {
+    case MessageSize.Small:
+      return 10;
+    case MessageSize.Large:
+      return 14;
+    default:
+      return 12;
+  }
+}
+
 String selectAvatarShapeString(AvatarShape avatarShape) {
   return enumToString(avatarShape);
 }

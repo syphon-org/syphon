@@ -9,7 +9,7 @@ import 'package:syphon/store/events/reactions/model.dart';
 @UseRowClass(Reaction)
 class Reactions extends Table {
   // Event Base Date
-  TextColumn get id => text().customConstraint('UNIQUE')();
+  TextColumn get id => text().unique()();
   TextColumn get roomId => text().nullable()();
   TextColumn get userId => text().nullable()();
   TextColumn get type => text().nullable()();

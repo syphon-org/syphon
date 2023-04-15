@@ -8,7 +8,7 @@ import 'package:drift/drift.dart';
 /// Meant to store all of crypto state in _cold storage_
 ///
 class MessageSessions extends Table {
-  TextColumn get id => text().customConstraint('UNIQUE')();
+  TextColumn get id => text().unique()();
 
   TextColumn get roomId => text()();
   IntColumn get index => integer()();

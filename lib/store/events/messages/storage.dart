@@ -72,8 +72,8 @@ extension MessageQueries on StorageDatabase {
   }) {
     return (select(messages)
           ..where((tbl) =>
-              tbl.roomId.equals(roomId) &
-              tbl.timestamp.isSmallerOrEqualValue(timestamp))
+              tbl.roomId.equals(roomId!) &
+              tbl.timestamp.isSmallerOrEqualValue(timestamp!))
           ..orderBy([
             (tbl) =>
                 OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
@@ -113,7 +113,7 @@ extension MessageQueries on StorageDatabase {
   }) {
     return (select(messages)
           ..where(
-            (tbl) => tbl.roomId.equals(roomId) & tbl.batch.equals(batch),
+            (tbl) => tbl.roomId.equals(roomId!) & tbl.batch.equals(batch!),
           ))
         .get();
   }
@@ -268,8 +268,8 @@ extension DecryptedQueries on StorageDatabase {
   }) {
     return (select(decrypted)
           ..where((tbl) =>
-              tbl.roomId.equals(roomId) &
-              tbl.timestamp.isSmallerOrEqualValue(timestamp))
+              tbl.roomId.equals(roomId!) &
+              tbl.timestamp.isSmallerOrEqualValue(timestamp!))
           ..orderBy([
             (tbl) =>
                 OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)

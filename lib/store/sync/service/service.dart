@@ -152,8 +152,9 @@ Future notificationJob() async {
 
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
-      onSelectNotification: (String? payload) {
-        log.threaded('[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload');
+      onSelectNotification: (NotificationResponse? payload) {
+        log.threaded(
+            '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload');
         return Future.value(true);
       },
     );
@@ -409,7 +410,7 @@ Future notificationSyncTEST() async {
   try {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
-      onSelectNotification: (String? payload) {
+      onSelectNotification: (NotificationResponse? payload) {
         log.threaded('[onSelectNotification] payload $payload');
         return Future.value(true);
       },

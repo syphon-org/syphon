@@ -46,6 +46,7 @@ class MessageWidget extends StatelessWidget {
     this.currentName,
     this.themeType = ThemeType.Light,
     this.fontSize = 14.0,
+    this.messageSize = 12.0,
     this.timeFormat = TimeFormat.hr12,
     this.color,
     this.luminance = 0.0,
@@ -67,6 +68,7 @@ class MessageWidget extends StatelessWidget {
 
   final int lastRead;
   final double fontSize;
+  final double messageSize;
   final TimeFormat timeFormat;
 
   final Color? color;
@@ -185,6 +187,7 @@ class MessageWidget extends StatelessWidget {
 
     var textColor = Colors.white;
     Color anchorColor = Colors.blue;
+    var backgroundColor = Theme.of(context).scaffoldBackgroundColor;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
     var luminance = this.luminance;
 
@@ -464,7 +467,7 @@ class MessageWidget extends StatelessWidget {
                                       child: Text(
                                         displayName ?? formatSender(message.sender!),
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: messageSize,
                                           color: textColor,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -529,18 +532,23 @@ class MessageWidget extends StatelessWidget {
                                             color: replyColor,
                                             borderRadius: const BorderRadius.only(
                                               //TODO: shape similar to bubbleBorder
-                                              topLeft: Radius.circular(4),
-                                              topRight: Radius.circular(4),
-                                              bottomLeft: Radius.circular(4),
-                                              bottomRight: Radius.circular(4),
+                                              topLeft: Radius.circular(12),
+                                              topRight: Radius.circular(12),
+                                              bottomLeft: Radius.circular(12),
+                                              bottomRight: Radius.circular(12),
                                             ),
                                           ),
                                           p: TextStyle(
                                             color: textColor,
                                             fontStyle: fontStyle,
                                             fontWeight: FontWeight.w300,
-                                            fontSize:
-                                                Theme.of(context).textTheme.subtitle2!.fontSize,
+                                            fontSize: messageSize,
+                                          ),
+                                          codeblockDecoration: ShapeDecoration(
+                                            color: backgroundColor,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -595,7 +603,7 @@ class MessageWidget extends StatelessWidget {
                                               child: Text(
                                                 status,
                                                 style: TextStyle(
-                                                  fontSize: 12,
+                                                  fontSize: messageSize,
                                                   color: textColor,
                                                   fontWeight: FontWeight.w100,
                                                 ),

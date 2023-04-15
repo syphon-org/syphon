@@ -12,7 +12,7 @@ class Messages extends Table {
   // TextColumn get id => text().clientDefault(() => _uuid.v4())();
 
   // event base data
-  TextColumn get id => text().customConstraint('UNIQUE')();
+  TextColumn get id => text().unique()();
   TextColumn get roomId => text().nullable()(); // TODO: index on roomId
   TextColumn get userId => text().nullable()();
   TextColumn get type => text().nullable()();
@@ -75,7 +75,7 @@ class Decrypted extends Table {
   // TextColumn get id => text().clientDefault(() => _uuid.v4())();
 
   // event base data
-  TextColumn get id => text().customConstraint('UNIQUE')();
+  TextColumn get id => text().unique()();
   TextColumn get roomId => text().nullable()(); // TODO: index on roomId
   TextColumn get userId => text().nullable()();
   TextColumn get type => text().nullable()();
