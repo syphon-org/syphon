@@ -213,6 +213,10 @@ class ChatInputState extends State<ChatInput> {
     store.dispatch(addInProgress());
   }
 
+  onAddAudioRecording(){
+
+  }
+
   onAddPhoto() async {
     // TODO: has bug with file path
     // final pickerResult = await ImagePicker().pickImage(
@@ -648,7 +652,9 @@ class ChatInputState extends State<ChatInput> {
                           },
                         ),
                       ),
-                      Row(children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
                         Padding(
                           padding: EdgeInsets.only(right: 2),
                           child: MediaCard(
@@ -687,6 +693,14 @@ class ChatInputState extends State<ChatInput> {
                             text: Strings.buttonLocation,
                             icon: Icons.near_me_rounded,
                             onPress: () => onAddInProgress(),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          child: MediaCard(
+                            text: Strings.buttonAudio,
+                            icon: Icons.mic,
+                            onPress: () => onAddAudioRecording(),
                           ),
                         ),
                       ])

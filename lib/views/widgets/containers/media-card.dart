@@ -27,7 +27,7 @@ class MediaCard extends StatelessWidget {
           onTap: disabled ? null : () => onPress(),
           onLongPress: disabled ? null : () => onPress(),
           child: Container(
-            width: 76,
+            width: 62,
             padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -36,7 +36,7 @@ class MediaCard extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: 8, top: 8),
                   child: Icon(
                     icon,
-                    size: 39,
+                    size: 35,
                     color: Colors.white,
                   ),
                 ),
@@ -46,6 +46,7 @@ class MediaCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.button?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w400,
+                    fontSize: 13
                       ),
                 ),
               ],

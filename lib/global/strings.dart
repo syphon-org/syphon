@@ -365,6 +365,7 @@ class Strings {
   static final buttonFile = tr('button-file');
   static final buttonContact = tr('button-contact');
   static final buttonLocation = tr('button-location');
+  static final buttonAudio = tr('button-audio');
 
   // Placeholders
   static final placeholderTopic = tr('placeholder-topic');
