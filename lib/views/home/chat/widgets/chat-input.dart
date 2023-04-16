@@ -294,7 +294,7 @@ class ChatInputState extends State<ChatInput> {
       final imageWidth = width * 0.48; // 2 images in view
 
       // dynamic dimensions
-      final double messageInputWidth = width - 72;
+      final double messageInputWidth = width - 112;
       final bool replying = widget.quotable != null && widget.quotable!.sender != null;
       final bool loading = widget.sending;
       final double maxInputHeight = replying ? height * 0.45 : height * 0.65;
@@ -346,6 +346,23 @@ class ChatInputState extends State<ChatInput> {
         ),
       );
 
+      final takePictureButton = Semantics(
+        button: true,
+        enabled: true,
+        // label: Strings.labelSendUnencrypted,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(48),
+          onTap:(){
+            // print("Hi");
+            openCamera();
+          },
+          child: CircleAvatar(
+            backgroundColor: sendButtonColor,
+            child: Icon(Icons.camera_alt, color: Colors.white,),
+          ),
+        ),
+      );
+
       if (widget.mediumType == MediumType.encryption) {
         sendButton = Semantics(
           button: true,
@@ -370,44 +387,27 @@ class ChatInputState extends State<ChatInput> {
         );
       }
 
-          final takePictureButton = Semantics(
-            button: true,
-            enabled: true,
-            // label: Strings.labelSendUnencrypted,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(48),
-              onTap:(){
-                // print("Hi");
-                openCamera();
-              },
-              child: CircleAvatar(
-                backgroundColor: sendButtonColor,
-                child: Icon(Icons.camera_alt, color: Colors.white,),
+      if (loading) {
+        sendButton = Semantics(
+          button: true,
+          enabled: true,
+          label: Strings.labelSendEncrypted,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(48),
+            onLongPress: widget.onChangeMethod as void Function()?,
+            onTap: widget.sending || !isSendable ? null : onSubmit,
+            child: CircleAvatar(
+              backgroundColor: sendButtonColor,
+              child: Container(
+                margin: EdgeInsets.only(left: 2, top: 3),
+                child: SvgPicture.asset(
+                  Assets.iconSendLockSolidBeing,
+                  color: Colors.white,
+                  semanticsLabel: Strings.labelSendEncrypted,
+                ),
               ),
             ),
-          );
-
-          if (widget.mediumType == MediumType.encryption) {
-            sendButton = Semantics(
-              button: true,
-              enabled: true,
-              label: Strings.labelSendEncrypted,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(48),
-                onLongPress: widget.onChangeMethod as void Function()?,
-                onTap: loading || !isSendable ? null : onSubmit,
-                child: CircleAvatar(
-                  backgroundColor: sendButtonColor,
-                  child: Container(
-                    margin: EdgeInsets.only(left: 2, top: 3),
-                    child: SvgPicture.asset(
-                      Assets.iconSendLockSolidBeing,
-                      color: Colors.white,
-                      semanticsLabel: Strings.labelSendEncrypted,
-                    ),
-                  ),
-              ),
-            ),
+          ),
         );
       }
 
@@ -514,12 +514,13 @@ class ChatInputState extends State<ChatInput> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               IconButton(
-                  onPressed: () {
-                    setState(() {
-                      emojiShowing = !emojiShowing;
-                    });
-                  },
-                  icon: Icon(emojiShowing ? Icons.keyboard : Icons.emoji_emotions)),
+                onPressed: () {
+                  setState(() {
+                    emojiShowing = !emojiShowing;
+                  });
+                },
+                icon: Icon(emojiShowing ? Icons.keyboard : Icons.emoji_emotions),
+              ),
               Container(
                 constraints: BoxConstraints(
                   maxHeight: maxInputHeight,
@@ -545,7 +546,7 @@ class ChatInputState extends State<ChatInput> {
                     Visibility(
                       visible: !widget.editing,
                       child: SizedBox(
-                        width: width - 120,
+                        width: showAttachments ? width - 160 : width,
                         child: TextField(
                           maxLines: null,
                           autocorrect: props.autocorrectEnabled,
@@ -610,6 +611,14 @@ class ChatInputState extends State<ChatInput> {
                   ],
                 ),
               ),
+              Visibility(
+                visible: showAttachments,
+                child: Container(
+                  width: Dimensions.buttonSendSize,
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: takePictureButton,
+                ),
+              ),
               Container(
                 width: Dimensions.buttonSendSize,
                 padding: EdgeInsets.symmetric(vertical: 4),
@@ -617,7 +626,6 @@ class ChatInputState extends State<ChatInput> {
               ),
             ],
           ),
-
           Offstage(
             offstage: !emojiShowing,
             child: SizedBox(
@@ -648,7 +656,6 @@ class ChatInputState extends State<ChatInput> {
                       buttonMode: ButtonMode.CUPERTINO)),
             ),
           ),
-
           //////// MEDIA FIELD ////////
           Visibility(
             visible: showAttachments,
@@ -669,104 +676,60 @@ class ChatInputState extends State<ChatInput> {
                       maxWidth: width,
                       maxHeight: imageHeight, // HACK: figure out why it overflows on Nexus 5x
                     ),
-                    child: Stack(
-                      children: [
-                        Visibility(
-                          visible: widget.editing,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ButtonText(
-                                text: Strings.buttonSaveMessageEdit,
-                                size: 18.0,
-                                disabled: widget.sending || !isSendable,
-                                onPressed: () => onSubmit(),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Visibility(
-                          visible: !widget.editing,
-                          child: SizedBox(
-                            width: showAttachments ? width - 120 : width,
-                            child: TextField(
-                              maxLines: null,
-                              autocorrect: props.autocorrectEnabled,
-                              enableSuggestions: props.suggestionsEnabled,
-                              textCapitalization: props.textCapitalization,
-                              keyboardType: TextInputType.multiline,
-                              textInputAction:
-                                  widget.enterSend ? TextInputAction.send : TextInputAction.newline,
-                              cursorColor: props.inputCursorColor,
-                              focusNode: widget.focusNode,
-                              controller: widget.controller,
-                              onChanged: (text) => onUpdate(text, props: props),
-                              onSubmitted: !isSendable ? null : (text) => onSubmit(),
-                              style: TextStyle(
-                                height: 1.5,
-                                color: props.inputTextColor,
-                              ),
-                              decoration: InputDecoration(
-                                filled: true,
-                                hintText: hintText,
-                                suffixIcon: Visibility(
-                                  visible: isSendable,
-                                  child: IconButton(
-                                    color: Theme.of(context).iconTheme.color,
-                                    onPressed: () => onToggleMediaOptions(),
-                                    icon: Icon(
-                                      Icons.add,
-                                      size: Dimensions.iconSizeLarge,
-                                    ),
-                                  ),
-                                ),
-                                fillColor: props.inputColorBackground,
-                                contentPadding: Dimensions.inputContentPadding,
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.secondary,
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                      topRight:
-                                          Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                      bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                      bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                    )),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.secondary,
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                      topRight:
-                                          Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                      bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                      bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                    )),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: ListLocalImages(
+                      imageSize: imageWidth,
+                      onSelectImage: (file) {
+                        widget.onAddMedia(
+                          file: file,
+                          type: MessageType.image,
+                        );
+
+                        onToggleMediaOptions();
+                      },
                     ),
                   ),
-                  Visibility(
-                    visible: showAttachments,
-                    child: Container(
-                      width: Dimensions.buttonSendSize,
-                      padding: EdgeInsets.symmetric(vertical: 4),
-                      child: takePictureButton,
+                  Row(children: [
+                    Padding(
+                      padding: EdgeInsets.only(right: 2),
+                      child: MediaCard(
+                        text: Strings.buttonGallery,
+                        icon: Icons.photo,
+                        onPress: () async{
+                          const photosPermission = Permission.photos;
+                          final status = await photosPermission.status;
+                          if(!status.isGranted){
+                            showDialogForPhotoPermission(context);
+                          }else{
+                            onAddPhoto();
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  Container(
-                    width: Dimensions.buttonSendSize,
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: sendButton,
-                  ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: MediaCard(
+                        text: Strings.buttonFile,
+                        icon: Icons.note_add,
+                        onPress: () => onAddInProgress(),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: MediaCard(
+                        text: Strings.buttonContact,
+                        icon: Icons.person,
+                        onPress: () => onAddInProgress(),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 2),
+                      child: MediaCard(
+                        text: Strings.buttonLocation,
+                        icon: Icons.near_me_rounded,
+                        onPress: () => onAddInProgress(),
+                      ),
+                    ),
+                  ])
                 ],
               ),
             ),
@@ -822,4 +785,6 @@ class _Props extends Equatable {
     ),
   );
 }
+
+
 
