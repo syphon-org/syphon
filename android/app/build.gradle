@@ -57,19 +57,19 @@ android {
         }
     }
 
-//    signingConfigs {
-//       release {
-//           keyAlias keystoreProperties['keyAlias']
-//           keyPassword keystoreProperties['keyPassword']
-//           storeFile file(keystoreProperties['storeFile'])
-//           storePassword keystoreProperties['storePassword']
-//       }
-//   }
+    signingConfigs {
+       release {
+           keyAlias keystoreProperties['keyAlias']
+           keyPassword keystoreProperties['keyPassword']
+           storeFile file(keystoreProperties['storeFile'])
+           storePassword keystoreProperties['storePassword']
+       }
+   }
    buildTypes {
-//       release {
-//           signingConfig signingConfigs.release
-//           resValue "string", "app_name", "Syphon"
-//       }
+       release {
+           signingConfig signingConfigs.release
+           resValue "string", "app_name", "Syphon"
+       }
        debug {
             signingConfig signingConfigs.debug
             resValue "string", "app_name", "Syphon Debug"
