@@ -11,7 +11,7 @@ class Users extends Table {
   // break
 
   // TODO: rename User model to id instead of userId
-  TextColumn get userId => text().named('id').customConstraint('UNIQUE')();
+  TextColumn get userId => text().named('id').unique()();
   TextColumn get deviceId => text().nullable()(); // current device ID for auth
   TextColumn get idserver => text().nullable()();
   TextColumn get homeserver => text().nullable()();

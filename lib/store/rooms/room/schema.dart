@@ -5,16 +5,16 @@ import 'package:syphon/storage/converters.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 
-class MessageToJsonConverter extends TypeConverter<Message?, String> {
+class MessageToJsonConverter extends NullAwareTypeConverter<Message?, String> {
   const MessageToJsonConverter();
 
   @override
-  Message? mapToDart(String? fromDb) {
+  Message? requireFromSql(String fromDb) {
     return Message.fromJson(jsonDecode(fromDb ?? '{}') ?? {});
   }
 
   @override
-  String? mapToSql(Message? value) {
+  String requireToSql(Message? value) {
     return json.encode(value);
   }
 }
@@ -28,7 +28,7 @@ class MessageToJsonConverter extends TypeConverter<Message?, String> {
 class Rooms extends Table {
   // TextColumn get id => text().clientDefault(() => _uuid.v4())();
 
-  TextColumn get id => text().customConstraint('UNIQUE')();
+  TextColumn get id => text().unique()();
   TextColumn get name => text().nullable()();
   TextColumn get alias => text().nullable()();
   TextColumn get homeserver => text().nullable()();

@@ -189,8 +189,8 @@ Future<List<dynamic>> decryptSessionKeys({
     ).getUint32(0, Endian.big);
 
     // for debugging only
-    if (DEBUG_MODE) {
-      log.json({
+    if (DEBUG_MODE && DEBUG_OLM_MODE) {
+      log.jsonDebug({
         'version': version,
         'salt': base64.encode(salt),
         'iv': ivFormatted,

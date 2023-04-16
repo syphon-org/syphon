@@ -4,16 +4,16 @@ import 'package:drift/drift.dart';
 import 'package:syphon/store/media/encryption.dart';
 import 'package:syphon/store/media/model.dart';
 
-class EncryptInfoToJsonConverter extends TypeConverter<EncryptInfo?, String> {
+class EncryptInfoToJsonConverter extends NullAwareTypeConverter<EncryptInfo?, String> {
   const EncryptInfoToJsonConverter();
 
   @override
-  EncryptInfo? mapToDart(String? fromDb) {
+  EncryptInfo? requireFromSql(String fromDb) {
     return EncryptInfo.fromJson(json.decode(fromDb ?? '{}') ?? {});
   }
 
   @override
-  String? mapToSql(EncryptInfo? value) {
+  String requireToSql(EncryptInfo? value) {
     return json.encode(value);
   }
 }
@@ -25,7 +25,7 @@ class EncryptInfoToJsonConverter extends TypeConverter<EncryptInfo?, String> {
 ///
 @UseRowClass(Media)
 class Medias extends Table {
-  TextColumn get mxcUri => text().customConstraint('UNIQUE')();
+  TextColumn get mxcUri => text().unique()();
   BlobColumn get data => blob().nullable()();
   TextColumn get type => text().nullable()();
   TextColumn get info => text().map(const EncryptInfoToJsonConverter()).nullable()();

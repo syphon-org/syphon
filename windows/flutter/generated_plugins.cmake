@@ -3,8 +3,12 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  connectivity_plus_windows
+  connectivity_plus
+  emoji_picker_flutter
   flutter_secure_storage_windows
+  permission_handler_windows
+  share_plus
+  sqlcipher_flutter_libs
   url_launcher_windows
 )
 

@@ -67,4 +67,5 @@ class log {
   static threaded(String content, {String? title}) => _printThreaded(content, title: title);
   static release(String content, {String? title}) => _printRelease(content, title: title);
   static json(Map? json) => _printJson(json);
+  static jsonDebug(Map? json) => _printJson(json);
 }

@@ -161,7 +161,7 @@ Future notificationJob() async {
 
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
-      onSelectNotification: (String? payload) {
+      onSelectNotification: (NotificationResponse? payload) {
         log.threaded(
             '[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload');
         return Future.value(true);
@@ -274,51 +274,25 @@ Future backgroundSync({
     await Future.forEach(roomsJson.keys, (String roomId) async {
       final roomJson = roomsJson[roomId];
 
-      // Don't parse room if there are no message events found
-      final events = parseEvents(roomJson);
+      final currentRoom = Room(id: roomId);
+      final currentUser = User(userId: currentUserId);
 
-      // TODO: use the same parsing methods across threads
-      // final sync = parseSync(
-      //   roomJson,
-      //   Room(id: roomId),
-      //   User(userId: currentUserId),
-      //   lastSince,
-      //   [], // existing ids
-      //   ignoreMessageless: true,
-      // );
-      // final room = sync.room;
+      // TODO: QA extensively
+      final sync = parseSync(
+        json: roomJson,
+        lastSince: lastSince,
+        currentRoom: currentRoom,
+        currentUser: currentUser,
+        currentMessageIds: [], // existing ids
+        ignoreMessageless: true,
+      );
 
-      if (events.messages.isEmpty) {
+      if (sync.events.messages.isEmpty) {
         return;
       }
 
-      final currentRoom = Room(id: roomId);
-      final currentUser = User(userId: currentUserId);
-      final details = parseDetails(
-        roomJson,
-      );
-
-      final stateDetails = parseState(
-        currentUser: currentUser,
-        events: events.state,
-        room: currentRoom,
-      );
-
-      final messageDetails = parseMessages(
-        existingIds: [],
-        room: currentRoom,
-        messages: events.messages,
-        prevBatch: details.prevBatch,
-      );
-
-      final room = currentRoom.fromSync(
-        lastSince: lastSince,
-        accountData: SyncAccountData(),
-        stateDetails: stateDetails,
-        messageDetails: messageDetails,
-        ephemerals: SyncEphemerals(),
-        syncDetails: details,
-      );
+      final room = sync.room;
+      final events = sync.events;
 
       final chatOptions = settings.notificationOptions;
       final hasOptions = chatOptions.containsKey(roomId);
@@ -447,7 +421,7 @@ Future notificationSyncTEST() async {
   try {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
-      onSelectNotification: (String? payload) {
+      onSelectNotification: (NotificationResponse? payload) {
         log.threaded('[onSelectNotification] payload $payload');
         return Future.value(true);
       },

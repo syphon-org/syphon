@@ -6,6 +6,6 @@ enum TimeFormat {
 
 enum ReadReceiptTypes {
   Off,
-  Hidden,
+  Private,
   On,
 }

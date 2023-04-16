@@ -8,6 +8,7 @@ import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/libs/matrix/encryption.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/alerts/actions.dart';
 import 'package:syphon/store/crypto/events/actions.dart';
 import 'package:syphon/store/crypto/keys/actions.dart';
@@ -154,11 +155,21 @@ ThunkAction<AppState> updateKeySessions({
   return (Store<AppState> store) async {
     try {
       // Fetch and save any new user device keys for the room
-      final roomUsersDeviceKeys = await store.dispatch(
-        fetchDeviceKeys(userIds: room.userIds),
+      final deviceKeysRoomUsers = Map<String, Map<String, DeviceKey>>.from(
+        await store.dispatch(
+          fetchDeviceKeys(userIds: room.userIds),
+        ),
       );
 
-      store.dispatch(setDeviceKeys(roomUsersDeviceKeys));
+      if (DEBUG_MODE && DEBUG_OLM_MODE) {
+        log.jsonDebug({'updateKeySessions': 'HIT'});
+      }
+
+      store.dispatch(setDeviceKeys(deviceKeysRoomUsers));
+
+      if (DEBUG_MODE && DEBUG_OLM_MODE) {
+        log.jsonDebug({'updateKeySessions': 'SET'});
+      }
 
       // get deviceKeys for every user present in the chat
       final devicesWithoutMessageSessions = filterDevicesWithoutMessageSessions(
@@ -167,7 +178,9 @@ ThunkAction<AppState> updateKeySessions({
       );
 
       if (devicesWithoutMessageSessions.isEmpty) {
-        log.info('[updateKeySessions] all device sessions have a message session for room');
+        log.info(
+          '[updateKeySessions] all device sessions have a message session for room',
+        );
         return;
       }
 
@@ -242,8 +255,11 @@ ThunkAction<AppState> updateKeySessions({
         },
       ));
     } catch (error) {
-      store
-          .dispatch(addAlert(origin: 'updateKeySessions', message: error.toString(), error: error));
+      store.dispatch(addAlert(
+        origin: 'updateKeySessions',
+        message: error.toString(),
+        error: error,
+      ));
     }
   };
 }

@@ -1,33 +1,44 @@
+// ignore_for_file: unnecessary_this
+
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/model.dart';
 import 'package:syphon/store/events/reactions/model.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/events/redaction/model.dart';
 import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/settings/chat-settings/model.dart';
 import 'package:syphon/store/sync/selectors.dart';
 import 'package:syphon/store/user/model.dart';
 
-class Sync {
-  final Room room;
-  final SyncEvents events;
-  final Map<String, User> users;
-  final Map<String, Receipt> readReceipts;
+class SyncDetails {
   final bool? leave;
-  final bool? overwrite; // TODO: remove - stops loading limited timeline
+  // TODO: clear messages if limited was explicitly false from parsed json
+  final bool? overwrite;
+  final String? currBatch;
+  final String? prevBatch;
 
-  const Sync({
-    required this.room,
-    required this.events,
-    this.readReceipts = const {},
-    this.users = const {},
+  const SyncDetails({
     this.leave,
     this.overwrite,
+    this.currBatch,
+    this.prevBatch,
   });
+
+  SyncDetails copyWith({
+    bool? leave,
+    bool? overwrite,
+    String? currBatch,
+    String? prevBatch,
+  }) =>
+      SyncDetails(
+        leave: leave ?? this.leave,
+        overwrite: overwrite ?? this.overwrite,
+        currBatch: currBatch ?? this.currBatch,
+      );
 }
 
 class SyncEvents {
@@ -48,196 +59,633 @@ class SyncEvents {
   });
 }
 
-class SyncDetails {
-  final bool? invite;
-  final bool? limited;
-  final bool? overwrite;
-  final int? totalMembers;
-  final String? currBatch; // current batch, if known from fetchMessages
-  final String? lastBatch;
-  final String? prevBatch;
+class Sync {
+  final Room room;
+  final SyncEvents events;
+  final SyncDetails details;
+  final Map<String, User> users;
+  final Map<String, Receipt> readReceipts;
 
-  const SyncDetails({
-    this.invite,
-    this.limited,
-    this.overwrite,
-    this.currBatch,
-    this.lastBatch,
-    this.prevBatch,
-    this.totalMembers,
-  });
-}
-
-class SyncMessageDetails {
-  final bool? limited;
-  final bool? encryptionEnabled;
-  final int? lastUpdate;
-
-  const SyncMessageDetails({
-    this.limited,
-    this.encryptionEnabled,
-    this.lastUpdate,
-  });
-}
-
-class SyncStateDetails {
-  final String? name;
-  final String? avatarUri;
-  final String? topic;
-  final String? joinRule;
-  final bool? encryptionEnabled;
-  final bool? direct;
-  final int? lastUpdate;
-  final int? namePriority;
-  final Map<String, User>? users;
-  final Set<String>? userIds;
-  final bool? leave;
-
-  const SyncStateDetails({
-    this.name,
-    this.avatarUri,
-    this.topic,
-    this.joinRule,
-    this.encryptionEnabled,
-    this.direct,
-    this.lastUpdate,
-    this.namePriority,
-    this.users,
-    this.userIds,
-    this.leave,
-  });
-}
-
-class SyncAccountData {
-  final bool? direct;
-
-  const SyncAccountData({
-    this.direct,
-  });
-}
-
-class SyncEphemerals {
-  final int lastRead;
-  final bool userTyping;
-  final List<String> usersTyping;
-  final Map<String, Receipt> readReceipts; // eventId indexed
-
-  const SyncEphemerals({
-    this.lastRead = 0,
-    this.userTyping = false,
-    this.usersTyping = const [],
+  const Sync({
+    required this.room,
+    this.events = const SyncEvents(),
+    this.details = const SyncDetails(),
     this.readReceipts = const {},
+    this.users = const {},
   });
+
+  Sync copyWith({
+    Room? room,
+    SyncEvents? events,
+    SyncDetails? details,
+    Map<String, User>? users,
+    Map<String, Receipt>? readReceipts,
+  }) =>
+      Sync(
+        room: room ?? this.room,
+        events: events ?? this.events,
+        users: users ?? this.users,
+        readReceipts: readReceipts ?? this.readReceipts,
+      );
+
+  ///
+  /// Parse Details
+  ///
+  /// Parsed details about new timeline
+  /// and batch information
+  ///
+  Sync parseDetails(Map<String, dynamic> json, String? lastSince) {
+    bool? invite;
+    bool? limited;
+    bool? overwrite;
+    int? totalMembers;
+
+    // oldest batch in timeline
+    String? lastBatch; // oldest batch in timeline
+    // most recent batch from the last /sync
+    String? prevBatch;
+    // current batch - or current lastSince - in the timeline
+    String? currBatch;
+
+    if (json['overwrite'] != null) {
+      overwrite = json['overwrite'];
+    }
+
+    if (json['invite_state'] != null) {
+      invite = true;
+    }
+
+    if (json['timeline'] != null) {
+      limited = json['timeline']['limited'];
+      lastBatch = json['timeline']['last_batch'];
+      currBatch = json['timeline']['curr_batch'];
+      prevBatch = json['timeline']['prev_batch'];
+    }
+
+    if (json['summary'] != null) {
+      totalMembers = json['summary']['m.joined_member_count'];
+    }
+
+    return this.copyWith(
+      room: room.copyWith(
+        invite: invite,
+        limited: limited,
+        totalJoinedUsers: totalMembers,
+        lastBatch: lastBatch ?? room.lastBatch ?? prevBatch,
+        nextBatch: currBatch ?? lastSince,
+      ),
+      details: SyncDetails(
+        overwrite: overwrite,
+        currBatch: currBatch,
+        prevBatch: prevBatch,
+      ),
+    );
+  }
+
+  ///
+  /// Parse Events
+  ///
+  /// Consider assigning roomId to a message at the cold storage layer
+  /// there's several areas we could want the message roomId independent of
+  /// the room itself. Relatively safe to remove from the message object
+  /// if the message class in terms of cruft or for performance.
+  ///
+  Sync parseEvents(Map<String, dynamic> json) {
+    final roomId = room.id;
+
+    List<Event> stateEvents = [];
+    List<Event> accountEvents = [];
+    List<Event> ephemeralEvents = [];
+    final List<Message> messageEvents = [];
+    final List<Reaction> reactionEvents = [];
+    final List<Redaction> redactionEvents = [];
+
+    if (json['state'] != null) {
+      final List<dynamic> stateEventsRaw = json['state']['events'];
+
+      stateEvents = stateEventsRaw
+          .map((event) => Event.fromMatrix(event, roomId: roomId))
+          .toList();
+    }
+
+    if (json['invite_state'] != null) {
+      final List<dynamic> stateEventsRaw = json['invite_state']['events'];
+
+      stateEvents = stateEventsRaw
+          .map((event) => Event.fromMatrix(event, roomId: roomId))
+          .toList();
+    }
+
+    if (json['account_data'] != null) {
+      final List<dynamic> accountEventsRaw = json['account_data']['events'];
+
+      accountEvents = accountEventsRaw
+          .map((event) => Event.fromMatrix(event, roomId: roomId))
+          .toList();
+    }
+
+    if (json['ephemeral'] != null) {
+      final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
+
+      ephemeralEvents = ephemeralEventsRaw
+          .map((event) => Event.fromMatrix(event, roomId: roomId))
+          .toList();
+    }
+
+    if (json['timeline'] != null) {
+      final List<dynamic> timelineEventsRaw = json['timeline']['events'];
+
+      final List<Event> timelineEvents = List.from(
+        timelineEventsRaw.map(
+          (event) => Event.fromMatrix(
+            event,
+            roomId: roomId,
+            currBatch: details.currBatch,
+            prevBatch: room.prevBatch,
+          ),
+        ),
+      );
+
+      for (final Event event in timelineEvents) {
+        switch (event.type) {
+          case EventTypes.message:
+          case EventTypes.encrypted:
+            messageEvents.add(Message.fromEvent(event));
+            break;
+          case EventTypes.reaction:
+            reactionEvents.add(Reaction.fromEvent(event));
+            break;
+          case EventTypes.redaction:
+            redactionEvents.add(Redaction.fromEvent(event));
+            break;
+          default:
+            stateEvents.add(event);
+            break;
+        }
+      }
+    }
+
+    return this.copyWith(
+      events: SyncEvents(
+        state: stateEvents,
+        account: accountEvents,
+        ephemeral: ephemeralEvents,
+        redactions: redactionEvents,
+        reactions: reactionEvents,
+        messages: messageEvents,
+      ),
+    );
+  }
+
+  ///
+  /// Parse Account Data
+  ///
+  /// Mostly used to assign is_direct
+  Sync parseAccountData() {
+    bool? isDirectNew;
+
+    try {
+      for (final event in events.account) {
+        switch (event.type) {
+          case 'm.direct':
+            isDirectNew = true;
+            break;
+          default:
+            break;
+        }
+      }
+    } catch (error) {
+      // ignore error processing
+    }
+
+    return this.copyWith(
+      room: room.copyWith(
+        direct: isDirectNew,
+      ),
+    );
+  }
+
+  ///
+  /// Parse Room State
+  ///
+  /// Find details of room based on state events
+  /// follows spec naming priority and thumbnail downloading
+  ///
+  /// NOTE: purposefully have not abstracted event names
+  /// it's good to know exactly what you're matching against
+  /// in the spec for research and comparison
+  ///
+  Sync parseState(User currentUser) {
+    bool? directNew;
+    String? topicNew;
+    int? lastUpdateNew;
+    String? joinRuleNew;
+    String? roomNameNew;
+    String? avatarUriNew;
+    bool? encryptionEnabledNew;
+
+    int? leaveTimestamp;
+
+    final usersAdd = <String, User>{};
+    final Set<String> userIdsRemove = {};
+    final Set<String> userIdsNew = Set.from(room.userIds);
+
+    int namePriority = room.namePriority;
+
+    for (final event in events.state) {
+      try {
+        // TODO: enable when setting is available
+        // if (lastUpdateType == LastUpdateType.State) {
+        //   final timestamp = event.timestamp;
+        //   lastUpdateNew = timestamp > room.lastUpdate ? timestamp : room.lastUpdate;
+        // }
+
+        switch (event.type) {
+          case 'm.room.name':
+            if (namePriority > 0) {
+              namePriority = 1;
+              roomNameNew = event.content['name'];
+            }
+            break;
+          case 'm.room.topic':
+            topicNew = event.content['topic'];
+            break;
+
+          case 'm.room.join_rules':
+            joinRuleNew = event.content['join_rule'];
+            break;
+
+          case 'm.room.canonical_alias':
+            if (namePriority > 2) {
+              namePriority = 2;
+              roomNameNew = event.content['alias'];
+            }
+            break;
+          case 'm.room.aliases':
+            if (namePriority > 3) {
+              namePriority = 3;
+              roomNameNew = event.content['aliases'][0];
+            }
+            break;
+          case 'm.room.avatar':
+            if (avatarUriNew == null) {
+              avatarUriNew = event.content['url'];
+            }
+            break;
+
+          case 'm.room.member':
+            final membership = event.content['membership'];
+            final displayName = event.content['displayname'];
+            final memberAvatarUri = event.content['avatar_url'];
+
+            // set direct new if it hasn't been set
+            directNew = directNew ?? event.content['is_direct'];
+
+            // Cache user to rooms user cache if not present
+            if (!usersAdd.containsKey(event.stateKey)) {
+              usersAdd[event.stateKey!] = User(
+                userId: event.stateKey,
+                displayName: displayName,
+                avatarUri: memberAvatarUri,
+              );
+            }
+
+            switch (membership) {
+              case 'join':
+                if (event.stateKey == currentUser.userId) {
+                  leaveTimestamp = null;
+                }
+                break;
+              case 'ban':
+              case 'leave':
+                userIdsRemove.add(event.stateKey!);
+
+                if (event.stateKey == currentUser.userId) {
+                  leaveTimestamp = event.timestamp;
+                }
+                break;
+              default:
+                break;
+            }
+
+            break;
+          case 'm.room.encryption':
+            encryptionEnabledNew = true;
+            break;
+          case 'm.room.encrypted':
+            break;
+          default:
+            break;
+        }
+      } catch (error) {
+        log.error('[parseState] $error ${event.type}');
+      }
+    }
+
+    final isDirect = directNew ?? room.direct;
+    userIdsNew.addAll(usersAdd.keys);
+    userIdsNew.removeWhere((id) => userIdsRemove.contains(id));
+
+    // generate direct message room names without a explicitly set name
+    if (isDirect) {
+      // checks to make sure someone didn't name the room after the authed user
+      final badRoomName = roomNameNew != null &&
+          currentUser.userId != null &&
+          (roomNameNew == currentUser.displayName ||
+              roomNameNew == currentUser.userId);
+
+      final isNameDefault = namePriority == 4 && usersAdd.isNotEmpty;
+
+      if (badRoomName || isNameDefault) {
+        // Filter out number of non current users to show preview of total
+        final otherUsers = usersAdd.values.where(
+          (user) => user.userId != currentUser.userId,
+        );
+
+        if (otherUsers.isNotEmpty) {
+          roomNameNew =
+              selectDirectRoomName(currentUser, otherUsers, userIdsNew.length);
+          avatarUriNew = selectDirectRoomAvatar(room, avatarUriNew, otherUsers);
+        }
+      }
+    }
+
+    return this.copyWith(
+      details: details.copyWith(leave: leaveTimestamp != null),
+      users: usersAdd.isNotEmpty ? usersAdd : null,
+      room: room.copyWith(
+        name: roomNameNew,
+        topic: topicNew,
+        direct: directNew,
+        avatarUri: avatarUriNew,
+        joinRule: joinRuleNew,
+        namePriority: namePriority,
+        lastUpdate: lastUpdateNew,
+        encryptionEnabled: encryptionEnabledNew,
+        // TODO: extract to pivot table for userIds associated by room
+        userIds: userIdsNew.toList(),
+      ),
+    );
+  }
+
+  ///
+  /// Parse Room Messages
+  ///
+  /// parses metadata for room from message metadata
+  ///
+  Sync parseMessages(List<String> currentMessageIds) {
+    final messages = events.messages;
+
+    try {
+      bool? limitedNew;
+      int? lastUpdateNew;
+
+      // Converting only message events
+      final hasEncrypted = messages.firstWhereOrNull(
+        (msg) => msg.type == EventTypes.encrypted,
+      );
+
+      // See if the newest message has a greater timestamp
+      final latestMessage = messages.firstWhereOrNull(
+        (msg) => msg.timestamp > room.lastUpdate,
+      );
+
+      if (latestMessage != null) {
+        lastUpdateNew = latestMessage.timestamp;
+      }
+
+      if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
+        log.jsonDebug({
+          'roomId': room.name,
+          'latestMessage': latestMessage,
+          'messagesTotal': messages.length,
+          'lastUpdateNew': lastUpdateNew,
+        });
+      }
+
+      // limited indicates need to fetch additional data for room timelines
+      if (room.limited) {
+        // TODO: potentially reimplement, but with batch tokens instead
+        // Check to see if the new messages contain those existing in cache
+        if (messages.isNotEmpty && currentMessageIds.isNotEmpty) {
+          final messageKnown = currentMessageIds.firstWhereOrNull(
+            (id) => id == messages[0].id,
+          );
+
+          // still limited if messages are all unknown / new
+          limitedNew = messageKnown == null;
+        }
+
+        // will be null if no other events are available / batched in the timeline (also "end")
+        if (details.prevBatch == null) {
+          limitedNew = false;
+        }
+
+        // current previous batch is equal to the room's historical previous batch
+        if (room.prevBatch == details.prevBatch) {
+          limitedNew = false;
+        }
+
+        // if the previous batch is the last known batch, skip pulling it
+        if (room.lastBatch == details.prevBatch) {
+          limitedNew = false;
+        }
+
+        // if a last known batch hasn't been set (full sync is not complete) stop limited pulls
+        if (room.lastBatch == null) {
+          limitedNew = false;
+        }
+
+        // remove limited status regardless if overwrite enabled
+        if (details.overwrite ?? false) {
+          limitedNew = false;
+
+          // pull if the room has no messages, but contains them later in the timeline
+          if (messages.isEmpty && currentMessageIds.isEmpty) {
+            limitedNew = true;
+          }
+        }
+      }
+
+      return this.copyWith(
+        room: room.copyWith(
+          limited: limitedNew,
+          lastUpdate: lastUpdateNew,
+          encryptionEnabled: hasEncrypted != null ? true : null,
+        ),
+      );
+    } catch (error) {
+      log.error('[parseMessages] $error');
+      return this;
+    }
+  }
+
+  ///
+  /// Parse Ephemerals
+  ///
+  /// Appends ephemeral events (mostly read receipts) to a
+  /// hashmap of eventIds linking them to users and timestamps
+  ///
+  Sync parseEphemerals(User currentUser) {
+    bool userTypingUpdated = false;
+    int lastReadUpdated = room.lastRead;
+    List<String> usersTypingUpdated = room.usersTyping;
+
+    final readReceiptsNew = <String, Receipt>{};
+
+    try {
+      for (final event in events.ephemeral) {
+        switch (event.type) {
+          case 'm.typing':
+            final List<dynamic> usersTypingList = event.content['user_ids'];
+            usersTypingUpdated = List<String>.from(usersTypingList);
+            usersTypingUpdated.removeWhere(
+              (user) => currentUser.userId == user,
+            );
+            userTypingUpdated = usersTypingUpdated.isNotEmpty;
+            break;
+          case 'm.receipt':
+            final Map<String, dynamic> receiptEventIds = event.content;
+
+            // Filter through every eventId to find receipts
+            receiptEventIds.forEach((eventId, receipt) {
+              // convert every m.read object to a map of userIds + timestamps for read
+              final receiptsNew = Receipt.fromMatrix(eventId, receipt);
+
+              // update the read receipts if that event has no reads yet
+              if (!readReceiptsNew.containsKey(eventId)) {
+                readReceiptsNew[eventId] = receiptsNew;
+              } else {
+                // otherwise, add the usersRead to the existing reads
+                readReceiptsNew[eventId]!
+                    .userReads
+                    .addAll(receiptsNew.userReads);
+              }
+            });
+            break;
+          default:
+            break;
+        }
+      }
+
+      readReceiptsNew.forEach((key, value) {
+        if (value.userReadsMapped!.containsKey(currentUser.userId)) {
+          final int readTimestamp = value.userReadsMapped![currentUser.userId];
+
+          if (readTimestamp > lastReadUpdated) {
+            lastReadUpdated = readTimestamp;
+          }
+        }
+      });
+    } catch (error) {
+      log.error('[parseEphemerals] ${error.toString()}');
+    }
+
+    return this.copyWith(
+      readReceipts: readReceipts,
+      room: room.copyWith(
+        lastRead: lastReadUpdated,
+        userTyping: userTypingUpdated,
+        usersTyping: usersTypingUpdated,
+      ),
+    );
+  }
+
+  ///
+  /// Parse Sync
+  ///
+  /// Not all events are needed to derive new information about the room
+  ///
+  /// Existing messages are used to check if a room has backfilled to a
+  /// previously known position of chat / messages
+  ///
+  Sync parseSync({
+    required User currentUser,
+    required String? lastSince,
+    required List<String> currentMessageIds,
+    required Map<String, dynamic> json,
+    bool ignoreMessageless = false,
+  }) {
+    final sync = this
+        .parseDetails(
+          json,
+          lastSince,
+        )
+        .parseEvents(
+          json,
+        );
+
+    if (ignoreMessageless && events.messages.isEmpty) {
+      return sync;
+    }
+
+    if (DEBUG_MODE && room.limited) {
+      log.jsonDebug({
+        'from': '[parseSync]',
+        'room': room.name,
+        'limited': room.limited,
+        'messages': events.messages.length,
+        'lastBatch': room.lastBatch,
+        'prevBatch': room.prevBatch,
+      });
+    }
+
+    return sync
+        .parseAccountData()
+        .parseState(
+          currentUser,
+        )
+        .parseMessages(
+          currentMessageIds,
+        )
+        .parseEphemerals(
+          currentUser,
+        );
+  }
 }
 
 ///
 /// Parse Sync
 ///
-/// Not all events are needed to derive new information about the room
+/// Parse Sync but not async
 ///
-/// Existing messages are used to check if a room has backfilled to a
-/// previously known position of chat / messages
-///
-Sync parseSync(
-  final Map<String, dynamic> json,
-  final Room roomExisting,
-  final User currentUser,
-  final String? lastSince,
-  final List<String> existingIds, {
-  final ignoreMessageless = false,
+Sync parseSync({
+  required Room currentRoom,
+  required User currentUser,
+  required String? lastSince,
+  required List<String> currentMessageIds,
+  required Map<String, dynamic> json,
+  bool ignoreMessageless = false,
 }) {
-  final syncDetails = parseDetails(json);
-
-  final events = parseEvents(
-    json,
-    roomId: roomExisting.id,
-    batch: syncDetails.currBatch ?? lastSince,
-    prevBatch: syncDetails.prevBatch,
-  );
-
-  if (ignoreMessageless) {
-    if (events.messages.isEmpty) {
-      return Sync(
-        room: roomExisting,
-        events: events,
-      );
-    }
-  }
-
-  final accountData = parseAccountData(
-    events.account,
-  );
-
-  final stateDetails = parseState(
-    room: roomExisting,
-    events: events.state,
-    currentUser: currentUser,
-    direct: accountData.direct,
-  );
-
-  final messageDetails = parseMessages(
-    room: roomExisting,
-    messages: events.messages,
-    existingIds: existingIds,
-    prevBatch: syncDetails.prevBatch,
-    overwrite: syncDetails.overwrite,
-  );
-
-  final ephemerals = parseEphemerals(
-    room: roomExisting,
-    events: events.ephemeral,
-    currentUser: currentUser,
-  );
-
-  final room = roomExisting.fromSync(
-    lastSince: lastSince,
-    accountData: accountData,
-    stateDetails: stateDetails,
-    messageDetails: messageDetails,
-    ephemerals: ephemerals,
-    syncDetails: syncDetails,
-  );
-
-  if (syncDetails.limited ?? false) {
-    log.json({
-      'from': '[parseSync]',
-      'room': room.name,
-      'limited': syncDetails.limited,
-      'messages': events.messages.length,
-      'lastBatch': syncDetails.lastBatch,
-      'prevBatch': syncDetails.prevBatch,
-    });
-  }
-
   return Sync(
-    room: room,
-    events: events,
-    users: stateDetails.users ?? {},
-    readReceipts: ephemerals.readReceipts,
-    // TODO: clear messages if limited was explicitly false from parsed json
-    overwrite: syncDetails.overwrite,
-    leave: stateDetails.leave,
+    room: currentRoom,
+  ).parseSync(
+    json: json,
+    lastSince: lastSince,
+    currentUser: currentUser,
+    currentMessageIds: currentMessageIds,
   );
 }
 
 ///
-/// Parse Sync (Isolate)
+/// Parse Sync (Mapped Params)
 ///
-/// Parse Sync but isolate safe
+/// Parse Sync but compute safe
 ///
-Future<Sync> parseSyncIsolate(Map params) async {
+Future<Sync> parseSyncMapped(Map params) async {
   final json = params['json'] as Map<String, dynamic>;
-  final Room roomExisting = params['room'];
+  final Room currentRoom = params['room'];
   final User currentUser = params['currentUser'];
   final String? lastSince = params['lastSince'];
-  final List<String> existingIds = params['existingMessagesIds'];
+  final List<String> currentMessageIds = params['existingMessagesIds'];
 
-  return parseSync(
-    json,
-    roomExisting,
-    currentUser,
-    lastSince,
-    existingIds,
+  return Sync(
+    room: currentRoom,
+  ).parseSync(
+    json: json,
+    lastSince: lastSince,
+    currentUser: currentUser,
+    currentMessageIds: currentMessageIds,
   );
 }
 
@@ -253,519 +701,14 @@ Future<Sync> parseSyncThreaded({
   required final Room room,
   required final User user,
   required final String? lastSince,
-  required final List<String> existingIds,
+  required final List<String> currentMessageIds,
   final ignoreMessageless = false,
 }) async {
-  return compute(parseSyncIsolate, {
+  return compute(parseSyncMapped, {
     'json': json,
     'room': room,
     'currentUser': user,
     'lastSince': lastSince,
-    'existingMessagesIds': existingIds,
+    'existingMessagesIds': currentMessageIds,
   });
-}
-
-///
-/// Parse Events
-///
-/// Consider assigning roomId to a message at the cold storage layer
-/// there's several areas we could want the message roomId independent of
-/// the room itself. Relatively safe to remove from the message object
-/// if the message class in terms of cruft or for performance.
-///
-SyncEvents parseEvents(
-  Map<String, dynamic> json, {
-  String? roomId,
-  String? batch,
-  String? prevBatch,
-}) {
-  List<Event> stateEvents = [];
-  List<Event> accountEvents = [];
-  List<Event> ephemeralEvents = [];
-  final List<Message> messageEvents = [];
-  final List<Reaction> reactionEvents = [];
-  final List<Redaction> redactionEvents = [];
-
-  if (json['state'] != null) {
-    final List<dynamic> stateEventsRaw = json['state']['events'];
-
-    stateEvents = stateEventsRaw
-        .map((event) => Event.fromMatrix(event, roomId: roomId))
-        .toList();
-  }
-
-  if (json['invite_state'] != null) {
-    final List<dynamic> stateEventsRaw = json['invite_state']['events'];
-
-    stateEvents = stateEventsRaw
-        .map((event) => Event.fromMatrix(event, roomId: roomId))
-        .toList();
-  }
-
-  if (json['account_data'] != null) {
-    final List<dynamic> accountEventsRaw = json['account_data']['events'];
-
-    accountEvents = accountEventsRaw
-        .map((event) => Event.fromMatrix(event, roomId: roomId))
-        .toList();
-  }
-
-  if (json['ephemeral'] != null) {
-    final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
-
-    ephemeralEvents = ephemeralEventsRaw
-        .map((event) => Event.fromMatrix(event, roomId: roomId))
-        .toList();
-  }
-
-  if (json['timeline'] != null) {
-    final List<dynamic> timelineEventsRaw = json['timeline']['events'];
-
-    final List<Event> timelineEvents = List.from(
-      timelineEventsRaw.map((event) => Event.fromMatrix(
-            event,
-            roomId: roomId,
-            batch: batch,
-            prevBatch: prevBatch,
-          )),
-    );
-
-    for (final Event event in timelineEvents) {
-      switch (event.type) {
-        case EventTypes.message:
-        case EventTypes.encrypted:
-          messageEvents.add(Message.fromEvent(event));
-          break;
-        case EventTypes.reaction:
-          reactionEvents.add(Reaction.fromEvent(event));
-          break;
-        case EventTypes.redaction:
-          redactionEvents.add(Redaction.fromEvent(event));
-          break;
-        default:
-          stateEvents.add(event);
-          break;
-      }
-    }
-  }
-
-  return SyncEvents(
-    state: stateEvents,
-    account: accountEvents,
-    ephemeral: ephemeralEvents,
-    redactions: redactionEvents,
-    reactions: reactionEvents,
-    messages: messageEvents,
-  );
-}
-
-///
-/// Parse Account Data
-///
-/// Mostly used to assign is_direct
-SyncAccountData parseAccountData(
-  List<Event> accountDataEvents,
-) {
-  bool? isDirect;
-
-  try {
-    for (final event in accountDataEvents) {
-      switch (event.type) {
-        case 'm.direct':
-          isDirect = true;
-          break;
-        default:
-          break;
-      }
-    }
-  } catch (error) {
-    // ignore error processing
-  }
-
-  return SyncAccountData(
-    direct: isDirect,
-  );
-}
-
-///
-/// Parse Details
-///
-/// Parsed details about new timeline
-/// and batch information
-///
-SyncDetails parseDetails(Map<String, dynamic> json) {
-  bool? invite;
-  bool? limited;
-  bool? overwrite;
-  int? totalMembers;
-  String? currBatch;
-  String? lastBatch;
-  String? prevBatch;
-
-  if (json['overwrite'] != null) {
-    overwrite = json['overwrite'];
-  }
-
-  if (json['invite_state'] != null) {
-    invite = true;
-  }
-
-  if (json['timeline'] != null) {
-    limited = json['timeline']['limited'];
-    lastBatch = json['timeline']['last_batch'];
-    currBatch = json['timeline']['curr_batch'];
-    prevBatch = json['timeline']['prev_batch'];
-  }
-
-  if (json['summary'] != null) {
-    totalMembers = json['summary']['m.joined_member_count'];
-  }
-
-  return SyncDetails(
-    invite: invite,
-    limited: limited,
-    overwrite: overwrite,
-    currBatch: currBatch,
-    lastBatch: lastBatch,
-    prevBatch: prevBatch,
-    totalMembers: totalMembers,
-  );
-}
-
-///
-/// Parse Room State
-///
-/// Find details of room based on state events
-/// follows spec naming priority and thumbnail downloading
-///
-/// NOTE: purposefully have not abstracted event names
-/// it's good to know exactly what you're matching against
-/// in the spec for research and comparison
-///
-SyncStateDetails parseState({
-  required Room room,
-  required User currentUser,
-  required List<Event> events,
-  LastUpdateType lastUpdateType = LastUpdateType.Message,
-  bool? direct,
-}) {
-  String? roomName;
-  String? avatarUri;
-  String? topic;
-  String? joinRule;
-  bool? encryptionEnabled;
-  bool? directNew = direct;
-  int? lastUpdateNew;
-  bool? leave;
-
-  final usersAdd = <String, User>{};
-  final Set<String> userIdsRemove = {};
-  final Set<String> userIdsNew = Set.from(room.userIds);
-
-  int namePriority = room.namePriority;
-
-  for (final event in events) {
-    try {
-      // TODO: enable when setting is available
-      // if (lastUpdateType == LastUpdateType.State) {
-      //   final timestamp = event.timestamp;
-      //   lastUpdateNew = timestamp > room.lastUpdate ? timestamp : room.lastUpdate;
-      // }
-
-      switch (event.type) {
-        case 'm.room.name':
-          if (namePriority > 0) {
-            namePriority = 1;
-            roomName = event.content['name'];
-          }
-          break;
-        case 'm.room.topic':
-          topic = event.content['topic'];
-          break;
-
-        case 'm.room.join_rules':
-          joinRule = event.content['join_rule'];
-          break;
-
-        case 'm.room.canonical_alias':
-          if (namePriority > 2) {
-            namePriority = 2;
-            roomName = event.content['alias'];
-          }
-          break;
-        case 'm.room.aliases':
-          if (namePriority > 3) {
-            namePriority = 3;
-            roomName = event.content['aliases'][0];
-          }
-          break;
-        case 'm.room.avatar':
-          if (avatarUri == null) {
-            avatarUri = event.content['url'];
-          }
-          break;
-
-        case 'm.room.member':
-          final membership = event.content['membership'];
-          final displayName = event.content['displayname'];
-          final memberAvatarUri = event.content['avatar_url'];
-
-          // set direct new if it hasn't been set
-          directNew = directNew ?? event.content['is_direct'];
-
-          // Cache user to rooms user cache if not present
-          if (!usersAdd.containsKey(event.stateKey)) {
-            usersAdd[event.stateKey!] = User(
-              userId: event.stateKey,
-              displayName: displayName,
-              avatarUri: memberAvatarUri,
-            );
-          }
-
-          switch (membership) {
-            case 'ban':
-            case 'leave':
-              userIdsRemove.add(event.stateKey!);
-
-              if (event.stateKey == currentUser.userId) {
-                leave = true;
-              }
-              break;
-            default:
-              break;
-          }
-
-          break;
-        case 'm.room.encryption':
-          encryptionEnabled = true;
-          break;
-        case 'm.room.encrypted':
-          break;
-        default:
-          break;
-      }
-    } catch (error) {
-      log.error('[parseState] $error ${event.type}');
-    }
-  }
-
-  final isDirect = directNew ?? room.direct;
-  userIdsNew.addAll(usersAdd.keys);
-  userIdsNew.removeWhere((id) => userIdsRemove.contains(id));
-
-  log.json({
-    'from': '[isDirect]',
-    'id': room.id,
-    'room': room.name,
-    'isDirect': isDirect,
-    'usersAdd': usersAdd.keys.fold('', (String o, u) => '$o, $u'),
-    'userIdsRemove': userIdsRemove.fold('', (String o, u) => '$o, $u'),
-  });
-
-  // generate direct message room names without a explicitly set name
-  if (isDirect) {
-    // checks to make sure someone didn't name the room after the authed user
-    final badRoomName = roomName != null &&
-        currentUser.userId != null &&
-        (roomName == currentUser.displayName || roomName == currentUser.userId);
-
-    final isNameDefault = namePriority == 4 && usersAdd.isNotEmpty;
-
-    log.json({
-      'from': '[isNameDefault]',
-      'id': room.id,
-      'room': room.name,
-      'badRoomName': badRoomName,
-      'isNameDefault': isNameDefault,
-    });
-
-    if (badRoomName || isNameDefault) {
-      // Filter out number of non current users to show preview of total
-      final otherUsers = usersAdd.values.where(
-        (user) => user.userId != currentUser.userId,
-      );
-
-      log.json({
-        'from': '[otherUsers]',
-        'id': room.id,
-        'room': room.name,
-        'isDirect': isDirect,
-        'otherUsers': otherUsers.fold('', (String o, u) => o + u.toString()),
-      });
-
-      if (otherUsers.isNotEmpty) {
-        roomName =
-            selectDirectRoomName(currentUser, otherUsers, userIdsNew.length);
-        avatarUri = selectDirectRoomAvatar(room, avatarUri, otherUsers);
-      }
-    }
-  }
-
-  return SyncStateDetails(
-    name: roomName,
-    topic: topic,
-    direct: directNew,
-    avatarUri: avatarUri,
-    joinRule: joinRule,
-    namePriority: namePriority,
-    lastUpdate: lastUpdateNew,
-    encryptionEnabled: encryptionEnabled,
-    userIds:
-        userIdsNew, // TODO: extract to pivot table for userIds associated by room
-    users: usersAdd.isNotEmpty ? usersAdd : null,
-    leave: leave,
-  );
-}
-
-///
-/// Parse Room Messages
-///
-SyncMessageDetails parseMessages({
-  required List<Message> messages,
-  required List<String> existingIds,
-  required Room room,
-  String? prevBatch,
-  bool? overwrite,
-}) {
-  try {
-    bool? limitedNew;
-    int? lastUpdateNew;
-
-    // Converting only message events
-    final hasEncrypted = messages.firstWhereOrNull(
-      (msg) => msg.type == EventTypes.encrypted,
-    );
-
-    // See if the newest message has a greater timestamp
-    final latestMessage = messages.firstWhereOrNull(
-      (msg) => msg.timestamp > room.lastUpdate,
-    );
-
-    if (latestMessage != null) {
-      lastUpdateNew = latestMessage.timestamp;
-    }
-
-    // limited indicates need to fetch additional data for room timelines
-    if (room.limited) {
-      // TODO: potentially reimplement, but with batch tokens instead
-      // Check to see if the new messages contain those existing in cache
-      if (messages.isNotEmpty && existingIds.isNotEmpty) {
-        final messageKnown = existingIds.firstWhereOrNull(
-          (id) => id == messages[0].id,
-        );
-
-        // still limited if messages are all unknown / new
-        limitedNew = messageKnown == null;
-      }
-
-      // will be null if no other events are available / batched in the timeline (also "end")
-      if (prevBatch == null) {
-        limitedNew = false;
-      }
-
-      // current previous batch is equal to the room's historical previous batch
-      if (room.prevBatch == prevBatch) {
-        limitedNew = false;
-      }
-
-      // if the previous batch is the last known batch, skip pulling it
-      if (room.lastBatch == prevBatch) {
-        limitedNew = false;
-      }
-
-      // if a last known batch hasn't been set (full sync is not complete) stop limited pulls
-      if (room.lastBatch == null) {
-        limitedNew = false;
-      }
-
-      // remove limited status regardless if overwrite enabled
-      if (overwrite ?? false) {
-        limitedNew = false;
-
-        // pull if the room has no messages, but contains them later in the timeline
-        if (messages.isEmpty && existingIds.isEmpty) {
-          limitedNew = true;
-        }
-      }
-    }
-
-    return SyncMessageDetails(
-      limited: limitedNew,
-      lastUpdate: lastUpdateNew,
-      encryptionEnabled: hasEncrypted != null,
-    );
-  } catch (error) {
-    log.error('[parseMessages] $error');
-    return SyncMessageDetails();
-  }
-}
-
-///
-/// Parse Ephemerals
-///
-/// Appends ephemeral events (mostly read receipts) to a
-/// hashmap of eventIds linking them to users and timestamps
-///
-SyncEphemerals parseEphemerals({
-  required List<Event> events,
-  required Room room,
-  required User currentUser,
-}) {
-  bool userTyping = false;
-  int lastRead = room.lastRead;
-  List<String> usersTypingNow = room.usersTyping;
-  final readReceipts = <String, Receipt>{};
-
-  try {
-    for (final event in events) {
-      switch (event.type) {
-        case 'm.typing':
-          final List<dynamic> usersTypingList = event.content['user_ids'];
-          usersTypingNow = List<String>.from(usersTypingList);
-          usersTypingNow.removeWhere(
-            (user) => currentUser.userId == user,
-          );
-          userTyping = usersTypingNow.isNotEmpty;
-          break;
-        case 'm.receipt':
-          final Map<String, dynamic> receiptEventIds = event.content;
-
-          // Filter through every eventId to find receipts
-          receiptEventIds.forEach((eventId, receipt) {
-            // convert every m.read object to a map of userIds + timestamps for read
-            final receiptsNew = Receipt.fromMatrix(eventId, receipt);
-
-            // update the read receipts if that event has no reads yet
-            if (!readReceipts.containsKey(eventId)) {
-              readReceipts[eventId] = receiptsNew;
-            } else {
-              // otherwise, add the usersRead to the existing reads
-              readReceipts[eventId]!.userReads.addAll(receiptsNew.userReads);
-            }
-          });
-          break;
-        default:
-          break;
-      }
-    }
-  } catch (error) {
-    log.error('[parseEphemerals] ${error.toString()}');
-  }
-
-  readReceipts.forEach((key, value) {
-    if (value.userReadsMapped!.containsKey(currentUser.userId)) {
-      final int readTimestamp = value.userReadsMapped![currentUser.userId];
-
-      if (readTimestamp > lastRead) {
-        lastRead = readTimestamp;
-      }
-    }
-  });
-
-  return SyncEphemerals(
-    lastRead: lastRead,
-    userTyping: userTyping,
-    usersTyping: usersTypingNow,
-    readReceipts: readReceipts,
-  );
 }

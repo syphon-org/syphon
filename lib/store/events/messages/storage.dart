@@ -34,6 +34,10 @@ extension MessageQueries on StorageDatabase {
     );
   }
 
+  Future<void> deleteMessages(List<String> messageIds) {
+    return (delete(messages)..where((tbl) => tbl.id.isIn(messageIds))).go();
+  }
+
   ///
   /// Select Messages (Ids)
   ///
@@ -68,8 +72,8 @@ extension MessageQueries on StorageDatabase {
   }) {
     return (select(messages)
           ..where((tbl) =>
-              tbl.roomId.equals(roomId) &
-              tbl.timestamp.isSmallerOrEqualValue(timestamp))
+              tbl.roomId.equals(roomId!) &
+              tbl.timestamp.isSmallerOrEqualValue(timestamp!))
           ..orderBy([
             (tbl) =>
                 OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)
@@ -109,7 +113,7 @@ extension MessageQueries on StorageDatabase {
   }) {
     return (select(messages)
           ..where(
-            (tbl) => tbl.roomId.equals(roomId) & tbl.batch.equals(batch),
+            (tbl) => tbl.roomId.equals(roomId!) & tbl.batch.equals(batch!),
           ))
         .get();
   }
@@ -137,6 +141,13 @@ Future<void> saveMessages(
   required StorageDatabase storage,
 }) async {
   await storage.insertMessagesBatched(messages);
+}
+
+Future<void> deleteMessages(
+  List<Message> messages, {
+  required StorageDatabase storage,
+}) async {
+  await storage.deleteMessages(messages.map((e) => e.id!).toList());
 }
 
 Future<void> saveMessagesRedacted(
@@ -257,8 +268,8 @@ extension DecryptedQueries on StorageDatabase {
   }) {
     return (select(decrypted)
           ..where((tbl) =>
-              tbl.roomId.equals(roomId) &
-              tbl.timestamp.isSmallerOrEqualValue(timestamp))
+              tbl.roomId.equals(roomId!) &
+              tbl.timestamp.isSmallerOrEqualValue(timestamp!))
           ..orderBy([
             (tbl) =>
                 OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)

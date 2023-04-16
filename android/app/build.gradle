@@ -32,7 +32,7 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -44,8 +44,8 @@ android {
 
     defaultConfig {
         applicationId "org.tether.tether"
-        minSdkVersion 18
-        targetSdkVersion 31
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -57,27 +57,30 @@ android {
         }
     }
 
-    signingConfigs {
-       release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile file(keystoreProperties['storeFile'])
-           storePassword keystoreProperties['storePassword']
-       }
-   }
+//    signingConfigs {
+//       release {
+//           keyAlias keystoreProperties['keyAlias']
+//           keyPassword keystoreProperties['keyPassword']
+//           storeFile file(keystoreProperties['storeFile'])
+//           storePassword keystoreProperties['storePassword']
+//       }
+//   }
    buildTypes {
-       release {
-           signingConfig signingConfigs.release
-       }
+//       release {
+//           signingConfig signingConfigs.release
+//           resValue "string", "app_name", "Syphon"
+//       }
        debug {
             signingConfig signingConfigs.debug
+            resValue "string", "app_name", "Syphon Debug"
+            applicationIdSuffix ".debug"
         }
    }
     externalNativeBuild {
         // Encapsulates your CMake build configurations.
         cmake {
             // Provides a relative path to your CMake build script.
-            path "../../ios/olm/CMakeLists.txt"
+            path "../olm/CMakeLists.txt"
             version "3.10.2"
         }
     }

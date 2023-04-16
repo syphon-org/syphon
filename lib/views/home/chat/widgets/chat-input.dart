@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:camera/camera.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
 import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/views/home/chat/camera_screen.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/containers/media-card.dart';
 import 'package:syphon/views/widgets/lists/list-local-images.dart';
@@ -271,6 +273,16 @@ class ChatInputState extends State<ChatInput> {
     widget.onAddMedia(file: file, type: MessageType.file);
   }
 
+  Future<void> openCamera() async {
+    final cameras = await availableCameras();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) =>
+          CameraScreen(onAddMedia: widget.onAddMedia, cameras: cameras,)
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
     distinct: true,
@@ -358,27 +370,44 @@ class ChatInputState extends State<ChatInput> {
         );
       }
 
-      if (loading) {
-        sendButton = Semantics(
-          button: true,
-          enabled: true,
-          label: Strings.labelSendEncrypted,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(48),
-            onLongPress: widget.onChangeMethod as void Function()?,
-            onTap: widget.sending || !isSendable ? null : onSubmit,
-            child: CircleAvatar(
-              backgroundColor: sendButtonColor,
-              child: Container(
-                margin: EdgeInsets.only(left: 2, top: 3),
-                child: SvgPicture.asset(
-                  Assets.iconSendLockSolidBeing,
-                  color: Colors.white,
-                  semanticsLabel: Strings.labelSendEncrypted,
-                ),
+          final takePictureButton = Semantics(
+            button: true,
+            enabled: true,
+            // label: Strings.labelSendUnencrypted,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(48),
+              onTap:(){
+                // print("Hi");
+                openCamera();
+              },
+              child: CircleAvatar(
+                backgroundColor: sendButtonColor,
+                child: Icon(Icons.camera_alt, color: Colors.white,),
               ),
             ),
-          ),
+          );
+
+          if (widget.mediumType == MediumType.encryption) {
+            sendButton = Semantics(
+              button: true,
+              enabled: true,
+              label: Strings.labelSendEncrypted,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(48),
+                onLongPress: widget.onChangeMethod as void Function()?,
+                onTap: loading || !isSendable ? null : onSubmit,
+                child: CircleAvatar(
+                  backgroundColor: sendButtonColor,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 2, top: 3),
+                    child: SvgPicture.asset(
+                      Assets.iconSendLockSolidBeing,
+                      color: Colors.white,
+                      semanticsLabel: Strings.labelSendEncrypted,
+                    ),
+                  ),
+              ),
+            ),
         );
       }
 
@@ -602,7 +631,7 @@ class ChatInputState extends State<ChatInput> {
                       indicatorColor: Colors.blue,
                       iconColor: Colors.grey,
                       iconColorSelected: Colors.blue,
-                      progressIndicatorColor: Colors.blue,
+                      // progressIndicatorColor: Colors.blue,
                       skinToneDialogBgColor: Colors.white,
                       skinToneIndicatorColor: Colors.grey,
                       enableSkinTones: true,
@@ -640,60 +669,104 @@ class ChatInputState extends State<ChatInput> {
                       maxWidth: width,
                       maxHeight: imageHeight, // HACK: figure out why it overflows on Nexus 5x
                     ),
-                    child: ListLocalImages(
-                      imageSize: imageWidth,
-                      onSelectImage: (file) {
-                        widget.onAddMedia(
-                          file: file,
-                          type: MessageType.image,
-                        );
-
-                        onToggleMediaOptions();
-                      },
+                    child: Stack(
+                      children: [
+                        Visibility(
+                          visible: widget.editing,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              ButtonText(
+                                text: Strings.buttonSaveMessageEdit,
+                                size: 18.0,
+                                disabled: widget.sending || !isSendable,
+                                onPressed: () => onSubmit(),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Visibility(
+                          visible: !widget.editing,
+                          child: SizedBox(
+                            width: showAttachments ? width - 120 : width,
+                            child: TextField(
+                              maxLines: null,
+                              autocorrect: props.autocorrectEnabled,
+                              enableSuggestions: props.suggestionsEnabled,
+                              textCapitalization: props.textCapitalization,
+                              keyboardType: TextInputType.multiline,
+                              textInputAction:
+                                  widget.enterSend ? TextInputAction.send : TextInputAction.newline,
+                              cursorColor: props.inputCursorColor,
+                              focusNode: widget.focusNode,
+                              controller: widget.controller,
+                              onChanged: (text) => onUpdate(text, props: props),
+                              onSubmitted: !isSendable ? null : (text) => onSubmit(),
+                              style: TextStyle(
+                                height: 1.5,
+                                color: props.inputTextColor,
+                              ),
+                              decoration: InputDecoration(
+                                filled: true,
+                                hintText: hintText,
+                                suffixIcon: Visibility(
+                                  visible: isSendable,
+                                  child: IconButton(
+                                    color: Theme.of(context).iconTheme.color,
+                                    onPressed: () => onToggleMediaOptions(),
+                                    icon: Icon(
+                                      Icons.add,
+                                      size: Dimensions.iconSizeLarge,
+                                    ),
+                                  ),
+                                ),
+                                fillColor: props.inputColorBackground,
+                                contentPadding: Dimensions.inputContentPadding,
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Theme.of(context).colorScheme.secondary,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      topRight:
+                                          Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                      bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                    )),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Theme.of(context).colorScheme.secondary,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      topRight:
+                                          Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                      bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                    )),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Row(children: [
-                    Padding(
-                      padding: EdgeInsets.only(right: 2),
-                      child: MediaCard(
-                        text: Strings.buttonGallery,
-                        icon: Icons.photo,
-                        onPress: () async{
-                          const photosPermission = Permission.photos;
-                          final status = await photosPermission.status;
-                          if(!status.isGranted){
-                            showDialogForPhotoPermission(context);
-                          }else{
-                            onAddPhoto();
-                          }
-                        },
-                      ),
+                  Visibility(
+                    visible: showAttachments,
+                    child: Container(
+                      width: Dimensions.buttonSendSize,
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: takePictureButton,
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: MediaCard(
-                        text: Strings.buttonFile,
-                        icon: Icons.note_add,
-                        onPress: () => onAddInProgress(),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: MediaCard(
-                        text: Strings.buttonContact,
-                        icon: Icons.person,
-                        onPress: () => onAddInProgress(),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: MediaCard(
-                        text: Strings.buttonLocation,
-                        icon: Icons.near_me_rounded,
-                        onPress: () => onAddInProgress(),
-                      ),
-                    ),
-                  ])
+                  ),
+                  Container(
+                    width: Dimensions.buttonSendSize,
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: sendButton,
+                  ),
                 ],
               ),
             ),

@@ -33,6 +33,7 @@
 		D23E4F252669521D0064E72D /* libolm.3.dylib in Resources */ = {isa = PBXBuildFile; fileRef = D23E4F2026694FFA0064E72D /* libolm.3.dylib */; };
 		D23E4F262669521F0064E72D /* libolm.3.2.2.dylib in Resources */ = {isa = PBXBuildFile; fileRef = D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */; };
 		D2743EC32651BBF5006FDB28 /* libolm.3.2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
+		D276170C28F784D1004EDA50 /* libolm.3.2.11.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D276170B28F784D1004EDA50 /* libolm.3.2.11.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		C1CD66FF4A25F1396737BF9C /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D23E4F2026694FFA0064E72D /* libolm.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libolm.3.dylib; sourceTree = "<group>"; };
 		D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libolm.3.2.2.dylib; sourceTree = "<group>"; };
+		D276170B28F784D1004EDA50 /* libolm.3.2.11.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libolm.3.2.11.dylib; sourceTree = "<group>"; };
 		FE87411DC33C73CF1781CD2F /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,6 +93,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D23E4F2126694FFA0064E72D /* libolm.3.dylib in Frameworks */,
+				D276170C28F784D1004EDA50 /* libolm.3.2.11.dylib in Frameworks */,
 				D2743EC32651BBF5006FDB28 /* libolm.3.2.2.dylib in Frameworks */,
 				26725682E95C9D306B1B4506 /* Pods_Runner.framework in Frameworks */,
 			);
@@ -179,6 +182,7 @@
 			children = (
 				D23E4F2026694FFA0064E72D /* libolm.3.dylib */,
 				D2743EC22651BBF5006FDB28 /* libolm.3.2.2.dylib */,
+				D276170B28F784D1004EDA50 /* libolm.3.2.11.dylib */,
 				C1CD66FF4A25F1396737BF9C /* Pods_Runner.framework */,
 			);
 			name = Frameworks;
@@ -445,7 +449,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -536,7 +540,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -583,7 +587,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;

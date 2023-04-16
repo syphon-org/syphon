@@ -6,6 +6,7 @@ import 'package:syphon/store/events/messages/model.dart';
 import 'package:syphon/store/events/receipts/model.dart';
 import 'package:syphon/store/index.dart';
 import 'package:syphon/store/rooms/room/model.dart';
+import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/store/settings/models.dart';
 
 class SetReceipts {
@@ -40,22 +41,24 @@ ThunkAction<AppState> sendReadReceipts({
 }) {
   return (Store<AppState> store) async {
     try {
-      // Skip if typing indicators are disabled
+      // Skip if Read Receipts are disabled
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
         return log.info('[sendReadReceipts] read receipts disabled');
       }
 
       final data;
 
-      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Hidden) {
-        log.info('[sendReadReceipts] read receipts hidden');
+      if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Private) {
+        log.info('[sendReadReceipts] read receipts set to private');
 
-        data = await MatrixApi.sendReadReceiptHidden(
+        data = await MatrixApi.sendPrivateReadReceipt(
           protocol: store.state.authStore.protocol,
           accessToken: store.state.authStore.user.accessToken,
           homeserver: store.state.authStore.user.homeserver,
           roomId: room!.id,
           messageId: message!.id,
+          stable:
+              await homeserverSupportsPrivateReadReceipts(store), //@deprecated
         );
       } else {
         data = await MatrixApi.sendReadReceipts(
