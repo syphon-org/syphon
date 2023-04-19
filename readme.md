@@ -94,6 +94,10 @@ Syphon will always be a not for profit, community driven application.
 ## 🏗️ Building
 You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster one can get people contributing, the easier it will be for others to maintain or oversee a tool that does not exploit the user.
 
+### continuous integration
+
+See our [CI script](/.drone.yml) if you wish to set up automated builds. It should also contain the most up-to-date build steps in case you are having trouble with those below.
+
 ### workstation
 - workstation independent setup for Syphon development
     - install flutter (stable channel for all platforms)
@@ -102,7 +106,7 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - android -> android studio
     - install cmake from cli through android studio platform tools (for olm/megolm)
           - ```sdkmanager --install "cmake;3.10.2.4988404"```
-    - (alternate) install cmake version from donwload per workstation platform
+    - (alternate) install cmake version from download per workstation platform
         - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 
         - [linux](https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh)
         - [windows](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
@@ -141,7 +145,7 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 
 ### linux
 1. ```flutter config --enable-linux-desktop```
-2. ```apt install libolm3 libsqlite3-dev``` or ```pacman -S libolm``` or platform equivalent for libolm
+2. ```apt install libgtk-3-dev liblzma-dev libblkid-dev libsecret-1-dev libolm-dev libolm3 libsqlite3-dev libjsoncpp-dev libsqlcipher-dev``` or distribution equivalent
 3. ```flutter build linux && flutter build bundle```
 4. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
 5. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
