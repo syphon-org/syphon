@@ -28,7 +28,6 @@
 .pub-cache/
 .pub/
 /build/
-**/key.properties
 
 # Web related
 lib/generated_plugin_registrant.dart
