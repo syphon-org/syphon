@@ -50,7 +50,7 @@
     "header-update-password": "修改密码",
     "title-message-details": "消息详情",
     "title-toggle-autocorrect": "自动纠错",
-    "title-toggle-suggestions": "输入建议",
+    "title-toggle-suggestions": "键盘自动补全",
     "title-dialog-terms": "确认服务条款",
     "title-dialog-terms-alpha": "确认Open Alpha的服务条款",
     "title-dialog-logout": "登出",
@@ -91,5 +91,18 @@
     "subtitle-images-audio-video-files": "图像, 音频, 视频, 文件",
     "subtitle-privacy-settings": "屏幕锁定 {}、注册锁定 {}",
     "subtitle-manual-sync": "根据上次同步时间强制matrix同步",
-    "subtitle-force-full-sync": "强制同步所有用户数据和消息"
+    "subtitle-force-full-sync": "强制同步所有用户数据和消息",
+    "button-save-message-edit": "保存对消息的修改",
+    "button-gallery": "相册",
+    "list-item-settings-read-receipts": "已读提醒",
+    "list-item-settings-force-full-sync": "强制全量同步",
+    "label-call-invite": "用户邀请您加入语音通话",
+    "alert-homeserver-invalid": "",
+    "alert-feature-in-progress": "🛠敬请期待",
+    "button-text-signup-action": "创建一个",
+    "list-item-mute-for-one-hour": "静音1小时",
+    "list-item-mute-for-hours": "静音{}小时",
+    "list-item-mute-for-one-day": "静音1天",
+    "list-item-mute-for-days": "静音{}天",
+    "list-item-settings-dismiss-keyboard": "忽略键盘"
 }
