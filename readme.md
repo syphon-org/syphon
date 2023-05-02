@@ -19,7 +19,7 @@ a privacy centric matrix client - now in open alpha*
         <img height="56" src="assets/external/get-it-on-fdroid.png">
     </a>
     <a href='https://flathub.org/apps/details/org.syphon.Syphon'>
-        <img height='56' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/>
+        <img height='56' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/>
     </a>
 </p>
 
