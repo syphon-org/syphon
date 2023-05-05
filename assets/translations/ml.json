@@ -1,1 +1,10 @@
-{}
+{
+    "header-media": "മാധ്യമം",
+    "header-signup-username": "ഒരു ഉപയോക്തൃനാമം സൃഷ്ടിക്കുക",
+    "header-general": "പൊതുവായ",
+    "title-intro": "{} എന്നതിലേക്ക് സ്വാഗതം",
+    "header-intro": "സ്വകാര്യതയും സ്വാതന്ത്ര്യവും\nബുദ്ധിമുട്ടില്ലാതെ.",
+    "title-verification": "സ്ഥിരീകരണം",
+    "title-view-search-users": "ഉപയോക്താക്കളെ തിരയുക",
+    "title-view-invite-users": "ഉപയോക്താക്കളെ ക്ഷണിക്കുക"
+}
