@@ -121,12 +121,18 @@ See our [CI script](/.drone.yml) if you wish to set up automated builds. It shou
         - ```flutter pub run build_runner build```
 
 ### ios/android
+
+#### only android
 0. install android studio
 0. install latest commandline tools through android studio gui
 0. confirm `sdkmanager` is available in your path
 0. pull the latest cmake, NDK, and other dependencies
-  - ```sdkmanager --install "ndk;21.4.7075529"```
-  - ```sdkmanager --install "cmake;3.10.2.4988404"```
+   - ```sdkmanager --install "ndk;21.4.7075529"```
+   - ```sdkmanager --install "cmake;3.10.2.4988404"```
+0. run the script ```scripts/init-android.sh```
+0. continue with next section `ios & android`
+
+#### ios & android
 0. pull dependencies needed 
   - ```flutter pub get```
 1. generate json conversion for models
