@@ -31,6 +31,7 @@ class SettingsStore extends Equatable {
   final bool timeFormat24Enabled;
   final bool dismissKeyboardEnabled;
   final bool autoDownloadEnabled;
+  final bool checkForUpdatesEnabled;
 
   final int syncInterval;
   final int syncPollTimeout;
@@ -66,6 +67,7 @@ class SettingsStore extends Equatable {
     this.timeFormat24Enabled = false,
     this.dismissKeyboardEnabled = false,
     this.autoDownloadEnabled = false,
+    this.checkForUpdatesEnabled = false,
     this.chatSettings = const <String, ChatSetting>{},
     this.devices = const [],
     this.loading = false,
@@ -91,6 +93,7 @@ class SettingsStore extends Equatable {
         timeFormat24Enabled,
         dismissKeyboardEnabled,
         autoDownloadEnabled,
+        checkForUpdatesEnabled,
         chatSettings,
         chatLists,
         devices,
@@ -115,6 +118,7 @@ class SettingsStore extends Equatable {
     bool? timeFormat24Enabled,
     bool? dismissKeyboardEnabled,
     bool? autoDownloadEnabled,
+    bool? checkForUpdatesEnabled,
     int? syncInterval,
     int? syncPollTimeout,
     bool? loading,
@@ -146,6 +150,8 @@ class SettingsStore extends Equatable {
         roomTypeBadgesEnabled:
             roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
         autoDownloadEnabled: autoDownloadEnabled ?? this.autoDownloadEnabled,
+        checkForUpdatesEnabled:
+            checkForUpdatesEnabled ?? this.checkForUpdatesEnabled,
         syncInterval: syncInterval ?? this.syncInterval,
         syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
         chatLists: chatLists ?? this.chatLists,

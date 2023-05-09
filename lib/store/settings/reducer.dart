@@ -116,6 +116,10 @@ SettingsStore settingsReducer([
       return state.copyWith(
         suggestionsEnabled: !state.suggestionsEnabled,
       );
+    case ToggleCheckForUpdates:
+      return state.copyWith(
+        checkForUpdatesEnabled: !state.checkForUpdatesEnabled,
+      );
     case SetSyncInterval:
       return state.copyWith(
         syncInterval: action.syncInterval,

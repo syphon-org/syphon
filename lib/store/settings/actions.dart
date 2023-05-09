@@ -52,6 +52,8 @@ class SetReadReceipts {
   SetReadReceipts({this.readReceipts});
 }
 
+class ToggleCheckForUpdates {}
+
 class ToggleEnterSend {}
 
 class ToggleAutocorrect {}
@@ -376,5 +378,11 @@ ThunkAction<AppState> toggleNotifications() {
     } else {
       store.dispatch(stopSyncService());
     }
+  };
+}
+
+ThunkAction<AppState> toggleCheckForUpdates() {
+  return (Store<AppState> store) async {
+    store.dispatch(ToggleCheckForUpdates());
   };
 }
