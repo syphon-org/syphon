@@ -104,5 +104,14 @@
     "list-item-mute-for-hours": "静音{}小时",
     "list-item-mute-for-one-day": "静音1天",
     "list-item-mute-for-days": "静音{}天",
-    "list-item-settings-dismiss-keyboard": "忽略键盘"
+    "list-item-settings-dismiss-keyboard": "忽略键盘",
+    "list-item-received": "接收",
+    "alert-storage-access-required-for-keys": "请为导入的会话密钥输入密码.",
+    "alert-no-images-found": "未找到任何图片.",
+    "prompt-confirm-deactivate": "请在下方再次输入密码以确认注销",
+    "list-item-sent": "发送",
+    "list-item-via": "平台",
+    "list-item-from": "来自",
+    "alert-could-not-launch-url": "无法运行{}",
+    "alert-log-out-enable-multiaccount": "再启用多用户特性前请先登出当前会话"
 }
