@@ -18,17 +18,16 @@ class Event {
   final String? sender;
   final String? stateKey;
   final String? batch;
-  final String?
-      prevBatch; // the end batch token after syncing / fetching these messages
+  final String? prevBatch; // the end batch token after syncing / fetching these messages
 
   // When the event arrived on the server
   @JsonKey(defaultValue: 0)
   final int timestamp;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final dynamic content;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final dynamic data;
 
   const Event({

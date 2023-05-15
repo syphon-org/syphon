@@ -15,16 +15,16 @@ class SyncStore extends Equatable {
   final int? lastAttempt; // last attempt to sync
   final String? lastSince; // Since we last checked for new info
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final int backoff;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool syncing;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool unauthed;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final Timer? syncObserver;
 
   const SyncStore({

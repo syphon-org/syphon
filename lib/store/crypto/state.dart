@@ -10,7 +10,7 @@ part 'state.g.dart';
 @JsonSerializable()
 class CryptoStore extends Equatable {
   // Active olm account (loaded from olmAccountKey)
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final Account? olmAccount;
 
   // Serialized olm account
@@ -28,7 +28,7 @@ class CryptoStore extends Equatable {
 
   // Map<roomId, Map<identityKey, serializedSession>  // megolm - messages per chat
   // NOTE: backed up to sqlite db storage, JsonKey ignore to not cache
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final Map<String, Map<String, List<MessageSession>>> messageSessionsInbound;
 
   /// Map<UserId, Map<DeviceId, DeviceKey> deviceKeys

@@ -15,7 +15,7 @@ part 'state.g.dart';
 
 @JsonSerializable()
 class SettingsStore extends Equatable {
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool loading;
 
   final String language;
@@ -47,7 +47,7 @@ class SettingsStore extends Equatable {
   final Map<String, ChatSetting> chatSettings; // roomId
   final NotificationSettings notificationSettings;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final String? pusherToken; // NOTE: can be device token for APNS
 
   const SettingsStore({
@@ -136,15 +136,11 @@ class SettingsStore extends Equatable {
         enterSendEnabled: enterSendEnabled ?? this.enterSendEnabled,
         autocorrectEnabled: autocorrectEnabled ?? this.autocorrectEnabled,
         suggestionsEnabled: suggestionsEnabled ?? this.suggestionsEnabled,
-        typingIndicatorsEnabled:
-            typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
+        typingIndicatorsEnabled: typingIndicatorsEnabled ?? this.typingIndicatorsEnabled,
         timeFormat24Enabled: timeFormat24Enabled ?? this.timeFormat24Enabled,
-        dismissKeyboardEnabled:
-            dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
-        membershipEventsEnabled:
-            membershipEventsEnabled ?? this.membershipEventsEnabled,
-        roomTypeBadgesEnabled:
-            roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
+        dismissKeyboardEnabled: dismissKeyboardEnabled ?? this.dismissKeyboardEnabled,
+        membershipEventsEnabled: membershipEventsEnabled ?? this.membershipEventsEnabled,
+        roomTypeBadgesEnabled: roomTypeBadgesEnabled ?? this.roomTypeBadgesEnabled,
         autoDownloadEnabled: autoDownloadEnabled ?? this.autoDownloadEnabled,
         syncInterval: syncInterval ?? this.syncInterval,
         syncPollTimeout: syncPollTimeout ?? this.syncPollTimeout,
@@ -164,6 +160,5 @@ class SettingsStore extends Equatable {
 
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
 
-  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
-      _$SettingsStoreFromJson(json);
+  factory SettingsStore.fromJson(Map<String, dynamic> json) => _$SettingsStoreFromJson(json);
 }

@@ -9,10 +9,10 @@ part 'state.g.dart';
 class RoomStore extends Equatable {
   final Map<String, Room> rooms;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool loading;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   List<Room> get roomList => List<Room>.from(rooms.values);
 
   const RoomStore({

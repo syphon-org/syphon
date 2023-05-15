@@ -10,13 +10,13 @@ class UserStore extends Equatable {
   // user.id's
   final List<String> blocked;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final Map<String, User> users;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool loading;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<User> invites;
 
   const UserStore({

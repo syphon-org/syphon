@@ -55,7 +55,7 @@ class Message extends Event implements drift.Insertable<Message> {
   // References
   final List<String> editIds;
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<Reaction> reactions;
 
   const Message({
@@ -207,8 +207,7 @@ class Message extends Event implements drift.Insertable<Message> {
   @override
   Map<String, dynamic> toJson() => _$MessageToJson(this);
 
-  factory Message.fromJson(Map<String, dynamic> json) =>
-      _$MessageFromJson(json);
+  factory Message.fromJson(Map<String, dynamic> json) => _$MessageFromJson(json);
 
   factory Message.fromEvent(Event event) {
     try {
