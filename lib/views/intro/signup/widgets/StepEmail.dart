@@ -19,7 +19,7 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 // Styling
 
 class EmailStep extends StatefulWidget {
-  const EmailStep({Key? key}) : super(key: key);
+  const EmailStep({super.key});
 
   @override
   EmailStepState createState() => EmailStepState();
@@ -107,7 +107,7 @@ class EmailStepState extends State<EmailStep> {
                       child: Text(
                         'This homeserver requires an email\n for account creation.',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                     Stack(
@@ -121,7 +121,7 @@ class EmailStepState extends State<EmailStep> {
                           child: Text(
                             'Enter an email address',
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headline5,
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
                         ),
                         Positioned(
@@ -160,7 +160,7 @@ class EmailStepState extends State<EmailStep> {
                         child: Text(
                           '* Email is already in use by another user',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.caption!.copyWith(
+                          style: Theme.of(context).textTheme.bodySmall!.copyWith(
                                 color: Colors.red,
                               ),
                         ),

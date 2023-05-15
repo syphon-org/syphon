@@ -299,7 +299,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         log.info('[fetchSync] *** full sync completed ***');
       }
     } catch (error) {
-      log.error('[fetchSync] ${error.toString()}');
+      log.error('[fetchSync] $error');
 
       final backoff = store.state.syncStore.backoff;
       final nextBackoff = backoff != 0 ? backoff + 1 : 5;
@@ -442,7 +442,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
         ));
       }
     } catch (error) {
-      log.error('[syncRoom] $id ${error.toString()}');
+      log.error('[syncRoom] $id $error');
 
       // prevents against recursive backfill from bombing attempts at fetching messages
       final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);

@@ -40,7 +40,7 @@ class ChatDetailsArguments {
 }
 
 class ChatSettingsScreen extends StatefulWidget {
-  const ChatSettingsScreen({Key? key}) : super(key: key);
+  const ChatSettingsScreen({super.key});
 
   @override
   ChatSettingsState createState() => ChatSettingsState();
@@ -209,7 +209,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                       child: Text(
                         arguments!.title!,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.white),
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Colors.white),
                       ),
                     ),
                   ],
@@ -264,7 +264,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                       Text(
                                         Strings.labelUsers,
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context).textTheme.subtitle2,
+                                        style: Theme.of(context).textTheme.titleSmall,
                                       ),
                                     ],
                                   ),
@@ -320,7 +320,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                               child: Text(
                                 Strings.labelAbout,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             Container(
@@ -331,21 +331,20 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                   Text(
                                     props.room.name!,
                                     textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.headline6,
+                                    style: Theme.of(context).textTheme.titleLarge,
                                   ),
                                   Text(
                                     props.room.id,
                                     textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.caption,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Text(
                                     props.room.type,
                                     textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.caption,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Visibility(
-                                    visible:
-                                        props.room.topic != null && props.room.topic!.isNotEmpty,
+                                    visible: props.room.topic != null && props.room.topic!.isNotEmpty,
                                     child: Container(
                                       padding: EdgeInsets.only(top: 12),
                                       child: Text(
@@ -370,14 +369,14 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                               child: Text(
                                 Strings.labelChatSettings,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             ListTile(
                               contentPadding: contentPadding,
                               title: Text(
                                 Strings.labelColor,
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.only(right: 8),
@@ -397,7 +396,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                               contentPadding: contentPadding,
                               title: Text(
                                 Strings.listItemChatDetailToggleDirectChat,
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Switch(
                                 value: props.room.direct,
@@ -422,7 +421,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                               child: Text(
                                 Strings.listItemChatDetailNotificationSetting,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             ListTile(
@@ -446,10 +445,8 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   Strings.labelDefault,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle1!
-                                      .copyWith(color: Colors.grey),
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium!.copyWith(color: Colors.grey),
                                 ),
                               ),
                             ),
@@ -463,10 +460,8 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   Strings.placeholderDefaultRoomNotification,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle1!
-                                      .copyWith(color: Colors.grey),
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium!.copyWith(color: Colors.grey),
                                 ),
                               ),
                             ),
@@ -482,7 +477,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                               child: Text(
                                 Strings.listItemChatDetailPrivacyStatus,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             ListTile(
@@ -508,7 +503,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                 contentPadding: contentPadding,
                                 title: Text(
                                   Strings.buttonBlockUser,
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                         color: Colors.redAccent,
                                       ),
                                 ),
@@ -519,7 +514,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                               contentPadding: contentPadding,
                               title: Text(
                                 Strings.buttonLeaveChat,
-                                style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                       color: Colors.redAccent,
                                     ),
                               ),
@@ -587,8 +582,7 @@ class _Props extends Equatable {
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
       loading: store.state.roomStore.loading,
       notificationSettings: store.state.settingsStore.notificationSettings,
-      notificationOptions:
-          store.state.settingsStore.notificationSettings.notificationOptions[roomId],
+      notificationOptions: store.state.settingsStore.notificationSettings.notificationOptions[roomId],
       room: selectRoom(id: roomId, state: store.state),
       users: roomUsers(store.state, roomId),
       usersTotal: selectRoom(id: roomId, state: store.state).totalJoinedUsers > 0

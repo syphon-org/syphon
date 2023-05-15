@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -30,7 +29,7 @@ const MESSAGE_MARGIN_VERTICAL_SMALL = 1.0;
 
 class MessageWidget extends StatelessWidget {
   const MessageWidget({
-    Key? key,
+    super.key,
     required this.message,
     this.editorController,
     this.isUserSent = false,
@@ -57,7 +56,7 @@ class MessageWidget extends StatelessWidget {
     this.onPressAvatar,
     this.onInputReaction,
     this.onToggleReaction,
-  }) : super(key: key);
+  });
 
   final bool messageOnly;
   final bool isNewContext;
@@ -187,7 +186,7 @@ class MessageWidget extends StatelessWidget {
 
     var textColor = Colors.white;
     Color anchorColor = Colors.blue;
-    var backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
     var luminance = this.luminance;
 
@@ -404,8 +403,7 @@ class MessageWidget extends StatelessWidget {
                             }
                           },
                           child: Container(
-                            margin: const EdgeInsets.only(right: 8)
-                                .copyWith(bottom: hasReactions ? 16 : 0),
+                            margin: const EdgeInsets.only(right: 8).copyWith(bottom: hasReactions ? 16 : 0),
                             child: Avatar(
                               margin: EdgeInsets.zero,
                               padding: EdgeInsets.zero,
@@ -425,8 +423,7 @@ class MessageWidget extends StatelessWidget {
                             Container(
                               constraints: BoxConstraints(
                                 // NOTE: issue shrinking the message based on width
-                                maxWidth:
-                                    !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
+                                maxWidth: !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
                                 // NOTE: prevents exposing the reply icon
                                 minWidth: 72,
                               ),
@@ -521,8 +518,7 @@ class MessageWidget extends StatelessWidget {
                                       firstChild: MarkdownBody(
                                         data: body.trim(),
                                         softLineBreak: true,
-                                        onTapLink: (text, href, title) =>
-                                            onConfirmLink(context, href),
+                                        onTapLink: (text, href, title) => onConfirmLink(context, href),
                                         styleSheet: MarkdownStyleSheet(
                                           a: TextStyle(color: anchorColor),
                                           blockquote: TextStyle(
@@ -582,8 +578,7 @@ class MessageWidget extends StatelessWidget {
                                         crossAxisAlignment: alignmentMessageText,
                                         children: [
                                           Visibility(
-                                            visible:
-                                                !isUserSent && message.type == EventTypes.encrypted,
+                                            visible: !isUserSent && message.type == EventTypes.encrypted,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
@@ -611,8 +606,7 @@ class MessageWidget extends StatelessWidget {
                                             ),
                                           ),
                                           Visibility(
-                                            visible:
-                                                isUserSent && message.type == EventTypes.encrypted,
+                                            visible: isUserSent && message.type == EventTypes.encrypted,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,

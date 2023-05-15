@@ -68,7 +68,7 @@ Future deleteStorage({AppContext context = const AppContext()}) async {
     final file = File(path.join(appDir.path, storageLocation));
     await file.delete();
   } catch (error) {
-    log.error('[deleteColdStorage] ${error.toString()}');
+    log.error('[deleteColdStorage] $error');
   }
 }
 
@@ -136,7 +136,7 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
       StorageKeys.MESSAGE_SESSIONS: messageSessions,
     };
   } catch (error) {
-    log.error('[loadStorage] ${error.toString()}');
+    log.error('[loadStorage] $error');
     return {};
   }
 }
@@ -190,6 +190,6 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
 
     loadAsync();
   } catch (error) {
-    log.error('[loadStorageAsync] ${error.toString()}');
+    log.error('[loadStorageAsync] $error');
   }
 }

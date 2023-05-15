@@ -570,7 +570,7 @@ class PrivacySettingsScreen extends HookWidget {
                       child: Text(
                         Strings.titleVerification,
                         textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
                     ListTile(
@@ -580,7 +580,7 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         sessionName,
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       onTap: () => onRenameDevice(),
                       trailing: IconButton(
@@ -595,7 +595,7 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         sessionId,
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       onTap: () async {
                         await onCopyToClipboard(sessionId);
@@ -612,7 +612,7 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         sessionKey,
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       onTap: () async {
                         await onCopyToClipboard(sessionKey);
@@ -634,7 +634,7 @@ class PrivacySettingsScreen extends HookWidget {
                       child: Text(
                         'User Access',
                         textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
                     ListTile(
@@ -647,7 +647,7 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         'Changing your password will refresh your\ncurrent session',
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                     ListTile(
@@ -660,7 +660,7 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         'View and manage blocked users',
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                   ],
@@ -675,7 +675,7 @@ class PrivacySettingsScreen extends HookWidget {
                       child: Text(
                         'Communication',
                         textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
                     ListTile(
@@ -686,7 +686,7 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         Strings.subtitleSettingsReadReceipts,
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       trailing: Text(readReceipts),
                     ),
@@ -698,10 +698,10 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         'If typing indicators are disabled, you won\'t be able to see typing indicators from others',
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       trailing: Switch(
-                        value: typingIndicators!,
+                        value: typingIndicators,
                         onChanged: (enterSend) => onToggleTypingIndicators(),
                       ),
                     ),
@@ -717,7 +717,7 @@ class PrivacySettingsScreen extends HookWidget {
                       child: Text(
                         'App access',
                         textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
                     ListTile(
@@ -727,7 +727,7 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         'Lock ${Values.appName} access with native device screen lock or fingerprint',
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       trailing: Switch(
                         value: screenLockEnabled,
@@ -742,7 +742,7 @@ class PrivacySettingsScreen extends HookWidget {
                       ),
                       subtitle: Text(
                         'None',
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                   ],
@@ -757,7 +757,7 @@ class PrivacySettingsScreen extends HookWidget {
                       child: Text(
                         'Encryption Keys',
                         textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                     ListTile(
@@ -784,7 +784,7 @@ class PrivacySettingsScreen extends HookWidget {
                         ),
                         subtitle: Text(
                           keyBackupLocation,
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ),
                     ),
@@ -798,14 +798,14 @@ class PrivacySettingsScreen extends HookWidget {
                         ),
                         subtitle: Text(
                           keyBackupSchedule,
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                         trailing: Text(
                           formatTimestampFull(
                             showTime: true,
                             lastUpdateMillis: int.parse(keyBackupLatest),
                           ),
-                          style: Theme.of(context).textTheme.caption,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ),
                     )
@@ -821,7 +821,7 @@ class PrivacySettingsScreen extends HookWidget {
                       child: Text(
                         'Account Management',
                         textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.subtitle2,
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
                     ListTile(

@@ -111,7 +111,7 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
           edited: true,
           body: messageEdited.body,
           msgtype: messageEdited.msgtype,
-          editIds: [messageEdited.id!, ...?messageOriginal.editIds],
+          editIds: [messageEdited.id!, ...messageOriginal.editIds],
         );
       }
     }

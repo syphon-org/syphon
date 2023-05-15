@@ -13,13 +13,13 @@ class TypingIndicator extends StatefulWidget {
   final Function? onPressAvatar;
 
   const TypingIndicator({
-    Key? key,
+    super.key,
     this.typing,
     this.usersTyping = const [],
     this.roomUsers = const {},
     this.selectedMessageId,
     this.onPressAvatar,
-  }) : super(key: key);
+  });
 
   @override
   TypingIndicatorState createState() => TypingIndicatorState();

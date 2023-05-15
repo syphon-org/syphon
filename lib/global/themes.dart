@@ -67,7 +67,6 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
         selectionColor: primaryColor.withAlpha(100),
         selectionHandleColor: primaryColor,
       ),
-      selectedRowColor: Color(selectedRowColor),
       iconTheme: IconThemeData(color: iconColor),
       scaffoldBackgroundColor:
           scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
@@ -92,41 +91,41 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       // Fonts
       fontFamily: fontFamily,
       primaryTextTheme: TextTheme(
-        headline6: TextStyle(
+        titleLarge: TextStyle(
           color: Colors.white,
           fontWeight: titleWeight,
         ),
       ),
       textTheme: TextTheme(
-        headline5: TextStyle(
+        headlineSmall: TextStyle(
           fontWeight: titleWeight,
         ),
-        headline6: TextStyle(
+        titleLarge: TextStyle(
           fontWeight: titleWeight,
           letterSpacing: letterSpacing,
         ),
-        subtitle1: TextStyle(
+        titleMedium: TextStyle(
           fontSize: subtitleSizeLarge,
           fontWeight: titleWeight,
           letterSpacing: letterSpacing,
         ),
-        subtitle2: TextStyle(
+        titleSmall: TextStyle(
           fontSize: subtitleSize,
           fontWeight: bodyWeight,
           letterSpacing: letterSpacing,
           color: secondaryColor,
         ),
-        caption: TextStyle(
+        bodySmall: TextStyle(
           fontSize: subtitleSize,
           fontWeight: titleWeight,
           letterSpacing: letterSpacing,
         ),
-        bodyText1: TextStyle(
+        bodyLarge: TextStyle(
           fontSize: bodySizeLarge,
           letterSpacing: letterSpacing,
           fontWeight: bodyWeight,
         ),
-        bodyText2: TextStyle(
+        bodyMedium: TextStyle(
           fontSize: bodySize,
           letterSpacing: letterSpacing,
           fontWeight: titleWeight,

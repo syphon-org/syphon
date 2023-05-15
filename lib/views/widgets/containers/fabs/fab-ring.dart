@@ -20,11 +20,11 @@ class FabRing extends StatelessWidget {
   final GlobalKey<FabCircularMenuState>? fabKey;
 
   const FabRing({
-    Key? key,
+    super.key,
     this.fabKey,
     this.alignment = Alignment.bottomRight,
     this.showLabels = false,
-  }) : super(key: key);
+  });
 
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
@@ -110,7 +110,7 @@ class FabRing extends StatelessWidget {
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreatePublic,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Colors.white,
                                 ),
                           ),
@@ -145,7 +145,7 @@ class FabRing extends StatelessWidget {
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreateGroup,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Colors.white,
                                 ),
                           ),
@@ -179,7 +179,7 @@ class FabRing extends StatelessWidget {
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreateDM,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Colors.white,
                                 ),
                           ),
@@ -214,7 +214,7 @@ class FabRing extends StatelessWidget {
                         child: Chip(
                           label: Text(
                             Strings.labelFabSearch,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Colors.white,
                                 ),
                           ),

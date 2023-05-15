@@ -17,10 +17,10 @@ class FabCircleExpanding extends StatelessWidget {
   final Alignment? alignment;
 
   const FabCircleExpanding({
-    Key? key,
+    super.key,
     this.fabKey,
     this.alignment,
-  }) : super(key: key);
+  });
 
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
@@ -121,12 +121,12 @@ class _Props extends Equatable {
 
 class FabBarContainer extends StatefulWidget {
   const FabBarContainer({
-    Key? key,
+    super.key,
     this.initialOpen,
     this.alignment,
     required this.distance,
     required this.children,
-  }) : super(key: key);
+  });
 
   final bool? initialOpen;
   final Alignment? alignment;
@@ -273,12 +273,11 @@ class FabBarContainerState extends State<FabBarContainer> with SingleTickerProvi
 @immutable
 class _ExpandingActionButton extends StatelessWidget {
   const _ExpandingActionButton({
-    Key? key,
     required this.directionInDegrees,
     required this.maxDistance,
     required this.progress,
     required this.child,
-  }) : super(key: key);
+  });
 
   final double directionInDegrees;
   final double maxDistance;

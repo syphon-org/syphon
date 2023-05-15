@@ -4,12 +4,12 @@ import 'package:flutter_screen_lock/configurations/input_button_config.dart';
 /// [OutlinedButton] based button.
 class LockButton extends StatelessWidget {
   const LockButton({
-    Key? key,
+    super.key,
     this.disabled = false,
     this.config = const StyledInputConfig(),
     required this.child,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   final bool disabled;
   final Widget child;

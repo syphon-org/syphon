@@ -182,7 +182,7 @@ class UserProfileScreen extends HookWidget {
                           child: Text(
                             'About',
                             textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         Container(
@@ -193,17 +193,17 @@ class UserProfileScreen extends HookWidget {
                               Text(
                                 user.displayName ?? '',
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.headline6,
+                                style: Theme.of(context).textTheme.titleLarge,
                               ),
                               Text(
                                 user.userId ?? '',
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               Text(
                                 'User',
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],
                           ),
@@ -221,7 +221,7 @@ class UserProfileScreen extends HookWidget {
                           child: Text(
                             'Chat Settings',
                             textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         ListTile(
@@ -249,7 +249,7 @@ class UserProfileScreen extends HookWidget {
                           child: Text(
                             'Privacy and Status',
                             textAlign: TextAlign.start,
-                            style: Theme.of(context).textTheme.subtitle2,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                         ListTile(

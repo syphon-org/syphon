@@ -1,42 +1,42 @@
 import './actions.dart';
 import './state.dart';
 
-SearchStore searchReducer([SearchStore state = const SearchStore(), dynamic action]) {
-  switch (action.runtimeType) {
+SearchStore searchReducer([SearchStore state = const SearchStore(), dynamic actionAny]) {
+  switch (actionAny.runtimeType) {
     case SetLoading:
       return state.copyWith(
-        loading: action.loading,
+        loading: actionAny.loading,
       );
     case SetSearchText:
       return state.copyWith(
-        searchText: action.text,
+        searchText: actionAny.text,
       );
     case SetHomeservers:
       return state.copyWith(
-        homeservers: action.homeservers,
-        searchResults: action.homeservers,
+        homeservers: actionAny.homeservers,
+        searchResults: actionAny.homeservers,
       );
     case UpdateHomeservers:
       return state.copyWith(
-        homeservers: action.homeservers,
-        searchResults: action.homeservers,
+        homeservers: actionAny.homeservers,
+        searchResults: actionAny.homeservers,
       );
     case SetSearchResults:
       return state.copyWith(
-        since: action.since,
-        searchText: action.searchText,
-        searchResults: action.searchResults,
-        totalResults: action.totalResults,
+        since: actionAny.since,
+        searchText: actionAny.searchText,
+        searchResults: actionAny.searchResults,
+        totalResults: actionAny.totalResults,
       );
     case SearchMessages:
       return state.copyWith(
         loading: true,
       );
     case SearchMessageResults:
-      final _action = action as SearchMessageResults;
+      final action = actionAny as SearchMessageResults;
       return state.copyWith(
         loading: false,
-        searchMessages: _action.results,
+        searchMessages: action.results,
       );
     case ResetSearchResults:
       return state.copyWith(

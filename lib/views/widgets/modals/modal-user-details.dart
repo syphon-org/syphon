@@ -158,7 +158,7 @@ class ModalUserDetails extends StatelessWidget {
                             props.user.displayName ?? '',
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontWeight: FontWeight.w500,
                                 ),
                           ),
@@ -199,7 +199,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsSendMessage,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),
@@ -221,7 +221,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsRoomInvite,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),
@@ -238,7 +238,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsViewProfile,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),

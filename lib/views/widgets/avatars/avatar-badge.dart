@@ -10,12 +10,12 @@ import 'package:syphon/store/settings/theme-settings/model.dart';
 
 class AvatarBadge extends StatelessWidget {
   const AvatarBadge({
-    Key? key,
+    super.key,
     this.public = false,
     this.group = false,
     this.invite = false,
     this.encryptionEnabled = false,
-  }) : super(key: key);
+  });
 
   final bool public;
   final bool group;

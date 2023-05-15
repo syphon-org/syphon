@@ -59,16 +59,16 @@ class Message extends Event implements drift.Insertable<Message> {
   final List<Reaction> reactions;
 
   const Message({
-    String? id,
-    String? userId,
-    String? roomId,
-    String? type,
-    String? sender,
-    String? stateKey,
-    String? batch,
-    String? prevBatch,
-    dynamic content,
-    int timestamp = 0,
+    super.id,
+    super.userId,
+    super.roomId,
+    super.type,
+    super.sender,
+    super.stateKey,
+    super.batch,
+    super.prevBatch,
+    super.content,
+    super.timestamp,
     this.body,
     this.typeDecrypted,
     this.msgtype,
@@ -93,16 +93,6 @@ class Message extends Event implements drift.Insertable<Message> {
     this.editIds = const [],
     this.reactions = const [],
   }) : super(
-          id: id,
-          userId: userId,
-          roomId: roomId,
-          type: type,
-          sender: sender,
-          stateKey: stateKey,
-          batch: batch,
-          prevBatch: prevBatch,
-          timestamp: timestamp,
-          content: content,
           data: null,
         );
 
@@ -288,7 +278,7 @@ class Message extends Event implements drift.Insertable<Message> {
         edited: false,
       );
     } catch (error) {
-      log.error('[Message.fromEvent] ${error.toString()}');
+      log.error('[Message.fromEvent] $error');
       return Message(
         id: event.id,
         userId: event.userId,

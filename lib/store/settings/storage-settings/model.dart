@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:syphon/global/values.dart';
 
 part 'model.g.dart';
 

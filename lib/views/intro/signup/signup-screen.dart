@@ -33,7 +33,7 @@ final Duration nextAnimationDuration = Duration(
 );
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({Key? key}) : super(key: key);
+  const SignupScreen({super.key});
 
   @override
   SignupScreenState createState() => SignupScreenState();
@@ -210,9 +210,9 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
             valid = await props.onSelectHomeserver(props.hostname);
           }
 
-          final _homeserver = store.state.authStore.homeserver;
-          if (_homeserver.signupTypes.isEmpty &&
-              !_homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+          final homeserver = store.state.authStore.homeserver;
+          if (homeserver.signupTypes.isEmpty &&
+              !homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
             store.dispatch(addInfo(
               origin: 'selectHomeserver',
               message: 'No new signups allowed on this server, try another if creating an account',

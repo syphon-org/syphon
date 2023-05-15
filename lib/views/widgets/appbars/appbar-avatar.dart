@@ -8,7 +8,7 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class AppBarAvatar extends StatelessWidget {
   const AppBarAvatar({
-    Key? key,
+    super.key,
     this.user,
     this.themeType = ThemeType.Light,
     this.syncing = false,
@@ -16,7 +16,7 @@ class AppBarAvatar extends StatelessWidget {
     this.unauthed = false,
     this.tooltip,
     this.onPressed,
-  }) : super(key: key);
+  });
 
   final User? user;
   final bool syncing;

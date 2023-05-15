@@ -12,7 +12,7 @@ import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'password-update-step.dart';
 
 class PasswordUpdateScreen extends StatefulWidget {
-  const PasswordUpdateScreen({Key? key}) : super(key: key);
+  const PasswordUpdateScreen({super.key});
 
   @override
   PasswordUpdateState createState() => PasswordUpdateState();

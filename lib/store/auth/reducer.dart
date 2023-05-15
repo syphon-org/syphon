@@ -4,83 +4,82 @@ import './actions.dart';
 import './state.dart';
 import '../user/model.dart';
 
-AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
-  switch (action.runtimeType) {
+AuthStore authReducer([AuthStore state = const AuthStore(), dynamic actionAny]) {
+  switch (actionAny.runtimeType) {
     case SetLoading:
-      return state.copyWith(loading: action.loading);
+      return state.copyWith(loading: actionAny.loading);
     case SetCreating:
-      return state.copyWith(creating: action.creating);
+      return state.copyWith(creating: actionAny.creating);
     case SetAuthObserver:
-      return state.copyWith(authObserver: action.authObserver);
+      return state.copyWith(authObserver: actionAny.authObserver);
     case SetContextObserver:
-      return state.copyWith(contextObserver: action.contextObserver);
+      return state.copyWith(contextObserver: actionAny.contextObserver);
     case SetUser:
-      final _action = action as SetUser;
+      final action = actionAny as SetUser;
       final availableUsers = List<User>.from(state.availableUsers);
       final hasUser = availableUsers.indexWhere(
-        (user) => user.userId == _action.user.userId,
+        (user) => user.userId == action.user.userId,
       );
 
       if (hasUser != -1) {
         availableUsers.replaceRange(hasUser, hasUser + 1, [
-          _action.user.copyWith(accessToken: ''),
+          action.user.copyWith(accessToken: ''),
         ]);
       }
 
       return state.copyWith(
-        user: _action.user,
+        user: action.user,
         availableUsers: availableUsers,
       );
     case SetSession:
-      final _action = action as SetSession;
-      return state.copyWith(authSession: _action.session);
+      final action = actionAny as SetSession;
+      return state.copyWith(authSession: action.session);
     case SetClientSecret:
-      final _action = action as SetClientSecret;
-      return state.copyWith(clientSecret: _action.clientSecret);
+      final action = actionAny as SetClientSecret;
+      return state.copyWith(clientSecret: action.clientSecret);
     case SetCompleted:
-      final _action = action as SetCompleted;
-      return state.copyWith(completed: _action.completed);
+      final action = actionAny as SetCompleted;
+      return state.copyWith(completed: action.completed);
     case SetCredential:
-      return state.copyWith(credential: action.credential);
+      return state.copyWith(credential: actionAny.credential);
     case SetInteractiveAuths:
-      return state.copyWith(interactiveAuths: action.interactiveAuths);
+      return state.copyWith(interactiveAuths: actionAny.interactiveAuths);
     case SetHostname:
-      return state.copyWith(hostname: action.hostname);
+      return state.copyWith(hostname: actionAny.hostname);
     case SetHomeserver:
-      return state.copyWith(homeserver: action.homeserver);
+      return state.copyWith(homeserver: actionAny.homeserver);
     case SetUsername:
-      return state.copyWith(username: action.username);
+      return state.copyWith(username: actionAny.username);
     case SetUsernameValid:
-      return state.copyWith(isUsernameValid: action.valid);
+      return state.copyWith(isUsernameValid: actionAny.valid);
     case SetUsernameAvailability:
-      return state.copyWith(isUsernameAvailable: action.availability);
+      return state.copyWith(isUsernameAvailable: actionAny.availability);
     case SetPassword:
-      return state.copyWith(password: action.password);
+      return state.copyWith(password: actionAny.password);
     case SetPasswordConfirm:
-      return state.copyWith(passwordConfirm: action.password);
+      return state.copyWith(passwordConfirm: actionAny.password);
     case SetPasswordCurrent:
-      return state.copyWith(passwordCurrent: action.password);
+      return state.copyWith(passwordCurrent: actionAny.password);
     case SetPasswordValid:
-      return state.copyWith(isPasswordValid: action.valid);
+      return state.copyWith(isPasswordValid: actionAny.valid);
     case SetEmail:
-      return state.copyWith(email: action.email);
+      return state.copyWith(email: actionAny.email);
     case SetEmailValid:
-      return state.copyWith(isEmailValid: action.valid);
+      return state.copyWith(isEmailValid: actionAny.valid);
     case SetEmailAvailability:
-      return state.copyWith(isEmailAvailable: action.available);
+      return state.copyWith(isEmailAvailable: actionAny.available);
     case SetVerificationNeeded:
-      return state.copyWith(verificationNeeded: action.needed);
+      return state.copyWith(verificationNeeded: actionAny.needed);
     case SetCaptcha:
-      return state.copyWith(captcha: action.completed);
+      return state.copyWith(captcha: actionAny.completed);
     case SetAgreement:
-      return state.copyWith(agreement: action.agreement);
+      return state.copyWith(agreement: actionAny.agreement);
     case AddAvailableUser:
-      final _action = action as AddAvailableUser;
-      final availableUser = _action.availableUser;
+      final action = actionAny as AddAvailableUser;
+      final availableUser = action.availableUser;
       final availableUsers = List<User>.from(state.availableUsers);
 
-      final existingIndex =
-          availableUsers.indexWhere((user) => user.userId == availableUser.userId);
+      final existingIndex = availableUsers.indexWhere((user) => user.userId == availableUser.userId);
 
       if (existingIndex == -1) {
         availableUsers.add(availableUser);
@@ -88,12 +87,11 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic action]) {
 
       return state.copyWith(availableUsers: availableUsers);
     case RemoveAvailableUser:
-      final _action = action as RemoveAvailableUser;
-      final availableUser = _action.availableUser;
+      final action = actionAny as RemoveAvailableUser;
+      final availableUser = action.availableUser;
       final availableUsers = List<User>.from(state.availableUsers);
 
-      final existingIndex =
-          availableUsers.indexWhere((user) => user.userId == availableUser.userId);
+      final existingIndex = availableUsers.indexWhere((user) => user.userId == availableUser.userId);
 
       if (existingIndex != -1) {
         availableUsers.remove(availableUser);

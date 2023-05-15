@@ -32,8 +32,8 @@ class MediaPreviewArguments {
 
 class MediaPreviewScreen extends StatefulWidget {
   const MediaPreviewScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   MediaPreviewState createState() => MediaPreviewState();
@@ -116,7 +116,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                                 ? Strings.titleSendMediaMessage
                                 : Strings.titleSendMediaMessageUnencrypted,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.w400,
                                 ),
                           ),
@@ -142,11 +142,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                                         child: CircularProgressIndicator(
                                           strokeWidth: Dimensions.strokeWidthThin * 1.5,
                                           valueColor: AlwaysStoppedAnimation<Color>(
-                                            Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary
-                                                        .computeLuminance() >
-                                                    0.6
+                                            Theme.of(context).colorScheme.secondary.computeLuminance() > 0.6
                                                 ? Colors.black
                                                 : Colors.white,
                                           ),

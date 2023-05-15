@@ -13,7 +13,7 @@ import 'package:syphon/store/auth/actions.dart';
 import 'package:syphon/store/index.dart';
 
 class TermsStep extends StatelessWidget {
-  TermsStep({Key? key}) : super(key: key);
+  TermsStep({super.key});
   final focusNode = FocusNode();
 
   @override
@@ -76,7 +76,7 @@ class TermsStep extends StatelessWidget {
                     child: Text(
                       '${props.homeserver} requires you read\nand agree to a terms of service.',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                   Stack(
@@ -90,7 +90,7 @@ class TermsStep extends StatelessWidget {
                         child: Text(
                           'Agree to Terms of Service',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ),
                       Positioned(
@@ -151,11 +151,11 @@ class TermsStep extends StatelessWidget {
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               text: 'Agree to ${props.homeserver} ',
-                              style: Theme.of(context).textTheme.subtitle1,
+                              style: Theme.of(context).textTheme.titleMedium,
                               children: <TextSpan>[
                                 TextSpan(
                                   text: 'terms of service',
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                         fontWeight: FontWeight.w400,
                                         decorationStyle: TextDecorationStyle.solid,
                                       ),

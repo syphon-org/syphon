@@ -1,50 +1,49 @@
 import './actions.dart';
 import './state.dart';
 
-SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic action]) {
-  switch (action.runtimeType) {
+SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic actionAny]) {
+  switch (actionAny.runtimeType) {
     case SetSyncing:
-      final _action = action as SetSyncing;
+      final action = actionAny as SetSyncing;
       return state.copyWith(
-        syncing: _action.syncing,
+        syncing: action.syncing,
         lastAttempt: DateTime.now().millisecondsSinceEpoch,
       );
     case SetBackoff:
-      final _action = action as SetBackoff;
+      final action = actionAny as SetBackoff;
       return state.copyWith(
-        backoff: _action.backoff,
+        backoff: action.backoff,
       );
     case SetUnauthed:
-      final _action = action as SetUnauthed;
+      final action = actionAny as SetUnauthed;
       return state.copyWith(
-        unauthed: _action.unauthed,
+        unauthed: action.unauthed,
       );
     case SetBackgrounded:
-      final _action = action as SetBackgrounded;
+      final action = actionAny as SetBackgrounded;
       return state.copyWith(
-        backgrounded: _action.backgrounded,
+        backgrounded: action.backgrounded,
       );
     case SetOffline:
-      final _action = action as SetOffline;
+      final action = actionAny as SetOffline;
       return state.copyWith(
-        offline: _action.offline,
+        offline: action.offline,
       );
     case SetSynced:
-      final _action = action as SetSynced;
+      final action = actionAny as SetSynced;
       return state.copyWith(
         backoff: 0,
         offline: false,
-        synced: _action.synced,
-        syncing: _action.syncing,
-        lastSince: _action.lastSince,
+        synced: action.synced,
+        syncing: action.syncing,
+        lastSince: action.lastSince,
         lastAttempt: DateTime.now().millisecondsSinceEpoch,
-        lastUpdate:
-            _action.synced ?? false ? DateTime.now().millisecondsSinceEpoch : state.lastUpdate,
+        lastUpdate: action.synced ?? false ? DateTime.now().millisecondsSinceEpoch : state.lastUpdate,
       );
     case SetSyncObserver:
-      final _action = action as SetSyncObserver;
+      final action = actionAny as SetSyncObserver;
       return state.copyWith(
-        syncObserver: _action.syncObserver,
+        syncObserver: action.syncObserver,
       );
     case ResetSync:
       return SyncStore();

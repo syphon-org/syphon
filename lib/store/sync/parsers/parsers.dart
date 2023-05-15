@@ -578,7 +578,7 @@ class Sync {
         }
       });
     } catch (error) {
-      log.error('[parseEphemerals] ${error.toString()}');
+      log.error('[parseEphemerals] $error');
     }
 
     return this.copyWith(

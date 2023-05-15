@@ -47,23 +47,19 @@ class ModalContextSwitcher extends StatelessWidget {
       builder: (context, currentContextData) => FutureBuilder<List<AppContext>>(
             future: props.availableContext, // async work
             builder: (context, contextsAllData) {
-              final knownUsers =
-                  props.availableUsers.map((u) => generateContextId_DEPRECATED(id: u.userId!));
+              final knownUsers = props.availableUsers.map((u) => generateContextId_DEPRECATED(id: u.userId!));
               final contextCurrent = currentContextData.data ?? AppContext();
               final contextsAll = contextsAllData.data ?? [];
 
-              final contextsUnknown = contextsAll
-                  .where((c) => c.id != contextCurrent.id && !knownUsers.contains(c.id))
-                  .toList();
+              final contextsUnknown =
+                  contextsAll.where((c) => c.id != contextCurrent.id && !knownUsers.contains(c.id)).toList();
 
               return ListView.builder(
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
                   scrollDirection: Axis.vertical,
-                  itemCount: props.availableUsers.length >= contextsAll.length
-                      ? 0
-                      : contextsUnknown.length,
+                  itemCount: props.availableUsers.length >= contextsAll.length ? 0 : contextsUnknown.length,
                   itemBuilder: (BuildContext context, int index) {
                     final context = contextsUnknown[index];
 
@@ -123,7 +119,7 @@ class ModalContextSwitcher extends StatelessWidget {
                   child: Text(
                     Strings.listItemContextSwitcherAccounts,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline5?.copyWith(
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).brightness == Brightness.light
                               ? Color(AppColors.greyDark)
@@ -154,7 +150,7 @@ class ModalContextSwitcher extends StatelessWidget {
                             ),
                             title: Text(
                               Strings.listItemContextSwitcherAddAccount,
-                              style: Theme.of(context).textTheme.bodyText2,
+                              style: Theme.of(context).textTheme.bodyMedium,
                             ),
                             leading: Container(
                               height: Dimensions.avatarSizeMin,

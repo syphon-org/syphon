@@ -19,12 +19,12 @@ class MediaFullScreen extends StatelessWidget {
   final String? eventId;
 
   const MediaFullScreen({
-    Key? key,
+    super.key,
     required this.roomId,
     required this.title,
     required this.bytes,
     required this.eventId,
-  }) : super(key: key);
+  });
 
   onPressDownload(BuildContext context) async {
     final store = StoreProvider.of<AppState>(context);

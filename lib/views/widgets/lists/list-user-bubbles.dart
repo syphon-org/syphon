@@ -16,13 +16,13 @@ import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 /// are still indexed by room
 class ListUserBubbles extends StatelessWidget {
   const ListUserBubbles({
-    Key? key,
+    super.key,
     this.users = const [],
     this.roomId = '',
     this.invite = false,
     this.forceOption = false,
     this.max = 12,
-  }) : super(key: key);
+  });
 
   final int max;
   final bool invite;
@@ -118,13 +118,13 @@ class ListUserBubbles extends StatelessWidget {
                           ),
                           border: Border.all(
                             width: 4,
-                            color: Theme.of(context).textTheme.caption!.color!,
+                            color: Theme.of(context).textTheme.bodySmall!.color!,
                           ),
                         ),
                         child: Icon(
                           invite ? Icons.edit : Icons.arrow_forward_ios,
                           size: invite ? Dimensions.iconSize : Dimensions.iconSizeLarge,
-                          color: Theme.of(context).textTheme.caption!.color,
+                          color: Theme.of(context).textTheme.bodySmall!.color,
                         ),
                       ),
                     ),

@@ -36,11 +36,11 @@ class LanguageSettingsScreen extends StatelessWidget {
                       contentPadding: Dimensions.listPadding,
                       title: Text(
                         displayName ?? 'Unknown',
-                        style: Theme.of(context).textTheme.bodyText2,
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       subtitle: Text(
                         nativeName ?? 'N/A',
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       trailing: Visibility(
                         visible: props.language == language,

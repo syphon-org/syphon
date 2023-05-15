@@ -251,12 +251,10 @@ ThunkAction<AppState> fetchDirectRooms() {
 ///
 /// Get a map of all the current members of a room
 ///
-ThunkAction<AppState> fetchRoomMembers({
-  required Room room,
-}) {
+ThunkAction<AppState> fetchRoomMembers({required Room room}) {
   return (Store<AppState> store) async {
     try {
-      final _room = store.state.roomStore.rooms[room.id]!;
+      final room0 = store.state.roomStore.rooms[room.id]!;
 
       store.dispatch(SetLoading(loading: true));
 
@@ -264,7 +262,7 @@ ThunkAction<AppState> fetchRoomMembers({
         protocol: store.state.authStore.protocol,
         accessToken: store.state.authStore.user.accessToken,
         homeserver: store.state.authStore.user.homeserver,
-        roomId: _room.id,
+        roomId: room0.id,
       );
 
       final members = data['joined'] as Map<String, dynamic>;
@@ -286,7 +284,7 @@ ThunkAction<AppState> fetchRoomMembers({
 
       store.dispatch(
         SetRoom(
-          room: _room.copyWith(userIds: members.keys.toList()),
+          room: room0.copyWith(userIds: members.keys.toList()),
         ),
       );
     } catch (error) {
@@ -658,8 +656,7 @@ ThunkAction<AppState> joinRoom({Room? room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom =
-          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
 
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
@@ -727,8 +724,7 @@ ThunkAction<AppState> acceptRoom({required Room room}) {
 
       final rooms = store.state.roomStore.rooms;
 
-      final Room joinedRoom =
-          rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
+      final Room joinedRoom = rooms.containsKey(room.id) ? rooms[room.id]! : Room(id: room.id);
       store.dispatch(SetRoom(room: joinedRoom.copyWith(invite: false)));
 
       store.dispatch(SetLoading(loading: true));

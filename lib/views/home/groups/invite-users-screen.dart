@@ -37,7 +37,7 @@ class InviteUsersArguments {
 }
 
 class InviteUsersScreen extends StatefulWidget {
-  const InviteUsersScreen({Key? key}) : super(key: key);
+  const InviteUsersScreen({super.key});
 
   @override
   InviteUsersState createState() => InviteUsersState();
@@ -226,14 +226,14 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                 ),
                 label: Text(
                   formatUsername(user),
-                  style: Theme.of(context).textTheme.caption!.copyWith(
-                        color: Theme.of(context).textTheme.bodyText1!.color,
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).textTheme.bodyLarge!.color,
                       ),
                 ),
                 deleteIcon: Icon(
                   Icons.close,
                   size: Dimensions.avatarSizeMessage / 1.5,
-                  color: Theme.of(context).textTheme.bodyText1!.color,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                 ),
                 onDeleted: () => onToggleInvite(user: user),
               ),
@@ -263,8 +263,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
 
         final showManualUser = searchable.isNotEmpty && foundResult < 0 && !props.loading;
         final usersList = searchable.isEmpty ? props.usersRecent : props.searchResults;
-        final usersListLabel =
-            searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
+        final usersListLabel = searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
 
         return Scaffold(
           appBar: AppBarSearch(
@@ -328,7 +327,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                                 Text(
                                   usersListLabel,
                                   textAlign: TextAlign.start,
-                                  style: Theme.of(context).textTheme.subtitle2,
+                                  style: Theme.of(context).textTheme.titleSmall,
                                 ),
                               ],
                             ),
@@ -336,8 +335,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                           Visibility(
                             visible: showManualUser,
                             child: ListItemUser(
-                              onPress: () => onAttemptInvite(
-                                  props: props, context: context, user: attemptableUser),
+                              onPress: () =>
+                                  onAttemptInvite(props: props, context: context, user: attemptableUser),
                               type: ListItemUserType.Selectable,
                               user: attemptableUser,
                               enabled: creatingRoomDisplayName != searchable,
@@ -360,8 +359,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                                 selected: invites.contains(user),
                                 loading: props.loading,
                                 onPress: () => onToggleInvite(user: user),
-                                onPressAvatar: () =>
-                                    onShowUserDetails(context: context, user: user),
+                                onPressAvatar: () => onShowUserDetails(context: context, user: user),
                               );
                             },
                           )

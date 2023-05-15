@@ -23,7 +23,7 @@ class Redaction extends Event {
     batch,
     prevBatch,
     timestamp,
-    content,
+    super.content,
     this.redactId,
   }) : super(
           id: id,
@@ -35,7 +35,6 @@ class Redaction extends Event {
           batch: batch,
           prevBatch: prevBatch,
           timestamp: timestamp,
-          content: content,
         );
 
   @override

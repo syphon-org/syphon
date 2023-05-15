@@ -11,10 +11,10 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class ProfilePreview extends StatelessWidget {
   const ProfilePreview({
-    Key? key,
+    super.key,
     this.hasMultiaccounts = false,
     this.onModifyAccounts,
-  }) : super(key: key);
+  });
 
   final bool hasMultiaccounts;
   final Function? onModifyAccounts;

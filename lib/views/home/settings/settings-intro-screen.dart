@@ -130,7 +130,7 @@ class IntroSettingsScreen extends StatelessWidget {
                             ),
                             subtitle: Text(
                               Strings.subtitleUseProxyServer,
-                              style: Theme.of(context).textTheme.caption,
+                              style: Theme.of(context).textTheme.bodySmall,
                             ),
                             trailing: Switch(
                               value: props.proxyEnabled,
@@ -145,7 +145,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 Strings.listItemSettingsProxyHost,
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
@@ -164,7 +164,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 Strings.listItemSettingsProxyPort,
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
@@ -185,7 +185,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               ),
                               subtitle: Text(
                                 Strings.subtitleProxyUseBasicAuthentication,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               trailing: Switch(
                                 value: props.proxyAuthenticationEnabled,
@@ -201,7 +201,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 Strings.listItemSettingsProxyUsername,
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
@@ -220,7 +220,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 Strings.listItemSettingsProxyPassword,
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8),
@@ -245,7 +245,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               child: Text(
                                 'Key Management Testing',
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                           ),
@@ -259,7 +259,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               },
                               title: Text(
                                 'Export Device Key',
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
                           ),
@@ -273,7 +273,7 @@ class IntroSettingsScreen extends StatelessWidget {
                               },
                               title: Text(
                                 'Import Device Key',
-                                style: Theme.of(context).textTheme.subtitle1,
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
                           ),

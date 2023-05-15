@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
@@ -42,7 +41,7 @@ extension MediaQueries on StorageDatabase {
   }
 
   Future<List<Media>> selectMediaAll() {
-    return (select(medias)).get();
+    return select(medias).get();
   }
 }
 
@@ -89,7 +88,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 
     final images = await storage.selectMediaAll();
 
-    log.info('[media] loaded ${images.length.toString()}');
+    log.info('[media] loaded ${images.length}');
 
     for (final image in images) {
       if (image.mxcUri != null && image.data != null) {
@@ -125,7 +124,7 @@ Future<Map<String, Uint8List>> loadMediaRelative({
 
     final images = await storage.selectMedias(idsAll);
 
-    log.info('[media] loaded ${images.length.toString()}');
+    log.info('[media] loaded ${images.length}');
 
     for (final image in images) {
       if (image.mxcUri != null && image.data != null) {

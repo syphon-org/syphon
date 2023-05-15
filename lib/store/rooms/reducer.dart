@@ -2,52 +2,52 @@ import './actions.dart';
 import './room/model.dart';
 import './state.dart';
 
-RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic action]) {
-  switch (action.runtimeType) {
+RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic actionAny]) {
+  switch (actionAny.runtimeType) {
     case SetLoading:
-      return state.copyWith(loading: action.loading);
+      return state.copyWith(loading: actionAny.loading);
 
     case SetRooms:
       final Map<String, Room> rooms = Map.fromIterable(
-        action.rooms,
+        actionAny.rooms,
         key: (room) => room.id,
         value: (room) => room,
       );
       return state.copyWith(rooms: rooms);
 
     case SetRoom:
-      final _action = action as SetRoom;
+      final action = actionAny as SetRoom;
       final rooms = Map<String, Room>.from(state.rooms);
-      rooms[_action.room.id] = _action.room;
+      rooms[action.room.id] = action.room;
       return state.copyWith(rooms: rooms);
 
     case UpdateRoom:
       final rooms = Map<String, Room>.from(state.rooms);
 
-      if (rooms[action.id] == null) {
+      if (rooms[actionAny.id] == null) {
         return state;
       }
 
-      rooms[action.id] = rooms[action.id]!.copyWith(
-        draft: action.draft,
-        reply: action.reply,
-        sending: action.sending,
-        syncing: action.syncing,
-        lastRead: action.lastRead,
+      rooms[actionAny.id] = rooms[actionAny.id]!.copyWith(
+        draft: actionAny.draft,
+        reply: actionAny.reply,
+        sending: actionAny.sending,
+        syncing: actionAny.syncing,
+        lastRead: actionAny.lastRead,
       );
 
       return state.copyWith(rooms: rooms);
 
     case RemoveRoom:
       final rooms = Map<String, Room>.from(state.rooms);
-      rooms.remove(action.roomId);
+      rooms.remove(actionAny.roomId);
       return state.copyWith(rooms: rooms);
 
     case AddArchive:
       final rooms = Map<String, Room>.from(state.rooms);
-      final room = rooms[action.roomId]!;
+      final room = rooms[actionAny.roomId]!;
 
-      rooms[action.roomId] = room.copyWith(hidden: true);
+      rooms[actionAny.roomId] = room.copyWith(hidden: true);
 
       return state.copyWith(rooms: rooms);
     case ResetRooms:

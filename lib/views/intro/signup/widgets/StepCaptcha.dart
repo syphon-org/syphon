@@ -16,7 +16,7 @@ import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
 class CaptchaStep extends StatefulWidget {
-  const CaptchaStep({Key? key}) : super(key: key);
+  const CaptchaStep({super.key});
 
   @override
   CaptchaStepState createState() => CaptchaStepState();
@@ -82,7 +82,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                     child: Text(
                       Strings.contentCaptchaRequirement,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                   Stack(
@@ -96,7 +96,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                         child: Text(
                           'Confirm you\'re alive',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ),
                       Positioned(
@@ -137,12 +137,8 @@ class CaptchaStepState extends State<CaptchaStep> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   ButtonText(
-                    text: !props.completed
-                        ? Strings.buttonTextLoadCaptcha
-                        : Strings.buttonTextConfirmed,
-                    color: !props.completed
-                        ? Color(AppColors.cyanSyphon)
-                        : Color(AppColors.cyanSyphonAlpha),
+                    text: !props.completed ? Strings.buttonTextLoadCaptcha : Strings.buttonTextConfirmed,
+                    color: !props.completed ? Color(AppColors.cyanSyphon) : Color(AppColors.cyanSyphonAlpha),
                     loading: props.loading,
                     disabled: props.completed,
                     onPressed: () => onShowDialog(context, props),
@@ -183,8 +179,7 @@ class _Props extends Equatable {
         completed: store.state.authStore.captcha,
         hostname: store.state.authStore.hostname,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]
-                  ['public_key'] ??
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'] ??
               '';
         }(),
         onCompleteCaptcha: (String token) async {

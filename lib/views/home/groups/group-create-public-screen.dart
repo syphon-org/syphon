@@ -25,7 +25,7 @@ import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 
 class CreatePublicGroupScreen extends StatefulWidget {
-  const CreatePublicGroupScreen({Key? key}) : super(key: key);
+  const CreatePublicGroupScreen({super.key});
 
   @override
   CreateGroupPublicState createState() => CreateGroupPublicState();
@@ -228,7 +228,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                   child: Text(
                                                     name ?? '',
                                                     overflow: TextOverflow.ellipsis,
-                                                    style: Theme.of(context).textTheme.bodyText1,
+                                                    style: Theme.of(context).textTheme.bodyLarge,
                                                   ),
                                                 ),
                                                 Visibility(
@@ -242,7 +242,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                       homeserver: props.homeserver ?? '',
                                                     ),
                                                     textAlign: TextAlign.center,
-                                                    style: Theme.of(context).textTheme.caption,
+                                                    style: Theme.of(context).textTheme.bodySmall,
                                                   ),
                                                 ),
                                                 Flexible(
@@ -258,7 +258,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                         maxLines: 1,
                                                         overflow: TextOverflow.ellipsis,
                                                         textAlign: TextAlign.center,
-                                                        style: Theme.of(context).textTheme.caption,
+                                                        style: Theme.of(context).textTheme.bodySmall,
                                                       ),
                                                     )),
                                               ],
@@ -282,7 +282,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                 child: Text(
                                                   'About',
                                                   textAlign: TextAlign.start,
-                                                  style: Theme.of(context).textTheme.subtitle2,
+                                                  style: Theme.of(context).textTheme.titleSmall,
                                                 ),
                                               ),
                                               Container(
@@ -295,8 +295,8 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                   label: 'Name*',
                                                   textInputAction: TextInputAction.next,
                                                   controller: nameController,
-                                                  onSubmitted: (text) => FocusScope.of(context)
-                                                      .requestFocus(aliasFocus),
+                                                  onSubmitted: (text) =>
+                                                      FocusScope.of(context).requestFocus(aliasFocus),
                                                   onChanged: (text) => setState(() {
                                                     name = text;
                                                   }),
@@ -313,8 +313,8 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                   textInputAction: TextInputAction.next,
                                                   disableSpacing: true,
                                                   focusNode: aliasFocus,
-                                                  onSubmitted: (text) => FocusScope.of(context)
-                                                      .requestFocus(topicFocus),
+                                                  onSubmitted: (text) =>
+                                                      FocusScope.of(context).requestFocus(topicFocus),
                                                   onChanged: (text) => setState(() {
                                                     alias = text;
                                                   }),
@@ -362,7 +362,7 @@ class CreateGroupPublicState extends State<CreatePublicGroupScreen> {
                                                 Text(
                                                   Strings.labelUsers,
                                                   textAlign: TextAlign.start,
-                                                  style: Theme.of(context).textTheme.subtitle2,
+                                                  style: Theme.of(context).textTheme.titleSmall,
                                                 ),
                                               ],
                                             ),

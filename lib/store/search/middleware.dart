@@ -14,20 +14,20 @@ import 'package:syphon/store/search/actions.dart';
 searchMiddleware(StorageDatabase? coldStorage) {
   return (
     Store<AppState> store,
-    dynamic action,
+    dynamic _action,
     NextDispatcher next,
   ) async {
-    next(action);
+    next(_action);
 
     if (coldStorage == null) {
       log.warn('storage is null, skipping saving cold storage data!!!', title: 'searchMiddleware');
       return;
     }
 
-    switch (action.runtimeType) {
+    switch (_action.runtimeType) {
       case SearchMessages:
-        final _action = action as SearchMessages;
-        final results = await searchMessagesStored(_action.searchText, storage: coldStorage);
+        final action = _action as SearchMessages;
+        final results = await searchMessagesStored(action.searchText, storage: coldStorage);
         store.dispatch(SearchMessageResults(results: results));
         break;
       default:

@@ -9,12 +9,12 @@ import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
 class CardSection extends StatelessWidget {
   const CardSection({
-    Key? key,
+    super.key,
     this.child,
     this.margin,
     this.padding,
     this.elevation,
-  }) : super(key: key);
+  });
 
   final Widget? child;
   final EdgeInsets? margin;

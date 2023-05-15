@@ -5,7 +5,7 @@ import 'package:syphon/global/dimensions.dart';
 
 class ButtonText extends StatelessWidget {
   const ButtonText({
-    Key? key,
+    super.key,
     this.text,
     this.color,
     this.size,
@@ -13,7 +13,7 @@ class ButtonText extends StatelessWidget {
     this.loading = false,
     this.disabled = false,
     this.onPressed,
-  }) : super(key: key);
+  });
 
   final bool loading;
   final bool disabled;
@@ -51,7 +51,7 @@ class ButtonText extends StatelessWidget {
                 : Text(
                     text!,
                     style: TextStyle(
-                      fontSize: size ?? Theme.of(context).textTheme.bodyText1?.fontSize,
+                      fontSize: size ?? Theme.of(context).textTheme.bodyLarge?.fontSize,
                       fontWeight: FontWeight.w100,
                       letterSpacing: 0.8,
                       color: () {

@@ -18,7 +18,7 @@ String? selectDirectRoomAvatar(
 
     return avatarUri;
   } catch (error) {
-    log.error('[selectDirectRoomAvatar] ${error.toString()}');
+    log.error('[selectDirectRoomAvatar] $error');
     return null;
   }
 }
@@ -48,7 +48,7 @@ String? selectDirectRoomName(
 
     return roomNameDirect;
   } catch (error) {
-    log.error('[selectDirectRoomName] ${error.toString()}');
+    log.error('[selectDirectRoomName] $error');
     return null;
   }
 }

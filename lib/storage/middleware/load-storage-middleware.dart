@@ -14,7 +14,8 @@ import 'package:syphon/store/user/storage.dart';
 loadStorageMiddleware(StorageDatabase? storage) {
   return (
     Store<AppState> store,
-    dynamic action,
+    // ignore: no_leading_underscores_for_local_identifiers
+    dynamic _action,
     NextDispatcher next,
   ) async {
     try {
@@ -26,11 +27,11 @@ loadStorageMiddleware(StorageDatabase? storage) {
         return;
       }
 
-      switch (action.runtimeType) {
+      switch (_action.runtimeType) {
         case LoadUsers:
-          final _action = action as LoadUsers;
+          final action = _action as LoadUsers;
           _loadUserAsync() async {
-            final loadedUsers = await loadUsers(storage: storage, ids: _action.userIds ?? []);
+            final loadedUsers = await loadUsers(storage: storage, ids: action.userIds ?? []);
 
             store.dispatch(SetUsers(users: loadedUsers));
           }
@@ -41,9 +42,9 @@ loadStorageMiddleware(StorageDatabase? storage) {
           break;
       }
     } catch (error) {
-      log.error('[loadStorageMiddleware] ${error.toString()}');
+      log.error('[loadStorageMiddleware] $error');
     }
 
-    next(action);
+    next(_action);
   };
 }

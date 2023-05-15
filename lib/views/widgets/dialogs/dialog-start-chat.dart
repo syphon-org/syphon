@@ -10,14 +10,14 @@ import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogStartChat extends StatelessWidget {
   const DialogStartChat({
-    Key? key,
+    super.key,
     this.user,
     this.title = 'Try chatting',
     this.content,
     this.action,
     this.onCancel,
     this.onStartChat,
-  }) : super(key: key);
+  });
 
   final User? user;
   final String title;
@@ -55,7 +55,7 @@ class DialogStartChat extends StatelessWidget {
                   ButtonText(
                     textWidget: Text(
                       Strings.buttonCancel,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     disabled: creating,
                     onPressed: () {
@@ -65,7 +65,7 @@ class DialogStartChat extends StatelessWidget {
                   ButtonText(
                     textWidget: Text(
                       action ?? Strings.buttonStartChat,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     loading: creating,
                     disabled: creating,
@@ -103,8 +103,7 @@ class Props extends Equatable {
   static Props mapStateToProps(Store<AppState> store) => Props(
         completed: store.state.authStore.captcha,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]
-              ['public_key'];
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
         onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(

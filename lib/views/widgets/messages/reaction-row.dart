@@ -12,11 +12,11 @@ class ReactionRow extends StatefulWidget {
   final Function? onToggleReaction;
 
   const ReactionRow({
-    Key? key,
+    super.key,
     this.reactions = const [],
     this.currentUserId = '',
     this.onToggleReaction,
-  }) : super(key: key);
+  });
 
   @override
   State<ReactionRow> createState() => _ReactionRowState();
@@ -77,8 +77,7 @@ class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
                   : Theme.of(context).dialogBackgroundColor,
               borderRadius: BorderRadius.circular(Dimensions.iconSize),
               border: Border.all(
-                color:
-                    Theme.of(context).brightness == Brightness.light ? Colors.grey : Colors.white,
+                color: Theme.of(context).brightness == Brightness.light ? Colors.grey : Colors.white,
                 width: 0.8,
               ),
             ),
@@ -89,7 +88,7 @@ class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
                   reactionKey,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.subtitle1!.color,
+                    color: Theme.of(context).textTheme.titleMedium!.color,
                     height: 1.35,
                   ),
                 ),
@@ -103,7 +102,7 @@ class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.subtitle1!.color,
+                        color: Theme.of(context).textTheme.titleMedium!.color,
                         height: 1.35,
                       ),
                     ),

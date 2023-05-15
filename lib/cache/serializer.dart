@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:redux_persist/redux_persist.dart';
@@ -71,7 +70,7 @@ class CacheSerializer implements StateSerializer<AppState> {
           }
         } catch (error) {
           log.error(
-            '[CacheSerializer|encryption] ${store.runtimeType.toString()} $error',
+            '[CacheSerializer|encryption] ${store.runtimeType} $error',
           );
         }
       }));

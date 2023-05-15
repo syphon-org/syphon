@@ -14,7 +14,7 @@ import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 
 class VerificationScreen extends StatefulWidget {
-  const VerificationScreen({Key? key}) : super(key: key);
+  const VerificationScreen({super.key});
 
   @override
   VerificationScreenState createState() => VerificationScreenState();
@@ -96,8 +96,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                             ),
                             child: SvgPicture.asset(
                               Assets.heroSignupVerificationView,
-                              semanticsLabel:
-                                  'Letter in envelop floating upward with attached balloons',
+                              semanticsLabel: 'Letter in envelop floating upward with attached balloons',
                             ),
                           ),
                         ),
@@ -110,7 +109,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                 child: Text(
                                   'Check your email and click the verification\nlink to finish account creation.',
                                   textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
                               Stack(
@@ -124,7 +123,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                     child: Text(
                                       'Verify your email address',
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(context).textTheme.headline5,
+                                      style: Theme.of(context).textTheme.headlineSmall,
                                     ),
                                   ),
                                   Positioned(

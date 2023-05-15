@@ -55,7 +55,7 @@ Future<AppContext> loadContextCurrent() async {
 
     return currentContext;
   } catch (error) {
-    log.error('[loadCurrentContext] ERROR LOADING CURRENT CONTEXT ${error.toString()}');
+    log.error('[loadCurrentContext] ERROR LOADING CURRENT CONTEXT $error');
 
     try {
       final fallback = await loadContextNext();
@@ -76,7 +76,7 @@ Future<AppContext> loadContextNext() async {
     final allContexts = await loadContextsAll();
     return allContexts.isNotEmpty ? allContexts[0] : AppContext();
   } catch (error) {
-    log.error('[loadNextContext] ERROR LOADING NEXT CONTEXT ${error.toString()}');
+    log.error('[loadNextContext] ERROR LOADING NEXT CONTEXT $error');
 
     return AppContext();
   }
@@ -87,7 +87,7 @@ Future<List<AppContext>> loadContextsAll() async {
     final contextJson = await SecureStorage().read(key: ALL_APP_CONTEXT_KEY) ?? '[]';
     return List.from(await json.decode(contextJson)).map((c) => AppContext.fromJson(c)).toList();
   } catch (error) {
-    log.error('[loadAllContexts] ERROR LOADING ALL CONTEXTS ${error.toString()}');
+    log.error('[loadAllContexts] ERROR LOADING ALL CONTEXTS $error');
 
     resetContextsAll();
 
@@ -126,6 +126,6 @@ resetContextsAll() async {
     await SecureStorage().write(key: ALL_APP_CONTEXT_KEY, value: json.encode([]));
     await SecureStorage().write(key: CURRENT_APP_CONTEXT_KEY, value: json.encode(AppContext()));
   } catch (error) {
-    log.error('[resetAllContexts] ERROR RESETTING CONTEXT STORAGE ${error.toString()}');
+    log.error('[resetAllContexts] ERROR RESETTING CONTEXT STORAGE $error');
   }
 }

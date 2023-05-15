@@ -1,4 +1,3 @@
-import 'package:redux/redux.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 

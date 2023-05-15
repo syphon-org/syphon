@@ -54,7 +54,7 @@ class ChatScreenArguments {
 }
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({super.key});
 
   @override
   ChatScreenState createState() => ChatScreenState();
@@ -700,7 +700,7 @@ class ChatScreenState extends State<ChatScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Load more messages',
-                                        style: Theme.of(context).textTheme.bodyText2,
+                                        style: Theme.of(context).textTheme.bodyMedium,
                                       )
                                     ],
                                   ),

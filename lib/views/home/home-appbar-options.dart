@@ -14,12 +14,12 @@ import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
 class AppBarHomeOptions extends HookWidget implements PreferredSizeWidget {
   const AppBarHomeOptions({
-    Key? key,
+    super.key,
     this.selectedChatsIds = const [],
     this.onSelectAll,
     this.onToggleChatOptions,
     this.onDismissChatOptions,
-  }) : super(key: key);
+  });
 
   final List<String> selectedChatsIds;
 
@@ -90,10 +90,9 @@ class AppBarHomeOptions extends HookWidget implements PreferredSizeWidget {
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
             try {
-              final _selectedChats = Map<String, Room>.from(selectedChats);
+              final selectedChats0 = Map<String, Room>.from(selectedChats);
 
-              await Future.forEach<Room>(_selectedChats.values,
-                  (Room room) async {
+              await Future.forEach<Room>(selectedChats0.values, (Room room) async {
                 await dispatch(leaveRoom(room: room));
                 onToggleChatOptions?.call(room: room);
               });
@@ -119,9 +118,9 @@ class AppBarHomeOptions extends HookWidget implements PreferredSizeWidget {
           confirmText: Strings.buttonConfirmFormal.capitalize(),
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
-            final _selectedChats = Map<String, Room>.from(selectedChats);
+            final selectedChats0 = Map<String, Room>.from(selectedChats);
 
-            await Future.forEach(_selectedChats.values, (Room room) async {
+            await Future.forEach(selectedChats0.values, (Room room) async {
               await dispatch(removeRoom(room: room));
             });
 

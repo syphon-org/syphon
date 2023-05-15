@@ -57,7 +57,7 @@ class ChatInput extends StatefulWidget {
   }) onAddMedia;
 
   const ChatInput({
-    Key? key,
+    super.key,
     required this.roomId,
     required this.focusNode,
     required this.controller,
@@ -73,7 +73,7 @@ class ChatInput extends StatefulWidget {
     this.onSubmitMessage,
     this.onCancelReply,
     this.onAddMedia = _empty,
-  }) : super(key: key);
+  });
 
   @override
   ChatInputState createState() => ChatInputState();

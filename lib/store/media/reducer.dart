@@ -5,13 +5,13 @@ import 'package:syphon/store/media/model.dart';
 import './actions.dart';
 import './state.dart';
 
-MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action]) {
-  switch (action.runtimeType) {
+MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic actionAny]) {
+  switch (actionAny.runtimeType) {
     case UpdateMediaCache:
-      final _action = action as UpdateMediaCache;
+      final action = actionAny as UpdateMediaCache;
 
-      final data = _action.data;
-      final mxcUri = _action.mxcUri!;
+      final data = action.data;
+      final mxcUri = action.mxcUri!;
 
       final medias = Map<String, Media>.from(state.media);
       final mediaCache = Map<String, Uint8List>.from(state.mediaCache);
@@ -24,9 +24,9 @@ MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action])
       medias.putIfAbsent(
         mxcUri,
         () => Media(
-          mxcUri: _action.mxcUri,
-          info: _action.info,
-          type: _action.type,
+          mxcUri: action.mxcUri,
+          info: action.info,
+          type: action.type,
           // data: _action.data TODO: pull only from the media object itself
         ),
       );
@@ -34,9 +34,9 @@ MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action])
       medias.update(
         mxcUri,
         (value) => Media(
-          mxcUri: _action.mxcUri,
-          info: value.info ?? _action.info,
-          type: _action.type,
+          mxcUri: action.mxcUri,
+          info: value.info ?? action.info,
+          type: action.type,
           // data: _action.data TODO: pull only from the media object itself
         ),
       );
@@ -46,10 +46,10 @@ MediaStore mediaReducer([MediaStore state = const MediaStore(), dynamic action])
         mediaCache: mediaCache,
       );
     case UpdateMediaChecks:
-      final _action = action as UpdateMediaChecks;
+      final action = actionAny as UpdateMediaChecks;
       final mediaChecks = Map<String, String>.from(state.mediaStatus);
       // ignore: cast_nullable_to_non_nullable
-      mediaChecks[_action.mxcUri!] = (_action.status as MediaStatus).value;
+      mediaChecks[action.mxcUri!] = (action.status as MediaStatus).value;
       return state.copyWith(
         mediaStatus: mediaChecks,
       );

@@ -23,7 +23,7 @@ enum ListItemUserType {
 ///
 class ListItemUser extends StatelessWidget {
   const ListItemUser({
-    Key? key,
+    super.key,
     required this.user,
     this.type = ListItemUserType.Pressable,
     this.enabled = false,
@@ -32,7 +32,7 @@ class ListItemUser extends StatelessWidget {
     this.real = true,
     this.onPress,
     this.onPressAvatar,
-  }) : super(key: key);
+  });
 
   final User user;
   final bool loading;
@@ -119,11 +119,11 @@ class ListItemUser extends StatelessWidget {
             title: Text(
               formatUsername(user),
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             subtitle: Text(
               user.userId!,
-              style: Theme.of(context).textTheme.caption!.merge(
+              style: Theme.of(context).textTheme.bodySmall!.merge(
                     TextStyle(
                       color: loading ? Color(AppColors.greyDisabled) : null,
                     ),

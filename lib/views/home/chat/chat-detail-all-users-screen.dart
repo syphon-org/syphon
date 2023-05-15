@@ -27,14 +27,13 @@ class ChatUsersDetailArguments {
 }
 
 class ChatUsersDetailScreen extends StatefulWidget {
-  const ChatUsersDetailScreen({Key? key}) : super(key: key);
+  const ChatUsersDetailScreen({super.key});
 
   @override
   ChatUsersDetailState createState() => ChatUsersDetailState();
 }
 
-class ChatUsersDetailState extends State<ChatUsersDetailScreen>
-    with Lifecycle<ChatUsersDetailScreen> {
+class ChatUsersDetailState extends State<ChatUsersDetailScreen> with Lifecycle<ChatUsersDetailScreen> {
   final searchInputFocusNode = FocusNode();
 
   bool loading = false;
@@ -101,11 +100,11 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
                 title: Text(
                   formatUsername(user),
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
                   user.userId!,
-                  style: Theme.of(context).textTheme.caption!.merge(
+                  style: Theme.of(context).textTheme.bodySmall!.merge(
                         TextStyle(
                           color: props.loading ? Color(AppColors.greyDisabled) : null,
                         ),

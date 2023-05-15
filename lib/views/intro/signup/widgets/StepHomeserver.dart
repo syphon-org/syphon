@@ -19,7 +19,7 @@ import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 class HomeserverStep extends StatefulWidget {
-  const HomeserverStep({Key? key}) : super(key: key);
+  const HomeserverStep({super.key});
 
   @override
   HomeserverStepState createState() => HomeserverStepState();
@@ -59,11 +59,11 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
           ),
           title: Text(
             props.homeserver.hostname ?? '',
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           subtitle: Text(
             props.homeserver.baseUrl ?? '',
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           trailing: TouchableOpacity(
             onTap: () {
@@ -160,7 +160,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
                     Text(
                       'Find a homeserver',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline5,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ],
                 ),

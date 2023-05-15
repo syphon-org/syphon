@@ -11,9 +11,9 @@ class LoadingScreen extends StatelessWidget {
   final bool dark;
 
   const LoadingScreen({
-    Key? key,
+    super.key,
     this.dark = false,
-  }) : super(key: key);
+  });
 
   buildLoadingLight(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;

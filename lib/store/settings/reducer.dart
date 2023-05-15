@@ -11,68 +11,63 @@ import './state.dart';
 
 SettingsStore settingsReducer([
   SettingsStore state = const SettingsStore(),
-  dynamic action,
+  dynamic actionAny,
 ]) {
-  switch (action.runtimeType) {
+  switch (actionAny.runtimeType) {
     case SetLoadingSettings:
       return state.copyWith(
-        loading: action.loading,
+        loading: actionAny.loading,
       );
     case SetPrimaryColor:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(primaryColor: action.color),
+        themeSettings: state.themeSettings.copyWith(primaryColor: actionAny.color),
       );
     case SetAccentColor:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(accentColor: action.color),
+        themeSettings: state.themeSettings.copyWith(accentColor: actionAny.color),
       );
     case SetAppBarColor:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(appBarColor: action.color),
+        themeSettings: state.themeSettings.copyWith(appBarColor: actionAny.color),
       );
     case SetFontName:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(fontName: action.fontName),
+        themeSettings: state.themeSettings.copyWith(fontName: actionAny.fontName),
       );
     case SetFontSize:
       return state.copyWith(
-        themeSettings: state.themeSettings.copyWith(fontSize: action.fontSize),
+        themeSettings: state.themeSettings.copyWith(fontSize: actionAny.fontSize),
       );
     case SetMessageSize:
       return state.copyWith(
-        themeSettings:
-            state.themeSettings.copyWith(messageSize: action.messageSize),
+        themeSettings: state.themeSettings.copyWith(messageSize: actionAny.messageSize),
       );
     case SetAvatarShape:
       return state.copyWith(
-        themeSettings:
-            state.themeSettings.copyWith(avatarShape: action.avatarShape),
+        themeSettings: state.themeSettings.copyWith(avatarShape: actionAny.avatarShape),
       );
     case SetMainFabType:
-      final _action = action as SetMainFabType;
+      final action = actionAny as SetMainFabType;
       return state.copyWith(
-        themeSettings:
-            state.themeSettings.copyWith(mainFabType: _action.fabType),
+        themeSettings: state.themeSettings.copyWith(mainFabType: action.fabType),
       );
     case SetMainFabLocation:
-      final _action = action as SetMainFabLocation;
+      final action = actionAny as SetMainFabLocation;
       return state.copyWith(
-        themeSettings:
-            state.themeSettings.copyWith(mainFabLocation: _action.fabLocation),
+        themeSettings: state.themeSettings.copyWith(mainFabLocation: action.fabLocation),
       );
     case SetMainFabLabels:
-      final _action = action as SetMainFabLabels;
+      final action = actionAny as SetMainFabLabels;
       return state.copyWith(
-        themeSettings:
-            state.themeSettings.copyWith(mainFabLabel: _action.fabLabels),
+        themeSettings: state.themeSettings.copyWith(mainFabLabel: action.fabLabels),
       );
     case SetDevices:
       return state.copyWith(
-        devices: action.devices,
+        devices: actionAny.devices,
       );
     case SetPusherToken:
       return state.copyWith(
-        pusherToken: action.token,
+        pusherToken: actionAny.token,
       );
     case LogAppAgreement:
       return state.copyWith(
@@ -82,27 +77,26 @@ SettingsStore settingsReducer([
       final chatSettings = Map<String, ChatSetting>.from(state.chatSettings);
 
       // Initialize chat settings if null
-      if (chatSettings[action.roomId] == null) {
-        chatSettings[action.roomId] = ChatSetting(
-          roomId: action.roomId,
+      if (chatSettings[actionAny.roomId] == null) {
+        chatSettings[actionAny.roomId] = ChatSetting(
+          roomId: actionAny.roomId,
           language: state.language,
         );
       }
 
-      chatSettings[action.roomId] = chatSettings[action.roomId]!.copyWith(
-        primaryColor: action.color,
+      chatSettings[actionAny.roomId] = chatSettings[actionAny.roomId]!.copyWith(
+        primaryColor: actionAny.color,
       );
       return state.copyWith(
         chatSettings: chatSettings,
       );
     case SetLanguage:
       return state.copyWith(
-        language: action.language,
+        language: actionAny.language,
       );
     case SetThemeType:
       return state.copyWith(
-        themeSettings:
-            state.themeSettings.copyWith(themeType: action.themeType),
+        themeSettings: state.themeSettings.copyWith(themeType: actionAny.themeType),
       );
     case ToggleEnterSend:
       return state.copyWith(
@@ -118,11 +112,11 @@ SettingsStore settingsReducer([
       );
     case SetSyncInterval:
       return state.copyWith(
-        syncInterval: action.syncInterval,
+        syncInterval: actionAny.syncInterval,
       );
     case SetPollTimeout:
       return state.copyWith(
-        syncPollTimeout: action.syncPollTimeout,
+        syncPollTimeout: actionAny.syncPollTimeout,
       );
     case ToggleTypingIndicators:
       return state.copyWith(
@@ -141,85 +135,85 @@ SettingsStore settingsReducer([
         autoDownloadEnabled: !state.autoDownloadEnabled,
       );
     case SetLastBackupMillis:
-      final _action = action as SetLastBackupMillis;
+      final action = actionAny as SetLastBackupMillis;
       return state.copyWith(
         privacySettings: state.privacySettings.copyWith(
-          lastBackupMillis: _action.timestamp,
+          lastBackupMillis: action.timestamp,
         ),
       );
     case SetKeyBackupPassword:
       // NOTE: saved to cold storage only instead of state
       return state;
     case SetKeyBackupLocation:
-      final _action = action as SetKeyBackupLocation;
+      final action = actionAny as SetKeyBackupLocation;
       return state.copyWith(
         storageSettings: state.storageSettings.copyWith(
-          keyBackupLocation: _action.location,
+          keyBackupLocation: action.location,
         ),
       );
     case SetKeyBackupInterval:
-      final _action = action as SetKeyBackupInterval;
+      final action = actionAny as SetKeyBackupInterval;
       return state.copyWith(
         privacySettings: state.privacySettings.copyWith(
-          keyBackupInterval: _action.duration,
+          keyBackupInterval: action.duration,
           lastBackupMillis: DateTime.now().millisecondsSinceEpoch.toString(),
         ),
       );
     case ToggleProxy:
-      final _state = state.copyWith(
+      final state0 = state.copyWith(
         proxySettings: state.proxySettings.copyWith(
           enabled: !state.proxySettings.enabled,
         ),
       );
 
-      httpClient = createClient(proxySettings: _state.proxySettings);
+      httpClient = createClient(proxySettings: state0.proxySettings);
 
-      return _state;
+      return state0;
     case SetProxyHost:
-      final _state = state.copyWith(
-        proxySettings: state.proxySettings.copyWith(host: action.host),
+      final state0 = state.copyWith(
+        proxySettings: state.proxySettings.copyWith(host: actionAny.host),
       );
 
-      httpClient = createClient(proxySettings: _state.proxySettings);
+      httpClient = createClient(proxySettings: state0.proxySettings);
 
-      return _state;
+      return state0;
     case SetProxyPort:
-      final _state = state.copyWith(
-        proxySettings: state.proxySettings.copyWith(port: action.port),
+      final state0 = state.copyWith(
+        proxySettings: state.proxySettings.copyWith(port: actionAny.port),
       );
 
-      httpClient = createClient(proxySettings: _state.proxySettings);
+      httpClient = createClient(proxySettings: state0.proxySettings);
 
-      return _state;
+      return state0;
     case ToggleProxyAuthentication:
-      final _state = state.copyWith(
-        proxySettings: state.proxySettings.copyWith(
-            authenticationEnabled: !state.proxySettings.authenticationEnabled),
+      final state0 = state.copyWith(
+        proxySettings:
+            state.proxySettings.copyWith(authenticationEnabled: !state.proxySettings.authenticationEnabled),
       );
 
-      httpClient = createClient(proxySettings: _state.proxySettings);
+      httpClient = createClient(proxySettings: state0.proxySettings);
 
-      return _state;
+      return state0;
     case SetProxyUsername:
-      final _state = state.copyWith(
-        proxySettings: state.proxySettings.copyWith(username: action.username),
+      final state0 = state.copyWith(
+        proxySettings: state.proxySettings.copyWith(username: actionAny.username),
       );
 
-      httpClient = createClient(proxySettings: _state.proxySettings);
+      httpClient = createClient(proxySettings: state0.proxySettings);
 
-      return _state;
+      return state0;
     case SetProxyPassword:
-      final _state = state.copyWith(
-        proxySettings: state.proxySettings.copyWith(password: action.password),
+      final state0 = state.copyWith(
+        proxySettings: state.proxySettings.copyWith(password: actionAny.password),
       );
 
-      httpClient = createClient(proxySettings: _state.proxySettings);
+      httpClient = createClient(proxySettings: state0.proxySettings);
 
-      return _state;
+      return state0;
     case SetReadReceipts:
-      final _action = action as SetReadReceipts;
+      final action = actionAny as SetReadReceipts;
       return state.copyWith(
-        readReceipts: _action.readReceipts,
+        readReceipts: action.readReceipts,
       );
     case ToggleMembershipEvents:
       return state.copyWith(
@@ -231,11 +225,11 @@ SettingsStore settingsReducer([
       );
     case ToggleNotifications:
       return state.copyWith(
-        notificationSettings: state.notificationSettings
-            .copyWith(enabled: !state.notificationSettings.enabled),
+        notificationSettings:
+            state.notificationSettings.copyWith(enabled: !state.notificationSettings.enabled),
       );
     case SetNotificationSettings:
-      return state.copyWith(notificationSettings: action.settings);
+      return state.copyWith(notificationSettings: actionAny.settings);
     default:
       return state;
   }

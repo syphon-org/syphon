@@ -66,8 +66,8 @@ class _Props extends Equatable {
         currentUser: store.state.authStore.user,
         lastSince: store.state.syncStore.lastSince,
         syncInterval: store.state.settingsStore.syncInterval,
-        syncObserverActive: store.state.syncStore.syncObserver != null &&
-            store.state.syncStore.syncObserver!.isActive,
+        syncObserverActive:
+            store.state.syncStore.syncObserver != null && store.state.syncStore.syncObserver!.isActive,
         onEditSyncInterval: (BuildContext context) {
           return showDialog(
             context: context,
@@ -126,7 +126,7 @@ class _Props extends Equatable {
 }
 
 class AdvancedSettingsScreen extends StatefulWidget {
-  const AdvancedSettingsScreen({Key? key}) : super(key: key);
+  const AdvancedSettingsScreen({super.key});
 
   @override
   AdvancedSettingsScreenState createState() => AdvancedSettingsScreenState();
@@ -172,7 +172,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       Strings.listItemAdvancedSettingsStartBackground,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
                 ),
@@ -189,7 +189,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       Strings.listItemAdvancedSettingsStopBackground,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
                 ),
@@ -203,9 +203,8 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                       );
                     },
                     contentPadding: Dimensions.listPadding,
-                    title: Text(
-                        Strings.listItemAdvancedSettingsTestNotifications,
-                        style: Theme.of(context).textTheme.subtitle1),
+                    title: Text(Strings.listItemAdvancedSettingsTestNotifications,
+                        style: Theme.of(context).textTheme.titleMedium),
                   ),
                 ),
                 Visibility(
@@ -217,7 +216,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     },
                     contentPadding: Dimensions.listPadding,
                     title: Text(Strings.listItemAdvancedSettingsTestSyncLoop,
-                        style: Theme.of(context).textTheme.subtitle1),
+                        style: Theme.of(context).textTheme.titleMedium),
                   ),
                 ),
                 Visibility(
@@ -229,7 +228,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                       props.onForceFunction();
                     },
                     title: Text(Strings.listItemAdvancedSettingsForceFunction,
-                        style: Theme.of(context).textTheme.subtitle1),
+                        style: Theme.of(context).textTheme.titleMedium),
                   ),
                 ),
                 ListTile(
@@ -240,7 +239,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemAdvancedSettingsLicenses,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
                 ListTile(
@@ -251,7 +250,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemSettingsProxy,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
                 ListTile(
@@ -260,7 +259,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemSettingsSyncInterval,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   subtitle: Text(
                     Strings.subtitleSettingsSyncInterval,
@@ -268,9 +267,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      Duration(milliseconds: props.syncInterval)
-                          .inSeconds
-                          .toString(),
+                      Duration(milliseconds: props.syncInterval).inSeconds.toString(),
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -281,7 +278,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemSettingsSyncToggle,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   subtitle: Text(
                     Strings.subtitleSettingsSyncToggle,
@@ -289,9 +286,7 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   trailing: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      props.syncObserverActive
-                          ? Strings.labelSyncing
-                          : Strings.labelStopped,
+                      props.syncObserverActive ? Strings.labelSyncing : Strings.labelStopped,
                       style: TextStyle(fontSize: 18.0),
                     ),
                   ),
@@ -300,30 +295,23 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.syncing
-                        ? null
-                        : props.onManualSync as void Function()?,
+                    onTap: props.syncing ? null : props.onManualSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       Strings.listItemSettingsManualSync,
-                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                            color: props.syncing
-                                ? Color(AppColors.greyDisabled)
-                                : null,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: props.syncing ? Color(AppColors.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
                       Strings.subtitleManualSync,
                       style: TextStyle(
-                        color: props.syncing
-                            ? Color(AppColors.greyDisabled)
-                            : null,
+                        color: props.syncing ? Color(AppColors.greyDisabled) : null,
                       ),
                     ),
                     trailing: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: CircularProgressIndicator(
-                          value: props.syncing ? null : 0),
+                      child: CircularProgressIndicator(value: props.syncing ? null : 0),
                     ),
                   ),
                 ),
@@ -331,16 +319,12 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   opacity: props.syncing ? 0.5 : 1,
                   child: ListTile(
                     dense: true,
-                    onTap: props.syncing
-                        ? null
-                        : props.onForceFullSync as void Function()?,
+                    onTap: props.syncing ? null : props.onForceFullSync as void Function()?,
                     contentPadding: Dimensions.listPadding,
                     title: Text(
                       Strings.listItemSettingsForceFullSync,
-                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                            color: props.syncing
-                                ? Color(AppColors.greyDisabled)
-                                : null,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: props.syncing ? Color(AppColors.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
@@ -359,11 +343,11 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.labelVersion,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   trailing: Text(
                     '$version ($buildNumber)',
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
               ],

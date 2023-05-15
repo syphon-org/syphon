@@ -149,7 +149,7 @@ ThunkAction<AppState> mutateMessagesAll() {
         messagesUpdated.addAll({room.id: allUpdated[0]});
         decryptedUpdated.addAll({room.id: allUpdated[1]});
       } catch (error) {
-        log.error('[mutateMessagesAll] ${room.id} ${error.toString()}');
+        log.error('[mutateMessagesAll] ${room.id} $error');
       }
     });
 

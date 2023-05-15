@@ -15,7 +15,7 @@ import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   ForgotPasswordState createState() => ForgotPasswordState();

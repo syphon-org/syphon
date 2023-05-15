@@ -18,10 +18,10 @@ _empty(File file) {}
 ///
 class ListLocalImages extends StatefulWidget {
   const ListLocalImages({
-    Key? key,
+    super.key,
     this.imageSize = 128,
     this.onSelectImage = _empty,
-  }) : super(key: key);
+  });
 
   final double imageSize;
   final Function(File imagefile) onSelectImage;
@@ -30,8 +30,7 @@ class ListLocalImages extends StatefulWidget {
   _ListLocalImagesState createState() => _ListLocalImagesState();
 }
 
-class _ListLocalImagesState extends State<ListLocalImages>
-    with Lifecycle<ListLocalImages> {
+class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLocalImages> {
   List<LocalImage> images = [];
   LocalImageProvider imageProvider = LocalImageProvider();
 
@@ -91,7 +90,7 @@ class _ListLocalImagesState extends State<ListLocalImages>
               Text(
                 Strings.alertNoImagesFound,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.button?.copyWith(
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w400,
                     ),
               ),

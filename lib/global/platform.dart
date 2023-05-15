@@ -65,7 +65,7 @@ Future<void> initPlatformDependencies() async {
     try {
       DynamicLibrary.open('libolm.3.dylib');
     } catch (error) {
-      log.info('[macos] ${error.toString()}');
+      log.info('[macos] $error');
     }
   }
 

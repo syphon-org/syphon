@@ -9,23 +9,21 @@ import 'package:syphon/store/events/redaction/model.dart';
 import './actions.dart';
 import './state.dart';
 
-EventStore eventReducer(
-    [EventStore state = const EventStore(), dynamic action]) {
-  switch (action.runtimeType) {
+EventStore eventReducer([EventStore state = const EventStore(), dynamic actionAny]) {
+  switch (actionAny.runtimeType) {
     case AddReactions:
-      final _action = action as AddReactions;
+      final action = actionAny as AddReactions;
       final reactionsUpdated = Map<String, List<Reaction>>.from(
         state.reactions,
       );
 
-      for (final Reaction reaction in _action.reactions ?? []) {
+      for (final Reaction reaction in action.reactions ?? []) {
         final reactionEventId = reaction.relEventId;
         final hasReactions = reactionsUpdated.containsKey(reactionEventId);
 
         if (hasReactions) {
           final reactions = reactionsUpdated[reactionEventId]!;
-          final reactionIndex =
-              reactions.indexWhere((value) => value.id == reaction.id);
+          final reactionIndex = reactions.indexWhere((value) => value.id == reaction.id);
 
           if (reactionIndex == -1) {
             reactionsUpdated[reactionEventId!] = [...reactions, reaction];
@@ -45,9 +43,9 @@ EventStore eventReducer(
     // set the messages map to exactly what's passed in
     // helps with message revisions after lazy loads
     case SetMessages:
-      final _action = action as SetMessages;
+      final action = actionAny as SetMessages;
 
-      final messagesAll = _action.all;
+      final messagesAll = action.all;
       final existingAll = state.messages;
 
       final combinedAll = Map<String, List<Message>>.from(existingAll);
@@ -78,9 +76,9 @@ EventStore eventReducer(
     // set the decrypted map to exactly what's passed in
     // helps with message revisions after lazy loads
     case SetMessagesDecrypted:
-      final _action = action as SetMessagesDecrypted;
+      final action = actionAny as SetMessagesDecrypted;
 
-      final messagesAll = _action.all;
+      final messagesAll = action.all;
       final existingAll = state.messagesDecrypted;
 
       final combinedAll = Map<String, List<Message>>.from(existingAll);
@@ -108,16 +106,16 @@ EventStore eventReducer(
 
       return state.copyWith(messagesDecrypted: combinedAll);
     case AddMessages:
-      final _action = action as AddMessages;
-      if (_action.messages.isEmpty) {
+      final action = actionAny as AddMessages;
+      if (action.messages.isEmpty) {
         return state;
       }
 
-      final roomId = _action.roomId;
+      final roomId = action.roomId;
 
       // convert to map to merge old and new messages based on ids
       // ignore previous messages and only save the newest to local state if "clear"ing
-      final messagesOld = _action.clear
+      final messagesOld = action.clear
           ? <String, Message>{}
           : Map<String, Message>.fromIterable(
               state.messages[roomId] ?? [],
@@ -126,7 +124,7 @@ EventStore eventReducer(
             );
 
       final messagesNew = Map<String, Message>.fromIterable(
-        action.messages,
+        actionAny.messages,
         key: (msg) => msg.id,
         value: (msg) => msg,
       );
@@ -141,8 +139,7 @@ EventStore eventReducer(
       messages[roomId] = messagesAll.values.toList();
 
       // remove locally saved outbox messages if they've now been received from a server
-      if (state.outbox.containsKey(roomId) &&
-          state.outbox[roomId]!.isNotEmpty) {
+      if (state.outbox.containsKey(roomId) && state.outbox[roomId]!.isNotEmpty) {
         final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
 
         // removed based on eventId, not tempId
@@ -161,10 +158,10 @@ EventStore eventReducer(
       return state.copyWith(messages: messages);
 
     case AddMessagesDecrypted:
-      final _action = action as AddMessagesDecrypted;
-      final roomId = _action.roomId;
+      final action = actionAny as AddMessagesDecrypted;
+      final roomId = action.roomId;
 
-      if (_action.messages.isEmpty) {
+      if (action.messages.isEmpty) {
         return state;
       }
 
@@ -180,7 +177,7 @@ EventStore eventReducer(
       );
 
       final messagesNew = Map<String, Message>.fromIterable(
-        action.messages,
+        actionAny.messages,
         key: (msg) => msg.id,
         value: (msg) => msg,
       );
@@ -192,8 +189,8 @@ EventStore eventReducer(
       // otherwise, save messages
       return state.copyWith(messagesDecrypted: messages);
     case SaveOutboxMessage:
-      final tempId = (action as SaveOutboxMessage).tempId;
-      final message = action.pendingMessage;
+      final tempId = (actionAny as SaveOutboxMessage).tempId;
+      final message = actionAny.pendingMessage;
       final roomId = message.roomId!;
 
       final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
@@ -207,7 +204,7 @@ EventStore eventReducer(
       return state.copyWith(outbox: outboxNew);
 
     case DeleteOutboxMessage:
-      final message = (action as DeleteOutboxMessage).message;
+      final message = (actionAny as DeleteOutboxMessage).message;
       final roomId = message.roomId!;
 
       final outbox = Map<String, Message>.from(state.outbox[roomId] ?? {});
@@ -224,15 +221,15 @@ EventStore eventReducer(
       return state;
 
     case SaveRedactions:
-      final _action = action as SaveRedactions;
-      if (_action.redactions == null || _action.redactions!.isEmpty) {
+      final action = actionAny as SaveRedactions;
+      if (action.redactions == null || action.redactions!.isEmpty) {
         return state;
       }
 
       final redactions = Map<String, Redaction>.from(state.redactions);
 
       final redactionsNew = Map<String, Redaction>.fromIterable(
-        action.redactions ?? [],
+        actionAny.redactions ?? [],
         key: (redaction) => redaction.redactId,
         value: (redaction) => redaction,
       );
@@ -242,16 +239,16 @@ EventStore eventReducer(
       );
 
     case SetReceipts:
-      if (action.receipts.isEmpty) {
+      if (actionAny.receipts.isEmpty) {
         return state;
       }
 
-      final roomId = action.roomId;
+      final roomId = actionAny.roomId;
       final receiptsUpdated = Map<String, Map<String, Receipt>>.from(
         state.receipts,
       );
       final receiptsNew = Map<String, Receipt>.from(
-        action.receipts,
+        actionAny.receipts,
       );
 
       if (receiptsUpdated.containsKey(roomId)) {
@@ -260,9 +257,9 @@ EventStore eventReducer(
 
       return state.copyWith(receipts: receiptsUpdated);
     case LoadReactions:
-      return state.copyWith(reactions: action.reactionsMap);
+      return state.copyWith(reactions: actionAny.reactionsMap);
     case LoadReceipts:
-      return state.copyWith(receipts: action.receiptsMap);
+      return state.copyWith(receipts: actionAny.receiptsMap);
     case ResetEvents:
       return EventStore();
     default:

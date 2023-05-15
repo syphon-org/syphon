@@ -21,7 +21,7 @@ class Reaction extends Event implements drift.Insertable<Reaction> {
     batch,
     prevBatch,
     timestamp,
-    content,
+    super.content,
     this.body,
     this.relType,
     this.relEventId,
@@ -35,7 +35,6 @@ class Reaction extends Event implements drift.Insertable<Reaction> {
           batch: batch,
           prevBatch: prevBatch,
           timestamp: timestamp,
-          content: content,
         );
 
   @override

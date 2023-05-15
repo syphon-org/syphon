@@ -32,7 +32,7 @@ extension UserQueries on StorageDatabase {
   }
 
   Future<List<User>> selectUsersAll() {
-    return (select(users)).get();
+    return select(users).get();
   }
 }
 

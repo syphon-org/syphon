@@ -40,7 +40,7 @@ class MessageList extends StatefulWidget {
   final void Function(Message?)? onToggleSelectedMessage;
 
   const MessageList({
-    Key? key,
+    super.key,
     required this.roomId,
     required this.scrollController,
     required this.editorController,
@@ -51,7 +51,7 @@ class MessageList extends StatefulWidget {
     this.onSelectReply,
     this.onViewUserDetails,
     this.onToggleSelectedMessage,
-  }) : super(key: key);
+  });
 
   @override
   MessageListState createState() => MessageListState();

@@ -169,7 +169,7 @@ ThunkAction<AppState> decryptMessages(
         return decryptedAll;
       } catch (error) {
         log.error(
-          '[decryptMessage(s)] ${room.name ?? 'Unknown Room'} ${error.toString()}',
+          '[decryptMessage(s)] ${room.name ?? 'Unknown Room'} $error',
         );
       } finally {
         store.dispatch(UpdateRoom(id: room.id, syncing: false));

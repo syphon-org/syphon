@@ -133,7 +133,7 @@ class DialogTextInput extends HookWidget {
               child: Text(
                 content,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
             Container(

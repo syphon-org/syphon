@@ -20,7 +20,7 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 // Styling
 
 class EmailVerifyStep extends StatefulWidget {
-  const EmailVerifyStep({Key? key}) : super(key: key);
+  const EmailVerifyStep({super.key});
 
   @override
   EmailStepState createState() => EmailStepState();
@@ -133,7 +133,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                             child: Text(
                               'Enter both your email\n and homeserver',
                               textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headline5,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                           Positioned(

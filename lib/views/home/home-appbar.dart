@@ -28,9 +28,9 @@ enum Options {
 
 class AppBarHome extends HookWidget implements PreferredSizeWidget {
   const AppBarHome({
-    Key? key,
+    super.key,
     this.onToggleSearch,
-  }) : super(key: key);
+  });
 
   final Function? onToggleSearch;
 
@@ -124,7 +124,7 @@ class AppBarHome extends HookWidget implements PreferredSizeWidget {
           ),
           Text(
             Values.appName,
-            style: Theme.of(context).textTheme.headline6!.copyWith(
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
                   fontWeight: FontWeight.w400,
                   color: assetColor,
                 ),

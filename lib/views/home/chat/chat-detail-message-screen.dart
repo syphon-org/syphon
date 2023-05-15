@@ -27,7 +27,7 @@ class MessageDetailArguments {
 }
 
 class MessageDetailsScreen extends StatelessWidget {
-  const MessageDetailsScreen({Key? key}) : super(key: key);
+  const MessageDetailsScreen({super.key});
 
   Widget buildUserReadList(_Props props, double width) {
     final Receipt readReceipts = props.readReceipts[props.message!.id!] ?? Receipt();

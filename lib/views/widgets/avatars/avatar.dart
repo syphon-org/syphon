@@ -22,7 +22,7 @@ import 'package:syphon/views/widgets/image-matrix.dart';
 /// params. Should be fixed in the parser.
 class Avatar extends StatelessWidget {
   const Avatar({
-    Key? key,
+    super.key,
     this.uri = '',
     this.url = '',
     this.file,
@@ -35,7 +35,7 @@ class Avatar extends StatelessWidget {
     this.selected = false,
     this.rebuild = true,
     this.computeColors = false,
-  }) : super(key: key);
+  });
 
   final bool force;
   final bool selected;

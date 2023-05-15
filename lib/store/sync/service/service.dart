@@ -135,13 +135,13 @@ Future notificationJob() async {
       final secureStorage = FlutterSecureStorage();
       protocol = await secureStorage.read(key: SyncService.protocolKey);
       lastSince = await secureStorage.read(key: SyncService.lastSinceKey);
-      final _proxySettingsString =
+      final proxySettingsString =
           await secureStorage.read(key: SyncService.proxySettingsKey);
-      final _userString =
+      final userString =
           await secureStorage.read(key: SyncService.currentUserKey);
-      currentUser = User.fromJson(jsonDecode(_userString ?? '{}'));
+      currentUser = User.fromJson(jsonDecode(userString ?? '{}'));
       proxySettings =
-          ProxySettings.fromJson(jsonDecode(_proxySettingsString ?? '{}'));
+          ProxySettings.fromJson(jsonDecode(proxySettingsString ?? '{}'));
     } catch (error) {
       return log.threaded('[notificationJob] decode error $error');
     }

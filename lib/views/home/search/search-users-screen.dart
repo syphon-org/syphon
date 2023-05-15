@@ -21,7 +21,7 @@ import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class SearchUserScreen extends StatefulWidget {
-  const SearchUserScreen({Key? key}) : super(key: key);
+  const SearchUserScreen({super.key});
 
   @override
   SearchUserState createState() => SearchUserState();
@@ -184,8 +184,7 @@ class SearchUserState extends State<SearchUserScreen> {
 
     final attemptableUser = User(
       displayName: searchable,
-      userId:
-          searchable.isNotEmpty && searchable.contains(':') ? searchable : formatUserId(searchable),
+      userId: searchable.isNotEmpty && searchable.contains(':') ? searchable : formatUserId(searchable),
     );
 
     return ListView(
@@ -197,7 +196,7 @@ class SearchUserState extends State<SearchUserScreen> {
               Text(
                 Strings.labelSearchResults,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.subtitle2,
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ],
           ),
@@ -256,7 +255,7 @@ class SearchUserState extends State<SearchUserScreen> {
                 Text(
                   Strings.labelUsersRecent,
                   textAlign: TextAlign.start,
-                  style: Theme.of(context).textTheme.subtitle2,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ],
             ),
@@ -292,7 +291,7 @@ class SearchUserState extends State<SearchUserScreen> {
               Text(
                 Strings.labelKnownUsers,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.subtitle2,
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ],
           ),

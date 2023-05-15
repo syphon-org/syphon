@@ -26,7 +26,6 @@ import 'package:syphon/store/sync/state.dart';
 import 'package:syphon/store/user/reducer.dart';
 import 'package:syphon/store/user/state.dart';
 
-import './alerts/model.dart';
 import './alerts/reducer.dart';
 import './auth/state.dart';
 import './media/state.dart';
@@ -42,6 +41,7 @@ class SetGlobalLoading {
   SetGlobalLoading({required this.loading});
 }
 
+// ignore: avoid_positional_boolean_parameters
 bool loadingReducer([bool state = false, dynamic action]) {
   switch (action.runtimeType) {
     case SetGlobalLoading:
@@ -120,7 +120,6 @@ class AppState extends Equatable {
 }
 
 AppState appReducer(AppState state, action) => AppState(
-      loading: loadingReducer(state.loading, action),
       authStore: authReducer(state.authStore, action),
       alertsStore: alertsReducer(state.alertsStore, action),
       mediaStore: mediaReducer(state.mediaStore, action),

@@ -17,10 +17,10 @@ class FabBarExpanding extends StatelessWidget {
   final Alignment? alignment;
 
   const FabBarExpanding({
-    Key? key,
+    super.key,
     this.alignment,
     this.showLabels = false,
-  }) : super(key: key);
+  });
 
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();

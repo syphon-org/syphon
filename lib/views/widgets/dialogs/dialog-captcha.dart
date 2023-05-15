@@ -6,12 +6,12 @@ import 'package:syphon/views/widgets/captcha.dart';
 
 class DialogCaptcha extends StatefulWidget {
   const DialogCaptcha({
-    Key? key,
+    super.key,
     this.hostname,
     this.publicKey,
     this.onCancel,
     this.onComplete,
-  }) : super(key: key);
+  });
 
   final String? hostname;
   final String? publicKey;

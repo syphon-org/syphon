@@ -15,7 +15,7 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 class UsernameStep extends StatefulWidget {
-  const UsernameStep({Key? key}) : super(key: key);
+  const UsernameStep({super.key});
 
   @override
   UsernameStepState createState() => UsernameStepState();
@@ -94,7 +94,7 @@ class UsernameStepState extends State<UsernameStep> with Lifecycle<UsernameStep>
                     Text(
                       Strings.headerSignupUsername,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline5,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ],
                 ),

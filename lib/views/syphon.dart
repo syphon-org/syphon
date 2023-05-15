@@ -378,7 +378,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           alertMessage,
           style: Theme.of(context)
               .textTheme
-              .subtitle1
+              .titleMedium
               ?.copyWith(color: Colors.white),
         ),
         duration: alert.duration,

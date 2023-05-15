@@ -219,7 +219,7 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
 class StorageDatabase extends _$StorageDatabase {
   StorageDatabase(AppContext context, {String pin = ''}) : super(openDatabase(context, pin: pin));
 
-  StorageDatabase.connect(DatabaseConnection connection) : super.connect(connection);
+  StorageDatabase.connect(super.connection) : super.connect();
 
   // you should bump this number whenever you change or add a table definition.
   @override

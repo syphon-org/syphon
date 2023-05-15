@@ -2,20 +2,20 @@ import './actions.dart';
 import './model.dart';
 import './state.dart';
 
-UserStore userReducer([UserStore state = const UserStore(), dynamic action]) {
-  switch (action.runtimeType) {
+UserStore userReducer([UserStore state = const UserStore(), dynamic actionAny]) {
+  switch (actionAny.runtimeType) {
     case SetLoading:
-      return state.copyWith(loading: action.loading);
+      return state.copyWith(loading: actionAny.loading);
     case SetUserInvites:
-      return state.copyWith(invites: action.users);
+      return state.copyWith(invites: actionAny.users);
     case SetUsersBlocked:
-      return state.copyWith(blocked: action.userIds);
+      return state.copyWith(blocked: actionAny.userIds);
     case SetUsers:
       final users = Map<String, User>.from(state.users);
-      users.addAll(action.users);
+      users.addAll(actionAny.users);
       return state.copyWith(users: users);
     case SaveUser:
-      final user = action.user as User;
+      final user = actionAny.user as User;
       final users = Map<String, User>.from(state.users);
 
       final userId = user.userId;

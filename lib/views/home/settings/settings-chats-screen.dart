@@ -15,7 +15,7 @@ import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
 
 class SettingsChatsScreen extends StatelessWidget {
-  const SettingsChatsScreen({Key? key}) : super(key: key);
+  const SettingsChatsScreen({super.key});
 
   displayThemeType(String themeTypeName) {
     return themeTypeName.split('.')[1].toLowerCase();
@@ -46,7 +46,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               child: Text(
                                 Strings.headerGeneral,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             GestureDetector(
@@ -70,7 +70,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 subtitle: Text(
                                   Strings.subtitleShowMembershipEvents,
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                                 trailing: Switch(
                                   value: false,
@@ -87,7 +87,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               ),
                               subtitle: Text(
                                 Strings.subtitleEnterSends,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               trailing: Switch(
                                 value: props.enterSend,
@@ -100,7 +100,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               title: Text(Strings.titleToggleAutocorrect),
                               subtitle: Text(
                                 Strings.subtitleToggleAutocorrect,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               trailing: Switch(
                                 value: props.autocorrect,
@@ -113,7 +113,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               title: Text(Strings.titleToggleSuggestions),
                               subtitle: Text(
                                 Strings.subtitleToggleSuggestions,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               trailing: Switch(
                                 value: props.suggestions,
@@ -128,7 +128,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               ),
                               subtitle: Text(
                                 Strings.subtitle24hFormat,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               trailing: Switch(
                                 value: props.timeFormat24,
@@ -143,7 +143,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               ),
                               subtitle: Text(
                                 Strings.subtitleDismissKeyboard,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               trailing: Switch(
                                 value: props.dismissKeyboard,
@@ -162,7 +162,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               child: Text(
                                 Strings.headerOrdering,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             GestureDetector(
@@ -174,7 +174,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 trailing: Text(
                                   Strings.labelTimestamp, //TODO
-                                  style: Theme.of(context).textTheme.subtitle1,
+                                  style: Theme.of(context).textTheme.titleMedium,
                                 ),
                               ),
                             ),
@@ -187,7 +187,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 trailing: Text(
                                   Strings.labelNone, //TODO
-                                  style: Theme.of(context).textTheme.subtitle1,
+                                  style: Theme.of(context).textTheme.titleMedium,
                                 ),
                               ),
                             ),
@@ -203,7 +203,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               child: Text(
                                 Strings.headerMedia,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             GestureDetector(
@@ -216,7 +216,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 subtitle: Text(
                                   Strings.subtitleViewUploadedMedia,
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
                             ),
@@ -232,7 +232,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               child: Text(
                                 Strings.headerMediaAutoDownload,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.subtitle2,
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             ListTile(
@@ -243,7 +243,7 @@ class SettingsChatsScreen extends StatelessWidget {
                               ),
                               subtitle: Text(
                                 props.autoDownload ? Strings.labelOn : Strings.labelOff,
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                               trailing: Switch(
                                 value: props.autoDownload,
@@ -260,7 +260,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 subtitle: Text(
                                   Strings.subtitleImagesAudioVideoFiles, //TODO
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
                             ),
@@ -274,7 +274,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 subtitle: Text(
                                   Strings.subtitleImagesAudioVideoFiles, //TODO
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
                             ),
@@ -288,7 +288,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 subtitle: Text(
                                   Strings.subtitleImagesAudioVideoFiles, //TODO
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
                             ),

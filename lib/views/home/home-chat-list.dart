@@ -20,13 +20,13 @@ import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class HomeChatList extends HookWidget {
   const HomeChatList({
-    Key? key,
+    super.key,
     this.searching = false,
     this.searchText = '',
     this.selectedChats = const [],
     this.onSelectChat,
     this.onToggleChatOptions,
-  }) : super(key: key);
+  });
 
   final bool searching;
   final String searchText;
@@ -98,7 +98,7 @@ class HomeChatList extends HookWidget {
                 padding: EdgeInsets.only(top: 16),
                 child: Text(
                   noChatsLabel,
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
             ),
@@ -152,7 +152,7 @@ class HomeChatList extends HookWidget {
           // display message as being 'unread'
           if (newMessage) {
             textStyle = textStyle.copyWith(
-              color: Theme.of(context).textTheme.bodyText1!.color,
+              color: Theme.of(context).textTheme.bodyLarge!.color,
               fontWeight: FontWeight.w500,
             );
           }
@@ -167,7 +167,7 @@ class HomeChatList extends HookWidget {
               color: backgroundColor, // if selected, color seperately
             ),
             padding: EdgeInsets.symmetric(
-              vertical: Theme.of(context).textTheme.subtitle1!.fontSize!,
+              vertical: Theme.of(context).textTheme.titleMedium!.fontSize!,
             ).add(Dimensions.appPaddingHorizontal),
             child: Flex(
               direction: Axis.horizontal,
@@ -300,7 +300,7 @@ class HomeChatList extends HookWidget {
                             child: Text(
                               chatName,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyText1,
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ),
                           Text(
@@ -313,7 +313,7 @@ class HomeChatList extends HookWidget {
                         preview,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.caption!.merge(
+                        style: Theme.of(context).textTheme.bodySmall!.merge(
                               textStyle,
                             ),
                       ),

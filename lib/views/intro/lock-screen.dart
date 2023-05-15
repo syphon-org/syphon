@@ -20,9 +20,9 @@ class LockScreen extends StatefulWidget {
   final AppContext appContext;
 
   const LockScreen({
-    Key? key,
+    super.key,
     required this.appContext,
-  }) : super(key: key);
+  });
 
   @override
   _LockScreenState createState() => _LockScreenState();

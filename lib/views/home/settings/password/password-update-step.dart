@@ -11,7 +11,7 @@ import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 class PasswordUpdateStep extends StatefulWidget {
-  const PasswordUpdateStep({Key? key}) : super(key: key);
+  const PasswordUpdateStep({super.key});
 
   @override
   PasswordUpdateStepState createState() => PasswordUpdateStepState();
@@ -71,7 +71,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       child: Text(
                         Strings.contentPasswordRecommendation,
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                     Container(
@@ -79,7 +79,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       child: Text(
                         Strings.headerUpdatePassword,
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline5,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
                   ],

@@ -25,7 +25,7 @@ import 'widgets/page-description-third.dart';
 import 'widgets/page-landing.dart';
 
 class IntroScreen extends StatefulWidget {
-  const IntroScreen({Key? key}) : super(key: key);
+  const IntroScreen({super.key});
 
   @override
   IntroScreenState createState() => IntroScreenState();
@@ -299,7 +299,7 @@ class IntroScreenState extends State<IntroScreen> with Lifecycle<IntroScreen> {
                                     child: Text(
                                       Strings.buttonTextLogin,
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                                             color: Theme.of(context).primaryColor,
                                             decoration: TextDecoration.underline,
                                           ),
