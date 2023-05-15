@@ -30,13 +30,13 @@ loadStorageMiddleware(StorageDatabase? storage) {
       switch (_action.runtimeType) {
         case LoadUsers:
           final action = _action as LoadUsers;
-          _loadUserAsync() async {
+          loadUserAsync() async {
             final loadedUsers = await loadUsers(storage: storage, ids: action.userIds ?? []);
 
             store.dispatch(SetUsers(users: loadedUsers));
           }
 
-          _loadUserAsync();
+          loadUserAsync();
           break;
         default:
           break;

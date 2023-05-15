@@ -28,10 +28,7 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic actionAn
           if (reactionIndex == -1) {
             reactionsUpdated[reactionEventId!] = [...reactions, reaction];
           } else {
-            reactionsUpdated[reactionEventId!] = [
-              ...reactions.where((r) => r.id != reaction.id).toList(),
-              reaction
-            ];
+            reactionsUpdated[reactionEventId!] = [...reactions.where((r) => r.id != reaction.id), reaction];
           }
         } else if (reactionEventId != null) {
           reactionsUpdated[reactionEventId] = [reaction];

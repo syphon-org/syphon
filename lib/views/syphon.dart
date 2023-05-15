@@ -43,22 +43,16 @@ class Syphon extends StatefulWidget {
     this.storage,
   );
 
-  static Future setAppContext(
-      BuildContext buildContext, AppContext appContext) {
-    return buildContext
-        .findAncestorStateOfType<SyphonState>()!
-        .onContextSet(appContext);
+  static Future setAppContext(BuildContext buildContext, AppContext appContext) {
+    return buildContext.findAncestorStateOfType<SyphonState>()!.onContextSet(appContext);
   }
 
   static AppContext getAppContext(BuildContext buildContext) {
-    return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ??
-        AppContext();
+    return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ?? AppContext();
   }
 
   static Future reloadCurrentContext(BuildContext buildContext) {
-    return buildContext
-        .findAncestorStateOfType<SyphonState>()!
-        .reloadCurrentContext();
+    return buildContext.findAncestorStateOfType<SyphonState>()!.reloadCurrentContext();
   }
 
   @override
@@ -118,8 +112,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final currentUser = store.state.authStore.user;
 
     // Reset contexts if the current user has no accessToken (unrecoverable state)
-    if (currentUser.accessToken == null &&
-        currentContext.id != AppContext.DEFAULT) {
+    if (currentUser.accessToken == null && currentContext.id != AppContext.DEFAULT) {
       return onResetContext();
     }
 
@@ -167,11 +160,11 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.paused:
         store.dispatch(updateLatestLastSince());
-        store.dispatch(setBackgrounded(true));
+        store.dispatch(setBackgrounded(backgrounded: true));
         break;
       case AppLifecycleState.detached:
         store.dispatch(updateLatestLastSince());
-        store.dispatch(setBackgrounded(true));
+        store.dispatch(setBackgrounded(backgrounded: true));
         break;
     }
   }
@@ -266,9 +259,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final authObserverNew = storeNew.state.authStore.authObserver;
 
     // revert to another authed user if available and logging out
-    if (user == null &&
-        userNew.accessToken != null &&
-        contextNew.id.isNotEmpty) {
+    if (user == null && userNew.accessToken != null && contextNew.id.isNotEmpty) {
       authObserverNew?.add(userNew);
     } else {
       authObserverNew?.add(user);
@@ -299,8 +290,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   // Reset contexts if the current user has no accessToken (unrecoverable state)
   onResetContext() async {
-    log.error(
-        '[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
+    log.error('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
 
     resetContextsAll();
 
@@ -324,9 +314,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
 
     // New user is found and previously was in an unauthenticated state
-    if (user != null &&
-        user.accessToken != null &&
-        defaultScreen == IntroScreen) {
+    if (user != null && user.accessToken != null && defaultScreen == IntroScreen) {
       defaultHome = HomeScreen();
       return NavigationService.clearTo(Routes.home, context);
     }
@@ -368,18 +356,14 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         color = Colors.grey;
     }
 
-    final alertMessage =
-        alertOverride ?? alert.message ?? alert.error ?? Strings.alertUnknown;
+    final alertMessage = alertOverride ?? alert.message ?? alert.error ?? Strings.alertUnknown;
 
     globalScaffold.currentState?.showSnackBar(
       SnackBar(
         backgroundColor: color,
         content: Text(
           alertMessage,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(color: Colors.white),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
         ),
         duration: alert.duration,
         action: SnackBarAction(
@@ -418,8 +402,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         child: localization.EasyLocalization(
           path: 'assets/translations',
           useOnlyLangCode: true,
-          startLocale: Locale(
-              findLocale(store.state.settingsStore.language, context: context)),
+          startLocale: Locale(findLocale(store.state.settingsStore.language, context: context)),
           fallbackLocale: Locale(SupportedLanguages.defaultLang),
           useFallbackTranslations: true,
           supportedLocales: SupportedLanguages.list,
@@ -436,8 +419,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               routes: NavigationProvider.getRoutes(),
               home: defaultHome,
               builder: (context, child) => Directionality(
-                textDirection: SupportedLanguages.rtl
-                        .contains(store.state.settingsStore.language)
+                textDirection: SupportedLanguages.rtl.contains(store.state.settingsStore.language)
                     ? TextDirection.rtl
                     : TextDirection.ltr,
                 child: child!,

@@ -49,7 +49,7 @@ class ListItemAccount extends StatelessWidget {
         );
       case ListItemUserType.Selectable:
         return InkWell(
-          splashColor: selected ? Theme.of(context).selectedRowColor : Colors.transparent,
+          splashColor: selected ? Theme.of(context).shadowColor : Colors.transparent,
           child: child,
         );
       default:

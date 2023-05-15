@@ -196,8 +196,7 @@ ThunkAction<AppState> fetchMessageEvents({
   return (Store<AppState> store) async {
     try {
       final cached = await store.dispatch(
-        loadMessagesCached(
-            room: room, batch: from, limit: loadLimit, timestamp: timestamp),
+        loadMessagesCached(room: room, batch: from, limit: loadLimit, timestamp: timestamp),
       ) as List<Message>;
 
       // known cached messages for this batch will be loaded
@@ -298,7 +297,7 @@ ThunkAction<AppState> clearDraft({Room? room}) {
 }
 
 ThunkAction<AppState> saveDraft({
-  final body,
+  body,
   String? type = 'm.text',
   Room? room,
 }) {
@@ -326,8 +325,7 @@ ThunkAction<AppState> selectReply({
 }
 
 /// Delete Room Event (For Outbox, Local, and Remote)
-ThunkAction<AppState> deleteMessage(
-    {required Message message, required Room room}) {
+ThunkAction<AppState> deleteMessage({required Message message, required Room room}) {
   return (Store<AppState> store) async {
     try {
       if (message.pending || message.failed) {
@@ -367,11 +365,9 @@ ThunkAction<AppState> deleteMessage(
       final messageDeleted = message.copyWith(body: '', url: null);
 
       if (room.encryptionEnabled) {
-        return store.dispatch(
-            AddMessagesDecrypted(roomId: room.id, messages: [messageDeleted]));
+        return store.dispatch(AddMessagesDecrypted(roomId: room.id, messages: [messageDeleted]));
       } else {
-        return store
-            .dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
+        return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
       }
     } catch (error) {
       log.error('[deleteMessage] $error');

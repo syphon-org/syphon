@@ -148,8 +148,7 @@ ThunkAction<AppState> startSyncObserver() {
     if (syncObserver == null || !syncObserver.isActive) {
       store.dispatch(
         SetSyncObserver(
-          syncObserver:
-              Timer.periodic(Duration(milliseconds: interval), onSync),
+          syncObserver: Timer.periodic(Duration(milliseconds: interval), onSync),
         ),
       );
     }
@@ -191,7 +190,7 @@ ThunkAction<AppState> initialSync() {
 ///
 /// Mark when the app has been backgrounded to visualize loading feedback
 ///
-ThunkAction<AppState> setBackgrounded(bool backgrounded) {
+ThunkAction<AppState> setBackgrounded({bool backgrounded = false}) {
   return (Store<AppState> store) async {
     store.dispatch(SetBackgrounded(backgrounded: backgrounded));
   };
@@ -257,8 +256,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       final String nextBatch = data['next_batch'];
       final Map<String, dynamic> roomJson = data['rooms'] ?? {};
       final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};
-      final Map<String, dynamic> oneTimeKeyCount =
-          data['device_one_time_keys_count'] ?? {};
+      final Map<String, dynamic> oneTimeKeyCount = data['device_one_time_keys_count'] ?? {};
 
       // Updates for device specific data (mostly room encryption)
       if (toDeviceJson.isNotEmpty) {
@@ -309,7 +307,7 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       store.dispatch(SetSyncing(syncing: false));
     } finally {
       if (store.state.syncStore.backgrounded) {
-        store.dispatch(setBackgrounded(false));
+        store.dispatch(setBackgrounded(backgrounded: false));
       }
     }
   };
@@ -356,13 +354,11 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
 
       // update various message mutations and meta data
       await store.dispatch(setUsers(sync.users));
-      await store
-          .dispatch(setReceipts(room: room, receipts: sync.readReceipts));
+      await store.dispatch(setReceipts(room: room, receipts: sync.readReceipts));
       await store.dispatch(addReactions(reactions: events.reactions));
 
       // redact events (reactions and messages) through cache and cold storage
-      await store
-          .dispatch(redactEvents(room: room, redactions: events.redactions));
+      await store.dispatch(redactEvents(room: room, redactions: events.redactions));
 
       // handles editing newly fetched messages
       final messages = await store.dispatch(

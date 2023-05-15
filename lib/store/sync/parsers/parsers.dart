@@ -163,33 +163,25 @@ class Sync {
     if (json['state'] != null) {
       final List<dynamic> stateEventsRaw = json['state']['events'];
 
-      stateEvents = stateEventsRaw
-          .map((event) => Event.fromMatrix(event, roomId: roomId))
-          .toList();
+      stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)).toList();
     }
 
     if (json['invite_state'] != null) {
       final List<dynamic> stateEventsRaw = json['invite_state']['events'];
 
-      stateEvents = stateEventsRaw
-          .map((event) => Event.fromMatrix(event, roomId: roomId))
-          .toList();
+      stateEvents = stateEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)).toList();
     }
 
     if (json['account_data'] != null) {
       final List<dynamic> accountEventsRaw = json['account_data']['events'];
 
-      accountEvents = accountEventsRaw
-          .map((event) => Event.fromMatrix(event, roomId: roomId))
-          .toList();
+      accountEvents = accountEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)).toList();
     }
 
     if (json['ephemeral'] != null) {
       final List<dynamic> ephemeralEventsRaw = json['ephemeral']['events'];
 
-      ephemeralEvents = ephemeralEventsRaw
-          .map((event) => Event.fromMatrix(event, roomId: roomId))
-          .toList();
+      ephemeralEvents = ephemeralEventsRaw.map((event) => Event.fromMatrix(event, roomId: roomId)).toList();
     }
 
     if (json['timeline'] != null) {
@@ -391,8 +383,7 @@ class Sync {
       // checks to make sure someone didn't name the room after the authed user
       final badRoomName = roomNameNew != null &&
           currentUser.userId != null &&
-          (roomNameNew == currentUser.displayName ||
-              roomNameNew == currentUser.userId);
+          (roomNameNew == currentUser.displayName || roomNameNew == currentUser.userId);
 
       final isNameDefault = namePriority == 4 && usersAdd.isNotEmpty;
 
@@ -403,8 +394,7 @@ class Sync {
         );
 
         if (otherUsers.isNotEmpty) {
-          roomNameNew =
-              selectDirectRoomName(currentUser, otherUsers, userIdsNew.length);
+          roomNameNew = selectDirectRoomName(currentUser, otherUsers, userIdsNew.length);
           avatarUriNew = selectDirectRoomAvatar(room, avatarUriNew, otherUsers);
         }
       }
@@ -557,9 +547,7 @@ class Sync {
                 readReceiptsNew[eventId] = receiptsNew;
               } else {
                 // otherwise, add the usersRead to the existing reads
-                readReceiptsNew[eventId]!
-                    .userReads
-                    .addAll(receiptsNew.userReads);
+                readReceiptsNew[eventId]!.userReads.addAll(receiptsNew.userReads);
               }
             });
             break;
@@ -697,12 +685,12 @@ Future<Sync> parseSyncMapped(Map params) async {
 /// actions
 ///
 Future<Sync> parseSyncThreaded({
-  required final Map<String, dynamic> json,
-  required final Room room,
-  required final User user,
-  required final String? lastSince,
-  required final List<String> currentMessageIds,
-  final ignoreMessageless = false,
+  required Map<String, dynamic> json,
+  required Room room,
+  required User user,
+  required String? lastSince,
+  required List<String> currentMessageIds,
+  ignoreMessageless = false,
 }) async {
   return compute(parseSyncMapped, {
     'json': json,

@@ -89,7 +89,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
   buildAdvancedPicker(context) => ColorPicker(
         pickerColor: currentColor ?? Color(widget.currentColor),
         hexInputController: controller,
-        showLabel: false,
+        labelTypes: const [],
         onColorChanged: (Color color) {
           widget.onSelectColor!(color.value);
           setState(() {

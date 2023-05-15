@@ -113,7 +113,7 @@ ThunkAction<AppState> initKeyEncryption(User user) {
       // if a key exists remotely, mark that it does
       // the user will be prompted to import in "home"
       // if they have no local keys
-      store.dispatch(toggleDeviceKeysExist(true));
+      store.dispatch(toggleDeviceKeysExist(existence: true));
     }
 
     // append all keys uploaded remotely
