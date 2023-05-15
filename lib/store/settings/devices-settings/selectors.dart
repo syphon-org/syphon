@@ -2,9 +2,9 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/store/index.dart';
 
-String selectCurrentDeviceName(Store<AppState> store) {
-  final currentSessionId = store.state.authStore.user.deviceId;
-  final currentUserDevices = store.state.settingsStore.devices;
+String selectCurrentDeviceName(AppState state) {
+  final currentSessionId = state.authStore.user.deviceId;
+  final currentUserDevices = state.settingsStore.devices;
 
   if (currentUserDevices.isEmpty) {
     return Values.UNKNOWN;

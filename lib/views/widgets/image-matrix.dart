@@ -18,7 +18,7 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 ///
 class MatrixImage extends HookWidget {
   const MatrixImage({
-    Key? key,
+    super.key,
     required this.mxcUri,
     this.width = Dimensions.avatarSizeMin,
     this.height = Dimensions.avatarSizeMin,
@@ -35,7 +35,7 @@ class MatrixImage extends HookWidget {
     this.fallback,
     this.fileName = '',
     this.onPressImage,
-  }) : super(key: key);
+  });
 
   final String? mxcUri;
   final String? imageType;
@@ -98,8 +98,7 @@ class MatrixImage extends HookWidget {
       loadingLocal.value = false;
     }
 
-    final failed =
-        mediaStatus != null && mediaStatus == MediaStatus.FAILURE.value;
+    final failed = mediaStatus != null && mediaStatus == MediaStatus.FAILURE.value;
     final loading = forceLoading || !isMediaCached || loadingLocal.value;
 
     // allows user option to manually load images on tap

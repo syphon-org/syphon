@@ -11,7 +11,7 @@ import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class DialogTextInput extends HookWidget {
   const DialogTextInput({
-    Key? key,
+    super.key,
     this.title = '',
     this.content = '',
     this.label = '',
@@ -27,7 +27,7 @@ class DialogTextInput extends HookWidget {
     this.onConfirm,
     this.onChange,
     this.onCancel,
-  }) : super(key: key);
+  });
 
   final String title;
   final String content;
@@ -50,8 +50,7 @@ class DialogTextInput extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editingControllerLocal =
-        editingController ?? useTextEditingController(text: initialValue);
+    final editingControllerLocal = editingController ?? useTextEditingController(text: initialValue);
 
     final inputFocusNode = useFocusNode();
 

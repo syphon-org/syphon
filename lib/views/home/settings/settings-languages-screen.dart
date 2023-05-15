@@ -11,7 +11,7 @@ import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 
 class LanguageSettingsScreen extends StatelessWidget {
-  const LanguageSettingsScreen({Key? key}) : super(key: key);
+  const LanguageSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(

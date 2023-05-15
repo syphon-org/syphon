@@ -21,9 +21,9 @@ extension Chunked on String {
   }
 }
 
-String selectCurrentUserSessionKey(Store<AppState> store) {
-  final currentDeviceId = store.state.authStore.user.deviceId;
-  final deviceKeysOwned = store.state.cryptoStore.deviceKeysOwned;
+String selectCurrentUserSessionKey(AppState state) {
+  final currentDeviceId = state.authStore.user.deviceId;
+  final deviceKeysOwned = state.cryptoStore.deviceKeysOwned;
 
   if (deviceKeysOwned.containsKey(currentDeviceId)) {
     final currentDeviceKey = deviceKeysOwned[currentDeviceId];
