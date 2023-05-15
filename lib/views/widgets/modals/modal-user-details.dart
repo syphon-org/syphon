@@ -21,14 +21,13 @@ import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
-
 class ModalUserDetails extends StatelessWidget {
   const ModalUserDetails({
-    Key? key,
+    super.key,
     this.user,
     this.userId,
     this.nested,
-  }) : super(key: key);
+  });
 
   final User? user;
   final String? userId;
@@ -145,9 +144,8 @@ class ModalUserDetails extends StatelessWidget {
                             uri: props.user.avatarUri,
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
-                            background: props.user.avatarUri == null
-                                ? AppColors.hashedColorUser(props.user)
-                                : null,
+                            background:
+                                props.user.avatarUri == null ? AppColors.hashedColorUser(props.user) : null,
                           ),
                         ),
                       ],
@@ -172,14 +170,15 @@ class ModalUserDetails extends StatelessWidget {
                       children: <Widget>[
                         Flexible(
                           // wrapped with flexible to allow ellipsis
-                          child: InkWell(child: Text(
-                            props.user.userId ?? '',
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                            onLongPress: () async  {
-                              await Clipboard.setData(ClipboardData(text: props.user.userId));
+                          child: InkWell(
+                            child: Text(
+                              props.user.userId ?? '',
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            onLongPress: () async {
+                              await Clipboard.setData(ClipboardData(text: props.user.userId ?? ''));
                               await props.onAddConfirmation('Username copied to clipboard');
                               Navigator.pop(context);
                             },
@@ -307,42 +306,41 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, {User? user, String? userId}) => _Props(
-        user: () {
-          final users = store.state.userStore.users;
-          final loading = store.state.userStore.loading;
+      user: () {
+        final users = store.state.userStore.users;
+        final loading = store.state.userStore.loading;
 
-          if (user != null && user.userId != null) {
-            return user;
-          }
-
-          if (userId == null) {
-            return User();
-          }
-
-          if (!users.containsKey(userId) && !loading) {
-            store.dispatch(fetchUser(user: User(userId: userId)));
-          }
-
-          return users[userId] ?? User();
-        }(),
-        users: store.state.userStore.users,
-        existingChatId: selectDirectChatIdExisting(
-          state: store.state,
-          user: user ?? User(userId: userId),
-        ),
-        loading: store.state.userStore.loading,
-        blocked: store.state.userStore.blocked.contains(userId ?? user!.userId),
-        onBlockUser: (User user) async {
-          await store.dispatch(toggleBlockUser(user: user));
-        },
-        onCreateChatDirect: ({required User user}) async => store.dispatch(
-          createRoom(
-            isDirect: true,
-            invites: <User>[user],
-          ),
-        ),
-        onAddConfirmation: (String message) async {
-          await store.dispatch(addConfirmation(message: message));
+        if (user != null && user.userId != null) {
+          return user;
         }
-      );
+
+        if (userId == null) {
+          return User();
+        }
+
+        if (!users.containsKey(userId) && !loading) {
+          store.dispatch(fetchUser(user: User(userId: userId)));
+        }
+
+        return users[userId] ?? User();
+      }(),
+      users: store.state.userStore.users,
+      existingChatId: selectDirectChatIdExisting(
+        state: store.state,
+        user: user ?? User(userId: userId),
+      ),
+      loading: store.state.userStore.loading,
+      blocked: store.state.userStore.blocked.contains(userId ?? user!.userId),
+      onBlockUser: (User user) async {
+        await store.dispatch(toggleBlockUser(user: user));
+      },
+      onCreateChatDirect: ({required User user}) async => store.dispatch(
+            createRoom(
+              isDirect: true,
+              invites: <User>[user],
+            ),
+          ),
+      onAddConfirmation: (String message) async {
+        await store.dispatch(addConfirmation(message: message));
+      });
 }

@@ -232,30 +232,31 @@ class ChatInputState extends State<ChatInput> {
     onToggleMediaOptions();
   }
 
-  showDialogForPhotoPermission(BuildContext context){
+  showDialogForPhotoPermission(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) =>
-          AlertDialog(
-            title: Text(Strings.titleDialogPhotoPermission,
-              style: TextStyle(fontWeight: FontWeight.w600),),
-            content: Text(Strings.contentPhotoPermission),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                },
-                child: Text(Strings.buttonCancel),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                  openAppSettings();
-                },
-                child: Text(Strings.buttonNext),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          Strings.titleDialogPhotoPermission,
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        content: Text(Strings.contentPhotoPermission),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text(Strings.buttonCancel),
           ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              openAppSettings();
+            },
+            child: Text(Strings.buttonNext),
+          ),
+        ],
+      ),
     );
   }
 
@@ -275,9 +276,11 @@ class ChatInputState extends State<ChatInput> {
     final cameras = await availableCameras();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) =>
-          CameraScreen(onAddMedia: widget.onAddMedia, cameras: cameras,)
-      ),
+      MaterialPageRoute(
+          builder: (context) => CameraScreen(
+                onAddMedia: widget.onAddMedia,
+                cameras: cameras,
+              )),
     );
   }
 
@@ -298,8 +301,7 @@ class ChatInputState extends State<ChatInput> {
           final double maxInputHeight = replying ? height * 0.45 : height * 0.65;
           final double maxMediaHeight = keyboardHeight > 0 ? keyboardHeight : height * 0.38;
 
-          final imageHeight =
-              keyboardHeight > 0 ? maxMediaHeight * 0.65 : imageWidth; // 2 images in view
+          final imageHeight = keyboardHeight > 0 ? maxMediaHeight * 0.65 : imageWidth; // 2 images in view
 
           final isSendable = (sendable && !widget.sending) ||
               // account for if editing
@@ -350,13 +352,16 @@ class ChatInputState extends State<ChatInput> {
             // label: Strings.labelSendUnencrypted,
             child: InkWell(
               borderRadius: BorderRadius.circular(48),
-              onTap:(){
+              onTap: () {
                 // print("Hi");
                 openCamera();
               },
               child: CircleAvatar(
                 backgroundColor: sendButtonColor,
-                child: Icon(Icons.camera_alt, color: Colors.white,),
+                child: Icon(
+                  Icons.camera_alt,
+                  color: Colors.white,
+                ),
               ),
             ),
           );
@@ -577,8 +582,7 @@ class ChatInputState extends State<ChatInput> {
                                     ),
                                     borderRadius: BorderRadius.only(
                                       topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                      topRight:
-                                          Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
                                       bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
                                       bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
                                     )),
@@ -589,8 +593,7 @@ class ChatInputState extends State<ChatInput> {
                                     ),
                                     borderRadius: BorderRadius.only(
                                       topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                      topRight:
-                                          Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
+                                      topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
                                       bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
                                       bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
                                     )),
@@ -654,12 +657,12 @@ class ChatInputState extends State<ChatInput> {
                           child: MediaCard(
                             text: Strings.buttonGallery,
                             icon: Icons.photo,
-                            onPress: () async{
+                            onPress: () async {
                               const photosPermission = Permission.photos;
                               final status = await photosPermission.status;
-                              if(!status.isGranted){
+                              if (!status.isGranted) {
                                 showDialogForPhotoPermission(context);
-                              }else{
+                              } else {
                                 onAddPhoto();
                               }
                             },
@@ -734,8 +737,7 @@ class _Props extends Equatable {
         room: selectRoom(id: roomId, state: store.state),
         inputTextColor: selectInputTextColor(store.state.settingsStore.themeSettings.themeType),
         inputCursorColor: selectCursorColor(store.state.settingsStore.themeSettings.themeType),
-        inputColorBackground:
-            selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
+        inputColorBackground: selectInputBackgroundColor(store.state.settingsStore.themeSettings.themeType),
         enterSendEnabled: store.state.settingsStore.enterSendEnabled,
         autocorrectEnabled: store.state.settingsStore.autocorrectEnabled,
         suggestionsEnabled: store.state.settingsStore.suggestionsEnabled,
