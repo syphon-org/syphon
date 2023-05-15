@@ -7,9 +7,9 @@ devices:
 install: 
 	flutter pub get
 builder: 
-	make install && flutter pub run build_runner build --delete-conflicting-outputs
+	make install && dart run build_runner build --delete-conflicting-outputs
 watch: 
-	flutter pub run build_runner watch --delete-conflicting-outputs
+	dart run build_runner watch --delete-conflicting-outputs
 uninstall: 
 	adb shell && pm uninstall org.tether.tether # (sometimes doesn't uninstall when debugging?)
 format: 
@@ -21,11 +21,11 @@ setup:
 
 # building
 build-release-ios: 
-	flutter build ipa  --release # open under xcworkspace, not xcodeproj
+	make builder && flutter build ipa  --release # open under xcworkspace, not xcodeproj
 build-release-macos: 
-	flutter pub run build_runner build --delete-conflicting-outputs && flutter build macos --release
+	make builder && flutter build macos --release
 build-release-android: 
-	flutter pub run build_runner build --delete-conflicting-outputs && flutter build apk --release
+	make builder && flutter build apk --release
 
 # mobile development commands
 setup-ios: 
