@@ -1,5 +1,13 @@
+
+# environment
+setup:
+	make builder && git submodule update --init --recursive
+
+# dev build commands
 start: 
 	make builder && flutter run # -d <device_id>
+start-only: 
+	flutter run # -d <device_id>
 start-fresh: 
 	flutter run --no-fast-start # -d <device_id>
 devices: 
@@ -15,11 +23,7 @@ uninstall:
 format: 
 	flutter dartfmt --line-length=120 .
 
-# environment
-setup:
-	make builder && git submodule update --init --recursive
-
-# building
+# release build commands
 build-release-ios: 
 	make builder && flutter build ipa  --release # open under xcworkspace, not xcodeproj
 build-release-macos: 

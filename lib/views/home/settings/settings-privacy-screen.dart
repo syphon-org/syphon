@@ -99,31 +99,25 @@ class _Props extends Equatable {
         screenLockEnabled,
       ];
 
-  static _Props mapStateToProps(Store<AppState> store, AppContext context) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store, AppContext context) => _Props(
         valid: store.state.authStore.credential != null &&
             store.state.authStore.credential!.value != null &&
             store.state.authStore.credential!.value!.isNotEmpty,
         loading: store.state.authStore.loading,
         screenLockEnabled: selectScreenLockEnabled(context),
         typingIndicators: store.state.settingsStore.typingIndicatorsEnabled,
-        keyBackupLatest:
-            store.state.settingsStore.privacySettings.lastBackupMillis,
+        keyBackupLatest: store.state.settingsStore.privacySettings.lastBackupMillis,
         keyBackupSchedule: selectKeyBackupSchedule(store.state),
         keyBackupLocation: selectKeyBackupLocation(store.state),
-        readReceipts:
-            selectReadReceiptsString(store.state.settingsStore.readReceipts),
+        readReceipts: selectReadReceiptsString(store.state.settingsStore.readReceipts),
         sessionId: store.state.authStore.user.deviceId ?? Values.empty,
         sessionName: selectCurrentDeviceName(store),
         sessionKey: selectCurrentUserSessionKey(store),
-        onSetScreenLock: (String matchedPin) async =>
-            store.dispatch(setScreenLock(pin: matchedPin)),
-        onRemoveScreenLock: (String matchedPin) async =>
-            store.dispatch(removeScreenLock(pin: matchedPin)),
+        onSetScreenLock: (String matchedPin) async => store.dispatch(setScreenLock(pin: matchedPin)),
+        onRemoveScreenLock: (String matchedPin) async => store.dispatch(removeScreenLock(pin: matchedPin)),
         onDisabled: () => store.dispatch(addInProgress()),
         onResetConfirmAuth: () => store.dispatch(resetInteractiveAuth()),
-        onToggleTypingIndicators: () =>
-            store.dispatch(toggleTypingIndicators()),
+        onToggleTypingIndicators: () => store.dispatch(toggleTypingIndicators()),
         onIncrementReadReceipts: () => store.dispatch(incrementReadReceipts()),
         onRenameDevice: (BuildContext context) async {
           showDialog(
@@ -149,7 +143,7 @@ class _Props extends Equatable {
           );
         },
         copyToClipboard: (String? clipboardData) async {
-          await Clipboard.setData(ClipboardData(text: clipboardData));
+          await Clipboard.setData(ClipboardData(text: clipboardData ?? ''));
           store.dispatch(addInfo(message: Strings.alertCopiedToClipboard));
           HapticFeedback.vibrate();
         },
@@ -158,8 +152,8 @@ class _Props extends Equatable {
 
 class PrivacySettingsScreen extends hooks.HookWidget {
   const PrivacySettingsScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   onConfirmDeactivateAccount(BuildContext context, _Props props) async {
     await showDialog(
@@ -269,8 +263,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
 
     final selectedDirectory = await FilePicker.platform.getDirectoryPath(
       dialogTitle: 'Select Backup Directory',
-      initialDirectory:
-          store.state.settingsStore.storageSettings.keyBackupLocation,
+      initialDirectory: store.state.settingsStore.storageSettings.keyBackupLocation,
     );
 
     if (selectedDirectory == null) {
@@ -354,9 +347,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
   }) async {
     final store = StoreProvider.of<AppState>(context);
     final defaultPadding = EdgeInsets.symmetric(horizontal: 10);
-    final isDefault =
-        store.state.settingsStore.privacySettings.keyBackupInterval ==
-            Duration.zero;
+    final isDefault = store.state.settingsStore.privacySettings.keyBackupInterval == Duration.zero;
 
     final onSelect = (BuildContext dialogContext, Duration duration) {
       store.dispatch(
@@ -385,7 +376,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                   padding: defaultPadding,
                   child: Text(
                     'Manual Only',
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   )),
               onTap: () {
                 onSelect(dialogContext, Duration.zero);
@@ -396,7 +387,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                   padding: defaultPadding,
                   child: Text(
                     'Every 15 Minutes',
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   )),
               onTap: () {
                 onSelect(dialogContext, Duration(minutes: 15));
@@ -407,7 +398,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                   padding: defaultPadding,
                   child: Text(
                     'Every hour',
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   )),
               onTap: () {
                 onSelect(dialogContext, Duration(hours: 1));
@@ -418,7 +409,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                   padding: defaultPadding,
                   child: Text(
                     'Every 6 hours',
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   )),
               onTap: () {
                 onSelect(dialogContext, Duration(hours: 6));
@@ -429,7 +420,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                 padding: defaultPadding,
                 child: Text(
                   'Every 12 hours',
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
               onTap: () {
@@ -441,7 +432,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                 padding: defaultPadding,
                 child: Text(
                   'Every day',
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
               onTap: () {
@@ -453,7 +444,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                 padding: defaultPadding,
                 child: Text(
                   'Every week',
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
               onTap: () {
@@ -465,7 +456,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                 padding: defaultPadding,
                 child: Text(
                   'Once a month',
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
               onTap: () {
@@ -560,7 +551,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
               },
               title: Text(Strings.titleDialogEnterScreenLockPin),
               onVerify: (String answer) async {
-                return Future.value(true);
+                return true;
               },
               onConfirmed: (String matchedText) async {
                 await props.onRemoveScreenLock(matchedText);
@@ -583,7 +574,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
       title: Text(Strings.titleDialogEnterNewScreenLockPin),
       confirmTitle: Text(Strings.titleDialogVerifyNewScreenLockPin),
       onVerify: (String answer) async {
-        return Future.value(true);
+        return true;
       },
       onConfirmed: (String matchedText) async {
         await props.onSetScreenLock(matchedText);
@@ -649,8 +640,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                               await props.copyToClipboard(props.sessionId);
                             },
                             trailing: IconButton(
-                              onPressed: () =>
-                                  props.copyToClipboard(props.sessionId),
+                              onPressed: () => props.copyToClipboard(props.sessionId),
                               icon: Icon(Icons.copy),
                             ),
                           ),
@@ -667,8 +657,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                               await props.copyToClipboard(props.sessionKey);
                             },
                             trailing: IconButton(
-                              onPressed: () =>
-                                  props.copyToClipboard(props.sessionKey),
+                              onPressed: () => props.copyToClipboard(props.sessionKey),
                               icon: Icon(Icons.copy),
                             ),
                           ),
@@ -689,8 +678,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(
-                                  context, Routes.settingsPassword);
+                              Navigator.pushNamed(context, Routes.settingsPassword);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -703,8 +691,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                           ),
                           ListTile(
                             onTap: () {
-                              Navigator.pushNamed(
-                                  context, Routes.settingsBlocked);
+                              Navigator.pushNamed(context, Routes.settingsBlocked);
                             },
                             contentPadding: Dimensions.listPadding,
                             title: Text(
@@ -754,8 +741,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                             ),
                             trailing: Switch(
                               value: props.typingIndicators!,
-                              onChanged: (enterSend) =>
-                                  props.onToggleTypingIndicators(),
+                              onChanged: (enterSend) => props.onToggleTypingIndicators(),
                             ),
                           ),
                         ],
@@ -784,8 +770,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                             ),
                             trailing: Switch(
                               value: props.screenLockEnabled,
-                              onChanged: (enabled) => onSetScreenLockPin(
-                                  props: props, context: context),
+                              onChanged: (enabled) => onSetScreenLockPin(props: props, context: context),
                             ),
                           ),
                           ListTile(
@@ -822,8 +807,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onExportSessionKeys(
-                                context: context, props: props),
+                            onTap: () => onExportSessionKeys(context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Backup Keys',
@@ -832,8 +816,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                           Visibility(
                             visible: true,
                             child: ListTile(
-                              onTap: () =>
-                                  onUpdateBackupLocation(context: context),
+                              onTap: () => onUpdateBackupLocation(context: context),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Backup Folder',
@@ -847,8 +830,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                           Visibility(
                             visible: true,
                             child: ListTile(
-                              onTap: () =>
-                                  onUpdateBackupSchedule(context: context),
+                              onTap: () => onUpdateBackupSchedule(context: context),
                               contentPadding: Dimensions.listPadding,
                               title: Text(
                                 'Backup Schedule',
@@ -884,8 +866,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () => onDeleteSessionKeys(
-                                context: context, props: props),
+                            onTap: () => onDeleteSessionKeys(context: context, props: props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Delete Keys',
@@ -896,8 +877,7 @@ class PrivacySettingsScreen extends hooks.HookWidget {
                             ),
                           ),
                           ListTile(
-                            onTap: () =>
-                                onConfirmDeactivateAccount(context, props),
+                            onTap: () => onConfirmDeactivateAccount(context, props),
                             contentPadding: Dimensions.listPadding,
                             title: Text(
                               'Deactivate Account',

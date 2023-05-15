@@ -62,7 +62,7 @@ class ProfileScreen extends HookWidget {
 
     // local widget functionality
     final onCopyToClipboard = useCallback(() async {
-      await Clipboard.setData(ClipboardData(text: user?.userId));
+      await Clipboard.setData(ClipboardData(text: user?.userId ?? ''));
       dispatch(addInfo(message: 'Copied User ID to clipboard'));
     }, [dispatch, user]);
 

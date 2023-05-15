@@ -18,7 +18,7 @@ import 'package:syphon/views/navigation.dart';
 
 class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget {
   const AppBarMessageOptions({
-    Key? key,
+    super.key,
     this.title = 'title:',
     this.label = 'label:',
     this.tooltip = 'tooltip:',
@@ -34,7 +34,7 @@ class AppBarMessageOptions extends StatefulWidget implements PreferredSizeWidget
     this.onEdit,
     this.onDismiss,
     required this.user,
-  }) : super(key: key);
+  });
 
   final String title;
   final String label;
@@ -152,7 +152,7 @@ class AppBarMessageOptionState extends State<AppBarMessageOptions> {
               onPressed: () {
                 Clipboard.setData(
                   ClipboardData(
-                    text: widget.message!.formattedBody ?? widget.message!.body,
+                    text: widget.message!.formattedBody ?? widget.message!.body ?? '',
                   ),
                 );
 

@@ -413,11 +413,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "623b65c0d8f392065f41a4628c0278563a809644"
-      resolved-ref: "623b65c0d8f392065f41a4628c0278563a809644"
+      ref: "3f8a1f40ddb4d6fdfa9c7bdbdd96a1233b469c98"
+      resolved-ref: "3f8a1f40ddb4d6fdfa9c7bdbdd96a1233b469c98"
       url: "https://github.com/ereio/fab-circular-menu.git"
     source: git
-    version: "1.0.2"
+    version: "1.1.0"
   ffi:
     dependency: transitive
     description:
