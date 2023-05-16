@@ -11,12 +11,6 @@ import 'package:sqlcipher_library_windows/sqlcipher_library_windows.dart';
 import 'package:sqlite3/open.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/types.dart';
-import 'package:syphon/global/libs/secure-storage/key-storage.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/global/libs/storage/converters.dart';
-import 'package:syphon/global/libs/storage/index.dart';
-import 'package:syphon/global/libs/storage/models.dart';
 import 'package:syphon/domain/auth/schema.dart';
 import 'package:syphon/domain/crypto/schema.dart';
 import 'package:syphon/domain/crypto/sessions/schema.dart';
@@ -35,6 +29,12 @@ import 'package:syphon/domain/settings/schema.dart';
 import 'package:syphon/domain/sync/schema.dart';
 import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/domain/user/schema.dart';
+import 'package:syphon/global/libs/secure-storage/key-storage.dart';
+import 'package:syphon/global/libs/storage/converters.dart';
+import 'package:syphon/global/libs/storage/index.dart';
+import 'package:syphon/global/libs/storage/models.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 part 'database.g.dart';
 
@@ -136,7 +136,7 @@ void _openDatabaseBackground(DatabaseInfo info) {
   initDatabase();
 
   final driftIsolate = DriftIsolate.inCurrent(
-    () => DatabaseConnection.fromExecutor(
+    () => DatabaseConnection(
       NativeDatabase(
         File(info.path),
         logStatements: false,

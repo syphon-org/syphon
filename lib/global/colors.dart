@@ -55,9 +55,9 @@ class AppColors {
   static const greyEnabled = 0xffFAFAFA;
   static const greyDisabled = 0xffD8D8D8;
 
-  static const greyDefault = 0xFF9E9E9E; // Colors.grey[500]
-  static const greyLight = 0xFFE0E0E0; // Colors.grey[300]
   static const greyLightest = 0xFFEEEEEE; // Colors.grey[200]
+  static const greyLight = 0xFFE0E0E0; // Colors.grey[300]
+  static const greyDefault = 0xFF9E9E9E; // Colors.grey[500]
   static const greyDark = 0xFF616161; // Colors.grey[700]
   static const greyDarkest = 0xFF303030; // Colors.grey[850]
 
