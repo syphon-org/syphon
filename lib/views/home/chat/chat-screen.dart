@@ -336,10 +336,7 @@ class ChatScreenState extends State<ChatScreen> {
     /// have something to do with the Visibility widget
     if (mxcUri != null) {
       store.dispatch(
-        fetchMedia(
-          mxcUri: mxcUri,
-          info: info,
-        ),
+        fetchMedia(mxcUri: mxcUri, info: info),
       );
     }
 

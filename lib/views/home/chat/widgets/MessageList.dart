@@ -52,7 +52,8 @@ class MessageList extends HookWidget {
   @override
   Widget build(BuildContext context) {
     // global actions
-    final dispatch = useDispatch();
+    final store = useStore<AppState>();
+    final dispatch = useDispatch<AppState>();
 
     // global state
     final room = useSelector<AppState, Room>(
@@ -70,23 +71,21 @@ class MessageList extends HookWidget {
       fallback: <String, User>{},
     );
 
-    // final messagesRaw = useSelectorSafe<AppState, Map<String, Message>>(
-    //   (state) => roomMessagesMap(state, roomId),
-    //   fallback: <String, Message>{},
-    // );
+    final messagesRaw = useSelector<AppState, Map<String, Message>>(
+      (state) => roomMessagesMap(state, roomId),
+      fallback: <String, Message>{},
+    );
 
-    // TODO: identify message updates based on roomMessagesMap above
-    final messages = useSelector<AppState, List<Message>>(
-      (state) => latestMessages(
-        filterMessages(
-          combineOutbox(
-            outbox: roomOutbox(state, roomId),
-            messages: roomMessages(state, roomId),
-          ),
-          state,
+    // TODO: identify message updates efficently based on roomMessagesMap above
+    final messages = useMemoized(
+      () => latestMessages(filterMessages(
+        combineOutbox(
+          outbox: roomOutbox(store.state, roomId),
+          messages: messagesRaw.values.toList(),
         ),
-      ),
-      fallback: const [],
+        store.state,
+      )),
+      [messagesRaw.keys],
     );
 
     final themeType = useSelector<AppState, ThemeType>(
@@ -104,9 +103,9 @@ class MessageList extends HookWidget {
       fallback: MessageSize.Default,
     );
 
-    final chatColorPrimary = useSelector<AppState, Color?>(
+    final chatColorPrimary = useSelectorUnsafe<AppState, Color?>(
       (state) => selectBubbleColor(state, roomId),
-      fallback: Color(AppColors.cyanSyphon),
+      equality: (a, b) => a == b,
     );
 
     // local hooks
@@ -189,6 +188,7 @@ class MessageList extends HookWidget {
     }
 
     final lockScrolling = selectedMessage != null && !editing;
+
     return GestureDetector(
       onTap: () => onToggleSelectedMessage!(null),
       child: ListView(
