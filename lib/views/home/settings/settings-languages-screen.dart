@@ -5,9 +5,9 @@ import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 
 class LanguageSettingsScreen extends StatelessWidget {

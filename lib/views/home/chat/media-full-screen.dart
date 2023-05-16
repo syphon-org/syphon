@@ -7,10 +7,10 @@ import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/index.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/index.dart';
 
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 
 class MediaFullScreen extends StatelessWidget {
   final String title;

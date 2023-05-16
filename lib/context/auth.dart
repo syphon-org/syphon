@@ -18,22 +18,14 @@ import 'package:syphon/global/print.dart';
 ///
 String generateContextId() {
   final shaHash = crypt.sha256.convert(utf8.encode(getRandomString(10)));
-  return base64
-      .encode(shaHash.bytes)
-      .toLowerCase()
-      .replaceAll(RegExp(r'[^\w]'), '')
-      .substring(0, 10);
+  return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 }
 
 // Switch to generating UserID independent context IDs that can still be managed globally
 // ignore: non_constant_identifier_names
 String generateContextId_DEPRECATED({required String id}) {
   final shaHash = crypt.sha256.convert(utf8.encode(id));
-  return base64
-      .encode(shaHash.bytes)
-      .toLowerCase()
-      .replaceAll(RegExp(r'[^\w]'), '')
-      .substring(0, 10);
+  return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 }
 
 Future<String> generatePinHash({required String passcode, String salt = 'TODO:'}) async {

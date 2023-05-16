@@ -5,8 +5,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
 
 class AvatarBadge extends StatelessWidget {
   const AvatarBadge({

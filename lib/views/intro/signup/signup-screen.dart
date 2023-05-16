@@ -8,13 +8,13 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libs/matrix/auth.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/auth/homeserver/model.dart';
-import 'package:syphon/store/auth/selectors.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
-import 'package:syphon/store/user/model.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/auth/homeserver/model.dart';
+import 'package:syphon/domain/auth/selectors.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/signup/widgets/StepCaptcha.dart';
 import 'package:syphon/views/intro/signup/widgets/StepEmail.dart';
@@ -142,8 +142,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
 
   onDidChange(_Props? oldProps, _Props props) {
     final ssoLoginChanged = props.isSSOLoginAvailable != oldProps?.isSSOLoginAvailable;
-    final passwordLoginChanged =
-        props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
+    final passwordLoginChanged = props.isPasswordLoginAvailable != oldProps?.isPasswordLoginAvailable;
 
     final signupTypesChanged = props.homeserver.signupTypes != oldProps?.homeserver.signupTypes;
 
@@ -211,8 +210,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
           }
 
           final homeserver = store.state.authStore.homeserver;
-          if (homeserver.signupTypes.isEmpty &&
-              !homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
+          if (homeserver.signupTypes.isEmpty && !homeserver.loginTypes.contains(MatrixAuthTypes.SSO)) {
             store.dispatch(addInfo(
               origin: 'selectHomeserver',
               message: 'No new signups allowed on this server, try another if creating an account',
@@ -313,8 +311,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        onWillChange:
-            onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
+        onWillChange: onDidChange, // NOTE: bug / issue where onDidChange doesn't show correct oldProps
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -384,8 +381,7 @@ class SignupScreenState extends State<SignupScreen> with Lifecycle<SignupScreen>
                           direction: Axis.vertical,
                           children: <Widget>[
                             Visibility(
-                              visible:
-                                  !(!props.isPasswordLoginAvailable && props.isSSOLoginAvailable),
+                              visible: !(!props.isPasswordLoginAvailable && props.isSSOLoginAvailable),
                               child: Container(
                                 padding: const EdgeInsets.only(top: 12, bottom: 12),
                                 child: ButtonSolid(

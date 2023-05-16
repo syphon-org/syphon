@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 
 // Set the theme for the system UI only
 void setSystemTheme(ThemeType themeType) {

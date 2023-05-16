@@ -4,8 +4,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 
@@ -163,8 +163,8 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.authStore.loading,
-        isPasswordValid: store.state.authStore.isPasswordValid &&
-            store.state.authStore.passwordCurrent.isNotEmpty,
+        isPasswordValid:
+            store.state.authStore.isPasswordValid && store.state.authStore.passwordCurrent.isNotEmpty,
         interactiveAuths: store.state.authStore.interactiveAuths,
         onSavePassword: () async {
           final valid = store.state.authStore.isPasswordValid;

@@ -6,12 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/receipts/model.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/models.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/user/model.dart';
+import 'package:syphon/domain/events/messages/model.dart';
+import 'package:syphon/domain/events/receipts/model.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/models.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
@@ -227,8 +227,7 @@ class _Props extends Equatable {
         readReceipts: store.state.eventStore.receipts[args?.roomId!] ?? <String, Receipt>{},
         userId: store.state.authStore.user.userId,
         themeType: store.state.settingsStore.themeSettings.themeType,
-        timeFormat:
-            store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
+        timeFormat: store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
       );
 
   @override

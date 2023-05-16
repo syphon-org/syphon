@@ -6,16 +6,16 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/selectors.dart';
-import 'package:syphon/store/hooks.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/room/selectors.dart';
-import 'package:syphon/store/rooms/selectors.dart';
-import 'package:syphon/store/settings/chat-settings/selectors.dart';
-import 'package:syphon/store/sync/selectors.dart';
-import 'package:syphon/store/user/model.dart';
+import 'package:syphon/domain/events/messages/model.dart';
+import 'package:syphon/domain/events/selectors.dart';
+import 'package:syphon/domain/hooks.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/rooms/room/selectors.dart';
+import 'package:syphon/domain/rooms/selectors.dart';
+import 'package:syphon/domain/settings/chat-settings/selectors.dart';
+import 'package:syphon/domain/sync/selectors.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class HomeChatList extends HookWidget {

@@ -5,9 +5,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PageEmailVerify.dart';
 import 'package:syphon/views/navigation.dart';
@@ -88,10 +88,8 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
               behavior: DefaultScrollBehavior(),
               child: SingleChildScrollView(
                 child: Container(
-                  width:
-                      width, // set actual height and width for flex constraints
-                  height:
-                      height, // set actual height and width for flex constraints
+                  width: width, // set actual height and width for flex constraints
+                  height: height, // set actual height and width for flex constraints
                   child: Flex(
                     direction: Axis.vertical,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -139,15 +137,13 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                     child: ButtonSolid(
                                       text: Strings.buttonSendVerification,
                                       loading: loading,
-                                      disabled: !props.isEmailValid ||
-                                          !props.isHomeserverValid,
+                                      disabled: !props.isEmailValid || !props.isHomeserverValid,
                                       onPressed: () async {
                                         setState(() {
                                           loading = true;
                                         });
 
-                                        final result = await props
-                                            .onSendVerification(sendAttempt);
+                                        final result = await props.onSendVerification(sendAttempt);
 
                                         if (result) {
                                           onShowConfirmDialog();
@@ -174,8 +170,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                           loading = true;
                                         });
 
-                                        final result =
-                                            await props.onConfirmVerification();
+                                        final result = await props.onConfirmVerification();
 
                                         if (result) {
                                           onVerificationConfirmed();

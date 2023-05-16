@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/hooks.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/media/actions.dart';
-import 'package:syphon/store/media/model.dart';
+import 'package:syphon/domain/hooks.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/media/actions.dart';
+import 'package:syphon/domain/media/model.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 ///

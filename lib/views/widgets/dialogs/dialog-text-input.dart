@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
+import 'package:syphon/domain/auth/actions.dart';
 
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 

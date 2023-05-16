@@ -10,8 +10,8 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
@@ -325,8 +325,7 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
-        session: store.state.authStore.authSession != null &&
-            store.state.authStore.authSession!.isNotEmpty,
+        session: store.state.authStore.authSession != null && store.state.authStore.authSession!.isNotEmpty,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },

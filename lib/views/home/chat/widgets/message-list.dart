@@ -5,21 +5,21 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/print.dart';
-import 'package:syphon/store/events/actions.dart';
-import 'package:syphon/store/events/messages/actions.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/messages/selectors.dart';
-import 'package:syphon/store/events/reactions/actions.dart';
-import 'package:syphon/store/events/selectors.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/selectors.dart';
-import 'package:syphon/store/settings/chat-settings/selectors.dart';
-import 'package:syphon/store/settings/models.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
+import 'package:syphon/domain/events/actions.dart';
+import 'package:syphon/domain/events/messages/actions.dart';
+import 'package:syphon/domain/events/messages/model.dart';
+import 'package:syphon/domain/events/messages/selectors.dart';
+import 'package:syphon/domain/events/reactions/actions.dart';
+import 'package:syphon/domain/events/selectors.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/rooms/selectors.dart';
+import 'package:syphon/domain/settings/chat-settings/selectors.dart';
+import 'package:syphon/domain/settings/models.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/messages/typing-indicator.dart';
@@ -174,8 +174,7 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                   roomUsers: props.users,
                   typing: props.room.userTyping,
                   usersTyping: props.room.usersTyping,
-                  selectedMessageId:
-                      widget.selectedMessage != null ? widget.selectedMessage!.id : null,
+                  selectedMessageId: widget.selectedMessage != null ? widget.selectedMessage!.id : null,
                 ),
                 ListView.builder(
                   reverse: true,
@@ -191,17 +190,13 @@ class MessageListState extends State<MessageList> with Lifecycle<MessageList> {
                   itemBuilder: (BuildContext context, int index) {
                     final message = props.messages[index];
                     final lastMessage = index != 0 ? props.messages[index - 1] : null;
-                    final nextMessage =
-                        index + 1 < props.messages.length ? props.messages[index + 1] : null;
+                    final nextMessage = index + 1 < props.messages.length ? props.messages[index + 1] : null;
 
                     // was sent at least 2 minutes after the previous message
-                    final isNewContext =
-                        ((lastMessage?.timestamp ?? 0) - message.timestamp) > 120000;
+                    final isNewContext = ((lastMessage?.timestamp ?? 0) - message.timestamp) > 120000;
 
-                    final isLastSender =
-                        lastMessage != null && lastMessage.sender == message.sender;
-                    final isNextSender =
-                        nextMessage != null && nextMessage.sender == message.sender;
+                    final isLastSender = lastMessage != null && lastMessage.sender == message.sender;
+                    final isNextSender = nextMessage != null && nextMessage.sender == message.sender;
                     final isUserSent = props.currentUser.userId == message.sender;
 
                     final selectedMessageId =
@@ -291,8 +286,7 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
-        timeFormat:
-            store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
+        timeFormat: store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
         themeType: store.state.settingsStore.themeSettings.themeType,
         messageSize: store.state.settingsStore.themeSettings.messageSize,
         currentUser: store.state.authStore.user,

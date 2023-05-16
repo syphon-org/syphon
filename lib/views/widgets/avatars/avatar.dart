@@ -8,9 +8,9 @@ import 'package:redux/redux.dart';
 
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 
 ///
@@ -57,8 +57,7 @@ class Avatar extends StatelessWidget {
         builder: (context, props) {
           // TODO: uri is parsed as an empty string under dendrite
           final bool emptyAvi = uri == null && url == null || (uri?.isEmpty ?? true);
-          final Color backgroundColor =
-              !emptyAvi || force ? Colors.transparent : background ?? Colors.grey;
+          final Color backgroundColor = !emptyAvi || force ? Colors.transparent : background ?? Colors.grey;
 
           var borderRadius = BorderRadius.circular(size);
 
