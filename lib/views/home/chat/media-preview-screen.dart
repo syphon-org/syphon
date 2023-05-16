@@ -1,19 +1,18 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/rooms/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/domain/index.dart';
-import 'package:syphon/domain/rooms/room/model.dart';
-import 'package:syphon/domain/rooms/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -155,7 +154,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                                           encryptionEnabled
                                               ? Assets.iconSendLockSolidBeing
                                               : Assets.iconSendUnlockBeing,
-                                          color: Colors.white,
+                                          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                                           semanticsLabel: Strings.labelSendEncrypted,
                                         ),
                                       ),

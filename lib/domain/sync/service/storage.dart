@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/settings/notification-settings/model.dart';
 import 'package:syphon/domain/sync/service/service.dart';
+import 'package:syphon/global/print.dart';
 
 FlutterSecureStorage? _secureStorage;
 

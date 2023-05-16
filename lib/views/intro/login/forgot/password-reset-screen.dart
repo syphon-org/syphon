@@ -1,13 +1,12 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/domain/auth/actions.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/theme-settings/selectors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/login/forgot/widgets/PagePasswordReset.dart';
 import 'package:syphon/views/navigation.dart';

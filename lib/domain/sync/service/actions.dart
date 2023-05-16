@@ -1,8 +1,8 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/notifications.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/sync/service/service.dart';
+import 'package:syphon/global/notifications.dart';
 
 ThunkAction<AppState> startSyncService() {
   return (Store<AppState> store) async {

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/libs/storage/database.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Room Queries

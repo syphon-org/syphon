@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/libs/storage/database.dart';
 import 'package:syphon/domain/crypto/sessions/model.dart' as model;
+import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Auth Quesies - unencrypted (Cold Storage)

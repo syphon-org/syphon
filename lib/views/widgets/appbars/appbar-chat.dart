@@ -2,18 +2,17 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/room/selectors.dart';
 import 'package:syphon/domain/settings/notification-settings/actions.dart';
 import 'package:syphon/domain/user/actions.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
 import 'package:syphon/views/navigation.dart';

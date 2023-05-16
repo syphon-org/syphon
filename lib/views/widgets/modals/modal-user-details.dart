@@ -4,16 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/actions.dart';
 import 'package:syphon/domain/rooms/selectors.dart';
 import 'package:syphon/domain/user/actions.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/home/profile/profile-user-screen.dart';
 import 'package:syphon/views/home/search/search-chats-screen.dart';
@@ -210,7 +210,8 @@ class ModalUserDetails extends StatelessWidget {
                           width: Dimensions.iconSize - 2,
                           height: Dimensions.iconSize - 2,
                           semanticsLabel: Strings.semanticsCreatePublicRoom,
-                          color: Theme.of(context).iconTheme.color,
+                          colorFilter: ColorFilter.mode(
+                              Theme.of(context).iconTheme.color ?? Colors.white, BlendMode.srcIn),
                         ),
                       ),
                     ),

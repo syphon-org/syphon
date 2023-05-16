@@ -1,15 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:syphon/domain/settings/models.dart';
 import 'package:syphon/global/algos.dart';
-
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/domain/settings/models.dart';
+
 import 'model.dart';
 
 bool isSystemDarkMode() {
-  return SchedulerBinding.instance.window.platformBrightness == Brightness.dark;
+  return PlatformDispatcher.instance.platformBrightness == Brightness.dark;
 }
 
 ThemeType themeTypeFromSystem() {

@@ -1,13 +1,13 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/receipts/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/settings/actions.dart';
 import 'package:syphon/domain/settings/models.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 
 class SetReceipts {
   final String? roomId;

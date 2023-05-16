@@ -1,7 +1,5 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/events/actions.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/model.dart';
@@ -10,6 +8,8 @@ import 'package:syphon/domain/events/reactions/model.dart';
 import 'package:syphon/domain/events/redaction/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 
 class SaveRedactions {
   final List<Redaction>? redactions;

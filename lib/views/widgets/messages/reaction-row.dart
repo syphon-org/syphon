@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
 import 'package:syphon/domain/index.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 
 class ReactionRow extends StatefulWidget {

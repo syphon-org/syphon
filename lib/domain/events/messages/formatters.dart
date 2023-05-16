@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/media/converters.dart';
 import 'package:syphon/domain/media/encryption.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 
 ///
 /// Format Message Content (Encrypted / Unencrypted)

@@ -11,17 +11,6 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/libs/matrix/utils.dart';
-import 'package:syphon/global/libs/secure-storage/key-storage.dart';
-import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/global/weburl.dart';
-import 'package:syphon/global/libs/storage/index.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/auth/context/actions.dart';
 import 'package:syphon/domain/auth/credential/model.dart';
@@ -41,6 +30,17 @@ import 'package:syphon/domain/sync/actions.dart';
 import 'package:syphon/domain/sync/service/actions.dart';
 import 'package:syphon/domain/sync/service/storage.dart';
 import 'package:syphon/domain/user/actions.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/matrix/utils.dart';
+import 'package:syphon/global/libs/secure-storage/key-storage.dart';
+import 'package:syphon/global/libs/storage/index.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
+import 'package:syphon/global/weburl.dart';
 import 'package:uni_links/uni_links.dart';
 
 import '../user/model.dart';
@@ -1093,7 +1093,7 @@ ThunkAction<AppState> updateAvatarUri({String? mxcUri}) {
   };
 }
 
-ThunkAction<AppState> setAuthLoading(bool loading) {
+ThunkAction<AppState> setAuthLoading({bool loading = false}) {
   return (Store<AppState> store) async {
     store.dispatch(SetLoading(loading: loading));
   };

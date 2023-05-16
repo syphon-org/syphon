@@ -1,7 +1,7 @@
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/index.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/strings.dart';
 
 bool selectIsMedia(Message message) {
   final isBodyNull = message.body == null || message.body!.isEmpty;

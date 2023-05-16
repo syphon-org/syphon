@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/libs/storage/database.dart';
 import 'package:syphon/domain/events/model.dart';
+import 'package:syphon/global/libs/storage/database.dart';
 
 part 'model.g.dart';
 
@@ -12,30 +12,20 @@ class Reaction extends Event implements drift.Insertable<Reaction> {
   final String? relEventId;
 
   const Reaction({
-    id,
-    userId,
-    roomId,
-    type,
-    sender,
-    stateKey,
-    batch,
-    prevBatch,
-    timestamp,
+    super.id,
+    super.userId,
+    super.roomId,
+    super.type,
+    super.sender,
+    super.stateKey,
+    super.batch,
+    super.prevBatch,
+    super.timestamp,
     super.content,
     this.body,
     this.relType,
     this.relEventId,
-  }) : super(
-          id: id,
-          userId: userId,
-          roomId: roomId,
-          type: type,
-          sender: sender,
-          stateKey: stateKey,
-          batch: batch,
-          prevBatch: prevBatch,
-          timestamp: timestamp,
-        );
+  });
 
   @override
   Reaction copyWith({

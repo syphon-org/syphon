@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:syphon/global/print.dart';
+import 'package:syphon/domain/auth/state.dart';
 import 'package:syphon/global/libs/storage/constants.dart';
 import 'package:syphon/global/libs/storage/database.dart';
-import 'package:syphon/domain/auth/state.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Auth Quesies - unencrypted (Cold Storage)

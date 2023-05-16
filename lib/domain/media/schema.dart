@@ -9,7 +9,7 @@ class EncryptInfoToJsonConverter extends NullAwareTypeConverter<EncryptInfo?, St
 
   @override
   EncryptInfo? requireFromSql(String fromDb) {
-    return EncryptInfo.fromJson(json.decode(fromDb ?? '{}') ?? {});
+    return EncryptInfo.fromJson(json.decode(fromDb) ?? {});
   }
 
   @override

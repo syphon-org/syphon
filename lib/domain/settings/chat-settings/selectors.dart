@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colors.dart';
 import 'package:syphon/domain/index.dart';
+import 'package:syphon/global/colors.dart';
 
 final _chatColorCache = <String, Color>{};
 

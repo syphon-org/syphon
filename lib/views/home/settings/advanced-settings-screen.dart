@@ -1,15 +1,9 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:package_info/package_info.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/crypto/keys/actions.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/actions.dart';
@@ -17,6 +11,11 @@ import 'package:syphon/domain/sync/actions.dart';
 import 'package:syphon/domain/sync/service/actions.dart';
 import 'package:syphon/domain/sync/service/service.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';

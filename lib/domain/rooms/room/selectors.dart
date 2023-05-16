@@ -1,8 +1,8 @@
+import 'package:syphon/domain/events/messages/model.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/domain/events/messages/model.dart';
-import 'package:syphon/domain/rooms/room/model.dart';
 
 String formatRoomName({required Room room}) {
   final name = room.name!;

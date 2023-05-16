@@ -10,12 +10,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/algos.dart';
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/receipts/actions.dart';
@@ -23,6 +17,12 @@ import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/selectors.dart';
 import 'package:syphon/domain/settings/theme-settings/selectors.dart';
+import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/home/chat/camera_screen.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/containers/media-card.dart';
@@ -215,13 +215,13 @@ class ChatInputState extends State<ChatInput> {
 
   onAddPhoto() async {
     // TODO: has bug with file path
-    // final pickerResult = await ImagePicker().pickImage(
-    //   source: ImageSource.gallery,
-    // );
-
-    final pickerResult = await ImagePicker().getImage(
+    final pickerResult = await ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
+
+    // final pickerResult = await ImagePicker().getImage(
+    //   source: ImageSource.gallery,
+    // );
 
     if (pickerResult == null) return;
 
@@ -338,7 +338,7 @@ class ChatInputState extends State<ChatInput> {
                   margin: EdgeInsets.only(left: 2, top: 3),
                   child: SvgPicture.asset(
                     Assets.iconSendUnlockBeing,
-                    color: Colors.white,
+                    colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     semanticsLabel: Strings.labelSendUnencrypted,
                   ),
                 ),
@@ -381,7 +381,7 @@ class ChatInputState extends State<ChatInput> {
                     margin: EdgeInsets.only(left: 2, top: 3),
                     child: SvgPicture.asset(
                       Assets.iconSendLockSolidBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       semanticsLabel: Strings.labelSendEncrypted,
                     ),
                   ),
@@ -405,7 +405,7 @@ class ChatInputState extends State<ChatInput> {
                     margin: EdgeInsets.only(left: 2, top: 3),
                     child: SvgPicture.asset(
                       Assets.iconSendLockSolidBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       semanticsLabel: Strings.labelSendEncrypted,
                     ),
                   ),

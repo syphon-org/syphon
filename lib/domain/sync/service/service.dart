@@ -6,11 +6,6 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:syphon/global/https.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/settings/notification-settings/model.dart';
 import 'package:syphon/domain/settings/proxy-settings/model.dart';
@@ -20,6 +15,11 @@ import 'package:syphon/domain/sync/service/parsers.dart';
 import 'package:syphon/domain/sync/service/requests.dart';
 import 'package:syphon/domain/sync/service/storage.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/https.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 /// Background Sync Service (Android Only)
 ///

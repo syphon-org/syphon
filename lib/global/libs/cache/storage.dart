@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/global/libs/cache/index.dart';
-import 'package:syphon/global/libs/cache/threadables.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/auth/state.dart';
 import 'package:syphon/domain/crypto/state.dart';
 import 'package:syphon/domain/rooms/state.dart';
 import 'package:syphon/domain/sync/state.dart';
+import 'package:syphon/global/libs/cache/index.dart';
+import 'package:syphon/global/libs/cache/threadables.dart';
+import 'package:syphon/global/print.dart';
 
 class CacheStorage implements StorageEngine {
   final Database? cache;

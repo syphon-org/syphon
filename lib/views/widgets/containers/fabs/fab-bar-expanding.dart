@@ -5,11 +5,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/domain/index.dart';
-import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
 class FabBarExpanding extends StatelessWidget {
@@ -58,7 +58,7 @@ class FabBarExpanding extends StatelessWidget {
               onTap: () => onNavigateToCreateGroupPublic(context),
               child: SvgPicture.asset(
                 Assets.iconPublicAddBeing,
-                color: Colors.white,
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
             SpeedDialChild(
@@ -67,7 +67,7 @@ class FabBarExpanding extends StatelessWidget {
               onTap: () => onNavigateToCreateGroup(context),
               child: SvgPicture.asset(
                 Assets.iconGroupAddBeing,
-                color: Colors.white,
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
             SpeedDialChild(
@@ -76,7 +76,7 @@ class FabBarExpanding extends StatelessWidget {
               onTap: () => onNavigateToDraft(context),
               child: SvgPicture.asset(
                 Assets.iconMessageCircleBeing,
-                color: Colors.white,
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
             SpeedDialChild(
@@ -85,7 +85,7 @@ class FabBarExpanding extends StatelessWidget {
               onTap: () => onNavigateToPublicSearch(context),
               child: SvgPicture.asset(
                 Assets.iconSearchPublicCondensedBeing,
-                color: Colors.white,
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
           ],

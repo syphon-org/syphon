@@ -9,12 +9,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/domain/crypto/events/actions.dart';
 import 'package:syphon/domain/crypto/events/selectors.dart';
 import 'package:syphon/domain/crypto/keys/actions.dart';
@@ -34,6 +28,12 @@ import 'package:syphon/domain/settings/chat-settings/selectors.dart';
 import 'package:syphon/domain/settings/theme-settings/model.dart';
 import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/domain/user/selectors.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
@@ -530,7 +530,7 @@ class ChatScreenState extends State<ChatScreen> {
                       backgroundColor: const Color(AppColors.greyDisabled),
                       child: SvgPicture.asset(
                         Assets.iconSendUnlockBeing,
-                        color: Colors.white,
+                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                         semanticsLabel: 'Switch to ${Strings.labelSendUnencrypted}',
                       ),
                     ),
@@ -563,7 +563,7 @@ class ChatScreenState extends State<ChatScreen> {
                       backgroundColor: Theme.of(context).primaryColor,
                       child: SvgPicture.asset(
                         Assets.iconSendLockSolidBeing,
-                        color: Colors.white,
+                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                         semanticsLabel: 'Switch to ${Strings.labelSendEncrypted}',
                       ),
                     ),

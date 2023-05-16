@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:syphon/global/colors.dart';
-import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/domain/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/user/actions.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';

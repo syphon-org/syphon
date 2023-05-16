@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:syphon/global/colors.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/domain/events/actions.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/selectors.dart';
@@ -13,6 +11,8 @@ import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/navigation.dart';
 

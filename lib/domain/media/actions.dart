@@ -4,16 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:mime/mime.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/libs/storage/index.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/media/converters.dart';
 import 'package:syphon/domain/media/encryption.dart';
 import 'package:syphon/domain/media/model.dart';
 import 'package:syphon/domain/media/storage.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/storage/index.dart';
+import 'package:syphon/global/print.dart';
 
 class LoadMedia {
   final Map<String, Uint8List> mediaMap;

@@ -1,4 +1,3 @@
-import 'package:syphon/global/https.dart';
 import 'package:syphon/domain/settings/chat-settings/actions.dart';
 import 'package:syphon/domain/settings/chat-settings/model.dart';
 import 'package:syphon/domain/settings/notification-settings/actions.dart';
@@ -6,6 +5,8 @@ import 'package:syphon/domain/settings/privacy-settings/actions.dart';
 import 'package:syphon/domain/settings/proxy-settings/actions.dart';
 import 'package:syphon/domain/settings/storage-settings/actions.dart';
 import 'package:syphon/domain/settings/theme-settings/actions.dart';
+import 'package:syphon/global/https.dart';
+
 import './actions.dart';
 import './state.dart';
 

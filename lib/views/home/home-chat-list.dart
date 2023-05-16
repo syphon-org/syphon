@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/strings.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/selectors.dart';
 import 'package:syphon/domain/hooks.dart';
@@ -16,6 +11,11 @@ import 'package:syphon/domain/rooms/selectors.dart';
 import 'package:syphon/domain/settings/chat-settings/selectors.dart';
 import 'package:syphon/domain/sync/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class HomeChatList extends HookWidget {

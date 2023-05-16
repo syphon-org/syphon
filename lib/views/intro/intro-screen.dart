@@ -1,18 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/actions.dart';
+import 'package:syphon/domain/settings/storage.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/domain/index.dart';
-import 'package:syphon/domain/settings/actions.dart';
-import 'package:syphon/domain/settings/storage.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';

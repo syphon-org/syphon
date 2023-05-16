@@ -7,8 +7,8 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/media/converters.dart';
+import 'package:syphon/global/print.dart';
 
 part 'encryption.g.dart';
 

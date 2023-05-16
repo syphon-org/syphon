@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/crypto/keys/models.dart';
 import 'package:syphon/domain/crypto/sessions/converters.dart';
 import 'package:syphon/domain/crypto/sessions/model.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 Future<bool> backupSessionKeysThreaded(Map params) {
   final String directory = params['directory'];

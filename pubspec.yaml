@@ -86,7 +86,7 @@ dependencies:
 
   ## media
   file_picker: ^5.2.7
-  image_picker: ^0.8.4
+  image_picker: ^0.8.7+5
   permission_handler: ^10.2.0
   local_image_provider: ^4.3.0 
   flutter_image_compress: ^1.1.3
@@ -94,7 +94,7 @@ dependencies:
 
   ### data
   uuid: ^3.0.4
-  json_annotation: ^4.0.0
+  json_annotation: ^4.8.0
   collection: ^1.15.0-nullsafety.4
 
   # TODO: potential overrides

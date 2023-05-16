@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/crypto/keys/models.dart';
 import 'package:syphon/domain/crypto/sessions/model.dart';
 import 'package:syphon/domain/crypto/sessions/service/functions.dart';
+import 'package:syphon/global/print.dart';
 import 'package:workmanager/workmanager.dart';
 
 void callback() {

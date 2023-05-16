@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
 import 'package:syphon/views/navigation.dart';

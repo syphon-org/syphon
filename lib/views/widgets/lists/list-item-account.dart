@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 enum ListItemUserType {

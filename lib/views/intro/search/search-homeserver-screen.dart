@@ -1,20 +1,19 @@
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/colors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/auth/actions.dart';
 import 'package:syphon/domain/auth/homeserver/actions.dart';
 import 'package:syphon/domain/auth/homeserver/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/search/actions.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';

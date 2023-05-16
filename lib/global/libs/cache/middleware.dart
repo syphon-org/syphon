@@ -1,5 +1,4 @@
 import 'package:redux/redux.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/auth/actions.dart';
 import 'package:syphon/domain/auth/context/actions.dart';
 import 'package:syphon/domain/crypto/actions.dart';
@@ -9,6 +8,7 @@ import 'package:syphon/domain/events/actions.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/actions.dart';
 import 'package:syphon/domain/sync/actions.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Cache Middleware

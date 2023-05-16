@@ -4,9 +4,6 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/crypto/actions.dart';
 import 'package:syphon/domain/crypto/events/actions.dart';
@@ -20,6 +17,9 @@ import 'package:syphon/domain/media/encryption.dart';
 import 'package:syphon/domain/rooms/actions.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Mutate Messages

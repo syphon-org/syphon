@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/libs/storage/constants.dart';
-import 'package:syphon/global/libs/storage/database.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/redaction/model.dart';
+import 'package:syphon/global/libs/storage/constants.dart';
+import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Message Quesies - unencrypted (Cold Storage)

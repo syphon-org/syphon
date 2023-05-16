@@ -2,9 +2,6 @@
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/model.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
@@ -13,6 +10,9 @@ import 'package:syphon/domain/events/redaction/model.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/sync/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 class SyncDetails {
   final bool? leave;

@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/print.dart';
 
 part 'model.g.dart';
 

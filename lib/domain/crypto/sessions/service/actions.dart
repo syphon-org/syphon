@@ -1,13 +1,13 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/crypto/sessions/service/service.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/privacy-settings/actions.dart';
 import 'package:syphon/domain/settings/privacy-settings/storage.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 ThunkAction<AppState> startKeyBackupService() {
   return (Store<AppState> store) async {

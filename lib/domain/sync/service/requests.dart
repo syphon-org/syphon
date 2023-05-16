@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:syphon/global/libs/matrix/index.dart';
 import 'package:syphon/domain/sync/service/storage.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
 
 Future<Map<String, String>> updateRoomNames({
   required String protocol,

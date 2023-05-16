@@ -1,10 +1,5 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/notifications.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/auth/actions.dart';
 import 'package:syphon/domain/auth/credential/model.dart';
@@ -12,6 +7,11 @@ import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/devices-settings/model.dart';
 import 'package:syphon/domain/settings/models.dart';
 import 'package:syphon/domain/sync/service/actions.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/notifications.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 class SetPusherToken {
   final String? token;

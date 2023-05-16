@@ -4,11 +4,10 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:syphon/domain/settings/notification-settings/model.dart';
 import 'package:syphon/global/print.dart';
-
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/domain/settings/notification-settings/model.dart';
 
 /// Notifications are handled by APNS when running in iOS
 /// Only need to handle local notifications on desktop and android

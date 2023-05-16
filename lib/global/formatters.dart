@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/settings/models.dart';
+import 'package:syphon/global/values.dart';
 
 // @again_guy:matrix.org -> again_ereio
 String formatSender(String sender) {

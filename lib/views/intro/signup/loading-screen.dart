@@ -70,7 +70,7 @@ class LoadingScreen extends StatelessWidget {
                     Assets.appIcon,
                     width: width * 0.35,
                     height: width * 0.35,
-                    color: Colors.white,
+                    colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                   ),
                 ),
               ],

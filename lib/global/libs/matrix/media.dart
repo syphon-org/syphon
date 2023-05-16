@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:syphon/domain/settings/proxy-settings/model.dart';
 import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/domain/settings/proxy-settings/model.dart';
 
 /// Media queries for matrix
 ///

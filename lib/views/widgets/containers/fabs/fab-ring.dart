@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/domain/index.dart';
-import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
 calculatePosition(int copyLength) => copyLength * 3.4;
@@ -96,7 +96,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToCreateGroupPublic(context),
                     child: SvgPicture.asset(
                       Assets.iconPublicAddBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -131,7 +131,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToCreateGroup(context),
                     child: SvgPicture.asset(
                       Assets.iconGroupAddBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -166,7 +166,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToDraft(context),
                     child: SvgPicture.asset(
                       Assets.iconMessageCircleBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -200,7 +200,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToPublicSearch(context),
                     child: SvgPicture.asset(
                       Assets.iconSearchPublicCondensedBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(

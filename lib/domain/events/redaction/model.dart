@@ -14,28 +14,18 @@ class Redaction extends Event {
   final String? redactId; // event_id
 
   const Redaction({
-    id,
-    userId,
-    roomId,
-    type,
-    sender,
-    stateKey,
-    batch,
-    prevBatch,
-    timestamp,
+    super.id,
+    super.userId,
+    super.roomId,
+    super.type,
+    super.sender,
+    super.stateKey,
+    super.batch,
+    super.prevBatch,
+    super.timestamp,
     super.content,
     this.redactId,
-  }) : super(
-          id: id,
-          userId: userId,
-          roomId: roomId,
-          type: type,
-          sender: sender,
-          stateKey: stateKey,
-          batch: batch,
-          prevBatch: prevBatch,
-          timestamp: timestamp,
-        );
+  });
 
   @override
   Redaction copyWith({

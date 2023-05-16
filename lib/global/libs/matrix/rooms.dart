@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:syphon/global/https.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/settings/proxy-settings/model.dart';
+import 'package:syphon/global/https.dart';
+import 'package:syphon/global/values.dart';
 
 abstract class Rooms {
   /// Sync (main functionality)

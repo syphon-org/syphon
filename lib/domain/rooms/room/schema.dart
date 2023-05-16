@@ -1,16 +1,16 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
-import 'package:syphon/global/libs/storage/converters.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/global/libs/storage/converters.dart';
 
 class MessageToJsonConverter extends NullAwareTypeConverter<Message?, String> {
   const MessageToJsonConverter();
 
   @override
   Message? requireFromSql(String fromDb) {
-    return Message.fromJson(jsonDecode(fromDb ?? '{}') ?? {});
+    return Message.fromJson(jsonDecode(fromDb) ?? {});
   }
 
   @override

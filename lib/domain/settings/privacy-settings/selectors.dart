@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/index.dart';
+import 'package:syphon/global/values.dart';
 
 String selectKeyBackupSchedule(AppState state) {
   final schedule = state.settingsStore.privacySettings.keyBackupInterval;

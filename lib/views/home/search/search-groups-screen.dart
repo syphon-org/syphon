@@ -1,22 +1,21 @@
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/colors.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/actions.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/room/selectors.dart';
 import 'package:syphon/domain/search/actions.dart';
 import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/loader/index.dart';

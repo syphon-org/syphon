@@ -8,9 +8,6 @@ import 'package:olm/olm.dart' as olm;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/crypto/actions.dart';
 import 'package:syphon/domain/crypto/events/actions.dart';
@@ -21,6 +18,9 @@ import 'package:syphon/domain/crypto/sessions/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/actions.dart';
 import 'package:syphon/domain/sync/actions.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 ///
 ///

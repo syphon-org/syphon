@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/libs/storage/database.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/room/schema.dart';
+import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Room Queries

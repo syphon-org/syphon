@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/print.dart';
 
 extension Version5 on StorageDatabase {
   @override

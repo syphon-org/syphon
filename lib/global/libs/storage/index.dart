@@ -6,10 +6,6 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 import 'package:syphon/context/types.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
-import 'package:syphon/global/libs/storage/constants.dart';
-import 'package:syphon/global/libs/storage/database.dart';
 import 'package:syphon/domain/auth/storage.dart';
 import 'package:syphon/domain/crypto/sessions/storage.dart';
 import 'package:syphon/domain/crypto/storage.dart';
@@ -29,6 +25,10 @@ import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/storage.dart';
 import 'package:syphon/domain/settings/storage.dart';
 import 'package:syphon/domain/user/storage.dart';
+import 'package:syphon/global/libs/storage/constants.dart';
+import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 class Storage {
   // cache key identifiers

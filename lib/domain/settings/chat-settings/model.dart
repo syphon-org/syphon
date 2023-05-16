@@ -1,8 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import 'package:syphon/global/colors.dart';
 import 'package:syphon/domain/settings/notification-settings/options/types.dart';
+import 'package:syphon/global/colors.dart';
 
 part 'model.g.dart';
 

@@ -5,9 +5,9 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:syphon/domain/crypto/sessions/model.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/domain/crypto/sessions/model.dart';
 
 const DEFAULT_ROUNDS = 500000;
 

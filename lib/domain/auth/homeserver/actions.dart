@@ -3,19 +3,19 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/assets.dart';
-import 'package:syphon/global/https.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/auth/actions.dart';
 import 'package:syphon/domain/auth/homeserver/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/search/actions.dart';
+import 'package:syphon/global/assets.dart';
+import 'package:syphon/global/https.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
 
 ThunkAction<AppState> fetchKnownServers() {
   return (Store<AppState> store) async {
-    store.dispatch(setAuthLoading(true));
+    store.dispatch(setAuthLoading(loading: true));
 
     try {
       final jsonData = await rootBundle.loadString(Assets.homeserversJSON);
@@ -65,7 +65,7 @@ ThunkAction<AppState> fetchKnownServers() {
     } catch (error) {
       store.dispatch(addAlert(origin: 'fetchHomeservers', error: error));
     }
-    store.dispatch(setAuthLoading(false));
+    store.dispatch(setAuthLoading(loading: false));
   };
 }
 

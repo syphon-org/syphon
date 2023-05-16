@@ -1,8 +1,8 @@
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/themes.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/global/themes.dart';
 
 class SetThemeType {
   final ThemeType themeType;

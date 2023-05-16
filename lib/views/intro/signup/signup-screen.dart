@@ -1,13 +1,8 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/global/strings.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/auth/actions.dart';
 import 'package:syphon/domain/auth/homeserver/model.dart';
@@ -15,6 +10,10 @@ import 'package:syphon/domain/auth/selectors.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/strings.dart';
+import 'package:syphon/global/values.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/intro/signup/widgets/StepCaptcha.dart';
 import 'package:syphon/views/intro/signup/widgets/StepEmail.dart';

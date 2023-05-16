@@ -1,8 +1,8 @@
-import 'package:syphon/global/libs/matrix/constants.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
 
 List<Message> roomMessages(AppState state, String? roomId) {
   final room = state.roomStore.rooms[roomId] ?? Room(id: '');

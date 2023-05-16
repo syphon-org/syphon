@@ -1,7 +1,8 @@
-import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/values.dart';
+
 import './model.dart';
 
 /*

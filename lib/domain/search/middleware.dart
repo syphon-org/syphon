@@ -1,9 +1,9 @@
 import 'package:redux/redux.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/libs/storage/database.dart';
 import 'package:syphon/domain/events/messages/storage.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/search/actions.dart';
+import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Storage Middleware
@@ -14,19 +14,19 @@ import 'package:syphon/domain/search/actions.dart';
 searchMiddleware(StorageDatabase? coldStorage) {
   return (
     Store<AppState> store,
-    dynamic _action,
+    dynamic actionRaw,
     NextDispatcher next,
   ) async {
-    next(_action);
+    next(actionRaw);
 
     if (coldStorage == null) {
       log.warn('storage is null, skipping saving cold storage data!!!', title: 'searchMiddleware');
       return;
     }
 
-    switch (_action.runtimeType) {
+    switch (actionRaw.runtimeType) {
       case SearchMessages:
-        final action = _action as SearchMessages;
+        final action = actionRaw as SearchMessages;
         final results = await searchMessagesStored(action.searchText, storage: coldStorage);
         store.dispatch(SearchMessageResults(results: results));
         break;

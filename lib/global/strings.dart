@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/global/values.dart';
 
 extension Capitalize on String {
   String capitalize() {

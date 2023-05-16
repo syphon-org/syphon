@@ -1,5 +1,5 @@
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/index.dart';
+import 'package:syphon/global/values.dart';
 
 String selectCurrentDeviceName(AppState state) {
   final currentSessionId = state.authStore.user.deviceId;

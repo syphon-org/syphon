@@ -5,9 +5,6 @@ import 'package:canonical_json/canonical_json.dart';
 import 'package:olm/olm.dart' as olm;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/print.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/crypto/keys/actions.dart';
 import 'package:syphon/domain/crypto/keys/models.dart';
@@ -21,6 +18,9 @@ import 'package:syphon/domain/media/actions.dart';
 import 'package:syphon/domain/media/encryption.dart';
 import 'package:syphon/domain/rooms/actions.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/print.dart';
 
 ///
 /// Encrypt event content with loaded outbound session for room

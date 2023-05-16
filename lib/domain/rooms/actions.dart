@@ -3,15 +3,8 @@ import 'dart:io';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/foundation.dart';
-
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/libs/storage/constants.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/events/actions.dart';
 import 'package:syphon/domain/events/messages/model.dart';
@@ -23,6 +16,12 @@ import 'package:syphon/domain/settings/models.dart';
 import 'package:syphon/domain/sync/actions.dart';
 import 'package:syphon/domain/user/actions.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/libs/matrix/constants.dart';
+import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libs/storage/constants.dart';
+import 'package:syphon/global/print.dart';
 
 import 'room/model.dart';
 

@@ -3,12 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:syphon/global/algos.dart';
-import 'package:syphon/global/connectivity.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/print.dart';
-import 'package:syphon/global/values.dart';
 import 'package:syphon/domain/crypto/events/actions.dart';
 import 'package:syphon/domain/crypto/keys/actions.dart';
 import 'package:syphon/domain/events/actions.dart';
@@ -24,6 +18,12 @@ import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/sync/parsers/parsers.dart';
 import 'package:syphon/domain/sync/service/storage.dart';
 import 'package:syphon/domain/user/actions.dart';
+import 'package:syphon/global/algos.dart';
+import 'package:syphon/global/connectivity.dart';
+import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/print.dart';
+import 'package:syphon/global/values.dart';
 
 class SetBackoff {
   final int? backoff;
