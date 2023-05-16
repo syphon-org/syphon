@@ -2,7 +2,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/actions.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 

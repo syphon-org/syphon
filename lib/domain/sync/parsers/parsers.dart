@@ -10,7 +10,8 @@ import 'package:syphon/domain/events/redaction/model.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/sync/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 

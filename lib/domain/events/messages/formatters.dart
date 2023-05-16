@@ -7,7 +7,8 @@ import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/media/converters.dart';
 import 'package:syphon/domain/media/encryption.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
 
 ///
 /// Format Message Content (Encrypted / Unencrypted)

@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:syphon/global/libs/storage/converters.dart';
+import 'package:syphon/global/libraries/storage/converters.dart';
 
 ///
 /// Cryptos Model (Table)

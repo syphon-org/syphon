@@ -4,7 +4,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/user/model.dart';
-import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/libraries/storage/database.dart';
 
 part 'model.g.dart';
 

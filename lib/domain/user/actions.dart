@@ -3,9 +3,9 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/user/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libraries/matrix/errors.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
+import 'package:syphon/global/libraries/matrix/user/types.dart';
 
 class SetLoading {
   final bool? loading;

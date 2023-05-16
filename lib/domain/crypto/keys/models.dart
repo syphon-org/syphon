@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libraries/matrix/events/encryption/requests.dart';
 
 part 'models.g.dart';
 

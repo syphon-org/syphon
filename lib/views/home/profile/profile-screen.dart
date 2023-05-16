@@ -30,14 +30,14 @@ class ProfileScreen extends HookWidget {
     final dispatch = useDispatch<AppState>();
 
     // global state
-    final user = useSelector<AppState, User>(
+    final user = useSelectorUnsafe<AppState, User>(
       (state) => state.authStore.user,
     );
-    final loading = useSelector<AppState, bool>(
+    final loading = useSelectorUnsafe<AppState, bool>(
       (state) => state.authStore.loading,
       fallback: false,
     )!;
-    final themeType = useSelector<AppState, ThemeType>(
+    final themeType = useSelectorUnsafe<AppState, ThemeType>(
       (state) => state.settingsStore.themeSettings.themeType,
     );
 

@@ -16,11 +16,12 @@ import 'package:syphon/domain/settings/models.dart';
 import 'package:syphon/domain/sync/actions.dart';
 import 'package:syphon/domain/user/actions.dart';
 import 'package:syphon/domain/user/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/libs/storage/constants.dart';
+import 'package:syphon/global/libraries/matrix/events/encryption/requests.dart';
+import 'package:syphon/global/libraries/matrix/errors.dart';
+import 'package:syphon/global/libraries/matrix/events/types.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
+import 'package:syphon/global/libraries/matrix/user/types.dart';
+import 'package:syphon/global/libraries/storage/constants.dart';
 import 'package:syphon/global/print.dart';
 
 import 'room/model.dart';

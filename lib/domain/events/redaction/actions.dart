@@ -8,7 +8,7 @@ import 'package:syphon/domain/events/reactions/model.dart';
 import 'package:syphon/domain/events/redaction/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 
 class SaveRedactions {

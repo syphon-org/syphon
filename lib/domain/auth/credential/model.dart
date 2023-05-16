@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libraries/matrix/auth/requests.dart';
+import 'package:syphon/global/libraries/matrix/auth/types.dart';
 
 part 'model.g.dart';
 

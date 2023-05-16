@@ -62,16 +62,16 @@ class MatrixImage extends HookWidget {
   Widget build(BuildContext context) {
     final dispatch = useDispatch<AppState>();
 
-    final bool isMediaCached = useSelector<AppState, bool?>(
+    final bool isMediaCached = useSelectorUnsafe<AppState, bool?>(
           (state) => state.mediaStore.mediaCache.containsKey(mxcUri),
         ) ??
         false;
 
-    final String? mediaStatus = useSelector<AppState, String?>(
+    final String? mediaStatus = useSelectorUnsafe<AppState, String?>(
       (state) => state.mediaStore.mediaStatus[mxcUri],
     );
 
-    final Uint8List? mediaCached = useSelector<AppState, Uint8List?>(
+    final Uint8List? mediaCached = useSelectorUnsafe<AppState, Uint8List?>(
       (state) => state.mediaStore.mediaCache[mxcUri],
     );
 

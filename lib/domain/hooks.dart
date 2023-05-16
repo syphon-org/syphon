@@ -23,7 +23,7 @@ redux.Store<S> useStore<S>() => use(StoreHook<S>());
 
 Dispatch useDispatch<AppState>() => useStore<AppState>().dispatch;
 
-Output? useSelector<State, Output>(
+Output? useSelectorUnsafe<State, Output>(
   Selector<State, Output> selector, {
   EqualityFn? equality,
   Output? fallback,
@@ -34,5 +34,19 @@ Output? useSelector<State, Output>(
     initialData: selector(store.state),
   );
 
-  return snap.data;
+  return snap.data ?? fallback;
+}
+
+Output useSelector<State, Output>(
+  Selector<State, Output> selector, {
+  EqualityFn? equality,
+  required Output fallback,
+}) {
+  final store = useStore<State>();
+  final snap = useStream<Output>(
+    store.onChange.map(selector).distinct(equality),
+    initialData: selector(store.state),
+  );
+
+  return snap.data ?? fallback;
 }

@@ -16,7 +16,7 @@ import 'package:syphon/domain/sync/service/requests.dart';
 import 'package:syphon/domain/sync/service/storage.dart';
 import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/https.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';

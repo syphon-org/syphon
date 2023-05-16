@@ -13,9 +13,10 @@ import 'package:syphon/domain/crypto/sessions/actions.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/user/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
+import 'package:syphon/global/libraries/matrix/events/encryption/requests.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 

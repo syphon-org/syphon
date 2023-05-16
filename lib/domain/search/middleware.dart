@@ -2,7 +2,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/domain/events/messages/storage.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/search/actions.dart';
-import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/libraries/storage/database.dart';
 import 'package:syphon/global/print.dart';
 
 ///

@@ -4,7 +4,8 @@ import 'package:redux/redux.dart';
 import 'package:syphon/domain/auth/actions.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/user/model.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libraries/matrix/auth/requests.dart';
+import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 

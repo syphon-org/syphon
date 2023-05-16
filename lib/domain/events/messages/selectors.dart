@@ -1,6 +1,7 @@
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/index.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
 import 'package:syphon/global/strings.dart';
 
 bool selectIsMedia(Message message) {

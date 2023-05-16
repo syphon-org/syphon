@@ -18,8 +18,9 @@ import 'package:syphon/domain/media/actions.dart';
 import 'package:syphon/domain/media/encryption.dart';
 import 'package:syphon/domain/rooms/actions.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
+import 'package:syphon/global/libraries/matrix/events/encryption/requests.dart';
 import 'package:syphon/global/print.dart';
 
 ///

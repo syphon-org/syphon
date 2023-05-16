@@ -49,7 +49,7 @@ class PrivacySettingsScreen extends HookWidget {
 
     final dispatch = useDispatch<AppState>();
 
-    final bool isValid = useSelector<AppState, bool>(
+    final bool isValid = useSelectorUnsafe<AppState, bool>(
       (state) =>
           state.authStore.credential != null &&
           state.authStore.credential!.value != null &&
@@ -57,50 +57,50 @@ class PrivacySettingsScreen extends HookWidget {
       fallback: false,
     )!;
 
-    final bool loading = useSelector<AppState, bool>(
+    final bool loading = useSelectorUnsafe<AppState, bool>(
       (state) => state.authStore.loading,
       fallback: false,
     )!;
 
-    final bool typingIndicators = useSelector<AppState, bool>(
+    final bool typingIndicators = useSelectorUnsafe<AppState, bool>(
       (state) => state.settingsStore.typingIndicatorsEnabled,
       fallback: false,
     )!;
 
-    final bool screenLockEnabled = useSelector<AppState, bool>(
+    final bool screenLockEnabled = useSelectorUnsafe<AppState, bool>(
       (state) => selectScreenLockEnabled(Syphon.getAppContext(context)),
       fallback: false,
     )!;
 
-    final String sessionId = useSelector<AppState, String?>(
+    final String sessionId = useSelectorUnsafe<AppState, String?>(
       (state) => state.authStore.user.deviceId,
       fallback: Values.empty,
     )!;
-    final String sessionName = useSelector<AppState, String>(
+    final String sessionName = useSelectorUnsafe<AppState, String>(
       (state) => selectCurrentDeviceName(state),
       fallback: Values.empty,
     )!;
-    final String sessionKey = useSelector<AppState, String>(
+    final String sessionKey = useSelectorUnsafe<AppState, String>(
       (state) => selectCurrentUserSessionKey(state),
       fallback: Values.empty,
     )!;
 
-    final String keyBackupLatest = useSelector<AppState, String>(
+    final String keyBackupLatest = useSelectorUnsafe<AppState, String>(
       (state) => state.settingsStore.privacySettings.lastBackupMillis,
       fallback: Values.empty,
     )!;
 
-    final String keyBackupSchedule = useSelector<AppState, String>(
+    final String keyBackupSchedule = useSelectorUnsafe<AppState, String>(
       (state) => selectKeyBackupSchedule(state),
       fallback: Values.empty,
     )!;
 
-    final String keyBackupLocation = useSelector<AppState, String>(
+    final String keyBackupLocation = useSelectorUnsafe<AppState, String>(
       (state) => selectKeyBackupLocation(state),
       fallback: Values.empty,
     )!;
 
-    final String readReceipts = useSelector<AppState, String>(
+    final String readReceipts = useSelectorUnsafe<AppState, String>(
       (state) => selectReadReceiptsString(state.settingsStore.readReceipts),
       fallback: Values.empty,
     )!;

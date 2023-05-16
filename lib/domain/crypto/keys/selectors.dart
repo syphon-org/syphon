@@ -2,7 +2,7 @@ import 'package:redux/redux.dart';
 import 'package:syphon/domain/crypto/keys/models.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libraries/matrix/events/encryption/requests.dart';
 import 'package:syphon/global/values.dart';
 
 extension Chunked on String {

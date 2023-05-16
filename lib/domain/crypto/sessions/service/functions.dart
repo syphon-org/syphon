@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syphon/domain/crypto/keys/models.dart';
 import 'package:syphon/domain/crypto/sessions/converters.dart';
 import 'package:syphon/domain/crypto/sessions/model.dart';
-import 'package:syphon/global/libs/matrix/encryption.dart';
+import 'package:syphon/global/libraries/matrix/events/encryption/requests.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 

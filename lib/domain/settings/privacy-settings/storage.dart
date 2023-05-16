@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:syphon/global/libs/secure-storage/secure-storage.dart';
+import 'package:syphon/global/libraries/secure-storage/secure-storage.dart';
 import 'package:syphon/global/print.dart';
 
 const KEY_BACKUP_PASSWORD_KEY = 'KEY_BACKUP_PASSWORD_KEY';

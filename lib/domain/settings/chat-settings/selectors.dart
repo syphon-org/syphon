@@ -42,12 +42,11 @@ Color selectChatColor(Store<AppState> store, String? roomId) {
 ///
 /// Chat Bubble Color per User
 ///
-Color? selectBubbleColor(Store<AppState> store, String? roomId) {
-  final chatSettings = store.state.settingsStore.chatSettings;
+Color? selectBubbleColor(AppState state, String? roomId) {
+  final chatSettings = state.settingsStore.chatSettings;
+  final chatSetting = chatSettings[roomId];
 
-  if (chatSettings[roomId] == null) {
-    return null;
-  }
+  if (chatSetting == null) return null;
 
-  return Color(chatSettings[roomId]!.primaryColor);
+  return Color(chatSetting.primaryColor);
 }

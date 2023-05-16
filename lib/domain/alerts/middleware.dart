@@ -1,7 +1,7 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/index.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
+import 'package:syphon/global/libraries/matrix/errors.dart';
 import 'package:syphon/global/weburl.dart';
 
 ///

@@ -10,7 +10,7 @@ import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/search/actions.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/https.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 
 ThunkAction<AppState> fetchKnownServers() {

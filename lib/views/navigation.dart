@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/views/home/HomeScreen.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-screen.dart';
@@ -9,7 +10,6 @@ import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/groups/group-create-public-screen.dart';
 import 'package:syphon/views/home/groups/group-create-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
-import 'package:syphon/views/home/home-screen.dart';
 import 'package:syphon/views/home/profile/profile-screen.dart';
 import 'package:syphon/views/home/profile/profile-user-screen.dart';
 import 'package:syphon/views/home/search/search-chats-screen.dart';
@@ -164,8 +164,7 @@ class NavigationProvider {
         Routes.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),
         Routes.settingsProxy: (BuildContext context) => const IntroSettingsScreen(),
         Routes.settingsPassword: (BuildContext context) => const PasswordUpdateScreen(),
-        Routes.licenses: (BuildContext context) =>
-            const LicensePage(applicationName: Values.appName),
+        Routes.licenses: (BuildContext context) => const LicensePage(applicationName: Values.appName),
         Routes.settingsPrivacy: (BuildContext context) => const PrivacySettingsScreen(),
         Routes.settingsChat: (BuildContext context) => const SettingsChatsScreen(),
         Routes.settingsTheme: (BuildContext context) => const ThemeSettingsScreen(),

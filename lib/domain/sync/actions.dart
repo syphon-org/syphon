@@ -20,8 +20,8 @@ import 'package:syphon/domain/sync/service/storage.dart';
 import 'package:syphon/domain/user/actions.dart';
 import 'package:syphon/global/algos.dart';
 import 'package:syphon/global/connectivity.dart';
-import 'package:syphon/global/libs/matrix/errors.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/global/libraries/matrix/errors.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 

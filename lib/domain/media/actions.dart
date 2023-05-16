@@ -10,8 +10,8 @@ import 'package:syphon/domain/media/converters.dart';
 import 'package:syphon/domain/media/encryption.dart';
 import 'package:syphon/domain/media/model.dart';
 import 'package:syphon/domain/media/storage.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
-import 'package:syphon/global/libs/storage/index.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
+import 'package:syphon/global/libraries/storage/index.dart';
 import 'package:syphon/global/print.dart';
 
 class LoadMedia {

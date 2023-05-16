@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:syphon/domain/settings/state.dart';
-import 'package:syphon/global/libs/secure-storage/secure-storage.dart';
-import 'package:syphon/global/libs/storage/constants.dart';
-import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/libraries/secure-storage/secure-storage.dart';
+import 'package:syphon/global/libraries/storage/constants.dart';
+import 'package:syphon/global/libraries/storage/database.dart';
 import 'package:syphon/global/print.dart';
 
 ///

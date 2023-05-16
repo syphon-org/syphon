@@ -31,14 +31,15 @@ import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/home/chat/media-preview-screen.dart';
+import 'package:syphon/views/home/chat/widgets/MessageList.dart';
 import 'package:syphon/views/home/chat/widgets/chat-input.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
-import 'package:syphon/views/home/chat/widgets/message-list.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-chat.dart';
 import 'package:syphon/views/widgets/appbars/appbar-options-message.dart';

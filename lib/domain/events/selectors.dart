@@ -2,7 +2,8 @@ import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
 
 List<Message> roomMessages(AppState state, String? roomId) {
   final room = state.roomStore.rooms[roomId] ?? Room(id: '');
@@ -31,6 +32,38 @@ List<Message> roomMessages(AppState state, String? roomId) {
   }
 
   return messages;
+}
+
+Map<String, Message> roomMessagesMap(AppState state, String? roomId) {
+  final room = state.roomStore.rooms[roomId] ?? Room(id: '');
+  final messages = state.eventStore.messages[roomId] ?? [];
+
+  final messagesNormal = Map<String, Message>.fromIterable(
+    messages,
+    key: (msg) => msg.id,
+    value: (msg) => msg,
+  );
+
+  // If encryption is enabled, combine the decrypted event cache
+  if (room.encryptionEnabled) {
+    final decrypted = state.eventStore.messagesDecrypted[roomId] ?? [];
+
+    final messagesDecrypted = Map<String, Message>.fromIterable(
+      decrypted,
+      key: (msg) => msg.id,
+      value: (msg) => msg,
+    );
+
+    return Map<String, Message>.fromIterable(
+      messagesNormal.keys.map(
+        (id) => (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? Message(),
+      ),
+      key: (msg) => msg.id,
+      value: (msg) => msg,
+    );
+  }
+
+  return messagesNormal;
 }
 
 List<Message> roomOutbox(AppState state, String? roomId) {

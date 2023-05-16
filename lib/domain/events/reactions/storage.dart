@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
 import 'package:syphon/domain/events/redaction/model.dart';
-import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/libraries/storage/database.dart';
 import 'package:syphon/global/print.dart';
 
 ///

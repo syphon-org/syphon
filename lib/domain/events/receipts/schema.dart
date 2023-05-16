@@ -7,25 +7,13 @@ class MapToReadConverter extends TypeConverter<Map<String, dynamic>?, String> {
   const MapToReadConverter();
 
   @override
-  Map<String, int>? mapToDart(String? fromDb) {
-    return json.decode(fromDb!) as Map<String, int>?;
-  }
-
-  @override
-  String? mapToSql(Map<String, dynamic>? value) {
-    return json.encode(value);
-  }
-
-  @override
   Map<String, dynamic>? fromSql(String fromDb) {
-    // TODO: implement fromSql
-    throw UnimplementedError();
+    return json.decode(fromDb) as Map<String, int>?;
   }
 
   @override
   String toSql(Map<String, dynamic>? value) {
-    // TODO: implement toSql
-    throw UnimplementedError();
+    return json.encode(value);
   }
 }
 

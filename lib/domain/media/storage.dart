@@ -8,7 +8,7 @@ import 'package:syphon/domain/media/encryption.dart';
 import 'package:syphon/domain/media/model.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/user/model.dart';
-import 'package:syphon/global/libs/storage/database.dart';
+import 'package:syphon/global/libraries/storage/database.dart';
 import 'package:syphon/global/print.dart';
 
 ///

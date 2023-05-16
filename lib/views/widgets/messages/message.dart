@@ -11,7 +11,8 @@ import 'package:syphon/domain/settings/theme-settings/model.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
 import 'package:syphon/global/noop.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/weburl.dart';
