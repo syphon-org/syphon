@@ -40,7 +40,7 @@ final sectionsPassword = [
 class SignupScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final dispatch = useDispatch();
+    final dispatch = useDispatch<AppState>();
     final Size(:height, :width) = useDimensions(context);
 
     final pageController = usePageController(viewportFraction: 1.5);

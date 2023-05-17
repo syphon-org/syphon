@@ -8,8 +8,7 @@ import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
-
-_empty(File file) {}
+import 'package:syphon/global/noop.dart';
 
 ///
 /// Local Image List
@@ -20,7 +19,7 @@ class ListLocalImages extends StatefulWidget {
   const ListLocalImages({
     super.key,
     this.imageSize = 128,
-    this.onSelectImage = _empty,
+    this.onSelectImage = empty<File>,
   });
 
   final double imageSize;
@@ -74,28 +73,29 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
 
     if (images.isEmpty) {
       return Container(
-          width: width,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.only(bottom: 8, top: 8),
-                child: Icon(
-                  Icons.search,
-                  size: Dimensions.iconSize * 1.5,
-                  color: const Color(AppColors.greyDefault),
-                ),
+        width: width,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.only(bottom: 8, top: 8),
+              child: Icon(
+                Icons.search,
+                size: Dimensions.iconSize * 1.5,
+                color: const Color(AppColors.greyDefault),
               ),
-              Text(
-                Strings.alertNoImagesFound,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w400,
-                    ),
-              ),
-            ],
-          ));
+            ),
+            Text(
+              Strings.alertNoImagesFound,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w400,
+                  ),
+            ),
+          ],
+        ),
+      );
     }
 
     return ListView.builder(

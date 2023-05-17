@@ -25,7 +25,7 @@ import 'package:syphon/views/home/settings/settings-notifications-screen.dart';
 import 'package:syphon/views/home/settings/settings-privacy-screen.dart';
 import 'package:syphon/views/home/settings/settings-screen.dart';
 import 'package:syphon/views/home/settings/settings-theme-screen.dart';
-import 'package:syphon/views/intro/intro-screen.dart';
+import 'package:syphon/views/intro/IntroScreen.dart';
 import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
@@ -138,7 +138,7 @@ class Routes {
 
 class NavigationProvider {
   static Map<String, Widget Function(BuildContext)> getRoutes() => <String, WidgetBuilder>{
-        Routes.intro: (BuildContext context) => const IntroScreen(),
+        Routes.intro: (BuildContext context) => IntroScreen(),
         Routes.login: (BuildContext context) => const LoginScreen(),
         Routes.signup: (BuildContext context) => SignupScreen(),
         Routes.forgot: (BuildContext context) => const ForgotPasswordScreen(),

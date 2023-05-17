@@ -24,6 +24,8 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 const imageSize = Dimensions.avatarSizeDetails;
 
 class ProfileScreen extends HookWidget {
+  const ProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     // global actions dispatch

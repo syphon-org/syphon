@@ -28,7 +28,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/HomeScreen.dart';
-import 'package:syphon/views/intro/intro-screen.dart';
+import 'package:syphon/views/intro/IntroScreen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/prelock.dart';
 
