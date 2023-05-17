@@ -82,11 +82,5 @@ class LoadingScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => dark
-      ? buildLoadingDark(
-          context,
-        )
-      : buildLoadingLight(
-          context,
-        );
+  Widget build(BuildContext context) => dark ? buildLoadingDark(context) : buildLoadingLight(context);
 }

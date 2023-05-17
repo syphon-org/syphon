@@ -4,7 +4,7 @@ import 'package:syphon/global/libraries/matrix/errors.dart';
 
 // Preauth
 
-bool creating(AppState state) {
+bool isCreating(AppState state) {
   return state.authStore.creating;
 }
 

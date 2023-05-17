@@ -58,22 +58,22 @@ class MessageList extends HookWidget {
     // global state
     final room = useSelector<AppState, Room>(
       (state) => selectRoom(id: roomId, state: state),
-      fallback: Room(id: roomId),
+      Room(id: roomId),
     );
 
     final currentUser = useSelector<AppState, User>(
       (state) => state.authStore.currentUser,
-      fallback: User(userId: ''),
+      User(userId: ''),
     );
 
     final users = useSelector<AppState, Map<String, User>>(
       (state) => messageUsers(roomId: roomId, state: state),
-      fallback: <String, User>{},
+      <String, User>{},
     );
 
     final messagesRaw = useSelector<AppState, Map<String, Message>>(
       (state) => roomMessagesMap(state, roomId),
-      fallback: <String, Message>{},
+      <String, Message>{},
     );
 
     // TODO: identify message updates efficently based on roomMessagesMap above
@@ -90,17 +90,17 @@ class MessageList extends HookWidget {
 
     final themeType = useSelector<AppState, ThemeType>(
       (state) => state.settingsStore.themeSettings.themeType,
-      fallback: ThemeType.Light,
+      ThemeType.Light,
     );
 
     final timeFormat = useSelector<AppState, TimeFormat>(
       (state) => state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
-      fallback: TimeFormat.hr12,
+      TimeFormat.hr12,
     );
 
     final messageSize = useSelector<AppState, MessageSize>(
       (state) => state.settingsStore.themeSettings.messageSize,
-      fallback: MessageSize.Default,
+      MessageSize.Default,
     );
 
     final chatColorPrimary = useSelectorUnsafe<AppState, Color?>(

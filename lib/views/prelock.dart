@@ -14,7 +14,7 @@ import 'package:syphon/global/libraries/storage/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/intro/lock-screen.dart';
-import 'package:syphon/views/intro/signup/loading-screen.dart';
+import 'package:syphon/views/intro/signup/LoadingScreen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/syphon.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -231,9 +231,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     }
   }
 
-  buildLoadingScreen() => LoadingScreen(
-        dark: Platform.isAndroid,
-      );
+  buildLoadingScreen() => LoadingScreen(dark: Platform.isAndroid);
 
   buildLockScreen() => LockScreen(
         appContext: appContext ?? widget.appContext,

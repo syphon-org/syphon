@@ -38,9 +38,9 @@ Output? useSelectorUnsafe<State, Output>(
 }
 
 Output useSelector<State, Output>(
-  Selector<State, Output> selector, {
+  Selector<State, Output> selector,
+  Output fallback, {
   EqualityFn? equality,
-  required Output fallback,
 }) {
   final store = useStore<State>();
   final snap = useStream<Output>(

@@ -30,8 +30,8 @@ import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
-import 'package:syphon/views/intro/signup/loading-screen.dart';
-import 'package:syphon/views/intro/signup/signup-screen.dart';
+import 'package:syphon/views/intro/signup/SignupScreen.dart';
+import 'package:syphon/views/intro/signup/LoadingScreen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
 import 'home/settings/settings-intro-screen.dart';
@@ -140,7 +140,7 @@ class NavigationProvider {
   static Map<String, Widget Function(BuildContext)> getRoutes() => <String, WidgetBuilder>{
         Routes.intro: (BuildContext context) => const IntroScreen(),
         Routes.login: (BuildContext context) => const LoginScreen(),
-        Routes.signup: (BuildContext context) => const SignupScreen(),
+        Routes.signup: (BuildContext context) => SignupScreen(),
         Routes.forgot: (BuildContext context) => const ForgotPasswordScreen(),
         Routes.reset: (BuildContext context) => const ResetPasswordScreen(),
         Routes.searchHomeservers: (BuildContext context) => const SearchHomeserverScreen(),
