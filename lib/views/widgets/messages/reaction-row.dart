@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
+import 'package:syphon/domain/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/views/widgets/lifecycle.dart';
 
-class ReactionRow extends StatefulWidget {
+class ReactionRow extends HookWidget {
   final String currentUserId;
   final List<Reaction> reactions;
-
   final Function? onToggleReaction;
 
   const ReactionRow({
@@ -19,41 +18,33 @@ class ReactionRow extends StatefulWidget {
   });
 
   @override
-  State<ReactionRow> createState() => _ReactionRowState();
-}
+  Widget build(BuildContext context) {
+    final reactionsMap = useRef(<String, int>{});
+    final reactionsUserMap = useRef(<String, bool>{});
 
-class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
-  var reactionsMap = <String, int>{};
-  var reactionsUserMap = <String, bool>{};
+    final reactionKeys = reactionsMap.value.keys;
+    final reactionCounts = reactionsMap.value.values;
 
-  @override
-  void onMounted() {
-    super.onMounted();
+    final currentUserId = useSelector<AppState, String>(
+      (state) => state.authStore.currentUser.userId ?? '',
+      '',
+    );
 
-    final store = StoreProvider.of<AppState>(context);
-    final currentUserId = store.state.authStore.currentUser.userId;
-
-    setState(() {
-      for (final reaction in widget.reactions) {
-        reactionsMap.update(
+    useEffect(() {
+      for (final reaction in reactions) {
+        reactionsMap.value.update(
           reaction.body ?? '',
           (value) => value + 1,
           ifAbsent: () => 1,
         );
 
-        reactionsUserMap.update(
+        reactionsUserMap.value.update(
           reaction.body ?? '',
           (value) => value || reaction.sender == currentUserId,
           ifAbsent: () => reaction.sender == currentUserId,
         );
       }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final reactionKeys = reactionsMap.keys;
-    final reactionCounts = reactionsMap.values;
+    }, []);
 
     return ListView.builder(
       shrinkWrap: true,
@@ -64,10 +55,10 @@ class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
       itemBuilder: (BuildContext context, int index) {
         final reactionKey = reactionKeys.elementAt(index);
         final reactionCount = reactionCounts.elementAt(index);
-        final isUserReaction = reactionsUserMap[reactionKey] ?? false;
+        final isUserReaction = reactionsUserMap.value[reactionKey] ?? false;
 
         return GestureDetector(
-          onTap: () => widget.onToggleReaction?.call(reactionKey),
+          onTap: () => onToggleReaction?.call(reactionKey),
           child: Container(
             width: reactionCount > 1 ? 48 : 32,
             height: 48,

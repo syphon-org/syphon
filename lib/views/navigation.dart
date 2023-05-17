@@ -30,8 +30,8 @@ import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
 import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
-import 'package:syphon/views/intro/signup/SignupScreen.dart';
 import 'package:syphon/views/intro/signup/LoadingScreen.dart';
+import 'package:syphon/views/intro/signup/SignupScreen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
 import 'home/settings/settings-intro-screen.dart';

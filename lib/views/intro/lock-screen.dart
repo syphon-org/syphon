@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/types.dart';
 
-import 'package:syphon/views/intro/signup/loading-screen.dart';
+import 'package:syphon/views/intro/signup/LoadingScreen.dart';
 import 'package:syphon/views/prelock.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:syphon/views/widgets/modals/modal-lock-overlay/show-lock-overlay.dart';
