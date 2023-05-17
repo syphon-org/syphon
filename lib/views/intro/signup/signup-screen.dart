@@ -11,7 +11,6 @@ import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libraries/matrix/auth/requests.dart';
 import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart' as crypt;
 import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/foundation.dart' as io;
@@ -17,14 +16,14 @@ import 'package:syphon/global/print.dart';
 /// allows multiaccount feature to be domain logic independent
 ///
 String generateContextId() {
-  final shaHash = crypt.sha256.convert(utf8.encode(getRandomString(10)));
+  final shaHash = Sha256().toSync().hashSync(utf8.encode(getRandomString(10)));
   return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 }
 
 // Switch to generating UserID independent context IDs that can still be managed globally
 // ignore: non_constant_identifier_names
 String generateContextId_DEPRECATED({required String id}) {
-  final shaHash = crypt.sha256.convert(utf8.encode(id));
+  final shaHash = Sha256().toSync().hashSync(utf8.encode(id));
   return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 }
 

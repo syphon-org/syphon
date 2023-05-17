@@ -5,7 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:syphon/domain/auth/credential/model.dart';
 import 'package:syphon/domain/auth/homeserver/model.dart';
 import 'package:syphon/domain/user/model.dart';
-import 'package:syphon/global/libraries/matrix/auth/requests.dart';
 import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/values.dart';
 

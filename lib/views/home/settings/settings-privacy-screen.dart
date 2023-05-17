@@ -764,14 +764,14 @@ class PrivacySettingsScreen extends HookWidget {
                       onTap: () => onImportSessionKeys(context),
                       contentPadding: Dimensions.listPadding,
                       title: Text(
-                        'Import Keys',
+                        Strings.labelImportSessionKeys,
                       ),
                     ),
                     ListTile(
                       onTap: () => onExportSessionKeys(),
                       contentPadding: Dimensions.listPadding,
                       title: Text(
-                        'Backup Keys',
+                        Strings.labelExportSessionKeys,
                       ),
                     ),
                     Visibility(

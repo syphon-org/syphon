@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart' as crypto;
+// TODO: remove after testing
+// import 'package:crypto/crypto.dart' as crypto;
 import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:syphon/domain/crypto/sessions/model.dart';
@@ -58,7 +59,7 @@ Future<String> encryptSessionKeyPassword(String password) async {
 ///
 /// Encrypt Session Keys
 ///
-/// Responsible for decrypting the key import file as well
+/// Responsible for encrypting the key export file
 /// Below is a block table for the encrypted data
 ///
 /// - 1 	Export format version, which must be 0x01.
@@ -120,8 +121,17 @@ Future<String> encryptSessionKeys({
     byteBuilder.add(convertIntToBytes(DEFAULT_ROUNDS));
     byteBuilder.add(sessionData.bytes); // actual session data
 
-    final hmacSha256 = crypto.Hmac(crypto.sha256, encryptionKeys.sublist(32, 64));
-    final digest = hmacSha256.convert(byteBuilder.toBytes());
+    // TODO: test this sha implmentation
+    final sha = Hmac.sha256();
+    final secretKey = SecretKey(encryptionKeys.sublist(32, 64));
+    final digest = await sha.toSync().calculateMac(
+          byteBuilder.toBytes().toList(),
+          secretKey: secretKey,
+        );
+
+    // TODO: remove after testing
+    // final hmacSha256 = crypto.Hmac(crypto.sha256, encryptionKeys.sublist(32, 64));
+    // final digest = hmacSha256.convert(byteBuilder.toBytes());
 
     // HMAC-SHA-256 of all of the above together using k'
     byteBuilder.add(digest.bytes);
@@ -235,8 +245,7 @@ Future<List<dynamic>> decryptSessionKeys({
 ///
 /// Decrypt Session Keys (Threaded)
 ///
-/// Responsible for decrypting the key import file as well
-/// Below is a block table for the encrypted data
+/// Responsible for decrypting the key import file
 ///
 /// Allows running decryption in a background thread
 ///
@@ -255,8 +264,7 @@ Future<List<dynamic>> decryptSessionKeysThreaded(Map params) async {
 ///
 /// Encrypt Session Keys (Threaded)
 ///
-/// Responsible for decrypting the key import file as well
-/// Below is a block table for the encrypted data
+/// Responsible for encrypting the key import fil
 ///
 /// Allows encrypting off the main thread
 ///

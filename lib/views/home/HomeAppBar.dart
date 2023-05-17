@@ -100,7 +100,7 @@ class AppBarHome extends HookWidget implements PreferredSizeWidget {
           },
           onConfirm: () async {
             Navigator.of(dialogContext).pop();
-            await launchUrl(Values.openHelpUrl);
+            await launchUrlWrapper(Values.openHelpUrl);
           },
         ),
       );

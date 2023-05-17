@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:crypto/crypto.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -308,7 +308,7 @@ class ChatScreenState extends State<ChatScreen> {
         encryptedFile = await encryptMedia(localFile: file, info: info);
         info = info.copyWith(
           shasum: base64.encode(
-            sha256.convert(encryptedFile!.readAsBytesSync().toList()).bytes,
+            Sha256().toSync().hashSync(encryptedFile!.readAsBytesSync().toList()).bytes,
           ),
         );
       }

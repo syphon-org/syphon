@@ -50,8 +50,6 @@ class Strings {
   static final titleToggleAutocorrect = tr('title-toggle-autocorrect');
   static final titleToggleSuggestions = tr('title-toggle-suggestions');
   static final titleBlockedUsers = tr('title-blocked-users');
-  static final titleImportSessionKeys = tr('title-import-session-keys');
-  static final titleExportSessionKeys = tr('title-export-session-keys');
 
   // Titles (Dialogs)
   static final titleDialogConfirmLinkout = tr('title-dialog-confirm-linkout');
@@ -84,6 +82,8 @@ class Strings {
   static final titleDialogVerifyNewScreenLockPin = tr('title-dialog-verify-new-screen-lock-pin');
   static final titleDialogPhotoPermission = tr('title-dialog-photo-permission');
   static final titleDialogBlockUser = tr('title-dialog-block-user');
+  static final titleImportSessionKeys = tr('title-import-session-keys');
+  static final titleExportSessionKeys = tr('title-export-session-keys');
 
   // Subtitles
   static final subtitleUseProxyServer = tr('subtitle-proxy-use-proxy');
@@ -166,6 +166,8 @@ class Strings {
   static final labelFabCreateDM = tr('label-fab-create-dm');
   static final labelFabCreateGroup = tr('label-fab-create-group');
   static final labelFabCreatePublic = tr('label-fab-create-public');
+  static final labelImportSessionKeys = tr('label-import-session-keys');
+  static final labelExportSessionKeys = tr('label-export-session-keys');
 
   // List Items
   static final listItemSettingsSms = tr('list-item-settings-sms');

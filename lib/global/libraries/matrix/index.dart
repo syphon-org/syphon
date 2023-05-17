@@ -1,8 +1,8 @@
 import 'package:syphon/global/libraries/matrix/auth/requests.dart';
 import 'package:syphon/global/libraries/matrix/devices/requests.dart';
 import 'package:syphon/global/libraries/matrix/events/encryption/requests.dart';
-import 'package:syphon/global/libraries/matrix/events/requests.dart';
 import 'package:syphon/global/libraries/matrix/events/media/requests.dart';
+import 'package:syphon/global/libraries/matrix/events/requests.dart';
 import 'package:syphon/global/libraries/matrix/notifications/requests.dart';
 import 'package:syphon/global/libraries/matrix/rooms/requests.dart';
 import 'package:syphon/global/libraries/matrix/search/requests.dart';

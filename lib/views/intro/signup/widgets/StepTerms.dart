@@ -8,7 +8,6 @@ import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libraries/matrix/auth/requests.dart';
 import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/weburl.dart';
 
@@ -209,7 +208,7 @@ class _Props extends Equatable {
       onViewTermsOfService: () async {
         try {
           final termsOfServiceUrl = store.state.authStore.credential!.termsUrl!;
-          launchUrl(termsOfServiceUrl);
+          launchUrlWrapper(termsOfServiceUrl);
         } catch (error) {}
       });
 

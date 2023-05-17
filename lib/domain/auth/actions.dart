@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:crypto/crypto.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:redux/redux.dart';
@@ -30,11 +30,10 @@ import 'package:syphon/domain/sync/actions.dart';
 import 'package:syphon/domain/sync/service/actions.dart';
 import 'package:syphon/domain/sync/service/storage.dart';
 import 'package:syphon/domain/user/actions.dart';
-import 'package:syphon/global/libraries/matrix/auth/requests.dart';
 import 'package:syphon/global/libraries/matrix/auth/types.dart';
+import 'package:syphon/global/libraries/matrix/devices/utils.dart';
 import 'package:syphon/global/libraries/matrix/errors.dart';
 import 'package:syphon/global/libraries/matrix/index.dart';
-import 'package:syphon/global/libraries/matrix/devices/utils.dart';
 import 'package:syphon/global/libraries/secure-storage/key-storage.dart';
 import 'package:syphon/global/libraries/storage/index.dart';
 import 'package:syphon/global/notifications.dart';
@@ -338,7 +337,7 @@ Device generateDeviceId({String salt = ''}) {
     // }
 
     final deviceId = Random.secure().nextInt(1 << 31).toString();
-    final deviceIdDigest = sha256.convert(utf8.encode(deviceId + salt));
+    final deviceIdDigest = Sha256().toSync().hashSync(utf8.encode(deviceId + salt));
 
     final deviceIdHash =
         base64.encode(deviceIdDigest.bytes).toUpperCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
@@ -475,7 +474,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
       if (token == null) {
         final ssoUrl = 'https://${homeserver.baseUrl}${Values.matrixSSOUrl}';
 
-        return await launchUrl(ssoUrl, forceSafariVC: false);
+        return await launchUrlWrapper(ssoUrl, forceSafariVC: false);
       }
 
       final username = store.state.authStore.username;

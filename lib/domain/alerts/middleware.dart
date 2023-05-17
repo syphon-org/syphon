@@ -28,7 +28,7 @@ dynamic alertMiddleware<State>(
         final termsUrl = 'https${alert.split('https')[1]}';
         final termsUrlFormatted = termsUrl.replaceFirst('.', '', termsUrl.length - 1);
 
-        await launchUrl(termsUrlFormatted);
+        await launchUrlWrapper(termsUrlFormatted);
       }
 
       break;

@@ -19,7 +19,6 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/libraries/matrix/auth/requests.dart';
 import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';

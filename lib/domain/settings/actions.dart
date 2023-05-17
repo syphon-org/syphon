@@ -7,7 +7,6 @@ import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/devices-settings/model.dart';
 import 'package:syphon/domain/settings/models.dart';
 import 'package:syphon/domain/sync/service/actions.dart';
-import 'package:syphon/global/libraries/matrix/auth/requests.dart';
 import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/notifications.dart';

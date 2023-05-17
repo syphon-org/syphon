@@ -72,7 +72,7 @@ class DialogTextInput extends HookWidget {
       () {
         if (randomizeText) {
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
               editingControllerLocal.text = generateDeviceId().deviceId ?? '';
             },
             child: Padding(

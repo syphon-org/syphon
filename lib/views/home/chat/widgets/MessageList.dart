@@ -120,6 +120,7 @@ class MessageList extends HookWidget {
         colorMap.value[message.sender ?? ''] = userColor;
         luminanceMap.value[message.sender ?? ''] = userColor.computeLuminance();
       }
+      return null;
     }, [messages.length]);
 
     onSelectReply(Message? message) {

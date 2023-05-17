@@ -146,7 +146,7 @@ class MessageWidget extends StatelessWidget {
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
           Navigator.of(dialogContext).pop();
-          await launchUrl(url);
+          await launchUrlWrapper(url);
         },
       ),
     );

@@ -1,9 +1,9 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.14+2140
+version: 0.2.20+2200
 
 environment:
-  sdk: ">=3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
   flutter: 3.0.5
 
 scripts: 
@@ -32,7 +32,6 @@ dependencies:
 
   ### encryption
   olm: ^2.0.0
-  crypto: ^3.0.1
   encrypt: ^5.0.0
   cryptography: ^2.0.5
   canonical_json: ^1.1.1
@@ -57,8 +56,8 @@ dependencies:
   flutter_dotenv: ^5.0.2
   android_alarm_manager_plus: ^2.0.3
   workmanager: 0.5.0 
-  # background_fetch: 1.1.0
   uni_links: ^0.5.0
+  # background_fetch: 1.1.0
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
   ### ui
@@ -85,12 +84,12 @@ dependencies:
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ## media
-  file_picker: ^5.2.7
+  file_picker: ^5.3.0
   image_picker: ^0.8.7+5
   permission_handler: ^10.2.0
   local_image_provider: ^4.3.0 
   flutter_image_compress: ^1.1.3
-  share_plus: ^6.3.2
+  share_plus: ^7.0.0
 
   ### data
   uuid: ^3.0.4

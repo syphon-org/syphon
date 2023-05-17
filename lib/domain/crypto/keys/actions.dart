@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:canonical_json/canonical_json.dart';
-import 'package:crypto/crypto.dart';
+import 'package:convert/convert.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:syphon/domain/alerts/actions.dart';
@@ -523,7 +524,8 @@ ThunkAction<AppState> sendKeyRequest({
       final String sessionId = event.sessionId ?? '';
 
       // Just needs to be unique, but different
-      final requestId = sha1.convert(utf8.encode(sessionId)).toString();
+      // final requestId = sha1.convert(utf8.encode(sessionId)).toString();
+      final requestId = hex.encode(Sha1().toSync().hashSync(utf8.encode(sessionId)).bytes);
 
       final currentUser = store.state.authStore.user;
 
