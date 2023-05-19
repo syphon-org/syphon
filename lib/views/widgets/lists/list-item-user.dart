@@ -41,7 +41,7 @@ class ListItemUser extends StatelessWidget {
   final Function? onPress;
   final Function? onPressAvatar;
 
-  Widget buildArrowIcon(context) => Semantics(
+  Widget buildArrowIcon(BuildContext context) => Semantics(
       button: true,
       enabled: true,
       label: 'Start Chat',

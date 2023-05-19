@@ -197,7 +197,22 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     }
   }
 
-  toggleLocked({required String pin, bool? override}) async {
+  Widget buildLoadingScreen() => LoadingScreen(dark: Platform.isAndroid);
+
+  Widget buildLockScreen() => LockScreen(
+        appContext: appContext ?? widget.appContext,
+      );
+
+  Widget buildSyphon() => WillPopScope(
+        onWillPop: () => NavigationService.goBack(),
+        child: Syphon(
+          cache,
+          store!,
+          storage,
+        ),
+      );
+
+  Future<void> toggleLocked({required String pin, bool? override}) async {
     final lockedNew = override ?? !locked;
 
     if (!lockedNew) {
@@ -231,22 +246,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     }
   }
 
-  buildLoadingScreen() => LoadingScreen(dark: Platform.isAndroid);
-
-  buildLockScreen() => LockScreen(
-        appContext: appContext ?? widget.appContext,
-      );
-
-  buildSyphon() => WillPopScope(
-        onWillPop: () => NavigationService.goBack(),
-        child: Syphon(
-          cache,
-          store!,
-          storage,
-        ),
-      );
-
-  buildHome() {
+  Widget buildHome() {
     if (enabled) {
       return buildLockScreen();
     }

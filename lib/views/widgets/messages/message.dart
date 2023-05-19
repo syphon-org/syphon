@@ -90,47 +90,6 @@ class MessageWidget extends StatelessWidget {
   final Function? onToggleReaction;
   final void Function(Message)? onLongPress;
 
-  buildReactionsInput(
-    BuildContext context,
-    MainAxisAlignment alignment, {
-    bool isUserSent = false,
-  }) {
-    final buildEmojiButton = GestureDetector(
-      onTap: () => onInputReaction?.call(),
-      child: ClipRRect(
-        child: Container(
-          width: 36,
-          height: Dimensions.iconSizeLarge,
-          decoration: BoxDecoration(
-            color: Color(AppColors.greyDefault),
-            borderRadius: BorderRadius.circular(Dimensions.iconSizeLarge),
-            border: Border.all(
-              color: Colors.white,
-              width: 1,
-            ),
-          ),
-          child: Icon(
-            Icons.tag_faces,
-            size: 22,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-
-    final reactionRow = ReactionRow(
-      // key: Key(message.reactions.length.toString()),
-      reactions: message.reactions,
-    );
-
-    // swaps order in row if user sent
-    return Row(
-      mainAxisAlignment: alignment,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: isUserSent ? [buildEmojiButton, reactionRow] : [reactionRow, buildEmojiButton],
-    );
-  }
-
   onSwipeMessage(Message message) {
     onSwipe(message);
   }
@@ -172,6 +131,47 @@ class MessageWidget extends StatelessWidget {
     );
   }
 
+  Widget buildReactionsInput(
+    BuildContext context,
+    MainAxisAlignment alignment, {
+    bool isUserSent = false,
+  }) {
+    final buildEmojiButton = GestureDetector(
+      onTap: () => onInputReaction?.call(),
+      child: ClipRRect(
+        child: Container(
+          width: 36,
+          height: Dimensions.iconSizeLarge,
+          decoration: BoxDecoration(
+            color: Color(AppColors.greyDefault),
+            borderRadius: BorderRadius.circular(Dimensions.iconSizeLarge),
+            border: Border.all(
+              color: Colors.white,
+              width: 1,
+            ),
+          ),
+          child: Icon(
+            Icons.tag_faces,
+            size: 22,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+
+    final reactionRow = ReactionRow(
+      // key: Key(message.reactions.length.toString()),
+      reactions: message.reactions,
+    );
+
+    // swaps order in row if user sent
+    return Row(
+      mainAxisAlignment: alignment,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: isUserSent ? [buildEmojiButton, reactionRow] : [reactionRow, buildEmojiButton],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final message = this.message;
@@ -203,7 +203,6 @@ class MessageWidget extends StatelessWidget {
     var showInfoRow = true;
     var showStatus = true;
 
-    var fontStyle;
     var opacity = 1.0;
     var zIndex = 1.0;
     var status = timeFormat == TimeFormat.full
@@ -217,6 +216,8 @@ class MessageWidget extends StatelessWidget {
             timeFormat: timeFormat,
             showTime: true,
           );
+
+    FontStyle? fontStyle;
 
     // Current User Bubble Styling
     if (isUserSent) {

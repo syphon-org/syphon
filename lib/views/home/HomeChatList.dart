@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/selectors.dart';
-import 'package:syphon/domain/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/room/selectors.dart';

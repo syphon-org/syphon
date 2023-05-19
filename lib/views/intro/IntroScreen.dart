@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:syphon/domain/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/actions.dart';
 import 'package:syphon/domain/settings/storage.dart';

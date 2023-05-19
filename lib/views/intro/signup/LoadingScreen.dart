@@ -15,7 +15,7 @@ class LoadingScreen extends StatelessWidget {
     this.dark = false,
   });
 
-  buildLoadingLight(BuildContext context) {
+  Widget buildLoadingLight(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -47,7 +47,7 @@ class LoadingScreen extends StatelessWidget {
     );
   }
 
-  buildLoadingDark(BuildContext context) {
+  Widget buildLoadingDark(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 

@@ -56,7 +56,6 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
             success = result;
           });
         }
-        break;
       default:
         break;
     }

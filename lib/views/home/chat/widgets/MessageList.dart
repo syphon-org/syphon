@@ -7,7 +7,7 @@ import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/messages/selectors.dart';
 import 'package:syphon/domain/events/reactions/actions.dart';
 import 'package:syphon/domain/events/selectors.dart';
-import 'package:syphon/domain/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/selectors.dart';

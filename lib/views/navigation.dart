@@ -26,9 +26,9 @@ import 'package:syphon/views/home/settings/settings-privacy-screen.dart';
 import 'package:syphon/views/home/settings/settings-screen.dart';
 import 'package:syphon/views/home/settings/settings-theme-screen.dart';
 import 'package:syphon/views/intro/IntroScreen.dart';
+import 'package:syphon/views/intro/login/LoginScreen.dart';
 import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
-import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
 import 'package:syphon/views/intro/signup/LoadingScreen.dart';
 import 'package:syphon/views/intro/signup/SignupScreen.dart';
@@ -41,8 +41,8 @@ T? useScreenArguments<T>(BuildContext context) {
   return ModalRoute.of(context)?.settings.arguments as T;
 }
 
-T? useArguments<T>(BuildContext context) {
-  return useMemoized(() => ModalRoute.of(context)?.settings.arguments as T, [context]);
+T useArguments<T>(BuildContext context) {
+  return useMemoized(() => (ModalRoute.of(context)?.settings.arguments ?? T) as T, [context]);
 }
 
 class NavigationService {

@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/domain/alerts/actions.dart';
 import 'package:syphon/domain/auth/actions.dart';
-import 'package:syphon/domain/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/theme-settings/model.dart';
 import 'package:syphon/domain/settings/theme-settings/selectors.dart';

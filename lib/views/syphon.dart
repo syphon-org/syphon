@@ -93,7 +93,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     super.initState();
   }
 
-  reloadCurrentContext() async {
+  Future<void> reloadCurrentContext() async {
     // context handling
     final currentContext = await loadContextCurrent();
     appContext = currentContext;
@@ -155,21 +155,18 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           pluginInstance: globalNotificationPluginInstance,
         );
         saveNotificationsUnchecked(const {});
-        break;
-      case AppLifecycleState.inactive:
-        break;
       case AppLifecycleState.paused:
         store.dispatch(updateLatestLastSince());
         store.dispatch(setBackgrounded(backgrounded: true));
-        break;
       case AppLifecycleState.detached:
         store.dispatch(updateLatestLastSince());
         store.dispatch(setBackgrounded(backgrounded: true));
+      case AppLifecycleState.inactive:
         break;
     }
   }
 
-  onContextSet(AppContext appContext) async {
+  Future<void> onContextSet(AppContext appContext) async {
     await saveContextCurrent(appContext);
     await Prelock.restart(context);
   }
@@ -333,7 +330,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   onAlertsChanged(Alert alert) {
     Color? color;
 
-    var alertOverride;
+    String? alertOverride;
 
     switch (alert.type) {
       case 'error':
@@ -341,16 +338,13 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           alertOverride = Strings.alertOffline;
         }
         color = Colors.red;
-        break;
       case 'warning':
         if (!ConnectionService.isConnected() && !alert.offline) {
           alertOverride = Strings.alertOffline;
         }
         color = Colors.red;
-        break;
       case 'success':
         color = Colors.green;
-        break;
       case 'info':
       default:
         color = Colors.grey;

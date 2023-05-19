@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:syphon/domain/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/search/actions.dart';

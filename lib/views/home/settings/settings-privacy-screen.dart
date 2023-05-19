@@ -13,7 +13,7 @@ import 'package:syphon/domain/crypto/actions.dart';
 import 'package:syphon/domain/crypto/keys/selectors.dart';
 import 'package:syphon/domain/crypto/sessions/actions.dart';
 import 'package:syphon/domain/crypto/sessions/service/actions.dart';
-import 'package:syphon/domain/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/actions.dart';
 import 'package:syphon/domain/settings/devices-settings/selectors.dart';
@@ -44,8 +44,7 @@ class PrivacySettingsScreen extends HookWidget {
   Widget build(BuildContext context) {
     // global actions dispatch
 
-    final size = useDimensions(context);
-    final width = size.width;
+    final Size(:width) = useDimensions(context);
 
     final dispatch = useDispatch<AppState>();
 

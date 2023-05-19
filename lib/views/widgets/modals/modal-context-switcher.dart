@@ -12,7 +12,7 @@ import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/behaviors.dart';
-import 'package:syphon/views/intro/login/login-screen.dart';
+import 'package:syphon/views/intro/login/LoginScreen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/syphon.dart';
 import 'package:syphon/views/widgets/lists/list-item-account.dart';
@@ -82,7 +82,7 @@ class ModalContextSwitcher extends StatelessWidget {
             },
           ));
 
-  buildUserList(BuildContext context, _Props props) => ListView.builder(
+  Widget buildUserList(BuildContext context, _Props props) => ListView.builder(
       shrinkWrap: true,
       padding: EdgeInsets.zero,
       physics: const NeverScrollableScrollPhysics(),

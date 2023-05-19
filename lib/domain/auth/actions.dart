@@ -876,7 +876,7 @@ ThunkAction<AppState> fetchSignupStages() {
 /// Create a user / Attempt creation
 ///
 /// process references are in assets/cheatsheet.md
-ThunkAction<AppState> createUser({enableErrors = false}) {
+ThunkAction<AppState> createUser({bool enableErrors = false}) {
   return (Store<AppState> store) async {
     try {
       store.dispatch(SetLoading(loading: true));
@@ -910,7 +910,7 @@ ThunkAction<AppState> createUser({enableErrors = false}) {
           store.dispatch(SetVerificationNeeded(needed: true));
           return false;
         }
-        throw data['error'];
+        throw data['error'] as String;
       }
 
       if (data['flows'] != null) {
@@ -1132,7 +1132,7 @@ ThunkAction<AppState> selectHomeserver({String? hostname}) {
   return (Store<AppState> store) async {
     final Homeserver homeserver = await store.dispatch(
       fetchHomeserver(hostname: hostname),
-    );
+    ) as Homeserver;
 
     await store.dispatch(setHomeserver(homeserver: homeserver));
     await store.dispatch(setHostname(hostname: hostname));
@@ -1206,7 +1206,7 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
     try {
       homeserver = await store.dispatch(fetchBaseUrl(
         homeserver: homeserver,
-      ));
+      )) as Homeserver;
       if (!homeserver.valid) {
         throw Strings.alertCheckHomeserver;
       }

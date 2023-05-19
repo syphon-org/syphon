@@ -41,13 +41,13 @@ class Storage {
   static StorageDatabase? database;
 }
 
-Future initStorage({AppContext context = const AppContext(), String pin = ''}) async {
+Future<StorageDatabase> initStorage({AppContext context = const AppContext(), String pin = ''}) async {
   final database = openDatabaseThreaded(context, pin: pin);
   Storage.database = database;
   return database;
 }
 
-Future closeStorage(StorageDatabase? storage) async {
+Future<void> closeStorage(StorageDatabase? storage) async {
   if (storage != null) {
     storage.close();
   }
