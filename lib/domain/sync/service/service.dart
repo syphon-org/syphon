@@ -46,7 +46,7 @@ class SyncService {
     try {
       return await AndroidAlarmManager.initialize();
     } catch (error) {
-      log.error('[SyncService.init] $error');
+      console.error('[SyncService.init] $error');
       return false;
     }
   }
@@ -62,7 +62,7 @@ class SyncService {
     // android only background sync
     if (!Platform.isAndroid) return;
 
-    log.info('[SyncService] starting');
+    console.info('[SyncService] starting');
 
     final secureStorage = FlutterSecureStorage();
 
@@ -97,7 +97,7 @@ class SyncService {
     try {
       await AndroidAlarmManager.cancel(service_id);
     } catch (error) {
-      log.error('[SyncService] $error');
+      console.error('[SyncService] $error');
     }
   }
 }
@@ -134,14 +134,14 @@ Future notificationJob() async {
       currentUser = User.fromJson(jsonDecode(userString ?? '{}'));
       proxySettings = ProxySettings.fromJson(jsonDecode(proxySettingsString ?? '{}'));
     } catch (error) {
-      return log.threaded('[notificationJob] decode error $error');
+      return console.threaded('[notificationJob] decode error $error');
     }
 
     if (proxySettings.enabled) {
       try {
         httpClient = createClient(proxySettings: proxySettings);
       } catch (error) {
-        log.error(error.toString());
+        console.error(error.toString());
         throw Exception(
           'Failed to initialize proxy settings, aborting background notifications service',
         );
@@ -153,7 +153,7 @@ Future notificationJob() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (NotificationResponse? payload) {
-        log.threaded('[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload');
+        console.threaded('[onSelectNotification] TESTING PAYLOAD INSIDE BACKGROUND THREAD $payload');
         return Future.value(true);
       },
     );
@@ -188,7 +188,7 @@ Future notificationJob() async {
       );
     }
   } catch (error) {
-    log.threaded('[notificationJob] $error');
+    console.threaded('[notificationJob] $error');
   }
 }
 
@@ -203,7 +203,7 @@ Future backgroundSync({
   required FlutterLocalNotificationsPlugin pluginInstance,
 }) async {
   try {
-    log.threaded('[backgroundSync] starting sync loop');
+    console.threaded('[backgroundSync] starting sync loop');
 
     final protocol = params['protocol'];
     final homeserver = params['homeserver'];
@@ -393,7 +393,7 @@ Future backgroundSync({
       });
     });
   } catch (error) {
-    log.threaded('[SyncService] $error');
+    console.threaded('[SyncService] $error');
   }
 }
 
@@ -410,7 +410,7 @@ Future notificationSyncTEST() async {
     // Init notifiations for background service and new messages/events
     final pluginInstance = await initNotifications(
       onSelectNotification: (NotificationResponse? payload) {
-        log.threaded('[onSelectNotification] payload $payload');
+        console.threaded('[onSelectNotification] payload $payload');
         return Future.value(true);
       },
     );
@@ -426,7 +426,7 @@ Future notificationSyncTEST() async {
         jsonDecode(await secureStorage.read(key: SyncService.currentUserKey) ?? '{}'),
       );
     } catch (error) {
-      return log.threaded('[notificationSyncTEST] $error');
+      return console.threaded('[notificationSyncTEST] $error');
     }
 
     final Map<String, String> roomNames = await loadRoomNames();
@@ -443,6 +443,6 @@ Future notificationSyncTEST() async {
       },
     );
   } catch (error) {
-    log.threaded('[notificationSyncTEST] $error');
+    console.threaded('[notificationSyncTEST] $error');
   }
 }

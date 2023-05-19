@@ -42,7 +42,7 @@ void _openOnIOS() {
   try {
     open.overrideFor(OperatingSystem.iOS, () => DynamicLibrary.process());
   } catch (error) {
-    log.error(error.toString());
+    console.error(error.toString());
   }
 }
 
@@ -50,7 +50,7 @@ void _openOnAndroid() {
   try {
     open.overrideFor(OperatingSystem.android, () => DynamicLibrary.open('libsqlcipher.so'));
   } catch (error) {
-    log.error(error.toString());
+    console.error(error.toString());
   }
 }
 
@@ -59,7 +59,7 @@ void _openOnLinux() {
     open.overrideFor(OperatingSystem.linux, () => DynamicLibrary.open('libsqlcipher.so'));
     return;
   } catch (_) {
-    log.error(_.toString());
+    console.error(_.toString());
     try {
       // fallback to sqlite if unavailable
       final scriptDir = File(Platform.script.toFilePath()).parent;
@@ -68,7 +68,7 @@ void _openOnLinux() {
 
       open.overrideFor(OperatingSystem.linux, () => lib);
     } catch (error) {
-      log.error(error.toString());
+      console.error(error.toString());
       rethrow;
     }
   }
@@ -169,7 +169,7 @@ Future<DriftIsolate> spawnDatabaseIsolate(AppContext context, {String pin = Valu
   return await receivePort.first as DriftIsolate;
 }
 
-StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.empty}) {
+ColdStorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.empty}) {
   final connection = DatabaseConnection.delayed(
     () async {
       final isolate = await spawnDatabaseIsolate(context, pin: pin);
@@ -178,7 +178,7 @@ StorageDatabase openDatabaseThreaded(AppContext context, {String pin = Values.em
     }(),
   );
 
-  return StorageDatabase.connect(connection);
+  return ColdStorageDatabase.connect(connection);
 }
 
 LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
@@ -214,10 +214,10 @@ LazyDatabase openDatabase(AppContext context, {String pin = Values.empty}) {
     Settings,
   ],
 )
-class StorageDatabase extends _$StorageDatabase {
-  StorageDatabase(AppContext context, {String pin = ''}) : super(openDatabase(context, pin: pin));
+class ColdStorageDatabase extends _$ColdStorageDatabase {
+  ColdStorageDatabase(AppContext context, {String pin = ''}) : super(openDatabase(context, pin: pin));
 
-  StorageDatabase.connect(super.connection) : super.connect();
+  ColdStorageDatabase.connect(super.connection) : super.connect();
 
   // you should bump this number whenever you change or add a table definition.
   @override
@@ -229,7 +229,7 @@ class StorageDatabase extends _$StorageDatabase {
           return m.createAll();
         },
         onUpgrade: (Migrator m, int from, int to) async {
-          log.info('[MIGRATION] VERSION $from to $to');
+          console.info('[MIGRATION] VERSION $from to $to');
           if (from == 8) {
             await m.addColumn(messages, messages.hasLink);
             await m.addColumn(messages, decrypted.hasLink);

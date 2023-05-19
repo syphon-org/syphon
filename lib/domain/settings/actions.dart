@@ -93,7 +93,7 @@ ThunkAction<AppState> fetchDevices() {
 
       store.dispatch(SetDevices(devices: devices));
     } catch (error) {
-      log.error('[fetchRooms] $error');
+      console.error('[fetchRooms] $error');
     } finally {
       store.dispatch(SetLoadingSettings(loading: false));
     }

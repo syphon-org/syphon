@@ -348,7 +348,7 @@ abstract class Auth {
 
       return await json.decode(response.body);
     } catch (error) {
-      log.error(error.toString());
+      console.error(error.toString());
       rethrow;
     }
   }

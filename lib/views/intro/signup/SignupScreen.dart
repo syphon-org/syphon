@@ -158,7 +158,7 @@ class SignupScreen extends HookWidget {
       await dispatch(loginUserSSO());
     }
 
-    onCreateUser({bool? enableErrors}) async {
+    onCreateUser({bool enableErrors = false}) async {
       return await dispatch(createUser(enableErrors: enableErrors));
     }
 

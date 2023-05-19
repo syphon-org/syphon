@@ -160,7 +160,7 @@ class ChatScreenState extends State<ChatScreen> {
         ),
       );
     } catch (error) {
-      log.error(error.toString());
+      console.error(error.toString());
     }
   }
 
@@ -583,7 +583,7 @@ class ChatScreenState extends State<ChatScreen> {
         onInitialBuild: onMounted,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          useScreenArguments<ChatScreenArguments>(context)?.roomId,
+          useScreenArguments<ChatScreenArguments>(context, ChatScreenArguments()).roomId,
         ),
         builder: (context, props) {
           final height = MediaQuery.of(context).size.height;
@@ -665,6 +665,7 @@ class ChatScreenState extends State<ChatScreen> {
                       child: Stack(
                         children: [
                           MessageList(
+                            key: Key(props.room.id),
                             roomId: props.room.id,
                             editing: editing,
                             editorController: editorController,
@@ -958,7 +959,7 @@ class _Props extends Equatable {
             ),
           );
 
-          log.debug('Found messages ${messagesNew.length}');
+          console.debug('Found messages ${messagesNew.length}');
         },
       );
 }

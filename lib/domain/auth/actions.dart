@@ -201,7 +201,7 @@ ThunkAction<AppState> initDeepLinks() => (Store<AppState> store) async {
           store.dispatch(SetLoading(loading: true));
           store.dispatch(loginUserSSO(token: token));
         }, onError: (err) {
-          log.error('[streamUniLinks] $err');
+          console.error('[streamUniLinks] $err');
           store.dispatch(SetLoading(loading: false));
         });
       } on PlatformException {
@@ -221,7 +221,7 @@ ThunkAction<AppState> disposeDeepLinks() => (Store<AppState> store) async {
       try {
         _deeplinkSubscription.cancel();
       } catch (error) {
-        log.error(error.toString());
+        console.error(error.toString());
       }
     };
 
@@ -349,7 +349,7 @@ Device generateDeviceId({String salt = ''}) {
 
     return device;
   } catch (error) {
-    log.error('[generateDeviceId] $error');
+    console.error('[generateDeviceId] $error');
     return Device(
       deviceId: defaultId,
       displayName: Values.appDisplayName,
@@ -622,7 +622,7 @@ ThunkAction<AppState> checkUsernameAvailability() {
         availability: data['available'],
       ));
     } catch (error) {
-      log.error('[checkUsernameAvailability] $error');
+      console.error('[checkUsernameAvailability] $error');
       store.dispatch(SetUsernameAvailability(availability: false));
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -649,7 +649,7 @@ ThunkAction<AppState> setInteractiveAuths({Map? auths}) {
         );
 
         if (currentStage.length > 0) {
-          log.info('[SetCredential] $currentStage');
+          console.info('[SetCredential] $currentStage');
           store.dispatch(SetCredential(
             credential: Credential(
               type: currentStage,
@@ -659,7 +659,7 @@ ThunkAction<AppState> setInteractiveAuths({Map? auths}) {
         }
       }
     } catch (error) {
-      log.error('[setInteractiveAuth] $error');
+      console.error('[setInteractiveAuth] $error');
     }
   };
 }
@@ -826,7 +826,7 @@ ThunkAction<AppState> submitEmail({int? sendAttempt = 1}) {
       ));
       return true;
     } catch (error) {
-      log.error('[submitEmail] $error');
+      console.error('[submitEmail] $error');
       store.dispatch(SetEmailValid(valid: false));
       store.dispatch(SetEmailAvailability(available: false));
       return false;
@@ -941,7 +941,7 @@ ThunkAction<AppState> createUser({bool enableErrors = false}) {
       store.dispatch(ResetOnboarding());
       return true;
     } catch (error) {
-      log.error('[createUser] $error');
+      console.error('[createUser] $error');
 
       if (enableErrors) {
         store.dispatch(addAlert(
@@ -1117,7 +1117,7 @@ ThunkAction<AppState> updateCredential({
         ),
       ));
     } catch (error) {
-      log.error('[updateCredential] $error');
+      console.error('[updateCredential] $error');
     }
   };
 }
@@ -1199,7 +1199,7 @@ ThunkAction<AppState> fetchHomeserver({String? hostname}) {
 
       homeserver = homeserver.copyWith(photoUrl: iconUrl);
     } catch (error) {
-      log.error('[selectHomserver] $error');
+      console.error('[selectHomserver] $error');
     }
 
     // fetch homeserver well-known

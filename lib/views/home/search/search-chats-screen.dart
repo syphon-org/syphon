@@ -59,8 +59,8 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
   Future onInviteUser(_Props props, Room room) async {
     FocusScope.of(context).unfocus();
 
-    final arguments = useScreenArguments<ChatSearchArguments>(context);
-    final user = arguments?.user;
+    final arguments = useScreenArguments<ChatSearchArguments>(context, ChatSearchArguments());
+    final user = arguments.user;
     final username = formatUsername(user!);
 
     return showDialog(
@@ -283,7 +283,7 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) {
-        final arguments = useScreenArguments<ChatSearchArguments>(context)!;
+        final arguments = useScreenArguments<ChatSearchArguments>(context, ChatSearchArguments());
         return Scaffold(
           appBar: AppBarSearch(
             title: '${Strings.titleInvite} ${formatUsername(arguments.user!)}',

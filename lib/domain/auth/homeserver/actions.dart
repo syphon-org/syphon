@@ -96,7 +96,7 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
         identityUrl: identityUrl,
       );
     } catch (error) {
-      log.error('[fetchBaseUrl] failed .well-known client query');
+      console.error('[fetchBaseUrl] failed .well-known client query');
 
       try {
         final response = await MatrixApi.checkHomeserverAlt(
@@ -113,7 +113,7 @@ ThunkAction<AppState> fetchBaseUrl({required Homeserver homeserver}) {
           identityUrl: baseUrl,
         );
       } catch (error) {
-        log.error(
+        console.error(
           '[fetchBaseUrl] failed alternative .well-known server query',
         );
       }

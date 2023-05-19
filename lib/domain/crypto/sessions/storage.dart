@@ -11,7 +11,7 @@ import 'package:syphon/global/print.dart';
 /// In storage, messages are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 ///
-extension SessionQueries on StorageDatabase {
+extension SessionQueries on ColdStorageDatabase {
   Future<void> insertMessageSessions(List<MessageSession> sessions) async {
     // HACK: temporary to account for sqlite versions without UPSERT
     if (Platform.isLinux) {
@@ -51,7 +51,7 @@ Future<void> saveMessageSessionInbound({
   required String identityKey,
   required String session,
   required int messageIndex,
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   return storage.insertMessageSessions([
     MessageSession(
@@ -68,7 +68,7 @@ Future<void> saveMessageSessionInbound({
 
 Future<void> saveMessageSessionsInbound(
   Map<String, Map<String, List<model.MessageSession>>> messageSessions, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   final List<MessageSession> messageSessionsDb = [];
 
@@ -106,7 +106,7 @@ Future<void> saveMessageSessionsInbound(
 ///
 Future<Map<String, Map<String, List<model.MessageSession>>>> loadMessageSessionsInbound({
   List<String>? roomIds,
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   try {
     final messageSessions = <String, Map<String, List<model.MessageSession>>>{};
@@ -145,7 +145,7 @@ Future<Map<String, Map<String, List<model.MessageSession>>>> loadMessageSessions
 
     return messageSessions;
   } catch (error) {
-    log.error(error.toString(), title: 'loadCrypto');
+    console.error(error.toString(), title: 'loadCrypto');
     return {};
   }
 }

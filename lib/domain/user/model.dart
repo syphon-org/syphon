@@ -87,7 +87,7 @@ class User extends Equatable implements drift.Insertable<User> {
         avatarUri: json['avatar_url'] as String?,
       );
     } catch (error) {
-      log.error('[User.fromMatrix] $error');
+      console.error('[User.fromMatrix] $error');
       return User();
     }
   }

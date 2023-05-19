@@ -13,7 +13,7 @@ import 'package:syphon/global/print.dart';
 /// In storage, messages are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 ///
-extension AuthQueries on StorageDatabase {
+extension AuthQueries on ColdStorageDatabase {
   Future<int> insertAuthStore(AuthStore store) async {
     final storeJson = json.decode(json.encode(store));
 
@@ -47,7 +47,7 @@ extension AuthQueries on StorageDatabase {
 
 Future<int> saveAuth(
   AuthStore authStore, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   return storage.insertAuthStore(authStore);
 }
@@ -55,11 +55,11 @@ Future<int> saveAuth(
 ///
 /// Load Auth Store (Cold Storage)
 ///
-Future<AuthStore?> loadAuth({required StorageDatabase storage}) async {
+Future<AuthStore?> loadAuth({required ColdStorageDatabase storage}) async {
   try {
     return storage.selectAuthStore();
   } catch (error) {
-    log.error(error.toString(), title: 'loadAuth');
+    console.error(error.toString(), title: 'loadAuth');
     return null;
   }
 }

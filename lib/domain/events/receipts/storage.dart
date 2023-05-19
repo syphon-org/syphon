@@ -12,7 +12,7 @@ import 'package:syphon/global/print.dart';
 /// In storage, reactions are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 ///
-extension ReceiptQueries on StorageDatabase {
+extension ReceiptQueries on ColdStorageDatabase {
   Future<void> insertReceiptsBatched(List<Receipt> receipts) {
     // HACK: temporary to account for sqlite versions without UPSERT
     if (Platform.isLinux) {
@@ -48,7 +48,7 @@ extension ReceiptQueries on StorageDatabase {
 ///
 Future<void> saveReceipts(
   Map<String, Receipt> receipts, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   required bool ready,
 }) async {
   if (!ready) return;
@@ -63,7 +63,7 @@ Future<void> saveReceipts(
 ///
 Future<Map<String, Receipt>> loadReceipts(
   List<String> eventIds, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   try {
     final receipts = await storage.selectReceipts(eventIds);
@@ -74,7 +74,7 @@ Future<Map<String, Receipt>> loadReceipts(
       value: (receipt) => receipt,
     );
   } catch (error) {
-    log.error(error.toString(), title: 'loadReactions');
+    console.error(error.toString(), title: 'loadReactions');
     return {};
   }
 }

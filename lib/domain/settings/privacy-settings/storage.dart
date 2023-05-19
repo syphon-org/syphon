@@ -20,7 +20,7 @@ Future<bool> checkBackupPassword() async {
       key: KEY_BACKUP_PASSWORD_KEY,
     );
   } catch (error) {
-    log.error(error.toString());
+    console.error(error.toString());
     return false;
   }
 }
@@ -29,7 +29,7 @@ Future<String> loadBackupPassword() async {
   try {
     return await _storage.read(key: KEY_BACKUP_PASSWORD_KEY) ?? '';
   } catch (error) {
-    log.error(error.toString());
+    console.error(error.toString());
     return '';
   }
 }

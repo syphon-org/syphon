@@ -42,7 +42,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen> with Lifecycle<C
   @override
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final arguments = useScreenArguments<ChatUsersDetailArguments>(context)!;
+    final arguments = useScreenArguments<ChatUsersDetailArguments>(context, ChatUsersDetailArguments());
 
     final searchResults = store.state.searchStore.searchResults;
 

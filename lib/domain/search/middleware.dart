@@ -11,7 +11,7 @@ import 'package:syphon/global/print.dart';
 /// Saves store data to cold storage based
 /// on which redux actions are fired.
 ///
-searchMiddleware(StorageDatabase? coldStorage) {
+searchMiddleware(ColdStorageDatabase? coldStorage) {
   return (
     Store<AppState> store,
     dynamic actionRaw,
@@ -20,7 +20,7 @@ searchMiddleware(StorageDatabase? coldStorage) {
     next(actionRaw);
 
     if (coldStorage == null) {
-      log.warn('storage is null, skipping saving cold storage data!!!', title: 'searchMiddleware');
+      console.warn('storage is null, skipping saving cold storage data!!!', title: 'searchMiddleware');
       return;
     }
 

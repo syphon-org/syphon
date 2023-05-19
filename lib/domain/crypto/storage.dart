@@ -13,7 +13,7 @@ import 'package:syphon/global/print.dart';
 /// In storage, messages are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 ///
-extension CryptoQueries on StorageDatabase {
+extension CryptoQueries on ColdStorageDatabase {
   Future<int> insertCryptoStore(CryptoStore store) async {
     final storeJson = json.decode(json.encode(store));
 
@@ -47,7 +47,7 @@ extension CryptoQueries on StorageDatabase {
 
 Future<int> saveCrypto(
   CryptoStore store, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   return storage.insertCryptoStore(store);
 }
@@ -55,11 +55,11 @@ Future<int> saveCrypto(
 ///
 /// Load Crypto Store (Cold Storage)
 ///
-Future<CryptoStore?> loadCrypto({required StorageDatabase storage}) async {
+Future<CryptoStore?> loadCrypto({required ColdStorageDatabase storage}) async {
   try {
     return storage.selectCryptoStore();
   } catch (error) {
-    log.error(error.toString(), title: 'loadCrypto');
+    console.error(error.toString(), title: 'loadCrypto');
     return null;
   }
 }

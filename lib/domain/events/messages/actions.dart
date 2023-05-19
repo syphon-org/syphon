@@ -150,7 +150,7 @@ ThunkAction<AppState> mutateMessagesAll() {
         messagesUpdated.addAll({room.id: allUpdated[0]});
         decryptedUpdated.addAll({room.id: allUpdated[1]});
       } catch (error) {
-        log.error('[mutateMessagesAll] ${room.id} $error');
+        console.error('[mutateMessagesAll] ${room.id} $error');
       }
     });
 
@@ -466,7 +466,7 @@ Future<bool> isMessageDeletable({required Message message, User? user, Room? roo
 
     return false;
   } catch (error) {
-    log.debug('[isMessageDeletable] $error');
+    console.debug('[isMessageDeletable] $error');
     return false;
   }
 }

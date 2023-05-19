@@ -90,17 +90,17 @@ ThunkAction<AppState> startSyncObserver() {
       final syncing = store.state.syncStore.syncing;
 
       if (accessToken == null) {
-        log.info('[syncObserver] skipping sync, context not authenticated');
+        console.info('[syncObserver] skipping sync, context not authenticated');
         return;
       }
 
       if (lastSince == null) {
-        log.info('[syncObserver] skipping sync, needs full sync');
+        console.info('[syncObserver] skipping sync, needs full sync');
         return;
       }
 
       if (syncing) {
-        log.info('[syncObserver] still syncing');
+        console.info('[syncObserver] still syncing');
         return;
       }
 
@@ -130,7 +130,7 @@ ThunkAction<AppState> startSyncObserver() {
               Duration(milliseconds: 1000 * backoffFactor),
             );
 
-        log.info(
+        console.info(
           '[syncObserver] backoff at ${DateTime.now().difference(lastAttempt)} of $backoffFactor',
         );
 
@@ -138,10 +138,10 @@ ThunkAction<AppState> startSyncObserver() {
           return;
         }
 
-        log.info('[syncObserver] backoff timeout, trying again');
+        console.info('[syncObserver] backoff timeout, trying again');
       }
 
-      log.info('[syncObserver] running sync');
+      console.info('[syncObserver] running sync');
       store.dispatch(fetchSync(since: lastSince));
     }
 
@@ -207,7 +207,7 @@ ThunkAction<AppState> updateLatestLastSince() {
     final lastSince = store.state.syncStore.lastSince;
 
     if (lastSince != null) {
-      log.info('[updateLatestLastSince] updating $lastSince');
+      console.info('[updateLatestLastSince] updating $lastSince');
       await saveLastSince(lastSince: lastSince);
     }
   };
@@ -221,14 +221,14 @@ ThunkAction<AppState> updateLatestLastSince() {
 ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
   return (Store<AppState> store) async {
     try {
-      log.info('[fetchSync] *** starting sync *** ');
+      console.info('[fetchSync] *** starting sync *** ');
       store.dispatch(SetSyncing(syncing: true));
 
       final lastSince = store.state.syncStore.lastSince;
       final isFullSync = forceFull || since == null;
 
       if (isFullSync) {
-        log.info('[fetchSync] *** full sync running *** ');
+        console.info('[fetchSync] *** full sync running *** ');
       }
 
       // Normal matrix /sync call to the homeserver (Threaded)
@@ -294,10 +294,10 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
       ));
 
       if (isFullSync) {
-        log.info('[fetchSync] *** full sync completed ***');
+        console.info('[fetchSync] *** full sync completed ***');
       }
     } catch (error) {
-      log.error('[fetchSync] $error');
+      console.error('[fetchSync] $error');
 
       final backoff = store.state.syncStore.backoff;
       final nextBackoff = backoff != 0 ? backoff + 1 : 5;
@@ -342,7 +342,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       final events = sync.events;
 
       if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
-        log.jsonDebug({
+        console.jsonDebug({
           'from': '[syncRooms]',
           'room': room.name,
           'synced': synced,
@@ -405,7 +405,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       );
 
       if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
-        log.jsonDebug({
+        console.jsonDebug({
           'room': room,
         });
       }
@@ -427,7 +427,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       // room will be marked limited to indicate this
       // TODO: a backfill should happen in background when processing is available
       if (room.limited && synced) {
-        log.warn(
+        console.warn(
           '[syncRooms] ${room.name} LIMITED TRUE - Fetching more messages',
         );
 
@@ -438,7 +438,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
         ));
       }
     } catch (error) {
-      log.error('[syncRoom] $id $error');
+      console.error('[syncRoom] $id $error');
 
       // prevents against recursive backfill from bombing attempts at fetching messages
       final roomExisting = rooms.containsKey(id) ? rooms[id]! : Room(id: id);

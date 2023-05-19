@@ -37,12 +37,8 @@ import 'package:syphon/views/intro/signup/verification-screen.dart';
 import 'home/settings/settings-intro-screen.dart';
 
 // helper hook for extracting navigation params
-T? useScreenArguments<T>(BuildContext context) {
-  return ModalRoute.of(context)?.settings.arguments as T;
-}
-
-T useArguments<T>(BuildContext context) {
-  return useMemoized(() => (ModalRoute.of(context)?.settings.arguments ?? T) as T, [context]);
+T useScreenArguments<T>(BuildContext context, T fallback) {
+  return (ModalRoute.of(context)?.settings.arguments ?? fallback) as T;
 }
 
 class NavigationService {

@@ -10,7 +10,7 @@ import 'package:workmanager/workmanager.dart';
 
 void callback() {
   Workmanager().executeTask((task, inputData) async {
-    log.release(
+    console.release(
       'Native called background task: $task',
     );
 
@@ -33,7 +33,7 @@ void callback() {
         messageSessions: messageSessions,
       );
     } catch (error) {
-      log.error(error.toString());
+      console.error(error.toString());
     }
 
     return Future.value(true);
@@ -58,7 +58,7 @@ class KeyBackupService {
       );
       return true;
     } catch (error) {
-      log.error('[KeyBackupService.init] $error');
+      console.error('[KeyBackupService.init] $error');
       return false;
     }
   }
@@ -79,10 +79,10 @@ class KeyBackupService {
     });
 
     if (completed) {
-      log.info('[KeyBackupService] completed backup successfully!!');
+      console.info('[KeyBackupService] completed backup successfully!!');
       return onCompleted();
     } else {
-      log.error('[KeyBackupService] completed backup successfully!!');
+      console.error('[KeyBackupService] completed backup successfully!!');
     }
 
     // TODO: does not work on iOS, must work on both android and iOS
@@ -106,7 +106,7 @@ class KeyBackupService {
     try {
       await Workmanager().cancelAll();
     } catch (error) {
-      log.error('[KeyBackupService] $error');
+      console.error('[KeyBackupService] $error');
     }
   }
 }

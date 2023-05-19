@@ -170,7 +170,7 @@ ThunkAction<AppState> loadMessagesCached({
 
       return messagesStored;
     } catch (error) {
-      log.error('[fetchMessageEvents] $error');
+      console.error('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -245,7 +245,7 @@ ThunkAction<AppState> fetchMessageEvents({
 
       return messages;
     } catch (error) {
-      log.error('[fetchMessageEvents] $error');
+      console.error('[fetchMessageEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -277,7 +277,7 @@ ThunkAction<AppState> fetchStateEvents({Room? room}) {
         },
       }));
     } catch (error) {
-      log.error('[fetchStateEvents] $error');
+      console.error('[fetchStateEvents] $error');
     } finally {
       store.dispatch(UpdateRoom(id: room!.id, syncing: false));
     }
@@ -370,7 +370,7 @@ ThunkAction<AppState> deleteMessage({required Message message, required Room roo
         return store.dispatch(AddMessages(roomId: room.id, messages: [messageDeleted]));
       }
     } catch (error) {
-      log.error('[deleteMessage] $error');
+      console.error('[deleteMessage] $error');
     }
   };
 }

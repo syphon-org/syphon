@@ -43,13 +43,13 @@ ThunkAction<AppState> sendReadReceipts({
     try {
       // Skip if Read Receipts are disabled
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Off) {
-        return log.info('[sendReadReceipts] read receipts disabled');
+        return console.info('[sendReadReceipts] read receipts disabled');
       }
 
       final data;
 
       if (store.state.settingsStore.readReceipts == ReadReceiptTypes.Private) {
-        log.info('[sendReadReceipts] read receipts set to private');
+        console.info('[sendReadReceipts] read receipts set to private');
 
         data = await MatrixApi.sendPrivateReadReceipt(
           protocol: store.state.authStore.protocol,
@@ -74,9 +74,9 @@ ThunkAction<AppState> sendReadReceipts({
         throw data['error'];
       }
 
-      log.info('[sendReadReceipts] sent ${message.id} $data');
+      console.info('[sendReadReceipts] sent ${message.id} $data');
     } catch (error) {
-      log.info('[sendReadReceipts] failed $error');
+      console.info('[sendReadReceipts] failed $error');
     }
   };
 }
@@ -94,7 +94,7 @@ ThunkAction<AppState> sendTyping({
     try {
       // Skip if typing indicators are disabled
       if (!store.state.settingsStore.typingIndicatorsEnabled) {
-        log.info('[sendTyping] typing indicators disabled');
+        console.info('[sendTyping] typing indicators disabled');
         return;
       }
 
@@ -111,7 +111,7 @@ ThunkAction<AppState> sendTyping({
         throw data['error'];
       }
     } catch (error) {
-      log.error('[sendTyping] $error');
+      console.error('[sendTyping] $error');
     }
   };
 }

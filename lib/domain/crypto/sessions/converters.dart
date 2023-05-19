@@ -198,7 +198,7 @@ Future<List<dynamic>> decryptSessionKeys({
 
     // for debugging only
     if (DEBUG_MODE && DEBUG_OLM_MODE) {
-      log.jsonDebug({
+      console.jsonDebug({
         'version': version,
         'salt': base64.encode(salt),
         'iv': ivFormatted,

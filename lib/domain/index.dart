@@ -142,7 +142,7 @@ AppState appReducer(AppState state, action) => AppState(
 ///
 Future<Store<AppState>> initStore(
   Database? cache,
-  StorageDatabase? storage, {
+  ColdStorageDatabase? storage, {
   AppState? existingState,
   bool existingUser = false,
 }) async {
@@ -176,7 +176,7 @@ Future<Store<AppState>> initStore(
       initialState = existingState ?? await persistor.load();
     }
   } catch (error) {
-    log.error('[persistor.load] $error');
+    console.error('[persistor.load] $error');
   }
 
   final store = Store<AppState>(

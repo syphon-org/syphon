@@ -371,7 +371,7 @@ class Sync {
             break;
         }
       } catch (error) {
-        log.error('[parseState] $error ${event.type}');
+        console.error('[parseState] $error ${event.type}');
       }
     }
 
@@ -446,7 +446,7 @@ class Sync {
       }
 
       if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
-        log.jsonDebug({
+        console.jsonDebug({
           'roomId': room.name,
           'latestMessage': latestMessage,
           'messagesTotal': messages.length,
@@ -506,7 +506,7 @@ class Sync {
         ),
       );
     } catch (error) {
-      log.error('[parseMessages] $error');
+      console.error('[parseMessages] $error');
       return this;
     }
   }
@@ -567,7 +567,7 @@ class Sync {
         }
       });
     } catch (error) {
-      log.error('[parseEphemerals] $error');
+      console.error('[parseEphemerals] $error');
     }
 
     return this.copyWith(
@@ -609,7 +609,7 @@ class Sync {
     }
 
     if (DEBUG_MODE && room.limited) {
-      log.jsonDebug({
+      console.jsonDebug({
         'from': '[parseSync]',
         'room': room.name,
         'limited': room.limited,

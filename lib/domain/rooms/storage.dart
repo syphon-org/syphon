@@ -9,7 +9,7 @@ import 'package:syphon/global/print.dart';
 ///
 /// Room Queries
 ///
-extension RoomQueries on StorageDatabase {
+extension RoomQueries on ColdStorageDatabase {
   Future<void> insertRooms(List<Room> rooms) {
     // HACK: temporary to account for sqlite versions without UPSERT
     if (Platform.isLinux) {
@@ -62,21 +62,21 @@ extension RoomQueries on StorageDatabase {
 
 Future saveRoom(
   Room room, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   return storage.insertRooms([room]);
 }
 
 Future saveRooms(
   Map<String, Room> rooms, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   return storage.insertRooms(rooms.values.toList());
 }
 
 Future deleteRooms(
   Map<String, Room> rooms, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   return storage.deleteRooms(rooms.values.toList());
 }
@@ -84,13 +84,13 @@ Future deleteRooms(
 Future<Map<String, Room>> loadRooms({
   int offset = 0,
   int limit = 10,
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   Map<String, Room> rooms = {};
 
   try {
     final loaded = await storage.selectRoomsAll();
-    log.info('[rooms] loaded ${loaded.length}');
+    console.info('[rooms] loaded ${loaded.length}');
 
     rooms = Map<String, Room>.fromIterable(
       loaded,
@@ -100,7 +100,7 @@ Future<Map<String, Room>> loadRooms({
       },
     );
   } catch (error) {
-    log.error(error.toString(), title: 'loadRooms');
+    console.error(error.toString(), title: 'loadRooms');
   }
 
   return rooms;

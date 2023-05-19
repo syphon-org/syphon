@@ -38,16 +38,16 @@ class Storage {
   static const sqliteLocation = '${Values.appLabel}-cold-storage.db';
 
   // cold storage references
-  static StorageDatabase? database;
+  static ColdStorageDatabase? database;
 }
 
-Future<StorageDatabase> initStorage({AppContext context = const AppContext(), String pin = ''}) async {
+Future<ColdStorageDatabase> initStorage({AppContext context = const AppContext(), String pin = ''}) async {
   final database = openDatabaseThreaded(context, pin: pin);
   Storage.database = database;
   return database;
 }
 
-Future<void> closeStorage(StorageDatabase? storage) async {
+Future<void> closeStorage(ColdStorageDatabase? storage) async {
   if (storage != null) {
     storage.close();
   }
@@ -68,7 +68,7 @@ Future deleteStorage({AppContext context = const AppContext()}) async {
     final file = File(path.join(appDir.path, storageLocation));
     await file.delete();
   } catch (error) {
-    log.error('[deleteColdStorage] $error');
+    console.error('[deleteColdStorage] $error');
   }
 }
 
@@ -81,7 +81,7 @@ Future deleteStorage({AppContext context = const AppContext()}) async {
 /// for example, only load users that are known to be
 /// involved in stored messages/events
 ///
-Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
+Future<Map<String, dynamic>> loadStorage(ColdStorageDatabase storage) async {
   try {
     final userIds = <String>[];
     final messages = <String, List<Message>>{};
@@ -135,7 +135,7 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
       StorageKeys.MESSAGE_SESSIONS: messageSessions,
     };
   } catch (error) {
-    log.error('[loadStorage] $error');
+    console.error('[loadStorage] $error');
     return {};
   }
 }
@@ -146,7 +146,7 @@ Future<Map<String, dynamic>> loadStorage(StorageDatabase storage) async {
 // finishes loading cold storage objects to RAM, this can
 // be much more specific and performant
 //
-loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
+loadStorageAsync(ColdStorageDatabase storage, Store<AppState> store) {
   try {
     final rooms = store.state.roomStore.roomList;
     final messages = store.state.eventStore.messages;
@@ -189,6 +189,6 @@ loadStorageAsync(StorageDatabase storage, Store<AppState> store) {
 
     loadAsync();
   } catch (error) {
-    log.error('[loadStorageAsync] $error');
+    console.error('[loadStorageAsync] $error');
   }
 }

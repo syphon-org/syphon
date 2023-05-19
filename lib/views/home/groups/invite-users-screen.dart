@@ -145,8 +145,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   /// also attempts to invite users directly if a room id already exists
   ///
   onConfirmInvites(_Props props) async {
-    final arguments = useScreenArguments<InviteUsersArguments>(context);
-    final roomId = arguments?.roomId;
+    final arguments = useScreenArguments<InviteUsersArguments>(context, InviteUsersArguments());
+    final roomId = arguments.roomId;
 
     if (roomId != null && invites.isNotEmpty) {
       await onSendInvites(props);
@@ -161,7 +161,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   ///
   onSendInvites(_Props props) async {
     FocusScope.of(context).unfocus();
-    final arguments = useScreenArguments<InviteUsersArguments>(context);
+    final arguments = useScreenArguments<InviteUsersArguments>(context, InviteUsersArguments());
     final store = StoreProvider.of<AppState>(context);
 
     final roomId = arguments?.roomId;

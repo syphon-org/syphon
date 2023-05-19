@@ -13,7 +13,7 @@ import 'package:syphon/global/print.dart';
 /// In storage, reactions are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 ///
-extension ReactionQueries on StorageDatabase {
+extension ReactionQueries on ColdStorageDatabase {
   Future<void> insertReactionsBatched(List<Reaction> reactions) {
     // HACK: temporary to account for sqlite versions without UPSERT
     if (Platform.isLinux) {
@@ -57,14 +57,14 @@ extension ReactionQueries on StorageDatabase {
 
 Future<void> saveReactions(
   List<Reaction> reactions, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   await storage.insertReactionsBatched(reactions);
 }
 
 Future<void> saveReactionsRedacted(
   List<Redaction> redactions, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   final reactionIds = redactions.map((redaction) => redaction.redactId ?? '').toList();
   final reactions = await storage.selectReactionsById(reactionIds);
@@ -78,14 +78,14 @@ Future<void> saveReactionsRedacted(
 ///
 ///
 Future<List<Reaction>> loadReactions({
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   required String roomId,
   List<String> eventIds = const [],
 }) async {
   try {
     return storage.selectReactionsPerEvent(roomId, eventIds);
   } catch (error) {
-    log.error(error.toString(), title: 'loadReactions');
+    console.error(error.toString(), title: 'loadReactions');
     return [];
   }
 }
@@ -95,7 +95,7 @@ Future<List<Reaction>> loadReactions({
 ///
 ///
 Future<Map<String, List<Reaction>>> loadReactionsMapped({
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   required String roomId,
   List<String> eventIds = const [],
 }) async {
@@ -112,7 +112,7 @@ Future<Map<String, List<Reaction>>> loadReactionsMapped({
           .toList(),
     );
   } catch (error) {
-    log.error(error.toString(), title: 'loadReactions');
+    console.error(error.toString(), title: 'loadReactions');
     return {};
   }
 }

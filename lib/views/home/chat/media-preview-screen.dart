@@ -45,7 +45,10 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
 
   @override
   onMounted() async {
-    final params = useScreenArguments<MediaPreviewArguments>(context);
+    final params = useScreenArguments<MediaPreviewArguments>(
+      context,
+      MediaPreviewArguments(onConfirmSend: () {}),
+    );
 
     try {
       final firstImage = params?.mediaList.first;
@@ -54,13 +57,17 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
         currentImage = firstImage;
       });
     } catch (error) {
-      log.error(error.toString());
+      console.error(error.toString());
     }
   }
 
   onConfirm(_Props props) async {
-    final params = useScreenArguments<MediaPreviewArguments>(context);
-    await params?.onConfirmSend();
+    final params = useScreenArguments<MediaPreviewArguments>(
+      context,
+      MediaPreviewArguments(onConfirmSend: () {}),
+    );
+
+    await params.onConfirmSend();
     Navigator.pop(context);
   }
 
@@ -68,9 +75,11 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
-          store,
-          useScreenArguments<MediaPreviewArguments>(context)?.roomId,
-        ),
+            store,
+            useScreenArguments<MediaPreviewArguments>(
+              context,
+              MediaPreviewArguments(onConfirmSend: () {}),
+            ).roomId),
         builder: (context, props) {
           final encryptionEnabled = props.room.encryptionEnabled;
           final height = MediaQuery.of(context).size.height;

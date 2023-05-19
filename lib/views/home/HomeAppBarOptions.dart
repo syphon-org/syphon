@@ -70,7 +70,7 @@ class AppBarHomeOptions extends HookWidget implements PreferredSizeWidget {
 
               onDismissChatOptions?.call();
             } catch (error) {
-              log.error(error.toString());
+              console.error(error.toString());
             }
 
             Navigator.of(dialogContext).pop();
@@ -99,7 +99,7 @@ class AppBarHomeOptions extends HookWidget implements PreferredSizeWidget {
 
               onDismissChatOptions?.call();
             } catch (error) {
-              log.error(error.toString());
+              console.error(error.toString());
             }
 
             Navigator.of(dialogContext).pop();

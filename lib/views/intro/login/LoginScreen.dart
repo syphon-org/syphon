@@ -32,7 +32,7 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 
 class LoginScreenArguments {
   final bool multiaccount;
-  LoginScreenArguments({this.multiaccount = true});
+  LoginScreenArguments({this.multiaccount = false});
 }
 
 class LoginScreen extends HookWidget {
@@ -42,14 +42,18 @@ class LoginScreen extends HookWidget {
   Widget build(BuildContext context) {
     final dispatch = useDispatch<AppState>();
     final Size(:width, :height) = useDimensions(context);
-    final LoginScreenArguments(:multiaccount) = useArguments<LoginScreenArguments>(context);
+
+    final LoginScreenArguments(:multiaccount) = useScreenArguments<LoginScreenArguments>(
+      context,
+      LoginScreenArguments(),
+    );
 
     final passwordFocus = useFocusNode();
     final usernameController = useTextEditingController();
     final avatarHash = useMemoized(() => Random().nextInt(2), []);
 
     final (visibility, setVisibility) = useStateful<bool>(false);
-    final (currentAuthType, setCurrentAuthType) = useStateful<AuthTypes?>(AuthTypes.Password);
+    final (currentAuthing, setCurrentAuthing) = useStateful<AuthTypes?>(null);
 
     final loading = useSelector<AppState, bool>((state) => state.authStore.loading, false);
     final hostname = useSelector<AppState, String>((state) => state.authStore.hostname, Values.empty);
@@ -132,7 +136,7 @@ class LoginScreen extends HookWidget {
     }
 
     onLoginPassword() async {
-      setCurrentAuthType(AuthTypes.Password);
+      setCurrentAuthing(AuthTypes.Password);
 
       final authExists = availableUsers.indexWhere(
         (user) => user.userId == userIdHint,
@@ -146,15 +150,15 @@ class LoginScreen extends HookWidget {
         await onLoginUser();
       }
 
-      setCurrentAuthType(null);
+      setCurrentAuthing(null);
     }
 
     onLoginSSO() async {
-      setCurrentAuthType(AuthTypes.SSO);
+      setCurrentAuthing(AuthTypes.SSO);
 
       await onLoginUserSSO();
 
-      setCurrentAuthType(null);
+      setCurrentAuthing(null);
     }
 
     onToggleShowPassword() {
@@ -476,8 +480,8 @@ class LoginScreen extends HookWidget {
                                 visible: isPasswordLoginAvailable,
                                 child: ButtonSolid(
                                   text: Strings.buttonLogin,
-                                  loading: loading && currentAuthType == AuthTypes.Password,
-                                  disabled: !isPasswordLoginAttemptable || currentAuthType != null,
+                                  loading: loading && currentAuthing == AuthTypes.Password,
+                                  disabled: !isPasswordLoginAttemptable || currentAuthing != null,
                                   onPressed: () => onLoginPassword(),
                                 ),
                               ),
@@ -487,8 +491,8 @@ class LoginScreen extends HookWidget {
                                   padding: const EdgeInsets.only(top: 12, bottom: 12),
                                   child: ButtonSolid(
                                     text: Strings.buttonLoginSSO,
-                                    loading: loading && currentAuthType == AuthTypes.SSO,
-                                    disabled: !isSSOLoginAttemptable || currentAuthType != null,
+                                    loading: loading && currentAuthing == AuthTypes.SSO,
+                                    disabled: !isSSOLoginAttemptable || currentAuthing != null,
                                     onPressed: () => onLoginSSO(),
                                   ),
                                 ),
@@ -499,8 +503,8 @@ class LoginScreen extends HookWidget {
                                   padding: const EdgeInsets.only(top: 12, bottom: 12),
                                   child: ButtonText(
                                     text: Strings.buttonLoginSSO,
-                                    loading: loading && currentAuthType == AuthTypes.SSO,
-                                    disabled: !isSSOLoginAttemptable || currentAuthType != null,
+                                    loading: loading && currentAuthing == AuthTypes.SSO,
+                                    disabled: !isSSOLoginAttemptable || currentAuthing != null,
                                     onPressed: () => onLoginSSO(),
                                   ),
                                 ),

@@ -76,7 +76,7 @@ Future<File?> scrubMedia({
 
     return await tempFile.writeAsBytes(mediaScrubbed, flush: true);
   } catch (error) {
-    log.error(error.toString());
+    console.error(error.toString());
     return null;
   }
 }

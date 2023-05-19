@@ -137,7 +137,7 @@ ThunkAction<AppState> generateIdentityKeys() {
       // return the generated keys
       return deviceKeysOwned;
     } catch (error) {
-      log.error('[generateIdentityKeys] $error');
+      console.error('[generateIdentityKeys] $error');
       return null;
     }
   };
@@ -237,7 +237,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeyCounts) 
   return (Store<AppState> store) async {
     final currentKeyCounts = store.state.cryptoStore.oneTimeKeysCounts;
 
-    log.info('[updateOneTimeKeyCounts] $oneTimeKeyCounts, current $currentKeyCounts');
+    console.info('[updateOneTimeKeyCounts] $oneTimeKeyCounts, current $currentKeyCounts');
 
     // Confirm user has access token
     final accessToken = store.state.authStore.user.accessToken;
@@ -270,7 +270,7 @@ ThunkAction<AppState> updateOneTimeKeyCounts(Map<String, int> oneTimeKeyCounts) 
       return;
     }
 
-    log.info(
+    console.info(
       '[updateOneTimeKeyCounts] Updating $oneTimeKeyCounts, current $currentKeyCounts',
     );
 
@@ -322,7 +322,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         throw data['error'];
       }
 
-      log.info('[updateOneTimeKeys] successfully uploaded oneTimeKeys');
+      console.info('[updateOneTimeKeys] successfully uploaded oneTimeKeys');
 
       // save account state after successful upload
       olmAccount.mark_keys_as_published();
@@ -333,7 +333,7 @@ ThunkAction<AppState> updateOneTimeKeys({type = Algorithms.signedcurve25519}) {
         Map<String, int>.from(data['one_time_key_counts']),
       ));
 
-      log.info('[updateOneTimeKeys] successfully updated oneTimeKeys');
+      console.info('[updateOneTimeKeys] successfully updated oneTimeKeys');
     } catch (error) {
       store.dispatch(addAlert(
           error: error,
@@ -373,7 +373,7 @@ ThunkAction<AppState> claimOneTimeKeys({
 
       // stop if one time keys for known devices already exist
       if (claimKeysPayload.isEmpty) {
-        log.info(
+        console.info(
           '[claimOneTimeKeys] all key sharing sessions per device are ready',
         );
         return true;
@@ -388,7 +388,7 @@ ThunkAction<AppState> claimOneTimeKeys({
       );
 
       if (claimKeysResponse['errcode'] != null || claimKeysResponse['failures'].isNotEmpty) {
-        log.json({
+        console.json({
           'error': claimKeysResponse,
         });
         throw claimKeysResponse['errcode'];

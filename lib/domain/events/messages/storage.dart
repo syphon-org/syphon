@@ -14,7 +14,7 @@ import 'package:syphon/global/print.dart';
 /// In storage, messages are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 ///
-extension MessageQueries on StorageDatabase {
+extension MessageQueries on ColdStorageDatabase {
   Future<void> insertMessagesBatched(List<Message> messages) {
     // HACK: temporary to account for sqlite versions without UPSERT
     if (Platform.isLinux) {
@@ -125,21 +125,21 @@ extension MessageQueries on StorageDatabase {
 
 Future<void> saveMessages(
   List<Message> messages, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   await storage.insertMessagesBatched(messages);
 }
 
 Future<void> deleteMessages(
   List<Message> messages, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   await storage.deleteMessages(messages.map((e) => e.id!).toList());
 }
 
 Future<void> saveMessagesRedacted(
   List<Redaction> redactions, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   final messageIds = redactions.map((redaction) => redaction.redactId ?? '').toList();
   final messages = await storage.selectMessagesIds(messageIds);
@@ -149,7 +149,7 @@ Future<void> saveMessagesRedacted(
 }
 
 Future<List<Message>> loadMessages({
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   required String roomId,
   int timestamp = 0,
   int offset = 0,
@@ -177,14 +177,14 @@ Future<List<Message>> loadMessages({
       limit: limit,
     );
   } catch (error) {
-    log.error(error.toString(), title: 'loadMessages');
+    console.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
 
 Future<List<Message>> loadMessagesRoom(
   String roomId, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   int timestamp = 0,
   int offset = 0,
   int limit = DEFAULT_LOAD_LIMIT,
@@ -196,14 +196,14 @@ Future<List<Message>> loadMessagesRoom(
       limit: limit,
     );
   } catch (error) {
-    log.error(error.toString(), title: 'loadMessages');
+    console.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
 
 Future<List<Message>> searchMessagesStored(
   String text, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) {
   return storage.searchMessageBodys(text);
 }
@@ -217,7 +217,7 @@ Future<List<Message>> searchMessagesStored(
 /// TODO: implemented a quick AOT decryption will
 /// prevent needing a cached table for this
 //
-extension DecryptedQueries on StorageDatabase {
+extension DecryptedQueries on ColdStorageDatabase {
   Future<void> insertDecryptedBatched(List<Message> decrypted) {
     // HACK: temporary to account for sqlite versions without UPSERT
     if (Platform.isLinux) {
@@ -293,13 +293,13 @@ extension DecryptedQueries on StorageDatabase {
 
 Future<void> saveDecrypted(
   List<Message> messages, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   await storage.insertDecryptedBatched(messages);
 }
 
 Future<List<Message>> loadDecrypted({
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   String? roomId,
   int offset = 0,
   int limit = DEFAULT_LOAD_LIMIT,
@@ -307,7 +307,7 @@ Future<List<Message>> loadDecrypted({
   try {
     return storage.selectDecrypted(roomId);
   } catch (error) {
-    log.error(error.toString(), title: 'loadMessages');
+    console.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }
@@ -322,7 +322,7 @@ Future<List<Message>> loadDecrypted({
 ///
 Future<List<Message>> loadDecryptedRoom(
   String roomId, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   int offset = 0,
   int limit = DEFAULT_LOAD_LIMIT, // default amount loaded
 }) async {
@@ -339,7 +339,7 @@ Future<List<Message>> loadDecryptedRoom(
       limit: limit,
     );
   } catch (error) {
-    log.error(error.toString(), title: 'loadMessages');
+    console.error(error.toString(), title: 'loadMessages');
     return [];
   }
 }

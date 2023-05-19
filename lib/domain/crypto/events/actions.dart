@@ -115,7 +115,7 @@ ThunkAction<AppState> backfillDecryptMessages(
         messages: decrypted,
       ));
     } catch (error) {
-      log.error('[syncDevice] $error');
+      console.error('[syncDevice] $error');
     }
   };
 }
@@ -151,7 +151,7 @@ ThunkAction<AppState> decryptMessages(
 
             decryptedAll.add(decryptedMessage);
           } catch (error) {
-            log.warn('[decryptMessage] $error');
+            console.warn('[decryptMessage] $error');
 
             if (!sentKeyRequest && verified) {
               sentKeyRequest = true;
@@ -165,7 +165,7 @@ ThunkAction<AppState> decryptMessages(
 
         return decryptedAll;
       } catch (error) {
-        log.error(
+        console.error(
           '[decryptMessage(s)] ${room.name ?? 'Unknown Room'} $error',
         );
       } finally {
@@ -470,7 +470,7 @@ ThunkAction<AppState> syncDevice(Map toDeviceRaw) {
                 backfillDecryptMessages(roomId);
               }
             } catch (error) {
-              log.error('[decryptKeyEvent] [ERROR] $error');
+              console.error('[decryptKeyEvent] [ERROR] $error');
             }
 
             break;

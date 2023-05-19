@@ -7,7 +7,6 @@ import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/messages/selectors.dart';
 import 'package:syphon/domain/events/reactions/actions.dart';
 import 'package:syphon/domain/events/selectors.dart';
-import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/selectors.dart';
@@ -18,6 +17,7 @@ import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
 import 'package:syphon/views/widgets/messages/typing-indicator.dart';
@@ -34,6 +34,7 @@ class MessageList extends HookWidget {
     this.onSelectReply,
     this.onViewUserDetails,
     this.onToggleSelectedMessage,
+    super.key,
   });
 
   final String roomId;
@@ -127,7 +128,7 @@ class MessageList extends HookWidget {
       try {
         dispatch(selectReply(roomId: roomId, message: message));
       } catch (error) {
-        log.error(error.toString());
+        console.error(error.toString());
       }
     }
 
@@ -135,7 +136,7 @@ class MessageList extends HookWidget {
       try {
         dispatch(sendMessageExisting(roomId: roomId, message: message));
       } catch (error) {
-        log.error(error.toString());
+        console.error(error.toString());
       }
     }
 

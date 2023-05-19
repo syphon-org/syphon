@@ -66,10 +66,10 @@ class CacheSerializer implements StateSerializer<AppState> {
             final storeRef = StoreRef<String, String>.main();
             await storeRef.record(type).put(cache!, jsonEncrypted);
           } catch (error) {
-            log.error('[CacheSerializer|database] $error');
+            console.error('[CacheSerializer|database] $error');
           }
         } catch (error) {
-          log.error(
+          console.error(
             '[CacheSerializer|encryption] ${store.runtimeType} $error',
           );
         }
@@ -133,7 +133,7 @@ class CacheSerializer implements StateSerializer<AppState> {
             break;
         }
       } catch (error) {
-        log.error('[CacheSerializer.decode] $error');
+        console.error('[CacheSerializer.decode] $error');
       }
     });
 

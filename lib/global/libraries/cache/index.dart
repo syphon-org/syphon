@@ -70,12 +70,12 @@ Future<Database?> initCache({AppContext context = const AppContext()}) async {
       );
     }
 
-    log.info('[initCache] $cacheLocation $cacheKey');
+    console.info('[initCache] $cacheLocation $cacheKey');
 
     Cache.cacheKey = cacheKey;
     return await cacheFactory.openDatabase(cacheLocation);
   } catch (error) {
-    log.error('[initCache] $error');
+    console.error('[initCache] $error');
     return null;
   }
 }
@@ -109,7 +109,7 @@ deleteCache({AppContext context = const AppContext()}) async {
     await cacheFactory.deleteDatabase(cacheLocation);
     await deleteKey(cacheKeyId);
   } catch (error) {
-    log.error('[deleteCache] $error');
+    console.error('[deleteCache] $error');
   }
 }
 

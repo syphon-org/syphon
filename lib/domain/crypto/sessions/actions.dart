@@ -172,7 +172,7 @@ ThunkAction<AppState> loadKeySessionOutbound({
       final deviceId = store.state.authStore.user.deviceId!;
       final keySessions = selectKeySessions(store, identityKey);
 
-      log.info('[loadKeySessionOutbound] checking outbounds for $identityKey');
+      console.info('[loadKeySessionOutbound] checking outbounds for $identityKey');
 
       for (final session in keySessions.reversed) {
         try {
@@ -183,16 +183,17 @@ ThunkAction<AppState> loadKeySessionOutbound({
 
           final keySessionType = keySession.encrypt_message_type();
 
-          log.info('[loadKeySessionOutbound] found $keySessionId for $identityKey of type $keySessionType');
+          console
+              .info('[loadKeySessionOutbound] found $keySessionId for $identityKey of type $keySessionType');
           return keySession;
         } catch (error) {
-          log.info('[loadKeySessionOutbound] unsuccessful $identityKey $error');
+          console.info('[loadKeySessionOutbound] unsuccessful $identityKey $error');
         }
       }
 
       throw 'No valid sessions found $identityKey';
     } catch (error) {
-      log.error('[loadKeySessionOutbound] failure $identityKey $error');
+      console.error('[loadKeySessionOutbound] failure $identityKey $error');
       return null;
     }
   };
@@ -216,7 +217,7 @@ ThunkAction<AppState> loadKeySessionInbound({
     // filter all key session saved under a certain identityKey
     final keySessions = selectKeySessions(store, identityKey);
 
-    log.info('[loadKeySessionInbound] checking known sessions for sender $identityKey');
+    console.info('[loadKeySessionInbound] checking known sessions for sender $identityKey');
 
     // reverse the list to attempt the latest first (LinkedHashMap will know)
     for (final session in keySessions.reversed) {
@@ -228,23 +229,23 @@ ThunkAction<AppState> loadKeySessionInbound({
         // this returns a flag indicating whether the message was encrypted using that session
         final keySessionMatch = keySession.matches_inbound(body);
 
-        log.info('[loadKeySessionInbound] $keySessionId session matched $keySessionMatch');
+        console.info('[loadKeySessionInbound] $keySessionId session matched $keySessionMatch');
 
         if (keySessionMatch) {
           return keySession;
         }
 
-        log.info('[loadKeySessionInbound] $keySessionId attempting decryption');
+        console.info('[loadKeySessionInbound] $keySessionId attempting decryption');
 
         // attempt decryption in case its not a locally known inbound session state
         keySession.decrypt(type, body);
 
-        log.info('[loadKeySessionInbound] $keySessionId successfully decrypted');
+        console.info('[loadKeySessionInbound] $keySessionId successfully decrypted');
 
         // Return a fresh key session having not decrypted the payload
         return olm.Session()..unpickle(deviceId, session);
       } catch (error) {
-        log.error('[loadKeySessionInbound] unsuccessful $error');
+        console.error('[loadKeySessionInbound] unsuccessful $error');
       }
     }
 
@@ -272,7 +273,7 @@ ThunkAction<AppState> loadKeySessionInbound({
         return newKeySession;
       }
     } catch (error) {
-      log.error('[loadKeySessionInbound] $error');
+      console.error('[loadKeySessionInbound] $error');
     }
 
     return null;
@@ -326,7 +327,7 @@ ThunkAction<AppState> loadMessageSessionInbound({
 
         return messageSession;
       } catch (error) {
-        log.warn('[loadMessageSessionInbound] valid session could not decrypt message');
+        console.warn('[loadMessageSessionInbound] valid session could not decrypt message');
       }
     }
 
@@ -521,7 +522,7 @@ ThunkAction<AppState> exportSessionKeys(String password) {
 
       // for debugging only
       if (DEBUG_MODE && DEBUG_OLM_MODE) {
-        log.jsonDebug({
+        console.jsonDebug({
           'sessionData': sessionData,
         });
       }
@@ -599,7 +600,7 @@ ThunkAction<AppState> importSessionKeys(FilePickerResult file, {String? password
         if (DEBUG_MODE && DEBUG_OLM_MODE) {
           final sessionIdNew = inboundSession.session_id();
 
-          log.jsonDebug({
+          console.jsonDebug({
             'sessionIdNew': sessionIdNew,
             'sessionIndexNew': sessionIndexNew,
           });

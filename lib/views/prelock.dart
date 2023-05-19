@@ -67,7 +67,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
   Timer? backgroundLockLatencyTimer;
 
   Database? cache;
-  StorageDatabase? storage;
+  ColdStorageDatabase? storage;
   Store<AppState>? store;
   AppContext? appContext;
 
@@ -87,7 +87,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     if (!locked) {
       await _onLoadStorage();
 
-      log.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+      console.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushReplacement(
         PageRouteBuilder(
@@ -185,7 +185,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     } else {
       await _onLoadStorage();
 
-      log.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+      console.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushAndRemoveUntil(
         PageRouteBuilder(

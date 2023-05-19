@@ -46,7 +46,7 @@ class MessageDetailsScreen extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          useScreenArguments<MessageDetailArguments>(context),
+          useScreenArguments<MessageDetailArguments>(context, MessageDetailArguments()),
         ),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;

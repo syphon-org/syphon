@@ -33,7 +33,7 @@ ThunkAction<AppState> sendRedaction({Room? room, Event? event}) {
         eventId: event!.id,
       );
     } catch (error) {
-      log.error('[sendRedaction] $error');
+      console.error('[sendRedaction] $error');
     }
   };
 }
@@ -89,7 +89,7 @@ ThunkAction<AppState> redactEvents({required Room room, List<Redaction> redactio
       // save redactions to cold storage
       store.dispatch(SaveRedactions(redactions: redactions));
     } catch (error) {
-      log.error('[redactEvents] $error');
+      console.error('[redactEvents] $error');
     }
   };
 }

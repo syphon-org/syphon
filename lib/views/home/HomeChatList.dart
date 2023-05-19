@@ -3,7 +3,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/selectors.dart';
-import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/rooms/room/selectors.dart';
@@ -14,8 +13,8 @@ import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
-
 import 'package:syphon/global/libraries/matrix/events/types.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 

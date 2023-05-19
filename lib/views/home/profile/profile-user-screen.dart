@@ -22,7 +22,7 @@ class UserProfileScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final dispatch = useDispatch<AppState>();
-    final arguments = useScreenArguments<UserProfileArguments>(context)!;
+    final arguments = useScreenArguments<UserProfileArguments>(context, UserProfileArguments());
 
     final headerOpacity = useState(1.0);
 

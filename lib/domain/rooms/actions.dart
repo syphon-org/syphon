@@ -151,7 +151,7 @@ ThunkAction<AppState> fetchRoom(
 
       await store.dispatch(syncRooms(payload));
     } catch (error) {
-      log.error('[fetchRoom] $roomId $error');
+      console.error('[fetchRoom] $roomId $error');
     } finally {
       store.dispatch(UpdateRoom(id: roomId, syncing: false));
     }
@@ -166,7 +166,7 @@ ThunkAction<AppState> fetchRoom(
 ThunkAction<AppState> fetchRooms({bool syncState = false}) {
   return (Store<AppState> store) async {
     try {
-      log.info('[fetchRooms] *** starting fetch all rooms *** ');
+      console.info('[fetchRooms] *** starting fetch all rooms *** ');
       final data = await MatrixApi.fetchRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -187,7 +187,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
             await store.dispatch(fetchRoom(room.id, fetchState: syncState));
             await store.dispatch(fetchRoomMembers(room: room));
           } catch (error) {
-            log.error('[fetchRoom(s)] ${room.id} $error');
+            console.error('[fetchRoom(s)] ${room.id} $error');
           } finally {
             store.dispatch(UpdateRoom(id: room.id, syncing: false));
           }
@@ -195,7 +195,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
       );
     } catch (error) {
       // WARNING: Silent error, throws error if they have no direct message
-      log.error('[fetchRoom(s)] $error');
+      console.error('[fetchRoom(s)] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -212,7 +212,7 @@ ThunkAction<AppState> fetchRooms({bool syncState = false}) {
 ThunkAction<AppState> fetchDirectRooms() {
   return (Store<AppState> store) async {
     try {
-      log.info('[fetchDirectRooms] *** fetch direct rooms *** ');
+      console.info('[fetchDirectRooms] *** fetch direct rooms *** ');
       final data = await MatrixApi.fetchDirectRoomIds(
         protocol: store.state.authStore.protocol,
         homeserver: store.state.authStore.user.homeserver,
@@ -235,11 +235,11 @@ ThunkAction<AppState> fetchDirectRooms() {
         try {
           await store.dispatch(fetchRoom(roomId, direct: true));
         } catch (error) {
-          log.error('[fetchDirectRooms] $error');
+          console.error('[fetchDirectRooms] $error');
         }
       }));
     } catch (error) {
-      log.error('[fetchDirectRooms] $error');
+      console.error('[fetchDirectRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -288,7 +288,7 @@ ThunkAction<AppState> fetchRoomMembers({required Room room}) {
         ),
       );
     } catch (error) {
-      log.error('[updateRoom] $error');
+      console.error('[updateRoom] $error');
       return null;
     } finally {
       store.dispatch(SetLoading(loading: false));
@@ -555,7 +555,7 @@ ThunkAction<AppState> toggleDirectRoom({
       // Refresh room information with toggle enabled
       await store.dispatch(fetchRoom(room.id, direct: enabled));
     } catch (error) {
-      log.error('[toggleDirectRoom] $error');
+      console.error('[toggleDirectRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -787,7 +787,7 @@ ThunkAction<AppState> removeRoom({Room? room}) {
 
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      log.error('[removeRoom] $error');
+      console.error('[removeRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -835,7 +835,7 @@ ThunkAction<AppState> leaveRoom({Room? room}) {
 
       store.dispatch(RemoveRoom(roomId: room.id));
     } catch (error) {
-      log.error('[leaveRoom] $error');
+      console.error('[leaveRoom] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }
@@ -849,7 +849,7 @@ ThunkAction<AppState> archiveRoom({Room? room}) {
     try {
       store.dispatch(AddArchive(roomId: room!.id));
     } catch (error) {
-      log.error('[archiveRoom] $error');
+      console.error('[archiveRoom] $error');
     }
   };
 }

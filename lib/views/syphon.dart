@@ -35,7 +35,7 @@ import 'package:syphon/views/prelock.dart';
 class Syphon extends StatefulWidget {
   final Database? cache;
   final Store<AppState> store;
-  final StorageDatabase? storage;
+  final ColdStorageDatabase? storage;
 
   const Syphon(
     this.cache,
@@ -63,7 +63,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   late Store<AppState> store;
 
   Database? cache;
-  StorageDatabase? storage;
+  ColdStorageDatabase? storage;
   AppContext? appContext;
 
   final globalScaffold = GlobalKey<ScaffoldMessengerState>();
@@ -275,9 +275,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   onDeleteContextStorage(AppContext context) async {
     if (context.id.isEmpty) {
-      log.info('[onContextChanged] DELETING DEFAULT CONTEXT');
+      console.info('[onContextChanged] DELETING DEFAULT CONTEXT');
     } else {
-      log.info('[onDeleteContext] DELETING CONTEXT DATA ${context.id}');
+      console.info('[onDeleteContext] DELETING CONTEXT DATA ${context.id}');
     }
 
     await deleteCache(context: context);
@@ -287,7 +287,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   // Reset contexts if the current user has no accessToken (unrecoverable state)
   onResetContext() async {
-    log.error('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
+    console.error('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
 
     resetContextsAll();
 

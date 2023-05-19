@@ -83,7 +83,7 @@ ThunkAction<AppState> initOlmEncryption(User user) {
         store.dispatch(SetOlmAccount(olmAccount: olmAccount));
       }
     } catch (error) {
-      log.error('[initOlmEncryption] $error');
+      console.error('[initOlmEncryption] $error');
     }
   };
 }
@@ -162,13 +162,13 @@ ThunkAction<AppState> updateKeySessions({
       );
 
       if (DEBUG_MODE && DEBUG_OLM_MODE) {
-        log.jsonDebug({'updateKeySessions': 'HIT'});
+        console.jsonDebug({'updateKeySessions': 'HIT'});
       }
 
       store.dispatch(setDeviceKeys(deviceKeysRoomUsers));
 
       if (DEBUG_MODE && DEBUG_OLM_MODE) {
-        log.jsonDebug({'updateKeySessions': 'SET'});
+        console.jsonDebug({'updateKeySessions': 'SET'});
       }
 
       // get deviceKeys for every user present in the chat
@@ -178,7 +178,7 @@ ThunkAction<AppState> updateKeySessions({
       );
 
       if (devicesWithoutMessageSessions.isEmpty) {
-        log.info(
+        console.info(
           '[updateKeySessions] all device sessions have a message session for room',
         );
         return;
@@ -248,9 +248,9 @@ ThunkAction<AppState> updateKeySessions({
               throw response['error'];
             }
 
-            log.info('[sendSessionKeys] success! $randomNumber');
+            console.info('[sendSessionKeys] success! $randomNumber');
           } catch (error) {
-            log.error('[sendSessionKeys] $error');
+            console.error('[sendSessionKeys] $error');
           }
         },
       ));

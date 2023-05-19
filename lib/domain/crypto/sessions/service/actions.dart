@@ -14,10 +14,10 @@ ThunkAction<AppState> startKeyBackupService() {
     final frequency = store.state.settingsStore.privacySettings.keyBackupInterval;
 
     if (frequency == Duration.zero) {
-      log.info('[KeyBackupService] disabled - no schedule frequency');
+      console.info('[KeyBackupService] disabled - no schedule frequency');
       return Future.value();
     } else {
-      log.info('[KeyBackupService] initing');
+      console.info('[KeyBackupService] initing');
       await KeyBackupService.init();
     }
 
@@ -42,7 +42,7 @@ ThunkAction<AppState> startKeyBackupService() {
     final nextBackupDelta = nextBackup.difference(DateTime.now());
 
     if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
-      log.jsonDebug({
+      console.jsonDebug({
         'frequency': frequency.toString(),
         'lastBackup': lastBackup.toIso8601String(),
         'nextBackup': nextBackup.toIso8601String(),

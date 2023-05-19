@@ -60,9 +60,9 @@ HttpClient customHttpClient({String? cert}) {
     }
   } on TlsException catch (e) {
     if (e.osError?.message != null && e.osError!.message.contains('CERT_ALREADY_IN_HASH_TABLE')) {
-      log.info('[customHttpClient] - cert already trusted! Skipping.');
+      console.info('[customHttpClient] - cert already trusted! Skipping.');
     } else {
-      log.error('[customHttpClient] setTrustedCertificateBytes EXCEPTION: $e');
+      console.error('[customHttpClient] setTrustedCertificateBytes EXCEPTION: $e');
       rethrow;
     }
   } finally {}

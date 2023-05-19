@@ -237,7 +237,7 @@ class Message extends Event implements drift.Insertable<Message> {
         try {
           info = Map<String, dynamic>.from(content['info']);
         } catch (error) {
-          log.error('[Message.fromEvent] Info Conversion Failed $error');
+          console.error('[Message.fromEvent] Info Conversion Failed $error');
         }
       }
 
@@ -277,7 +277,7 @@ class Message extends Event implements drift.Insertable<Message> {
         edited: false,
       );
     } catch (error) {
-      log.error('[Message.fromEvent] $error');
+      console.error('[Message.fromEvent] $error');
       return Message(
         id: event.id,
         userId: event.userId,

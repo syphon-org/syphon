@@ -90,7 +90,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
   @override
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final arguments = useScreenArguments<ChatDetailsArguments>(context);
+    final arguments = useScreenArguments<ChatDetailsArguments>(context, ChatDetailsArguments());
 
     if (arguments?.roomId == null) return;
 

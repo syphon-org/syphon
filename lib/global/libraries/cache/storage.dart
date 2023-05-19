@@ -45,7 +45,7 @@ class CacheStorage implements StorageEngine {
         // Load for CacheSerializer to use later
         Cache.cacheStores[type] = jsonDecoded;
       } catch (error) {
-        log.error(error.toString(), title: 'CacheStorage|$type');
+        console.error(error.toString(), title: 'CacheStorage|$type');
       }
     }));
 

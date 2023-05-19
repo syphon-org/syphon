@@ -41,7 +41,7 @@ import 'package:syphon/global/print.dart';
 /// Saves state data to cold storage based
 /// on which redux actions are fired.
 ///
-saveStorageMiddleware(StorageDatabase? storage) {
+saveStorageMiddleware(ColdStorageDatabase? storage) {
   return (
     Store<AppState> store,
     // ignore: no_leading_underscores_for_local_identifiers
@@ -51,7 +51,7 @@ saveStorageMiddleware(StorageDatabase? storage) {
     next(_action);
 
     if (storage == null) {
-      log.warn('storage is null, skipping saving cold storage data!!!', title: 'storageMiddleware');
+      console.warn('storage is null, skipping saving cold storage data!!!', title: 'storageMiddleware');
       return;
     }
 

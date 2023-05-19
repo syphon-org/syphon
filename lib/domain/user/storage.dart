@@ -9,7 +9,7 @@ import 'package:syphon/global/print.dart';
 ///
 /// Room Queries
 ///
-extension UserQueries on StorageDatabase {
+extension UserQueries on ColdStorageDatabase {
   Future<void> insertUsers(List<User> users) {
     // HACK: temporary to account for sqlite versions without UPSERT
     if (Platform.isLinux) {
@@ -37,7 +37,7 @@ extension UserQueries on StorageDatabase {
 
 Future<void> saveUsers(
   Map<String, User> users, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   return storage.insertUsers(users.values.toList());
 }
@@ -46,7 +46,7 @@ Future<void> saveUsers(
 /// Load Users (Cold Storage)
 ///
 Future<Map<String, User>> loadUsers({
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   List<String> ids = const [],
 }) async {
   final Map<String, User> users = {};
@@ -54,7 +54,7 @@ Future<Map<String, User>> loadUsers({
   try {
     final users = await storage.selectUsers(ids);
 
-    log.info('[users] loaded ${users.length}');
+    console.info('[users] loaded ${users.length}');
 
     return Map.fromIterable(
       users,
@@ -62,7 +62,7 @@ Future<Map<String, User>> loadUsers({
       value: (user) => user,
     );
   } catch (error) {
-    log.error(error.toString(), title: 'loadUsers');
+    console.error(error.toString(), title: 'loadUsers');
     return users;
   }
 }
@@ -71,14 +71,14 @@ Future<Map<String, User>> loadUsers({
 /// Load Users All (Cold Storage)
 ///
 Future<Map<String, User>> loadUsersAll({
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   final Map<String, User> users = {};
 
   try {
     final users = await storage.selectUsersAll();
 
-    log.info('[users ALL] loaded ${users.length}');
+    console.info('[users ALL] loaded ${users.length}');
 
     return Map.fromIterable(
       users,
@@ -86,7 +86,7 @@ Future<Map<String, User>> loadUsersAll({
       value: (user) => user,
     );
   } catch (error) {
-    log.error(error.toString(), title: 'loadUsers');
+    console.error(error.toString(), title: 'loadUsers');
     return users;
   }
 }

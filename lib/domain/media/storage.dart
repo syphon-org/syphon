@@ -17,7 +17,7 @@ import 'package:syphon/global/print.dart';
 /// In storage, messages are indexed by eventId
 /// In redux, they're indexed by RoomID and placed in a list
 ///
-extension MediaQueries on StorageDatabase {
+extension MediaQueries on ColdStorageDatabase {
   Future<int> insertMedia(Media media) async {
     // HACK: temporary to account for sqlite versions without UPSERT
     if (Platform.isLinux) {
@@ -44,7 +44,7 @@ extension MediaQueries on StorageDatabase {
 
 Future<bool> checkMedia(
   String? mxcUri, {
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   if (mxcUri == null) return false;
   return (await storage.selectMedia(mxcUri)) != null;
@@ -55,7 +55,7 @@ Future<int> saveMedia(
   Uint8List? data, {
   String? type,
   EncryptInfo? info,
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   return storage.insertMedia(
     Media(mxcUri: mxcUri, data: data, info: info, type: type),
@@ -67,7 +67,7 @@ Future<int> saveMedia(
 /// load one set of media data based on mxc uri
 Future<Media?> loadMedia({
   String? mxcUri,
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   if (mxcUri == null) return null;
   return storage.selectMedia(mxcUri);
@@ -78,14 +78,14 @@ Future<Media?> loadMedia({
 ///
 /// load all media found within media storage
 Future<Map<String, Uint8List>?> loadMediaAll({
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
 }) async {
   try {
     final Map<String, Uint8List> media = {};
 
     final images = await storage.selectMediaAll();
 
-    log.info('[media] loaded ${images.length}');
+    console.info('[media] loaded ${images.length}');
 
     for (final image in images) {
       if (image.mxcUri != null && image.data != null) {
@@ -95,7 +95,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 
     return media;
   } catch (error) {
-    log.error(error.toString(), title: 'loadMediaAll');
+    console.error(error.toString(), title: 'loadMediaAll');
     return null;
   }
 }
@@ -105,7 +105,7 @@ Future<Map<String, Uint8List>?> loadMediaAll({
 ///
 /// load all media found within media storage
 Future<Map<String, Uint8List>> loadMediaRelative({
-  required StorageDatabase storage,
+  required ColdStorageDatabase storage,
   List<User> users = const [],
   List<Room> rooms = const [],
   List<Message> messages = const [],
@@ -121,7 +121,7 @@ Future<Map<String, Uint8List>> loadMediaRelative({
 
     final images = await storage.selectMedias(idsAll);
 
-    log.info('[media] loaded ${images.length}');
+    console.info('[media] loaded ${images.length}');
 
     for (final image in images) {
       if (image.mxcUri != null && image.data != null) {
@@ -129,7 +129,7 @@ Future<Map<String, Uint8List>> loadMediaRelative({
       }
     }
   } catch (error) {
-    log.error(error.toString(), title: 'loadMediaRelative');
+    console.error(error.toString(), title: 'loadMediaRelative');
   }
 
   return media;

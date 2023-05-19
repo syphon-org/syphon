@@ -100,7 +100,7 @@ Future<String?> fetchFavicon({String? url}) async {
 
     return faviconUrl + favicon.attributes['href']!.replaceAll('...', '').replaceAll('//', '/');
   } catch (error) {
-    log.error(error.toString());
+    console.error(error.toString());
   }
 
   return null;
@@ -241,7 +241,7 @@ ThunkAction<AppState> searchUsers({String? searchText}) {
         totalResults: searchResults.length,
       ));
     } catch (error) {
-      log.error('[searchPublicRooms] $error');
+      console.error('[searchPublicRooms] $error');
     } finally {
       store.dispatch(SetLoading(loading: false));
     }

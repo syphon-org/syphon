@@ -11,7 +11,7 @@ import 'package:syphon/global/print.dart';
 /// Loads storage data from cold storage
 /// based  on which redux actions are fired.
 ///
-loadStorageMiddleware(StorageDatabase? storage) {
+loadStorageMiddleware(ColdStorageDatabase? storage) {
   return (
     Store<AppState> store,
     // ignore: no_leading_underscores_for_local_identifiers
@@ -20,7 +20,7 @@ loadStorageMiddleware(StorageDatabase? storage) {
   ) async {
     try {
       if (storage == null) {
-        log.warn(
+        console.warn(
           'storage is null, skipping saving cold storage data!!!',
           title: 'storageMiddleware',
         );
@@ -42,7 +42,7 @@ loadStorageMiddleware(StorageDatabase? storage) {
           break;
       }
     } catch (error) {
-      log.error('[loadStorageMiddleware] $error');
+      console.error('[loadStorageMiddleware] $error');
     }
 
     next(_action);
