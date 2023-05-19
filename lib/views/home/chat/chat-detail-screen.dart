@@ -92,10 +92,10 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
     final store = StoreProvider.of<AppState>(context);
     final arguments = useScreenArguments<ChatDetailsArguments>(context, ChatDetailsArguments());
 
-    if (arguments?.roomId == null) return;
+    if (arguments.roomId == null) return;
 
     store.dispatch(LoadUsers(
-      userIds: selectRoom(id: arguments!.roomId, state: store.state).userIds,
+      userIds: selectRoom(id: arguments.roomId, state: store.state).userIds,
     ));
   }
 

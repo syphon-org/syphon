@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -17,6 +19,7 @@ import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/colors.dart';
+import 'package:syphon/global/diff.dart';
 import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
@@ -77,7 +80,12 @@ class MessageList extends HookWidget {
       <String, Message>{},
     );
 
-    // TODO: identify message updates efficently based on roomMessagesMap above
+    // used to identify if messages have updated
+    final messagesKey = shasum(messagesRaw.keys.expand<int>((e) => e.codeUnits).toList());
+
+    console.debug('[messagesKey]', messagesKey);
+
+    // the key above denotes uniquness
     final messages = useMemoized(
       () => latestMessages(filterMessages(
         combineOutbox(
@@ -86,7 +94,7 @@ class MessageList extends HookWidget {
         ),
         store.state,
       )),
-      [messagesRaw.keys],
+      [messagesKey],
     );
 
     final themeType = useSelector<AppState, ThemeType>(
