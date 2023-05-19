@@ -35,7 +35,7 @@ import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/chat/widgets/MessageList.dart';
-import 'package:syphon/views/home/chat/widgets/chat-input.dart';
+import 'package:syphon/views/home/chat/widgets/ChatInput.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
 import 'package:syphon/views/navigation.dart';
@@ -140,9 +140,7 @@ class ChatScreen extends HookWidget {
     }
 
     onUpdateDeviceKeys() async {
-      final usersDeviceKeys = await dispatch(
-        fetchDeviceKeys(userIds: room.userIds),
-      );
+      final usersDeviceKeys = await dispatch(fetchDeviceKeys(userIds: room.userIds));
 
       dispatch(setDeviceKeys(usersDeviceKeys));
     }

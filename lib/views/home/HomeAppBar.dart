@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/actions.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
@@ -8,6 +7,7 @@ import 'package:syphon/domain/settings/theme-settings/model.dart';
 import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/domain/sync/selectors.dart';
 import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/global/weburl.dart';
