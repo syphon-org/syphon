@@ -15,6 +15,10 @@ void setSystemTheme(ThemeType themeType) {
   );
 }
 
+Brightness useBrightness(BuildContext context) {
+  return Theme.of(context).brightness;
+}
+
 // Set the theme
 // Applies a system theme and returns a ThemeData instance which should be
 // applied immediately to match the system UI

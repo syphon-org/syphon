@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -20,6 +18,7 @@ import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/diff.dart';
+import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
@@ -27,6 +26,7 @@ import 'package:syphon/views/widgets/messages/typing-indicator.dart';
 
 class MessageList extends HookWidget {
   const MessageList({
+    super.key,
     required this.roomId,
     required this.scrollController,
     required this.editorController,
@@ -37,7 +37,6 @@ class MessageList extends HookWidget {
     this.onSelectReply,
     this.onViewUserDetails,
     this.onToggleSelectedMessage,
-    super.key,
   });
 
   final String roomId;
@@ -58,6 +57,7 @@ class MessageList extends HookWidget {
     // global actions
     final store = useStore<AppState>();
     final dispatch = useDispatch<AppState>();
+    final Size(:height) = useDimensions(context);
 
     // global state
     final room = useSelector<AppState, Room>(
@@ -153,7 +153,6 @@ class MessageList extends HookWidget {
     }
 
     onInputReaction({Message? message}) async {
-      final height = MediaQuery.of(context).size.height;
       await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -185,10 +184,7 @@ class MessageList extends HookWidget {
                 ),
               ),
               onEmojiSelected: (category, emoji) {
-                onToggleReaction(
-                  emoji: emoji.emoji,
-                  message: message,
-                );
+                onToggleReaction(emoji: emoji.emoji, message: message);
 
                 Navigator.pop(context, false);
                 onToggleSelectedMessage?.call(null);

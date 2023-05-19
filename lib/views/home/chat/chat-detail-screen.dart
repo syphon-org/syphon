@@ -33,10 +33,7 @@ class ChatDetailsArguments {
   final String? roomId;
   final String? title;
 
-  ChatDetailsArguments({
-    this.roomId,
-    this.title,
-  });
+  ChatDetailsArguments({this.roomId, this.title});
 }
 
 class ChatSettingsScreen extends StatefulWidget {
@@ -603,7 +600,7 @@ class _Props extends Equatable {
           room: selectRoom(state: store.state, id: roomId),
         ));
       },
-      chatColorPrimary: selectChatColor(store, roomId),
+      chatColorPrimary: selectChatColor(store.state, roomId),
       onSelectPrimaryColor: (color) {
         store.dispatch(updateRoomPrimaryColor(
           roomId: roomId,

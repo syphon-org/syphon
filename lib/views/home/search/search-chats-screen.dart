@@ -127,7 +127,7 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
 
         var previewStyle;
         var preview = room.topic;
-        final backgroundColor = selectChatColor(store, room.id);
+        final backgroundColor = selectChatColor(store.state, room.id);
 
         if (preview == null || preview.isEmpty) {
           preview = 'No Description';

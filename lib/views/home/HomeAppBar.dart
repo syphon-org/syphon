@@ -11,7 +11,7 @@ import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/global/weburl.dart';
-import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/home/chat/ChatScreen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-avatar.dart';
 import 'package:syphon/views/widgets/containers/menu-rounded.dart';

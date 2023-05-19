@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/home/HomeScreen.dart';
+import 'package:syphon/views/home/chat/ChatScreen.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-screen.dart';
-import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/groups/group-create-public-screen.dart';
 import 'package:syphon/views/home/groups/group-create-screen.dart';

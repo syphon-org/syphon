@@ -21,7 +21,7 @@ class StoreHookState<S> extends HookState<redux.Store<S>, StoreHook<S>> {
 
 redux.Store<S> useStore<S>() => use(StoreHook<S>());
 
-Dispatch useDispatch<AppState>() => useStore<AppState>().dispatch;
+Dispatch useDispatch<T>() => useStore<T>().dispatch;
 
 Output? useSelectorUnsafe<State, Output>(
   Selector<State, Output> selector, {

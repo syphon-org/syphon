@@ -8,8 +8,8 @@ final _chatColorCache = <String, Color>{};
 ///
 /// Chat Color per Chat or Users
 ///
-Color selectChatColor(Store<AppState> store, String? roomId) {
-  final chatSettings = store.state.settingsStore.chatSettings;
+Color selectChatColor(AppState state, String? roomId) {
+  final chatSettings = state.settingsStore.chatSettings;
 
   // use custom chat color if one has been customized / selected
   if (chatSettings[roomId] != null) {
@@ -21,10 +21,10 @@ Color selectChatColor(Store<AppState> store, String? roomId) {
     return _chatColorCache[roomId]!;
   }
 
-  final room = store.state.roomStore.rooms[roomId!];
-  final currentUserId = store.state.authStore.user.userId;
+  final room = state.roomStore.rooms[roomId!];
+  final currentUserId = state.authStore.user.userId;
 
-  // use the userId to generate a color if
+  // use the userId to generate a color if a direct chat
   if (room != null && room.direct) {
     final userId = room.userIds.firstWhere((id) => id != currentUserId, orElse: () => '');
     if (userId.isNotEmpty) {

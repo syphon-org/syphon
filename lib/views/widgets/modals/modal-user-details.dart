@@ -14,7 +14,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/home/chat/ChatScreen.dart';
 import 'package:syphon/views/home/profile/profile-user-screen.dart';
 import 'package:syphon/views/home/search/search-chats-screen.dart';
 import 'package:syphon/views/navigation.dart';

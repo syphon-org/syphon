@@ -1,9 +1,9 @@
 import 'package:redux/redux.dart';
 import 'package:syphon/domain/index.dart';
 
-bool selectHasDecryptableMessages(Store<AppState> store, String roomId) {
-  final messages = store.state.eventStore.messages;
-  final decrypted = store.state.eventStore.messagesDecrypted;
+bool selectHasDecryptableMessages(AppState state, String roomId) {
+  final messages = state.eventStore.messages;
+  final decrypted = state.eventStore.messagesDecrypted;
 
   final roomMessages = messages[roomId] ?? [];
   final roomDecrypted = decrypted[roomId] ?? [];
