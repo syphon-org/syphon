@@ -2,8 +2,11 @@ import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/settings/models.dart';
+import 'package:syphon/global/formatters.dart';
 
 import 'package:syphon/global/libraries/matrix/events/types.dart';
+import 'package:syphon/global/print.dart';
 
 List<Message> roomMessages(AppState state, String? roomId) {
   final room = state.roomStore.rooms[roomId] ?? Room(id: '');
@@ -151,15 +154,29 @@ Map<String, Message?> replaceEdited(List<Message> messages) {
   return messagesMap;
 }
 
-///
 Message? selectOldestMessage(List<Message> messages, {List<Message>? decrypted}) {
-  if (messages.isEmpty) {
-    return null;
-  }
+  if (messages.isEmpty) return null;
 
   final Message oldestMessage = messages.fold(
     messages.last,
-    (oldest, msg) => msg.timestamp < oldest.timestamp ? msg : oldest,
+    (oldest, msg) {
+      // console.debug(
+      //   '[selectOldestMessage] next',
+      //   formatTimestampFull(
+      //     lastUpdateMillis: oldest.timestamp,
+      //     timeFormat: TimeFormat.hr12,
+      //     showTime: true,
+      //   ),
+      //   oldest.body,
+      //   formatTimestampFull(
+      //     lastUpdateMillis: msg.timestamp,
+      //     timeFormat: TimeFormat.hr12,
+      //     showTime: true,
+      //   ),
+      //   msg.body,
+      // );
+      return msg.timestamp < oldest.timestamp ? msg : oldest;
+    },
   );
 
   if (decrypted != null && decrypted.isNotEmpty) {

@@ -10,6 +10,7 @@ import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/actions.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
 import 'package:syphon/domain/sync/actions.dart';
+import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/libraries/storage/constants.dart';
 import 'package:syphon/global/libraries/storage/index.dart';
@@ -165,6 +166,21 @@ ThunkAction<AppState> loadMessagesCached({
 
       // load cold storage messages to state
       if (messagesStored.isNotEmpty) {
+        console.warn('[loadMessagesCached] Mesages have loaded are not empty');
+        console.debug(
+          messagesStored.last.body,
+          formatTimestampFull(
+            lastUpdateMillis: messagesStored.last.timestamp,
+            showTime: true,
+          ),
+        );
+        console.debug(
+          messagesStored.first.body,
+          formatTimestampFull(
+            lastUpdateMillis: messagesStored.first.timestamp,
+            showTime: true,
+          ),
+        );
         store.dispatch(AddMessages(roomId: room.id, messages: messagesStored));
       }
 
@@ -199,8 +215,11 @@ ThunkAction<AppState> fetchMessageEvents({
         loadMessagesCached(room: room, batch: from, limit: loadLimit, timestamp: timestamp),
       ) as List<Message>;
 
-      // known cached messages for this batch will be loaded
-      if (cached.isNotEmpty) return [];
+      // known cached messages for this batch will be loaded async
+      if (cached.isNotEmpty) {
+        console.debug('known cached messages for this batch will be loaded async');
+        return [];
+      }
 
       final oldest = cached.isEmpty;
 

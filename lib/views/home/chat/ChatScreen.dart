@@ -108,10 +108,6 @@ class ChatScreen extends HookWidget {
       (state) => state.eventStore.messages[roomId] ?? const [],
       const [],
     );
-    final messagesLength = useSelector<AppState, int>(
-      (state) => state.eventStore.messages[roomId]?.length ?? 0,
-      0,
-    );
     final hasDecryptables = useSelector<AppState, bool>(
       (state) => selectHasDecryptableMessages(state, roomId ?? ''),
       false,
@@ -215,12 +211,10 @@ class ChatScreen extends HookWidget {
     }
 
     onFetchNewest() {
-      dispatch(
-        fetchMessageEvents(
-          room: room,
-          from: room.nextBatch,
-        ),
-      );
+      dispatch(fetchMessageEvents(
+        room: room,
+        from: room.nextBatch,
+      ));
     }
 
     onToggleEncryption() {
@@ -229,21 +223,24 @@ class ChatScreen extends HookWidget {
       );
     }
 
-    onLoadMoreMessages() async {
+    console.debug('[ChatScreenBuild] last', messages.length, messages.last.body);
+
+    final onLoadMoreMessages = useCallback(() async {
+      console.debug('[onLoadMoreMessages] last', messages.length, messages.last.body);
+
       // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
-      final oldest = messages.isNotEmpty ? selectOldestMessage(messages) ?? Message() : Message();
+      final oldest = selectOldestMessage(messages) ?? Message();
 
+      console.debug('[onLoadMoreMessages] oldest', messages.length, oldest, oldest.body);
       // fetch messages from the oldest cached batch
-      final messagesNew = await dispatch(
-        fetchMessageEvents(
-          room: room,
-          from: oldest.prevBatch,
-          timestamp: oldest.timestamp,
-        ),
-      );
+      final messagesNew = await dispatch(fetchMessageEvents(
+        room: room,
+        from: oldest.prevBatch,
+        timestamp: oldest.timestamp,
+      ));
 
-      console.debug('Found messages ${messagesNew.length}');
-    }
+      console.debug('[onLoadMoreMessages]', 'Found messages ${messagesNew.length}');
+    }, [messages.length]);
 
     onAttemptDecryption() async {
       // dont attempt to decrypt if encryption is not enabled
@@ -300,7 +297,7 @@ class ChatScreen extends HookWidget {
         onAttemptDecryption();
       }
 
-      if (messagesLength < 10) {
+      if (messages.length < 10) {
         onFetchNewest();
       }
 
@@ -312,8 +309,10 @@ class ChatScreen extends HookWidget {
           ),
         );
       }
+    }, []);
 
-      messagesController.addListener(() {
+    useEffect(() {
+      onLoadMore() {
         final extentBefore = messagesController.position.extentBefore;
         final max = messagesController.position.maxScrollExtent;
 
@@ -323,11 +322,18 @@ class ChatScreen extends HookWidget {
         if (atLimit && !loadMore) {
           setLoadMore(true);
           onLoadMoreMessages();
-        } else if (!atLimit && loadMore && !loading) {
+          return;
+        }
+
+        if (!atLimit && loadMore && !loading) {
           setLoadMore(false);
         }
-      });
-    }, []);
+      }
+
+      messagesController.addListener(onLoadMore);
+
+      return () => messagesController.removeListener(onLoadMore);
+    }, [messagesController, setLoadMore, onLoadMoreMessages]);
 
     useEffect(() {
       if (mediumType != MediumType.encryption && room.encryptionEnabled) {
@@ -436,9 +442,7 @@ class ChatScreen extends HookWidget {
         }
       } catch (error) {
         // Globally notify other widgets you're sending a message in this room
-        dispatch(
-          UpdateRoom(id: room.id, sending: false),
-        );
+        dispatch(UpdateRoom(id: room.id, sending: false));
         rethrow;
       }
 
@@ -724,7 +728,7 @@ class ChatScreen extends HookWidget {
                     ),
                     Positioned(
                       child: Visibility(
-                        visible: room.lastBatch == null && messagesLength < 10,
+                        visible: room.lastBatch == null && messages.length < 10,
                         child: GestureDetector(
                           onTap: () => onLoadMoreMessages(),
                           child: Container(

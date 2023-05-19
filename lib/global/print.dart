@@ -70,7 +70,7 @@ void _printJson(Map? jsonMap) {
 // NOTE: start using this for better tab completion
 // ignore: camel_case_types
 class console {
-  static info(String content, {String? title}) => _printInfo(content, title: title);
+  static info(String content, {String? title}) => false; //_printInfo(content, title: title);
   static warn(String content, {String? title}) => _printWarning(content, title: title);
   static error(String content, {String? title}) => _printError(content, title: title);
   static threaded(String content, {String? title}) => _printThreaded(content, title: title);
@@ -80,8 +80,10 @@ class console {
 
   static final dynamic debug = VarArgsFunction((args) {
     if (DEBUG_MODE) {
-      final output = args.join(' ');
-      print('[DEBUG] $output');
+      if (args[0] != false) {
+        final output = args.join(' ');
+        print('[DEBUG] $output');
+      }
     }
   });
 }

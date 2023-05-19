@@ -95,10 +95,11 @@ class ChatInput extends HookWidget {
     );
 
     // Global Chat Settings
-    final enterSendEnabled = useSelector<AppState, bool>(
-      (state) => state.settingsStore.enterSendEnabled,
-      false,
-    );
+    // TODO: not yet referenced
+    // final enterSendEnabled = useSelector<AppState, bool>(
+    //   (state) => state.settingsStore.enterSendEnabled,
+    //   false,
+    // );
     final autocorrectEnabled = useSelector<AppState, bool>(
       (state) => state.settingsStore.autocorrectEnabled,
       false,
