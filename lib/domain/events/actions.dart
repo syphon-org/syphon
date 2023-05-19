@@ -166,22 +166,11 @@ ThunkAction<AppState> loadMessagesCached({
 
       // load cold storage messages to state
       if (messagesStored.isNotEmpty) {
-        console.warn('[loadMessagesCached] Mesages have loaded are not empty');
-        console.debug(
-          messagesStored.last.body,
-          formatTimestampFull(
-            lastUpdateMillis: messagesStored.last.timestamp,
-            showTime: true,
-          ),
-        );
-        console.debug(
-          messagesStored.first.body,
-          formatTimestampFull(
-            lastUpdateMillis: messagesStored.first.timestamp,
-            showTime: true,
-          ),
-        );
         store.dispatch(AddMessages(roomId: room.id, messages: messagesStored));
+      } else {
+        console.warn(
+          '[loadMessagesCached] No messages found in cache before ${formatTimestampFull(lastUpdateMillis: timestamp, showTime: true)}',
+        );
       }
 
       return messagesStored;
@@ -217,7 +206,10 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // known cached messages for this batch will be loaded async
       if (cached.isNotEmpty) {
-        console.debug('known cached messages for this batch will be loaded async');
+        console.debug('[onLoadMoreMessages]', 'Loaded ${cached.length} messages from storage');
+        for (final message in cached) {
+          console.debug(message.id, message.prevBatch);
+        }
         return [];
       }
 
@@ -255,13 +247,14 @@ ThunkAction<AppState> fetchMessageEvents({
           'timeline': {
             'events': messages,
             'curr_batch': start,
-            'last_batch': oldest ? end ?? from : null,
             'prev_batch': end,
+            'last_batch': oldest ? end ?? from : null,
             'limited': end == start || end == null ? false : null,
           }
         },
       ));
 
+      console.debug('[onLoadMoreMessages]', 'Fetched ${cached.length} messages from server');
       return messages;
     } catch (error) {
       console.error('[fetchMessageEvents] $error');

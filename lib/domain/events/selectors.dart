@@ -159,24 +159,7 @@ Message? selectOldestMessage(List<Message> messages, {List<Message>? decrypted})
 
   final Message oldestMessage = messages.fold(
     messages.last,
-    (oldest, msg) {
-      // console.debug(
-      //   '[selectOldestMessage] next',
-      //   formatTimestampFull(
-      //     lastUpdateMillis: oldest.timestamp,
-      //     timeFormat: TimeFormat.hr12,
-      //     showTime: true,
-      //   ),
-      //   oldest.body,
-      //   formatTimestampFull(
-      //     lastUpdateMillis: msg.timestamp,
-      //     timeFormat: TimeFormat.hr12,
-      //     showTime: true,
-      //   ),
-      //   msg.body,
-      // );
-      return msg.timestamp < oldest.timestamp ? msg : oldest;
-    },
+    (oldest, msg) => msg.timestamp < oldest.timestamp ? msg : oldest,
   );
 
   if (decrypted != null && decrypted.isNotEmpty) {

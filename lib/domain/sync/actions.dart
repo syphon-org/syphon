@@ -252,7 +252,6 @@ ThunkAction<AppState> fetchSync({String? since, bool forceFull = false}) {
         throw data['error'];
       }
 
-      // final Map presence = data['presence'];
       final String nextBatch = data['next_batch'];
       final Map<String, dynamic> roomJson = data['rooms'] ?? {};
       final Map<String, dynamic> toDeviceJson = data['to_device'] ?? {};

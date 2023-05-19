@@ -27,15 +27,14 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/hooks.dart';
-
 import 'package:syphon/global/libraries/matrix/events/types.dart';
 import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/views/home/chat/media-preview-screen.dart';
-import 'package:syphon/views/home/chat/widgets/MessageList.dart';
 import 'package:syphon/views/home/chat/widgets/ChatInput.dart';
+import 'package:syphon/views/home/chat/widgets/MessageList.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-invite.dart';
 import 'package:syphon/views/navigation.dart';
@@ -223,24 +222,21 @@ class ChatScreen extends HookWidget {
       );
     }
 
-    console.debug('[ChatScreenBuild] last', messages.length, messages.last.body);
-
     final onLoadMoreMessages = useCallback(() async {
       console.debug('[onLoadMoreMessages] last', messages.length, messages.last.body);
 
       // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
       final oldest = selectOldestMessage(messages) ?? Message();
 
-      console.debug('[onLoadMoreMessages] oldest', messages.length, oldest, oldest.body);
+      console.debug('[onLoadMoreMessages] oldest', messages.length, oldest, oldest.prevBatch);
+
       // fetch messages from the oldest cached batch
-      final messagesNew = await dispatch(fetchMessageEvents(
+      await dispatch(fetchMessageEvents(
         room: room,
         from: oldest.prevBatch,
         timestamp: oldest.timestamp,
       ));
-
-      console.debug('[onLoadMoreMessages]', 'Found messages ${messagesNew.length}');
-    }, [messages.length]);
+    }, [messages]);
 
     onAttemptDecryption() async {
       // dont attempt to decrypt if encryption is not enabled

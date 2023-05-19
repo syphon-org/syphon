@@ -83,7 +83,7 @@ class MessageList extends HookWidget {
     // used to identify if messages have updated
     final messagesKey = shasum(messagesRaw.keys.expand<int>((e) => e.codeUnits).toList());
 
-    console.debug(false, '[messagesKey]', messagesKey);
+    console.info('[messagesKey] $messagesKey');
 
     // the key above denotes uniquness
     final messages = useMemoized(
