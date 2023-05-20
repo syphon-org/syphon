@@ -228,7 +228,7 @@ class ChatScreen extends HookWidget {
       // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
       final oldest = selectOldestMessage(messages) ?? Message();
 
-      console.debug('[onLoadMoreMessages] oldest', messages.length, oldest, oldest.prevBatch);
+      console.debug('[onLoadMoreMessages] Oldest Message: ', messages.length, oldest, oldest.prevBatch);
 
       // fetch messages from the oldest cached batch
       await dispatch(fetchMessageEvents(

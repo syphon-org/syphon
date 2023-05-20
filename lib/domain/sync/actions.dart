@@ -360,48 +360,38 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       await store.dispatch(redactEvents(room: room, redactions: events.redactions));
 
       // handles editing newly fetched messages
-      final messages = await store.dispatch(
-        mutateMessages(
-          messages: events.messages,
-          existing: currentMessages,
-        ),
-      ) as List<Message>;
+      final messages = await store.dispatch(mutateMessages(
+        messages: events.messages,
+        existing: currentMessages,
+      )) as List<Message>;
 
       // update encrypted messages (updating before normal messages prevents flicker)
       if (room.encryptionEnabled) {
         final decryptedOld = store.state.eventStore.messagesDecrypted[id];
 
-        final decrypted = await store.dispatch(
-          decryptMessages(
-            room,
-            messages,
-          ),
-        ) as List<Message>;
+        final decrypted = await store.dispatch(decryptMessages(
+          room,
+          messages,
+        )) as List<Message>;
 
         // handles editing newly fetched decrypted messages
-        final decryptedMutated = await store.dispatch(
-          mutateMessages(
-            messages: decrypted,
-            existing: decryptedOld,
-          ),
-        ) as List<Message>;
+        final decryptedMutated = await store.dispatch(mutateMessages(
+          messages: decrypted,
+          existing: decryptedOld,
+        )) as List<Message>;
 
-        await store.dispatch(
-          addMessagesDecrypted(
-            roomId: room.id,
-            messages: decryptedMutated,
-          ),
-        );
+        await store.dispatch(addMessagesDecrypted(
+          roomId: room.id,
+          messages: decryptedMutated,
+        ));
       }
 
       // save normal or encrypted messages
-      await store.dispatch(
-        addMessages(
-          roomId: room.id,
-          messages: messages,
-          clear: sync.details.overwrite ?? false,
-        ),
-      );
+      await store.dispatch(addMessages(
+        roomId: room.id,
+        messages: messages,
+        clear: sync.details.overwrite ?? false,
+      ));
 
       if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
         console.jsonDebug({
@@ -414,12 +404,10 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
 
       // fetch avatar if a uri was found
       if (room.avatarUri != null) {
-        store.dispatch(
-          fetchMedia(
-            mxcUri: room.avatarUri,
-            thumbnail: true,
-          ),
-        );
+        store.dispatch(fetchMedia(
+          mxcUri: room.avatarUri,
+          thumbnail: true,
+        ));
       }
 
       // fetch previous messages since last /sync (a messages gap)

@@ -254,7 +254,7 @@ ThunkAction<AppState> fetchMessageEvents({
         },
       ));
 
-      console.debug('[onLoadMoreMessages]', 'Fetched ${cached.length} messages from server');
+      console.debug('[onLoadMoreMessages]', 'Fetched ${messages.length} messages from server');
       return messages;
     } catch (error) {
       console.error('[fetchMessageEvents] $error');

@@ -95,45 +95,39 @@ class Sync {
   /// Parsed details about new timeline
   /// and batch information
   ///
-  Sync parseDetails(Map<String, dynamic> json, String? lastSince) {
-    bool? invite;
-    bool? limited;
-    bool? overwrite;
-    int? totalMembers;
+  Sync parseDetails(
+    Map<String, dynamic> json,
+    String? lastSince,
+  ) {
+    // determine if we should overwrite all messages in the room with these
+    final bool overwrite = json['overwrite'] ?? false;
+
+    // determine if this room is in an invite state
+    final bool invite = json['invite_state'] != null;
+
+    // not the full version of the timeline
+    final bool limited = json['timeline']?['limited'] as bool? ?? false;
+
+    // current batch - or current lastSince - in the timeline
+    final String? currBatch = json['timeline']?['curr_batch'];
+
+    // most recent batch from the last /sync
+    final String? prevBatch = json['timeline']?['prev_batch'];
 
     // oldest batch in timeline
-    String? lastBatch; // oldest batch in timeline
-    // most recent batch from the last /sync
-    String? prevBatch;
-    // current batch - or current lastSince - in the timeline
-    String? currBatch;
+    final String? lastBatch = json['timeline']?['last_batch'];
 
-    if (json['overwrite'] != null) {
-      overwrite = json['overwrite'];
-    }
-
-    if (json['invite_state'] != null) {
-      invite = true;
-    }
-
-    if (json['timeline'] != null) {
-      limited = json['timeline']['limited'];
-      lastBatch = json['timeline']['last_batch'];
-      currBatch = json['timeline']['curr_batch'];
-      prevBatch = json['timeline']['prev_batch'];
-    }
-
-    if (json['summary'] != null) {
-      totalMembers = json['summary']['m.joined_member_count'];
-    }
+    // determine the total member count for the room
+    final int? totalMembers = json['summary']?['m.joined_member_count'];
 
     return this.copyWith(
       room: room.copyWith(
         invite: invite,
         limited: limited,
         totalJoinedUsers: totalMembers,
-        lastBatch: lastBatch ?? room.lastBatch ?? prevBatch,
+        lastBatch: lastBatch ?? room.lastBatch ?? prevBatch ?? lastSince,
         nextBatch: currBatch ?? lastSince,
+        prevBatch: prevBatch ?? lastSince,
       ),
       details: SyncDetails(
         overwrite: overwrite,
@@ -596,34 +590,29 @@ class Sync {
     bool ignoreMessageless = false,
   }) {
     final sync = this
-        .parseDetails(
-          json,
-          lastSince,
-        )
-        .parseEvents(
-          json,
-        );
+        // parse
+        .parseDetails(json, lastSince)
+        .parseEvents(json);
 
     if (ignoreMessageless && events.messages.isEmpty) {
       return sync;
     }
 
-    if (DEBUG_MODE && room.limited) {
-      console.jsonDebug({
-        'from': '[parseSync]',
-        'room': room.name,
-        'limited': room.limited,
-        'messages': events.messages.length,
-        'lastBatch': room.lastBatch,
-        'prevBatch': room.prevBatch,
-      });
-    }
+    // if (DEBUG_MODE && room.limited) {
+    console.jsonDebug({
+      'from': '[parseSync]',
+      'room': room.name,
+      'limited': room.limited,
+      'messages': events.messages.length,
+      'lastBatch': room.lastBatch,
+      'prevBatch': room.prevBatch,
+    });
+    // }
 
     return sync
+        //
         .parseAccountData()
-        .parseState(
-          currentUser,
-        )
+        .parseState(currentUser)
         .parseMessages(
           currentMessageIds,
         )
