@@ -12,16 +12,16 @@ import 'package:syphon/global/strings.dart';
 
 class MediaFullScreen extends StatelessWidget {
   final String title;
-  final Uint8List bytes;
   final String? roomId;
   final String? eventId;
+  final Uint8List bytes;
 
   const MediaFullScreen({
     super.key,
-    required this.roomId,
     required this.title,
-    required this.bytes,
+    required this.roomId,
     required this.eventId,
+    required this.bytes,
   });
 
   onPressDownload(BuildContext context) async {
