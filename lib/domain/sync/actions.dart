@@ -318,10 +318,10 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
     final user = store.state.authStore.user;
     final rooms = store.state.roomStore.rooms;
     final synced = store.state.syncStore.synced;
-    final lastSince = store.state.syncStore.lastSince;
+    final lastSince = store.state.syncStore.lastSince ?? '';
 
     try {
-      final currentRoom = rooms.containsKey(id) ? rooms[id]! : Room(id: id);
+      final currentRoom = rooms[id] ?? Room(id: id);
       final currentMessages = store.state.eventStore.messages[id] ?? [];
 
       final sync = await parseSyncThreaded(
@@ -332,13 +332,12 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
         currentMessageIds: currentMessages.map((m) => m.id ?? '').toList(),
       );
 
-      if (sync.details.leave ?? false) {
+      // updated room and events from sync
+      final Sync(:room, :events, :details, :users, :readReceipts) = sync;
+
+      if (details.leave ?? false) {
         return store.dispatch(RemoveRoom(roomId: id));
       }
-
-      // updated room and events from sync
-      final room = sync.room;
-      final events = sync.events;
 
       if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {
         console.jsonDebug({
@@ -352,8 +351,8 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       }
 
       // update various message mutations and meta data
-      await store.dispatch(setUsers(sync.users));
-      await store.dispatch(setReceipts(room: room, receipts: sync.readReceipts));
+      await store.dispatch(setUsers(users));
+      await store.dispatch(setReceipts(room: room, receipts: readReceipts));
       await store.dispatch(addReactions(reactions: events.reactions));
 
       // redact events (reactions and messages) through cache and cold storage
@@ -390,7 +389,7 @@ ThunkAction<AppState> syncRoom(String id, Map<String, dynamic> json) {
       await store.dispatch(addMessages(
         roomId: room.id,
         messages: messages,
-        clear: sync.details.overwrite ?? false,
+        clear: details.overwrite ?? false,
       ));
 
       if (DEBUG_MODE && DEBUG_PAYLOADS_MODE) {

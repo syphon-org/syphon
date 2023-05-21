@@ -112,16 +112,13 @@ ThunkAction<AppState> fetchRoom(
       }
 
       if (fetchMessages) {
-        messageEvents = await compute(
-          MatrixApi.fetchMessageEventsThreaded,
-          {
-            'protocol': store.state.authStore.protocol,
-            'homeserver': store.state.authStore.user.homeserver,
-            'accessToken': store.state.authStore.user.accessToken,
-            'roomId': roomId,
-            'limit': DEFAULT_LOAD_LIMIT,
-          },
-        );
+        messageEvents = await compute(MatrixApi.fetchMessageEventsThreaded, {
+          'protocol': store.state.authStore.protocol,
+          'homeserver': store.state.authStore.user.homeserver,
+          'accessToken': store.state.authStore.user.accessToken,
+          'roomId': roomId,
+          'limit': DEFAULT_LOAD_LIMIT,
+        });
 
         if (messageEvents['errcode'] != null) {
           throw messageEvents['error'];

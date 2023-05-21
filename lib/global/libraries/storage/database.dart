@@ -230,6 +230,7 @@ class ColdStorageDatabase extends _$ColdStorageDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           console.info('[MIGRATION] VERSION $from to $to');
+
           if (from == 8) {
             await m.addColumn(messages, messages.hasLink);
             await m.addColumn(messages, decrypted.hasLink);

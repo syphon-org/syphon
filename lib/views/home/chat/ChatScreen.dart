@@ -75,9 +75,9 @@ class ChatScreen extends HookWidget {
     final inputFieldNode = useFocusNode();
     final inputController = useTextEditingController();
     final editorController = useTextEditingController();
-    final messagesController = useScrollController();
+    final chatScrollController = useScrollController();
 
-    final isScrolling = messagesController.hasClients && messagesController.offset != 0;
+    final isScrolling = chatScrollController.hasClients && chatScrollController.offset != 0;
     final closedInputPadding =
         !inputFieldNode.hasFocus && Platform.isIOS && Dimensions.buttonlessHeightiOS < height;
 
@@ -141,19 +141,11 @@ class ChatScreen extends HookWidget {
     }
 
     onSaveDraftMessage({String? body, String? type}) {
-      dispatch(
-        saveDraft(
-          body: body,
-          type: type,
-          room: room,
-        ),
-      );
+      dispatch(saveDraft(body: body, type: type, room: room));
     }
 
     onClearDraftMessage({String? body, String? type}) {
-      dispatch(
-        clearDraft(room: room),
-      );
+      dispatch(clearDraft(room: room));
     }
 
     onSendMessage({
@@ -167,24 +159,20 @@ class ChatScreen extends HookWidget {
       final message = Message(body: body, type: type);
 
       if (room.encryptionEnabled) {
-        return dispatch(
-          sendMessageEncrypted(
-            roomId: room.id,
-            message: message,
-            related: related,
-            edit: edit,
-          ),
-        );
-      }
-
-      return dispatch(
-        sendMessage(
+        return dispatch(sendMessageEncrypted(
           roomId: room.id,
           message: message,
           related: related,
           edit: edit,
-        ),
-      );
+        ));
+      }
+
+      return dispatch(sendMessage(
+        roomId: room.id,
+        message: message,
+        related: related,
+        edit: edit,
+      ));
     }
 
     onDeleteMessage({Message? message, Room? room}) {
@@ -198,11 +186,7 @@ class ChatScreen extends HookWidget {
     }
 
     onRejectInvite() {
-      dispatch(
-        leaveRoom(
-          room: room,
-        ),
-      );
+      dispatch(leaveRoom(room: room));
     }
 
     onMarkRead() {
@@ -210,25 +194,16 @@ class ChatScreen extends HookWidget {
     }
 
     onFetchNewest() {
-      dispatch(fetchMessageEvents(
-        room: room,
-        from: room.nextBatch,
-      ));
+      dispatch(fetchMessageEvents(room: room, from: room.nextBatch));
     }
 
     onToggleEncryption() {
-      dispatch(
-        toggleRoomEncryption(room: room),
-      );
+      dispatch(toggleRoomEncryption(room: room));
     }
 
     final onLoadMoreMessages = useCallback(() async {
-      console.debug('[onLoadMoreMessages] last', messages.length, messages.last.body);
-
       // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
       final oldest = selectOldestMessage(messages) ?? Message();
-
-      console.debug('[onLoadMoreMessages] Oldest Message: ', messages.length, oldest, oldest.prevBatch);
 
       // fetch messages from the oldest cached batch
       await dispatch(fetchMessageEvents(
@@ -293,10 +268,6 @@ class ChatScreen extends HookWidget {
         onAttemptDecryption();
       }
 
-      if (messages.length < 10) {
-        onFetchNewest();
-      }
-
       if (draft != null && draft.type == MatrixMessageTypes.text) {
         inputController.value = TextEditingValue(
           text: draft.body!,
@@ -308,9 +279,20 @@ class ChatScreen extends HookWidget {
     }, []);
 
     useEffect(() {
+      // fetch more messages if the list is not scrollable
+      if (chatScrollController.hasClients) {
+        if (!(chatScrollController.position.maxScrollExtent > 0)) {
+          onFetchNewest();
+        }
+      }
+
+      return null;
+    }, [chatScrollController.hasClients]);
+
+    useEffect(() {
       onLoadMore() {
-        final extentBefore = messagesController.position.extentBefore;
-        final max = messagesController.position.maxScrollExtent;
+        final extentBefore = chatScrollController.position.extentBefore;
+        final max = chatScrollController.position.maxScrollExtent;
 
         final limit = max - extentBefore;
         final atLimit = Platform.isAndroid ? limit < 1 : limit < -32;
@@ -326,10 +308,10 @@ class ChatScreen extends HookWidget {
         }
       }
 
-      messagesController.addListener(onLoadMore);
+      chatScrollController.addListener(onLoadMore);
 
-      return () => messagesController.removeListener(onLoadMore);
-    }, [messagesController, setLoadMore, onLoadMoreMessages]);
+      return () => chatScrollController.removeListener(onLoadMore);
+    }, [chatScrollController, setLoadMore, onLoadMoreMessages]);
 
     useEffect(() {
       if (mediumType != MediumType.encryption && room.encryptionEnabled) {
@@ -708,7 +690,7 @@ class ChatScreen extends HookWidget {
                       editorController: editorController,
                       showAvatars: showAvatars,
                       selectedMessage: selectedMessage,
-                      scrollController: messagesController,
+                      scrollController: chatScrollController,
                       onSendEdit: (text, related) => onSendEdit(
                         text: text,
                         related: related,

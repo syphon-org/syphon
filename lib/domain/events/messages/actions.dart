@@ -466,7 +466,7 @@ Future<bool> isMessageDeletable({required Message message, User? user, Room? roo
 
     return false;
   } catch (error) {
-    console.debug('[isMessageDeletable] $error');
+    console.error('[isMessageDeletable] $error');
     return false;
   }
 }

@@ -62,7 +62,7 @@ extension MessageQueries on ColdStorageDatabase {
   /// previous in time.
   ///
   Future<List<Message>> selectMessagesOrdered(
-    String? roomId, {
+    String roomId, {
     int? timestamp,
     int offset = 0,
     int limit = DEFAULT_LOAD_LIMIT,
@@ -95,10 +95,7 @@ extension MessageQueries on ColdStorageDatabase {
   /// This is meant to help resolve gaps in syncing, if a
   /// backfill sync fails to fetch all previous messages
   ///
-  Future<List<Message>> selectMessagesBatch(
-    String? roomId, {
-    String? batch,
-  }) {
+  Future<List<Message>> selectMessagesBatch(String? roomId, String? batch) {
     return (select(messages)
           ..where(
             (tbl) => tbl.roomId.equals(roomId!) & tbl.batch.equals(batch!),
@@ -164,17 +161,14 @@ Future<List<Message>> loadMessages({
 
     // load batch based messages
     if (batch != null) {
-      return storage.selectMessagesBatch(
-        roomId,
-        batch: batch,
-      );
+      return storage.selectMessagesBatch(roomId, batch);
     }
 
     return storage.selectMessagesOrdered(
       roomId,
-      timestamp: timestamp,
-      offset: offset,
       limit: limit,
+      offset: offset,
+      timestamp: timestamp,
     );
   } catch (error) {
     console.error(error.toString(), title: 'loadMessages');

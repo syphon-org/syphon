@@ -160,8 +160,8 @@ ThunkAction<AppState> loadMessagesCached({
         storage: Storage.database!,
         roomId: room.id,
         limit: limit,
+        // batch: batch,
         timestamp: timestamp,
-        batch: batch,
       );
 
       // load cold storage messages to state
@@ -200,18 +200,15 @@ ThunkAction<AppState> fetchMessageEvents({
 }) {
   return (Store<AppState> store) async {
     try {
-      final cached = await store.dispatch(
-        loadMessagesCached(room: room, batch: from, limit: loadLimit, timestamp: timestamp),
-      ) as List<Message>;
+      final cached = await store.dispatch(loadMessagesCached(
+        room: room,
+        batch: from,
+        limit: loadLimit,
+        timestamp: timestamp,
+      )) as List<Message>;
 
       // known cached messages for this batch will be loaded async
-      if (cached.isNotEmpty) {
-        console.debug('[onLoadMoreMessages]', 'Loaded ${cached.length} messages from storage');
-        for (final message in cached) {
-          console.debug(message.id, message.prevBatch);
-        }
-        return [];
-      }
+      if (cached.isNotEmpty) return [];
 
       final oldest = cached.isEmpty;
 
@@ -240,21 +237,17 @@ ThunkAction<AppState> fetchMessageEvents({
 
       // reuse the logic for syncing
       // end will be null if no more batches are available to fetch
-      await store.dispatch(syncRoom(
-        room.id,
-        {
-          'overwrite': overwrite,
-          'timeline': {
-            'events': messages,
-            'curr_batch': start,
-            'prev_batch': end,
-            'last_batch': oldest ? end ?? from : null,
-            'limited': end == start || end == null ? false : null,
-          }
-        },
-      ));
+      await store.dispatch(syncRoom(room.id, {
+        'overwrite': overwrite,
+        'timeline': {
+          'events': messages,
+          'curr_batch': start,
+          'prev_batch': end,
+          'last_batch': oldest ? end ?? from : null,
+          'limited': end == start || end == null ? false : null,
+        }
+      }));
 
-      console.debug('[onLoadMoreMessages]', 'Fetched ${messages.length} messages from server');
       return messages;
     } catch (error) {
       console.error('[fetchMessageEvents] $error');
