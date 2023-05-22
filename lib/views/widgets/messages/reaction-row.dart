@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
-import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 
 class ReactionRow extends HookWidget {
   final String currentUserId;
@@ -19,11 +20,8 @@ class ReactionRow extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reactionsMap = useRef(<String, int>{});
-    final reactionsUserMap = useRef(<String, bool>{});
-
-    final reactionKeys = reactionsMap.value.keys;
-    final reactionCounts = reactionsMap.value.values;
+    final (reactionsMap, setReactionsMap) = useStateful(<String, int>{});
+    final (reactionsUserMap, setreactionsUserMap) = useStateful(<String, bool>{});
 
     final currentUserId = useSelector<AppState, String>(
       (state) => state.authStore.currentUser.userId ?? '',
@@ -32,30 +30,32 @@ class ReactionRow extends HookWidget {
 
     useEffect(() {
       for (final reaction in reactions) {
-        reactionsMap.value.update(
-          reaction.body ?? '',
-          (value) => value + 1,
-          ifAbsent: () => 1,
-        );
+        setReactionsMap(Map.from(reactionsMap
+          ..update(
+            reaction.body ?? '',
+            (value) => value + 1,
+            ifAbsent: () => 1,
+          )));
 
-        reactionsUserMap.value.update(
-          reaction.body ?? '',
-          (value) => value || reaction.sender == currentUserId,
-          ifAbsent: () => reaction.sender == currentUserId,
-        );
+        setreactionsUserMap(Map.from(reactionsUserMap
+          ..update(
+            reaction.body ?? '',
+            (value) => value || reaction.sender == currentUserId,
+            ifAbsent: () => reaction.sender == currentUserId,
+          )));
       }
     }, []);
 
     return ListView.builder(
       shrinkWrap: true,
+      itemCount: reactionsMap.keys.length,
       physics: ClampingScrollPhysics(),
-      itemCount: reactionKeys.length,
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.antiAlias,
       itemBuilder: (BuildContext context, int index) {
-        final reactionKey = reactionKeys.elementAt(index);
-        final reactionCount = reactionCounts.elementAt(index);
-        final isUserReaction = reactionsUserMap.value[reactionKey] ?? false;
+        final reactionKey = reactionsMap.keys.elementAt(index);
+        final reactionCount = reactionsMap.values.elementAt(index);
+        final isUserReaction = reactionsUserMap[reactionKey] ?? false;
 
         return GestureDetector(
           onTap: () => onToggleReaction?.call(reactionKey),
