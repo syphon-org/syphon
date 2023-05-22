@@ -6,7 +6,7 @@ import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class ButtonOutline extends StatelessWidget {
   const ButtonOutline({
-    Key? key,
+    super.key,
     this.text,
     this.loading = false,
     this.disabled = false,
@@ -14,7 +14,7 @@ class ButtonOutline extends StatelessWidget {
     this.height,
     this.child,
     this.onPressed,
-  }) : super(key: key);
+  });
 
   final bool loading;
   final bool disabled;

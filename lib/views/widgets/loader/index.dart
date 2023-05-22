@@ -4,9 +4,9 @@ import 'package:syphon/global/dimensions.dart';
 
 class Loader extends StatelessWidget {
   const Loader({
-    Key? key,
+    super.key,
     this.loading = false,
-  }) : super(key: key);
+  });
 
   final bool loading;
 

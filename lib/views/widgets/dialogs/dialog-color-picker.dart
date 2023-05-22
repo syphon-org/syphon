@@ -6,7 +6,7 @@ import 'package:syphon/global/strings.dart';
 
 class DialogColorPicker extends StatefulWidget {
   const DialogColorPicker({
-    Key? key,
+    super.key,
     required this.title, // i18n Strings isn't a constant. You gotta pass it in
     required this.currentColor,
     this.advanced = false,
@@ -14,7 +14,7 @@ class DialogColorPicker extends StatefulWidget {
     this.onCancel,
     this.onSelectColor,
     this.onToggleAdvanced,
-  }) : super(key: key);
+  });
 
   final String title;
   final int? resetColor;
@@ -89,7 +89,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
   buildAdvancedPicker(context) => ColorPicker(
         pickerColor: currentColor ?? Color(widget.currentColor),
         hexInputController: controller,
-        showLabel: false,
+        labelTypes: const [],
         onColorChanged: (Color color) {
           widget.onSelectColor!(color.value);
           setState(() {
@@ -124,7 +124,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
         },
         child: Text(
           'reset',
-          style: Theme.of(context).textTheme.subtitle1,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
     ];
@@ -140,7 +140,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
             },
             child: Text(
               Strings.titleAdvanced.toLowerCase(),
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
         );
@@ -150,14 +150,12 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
         SimpleDialogOption(
           padding: optionsPadding,
           onPressed: () {
-            if (widget.onCancel != null) {
-              widget.onCancel!();
-            }
+            widget.onCancel?.call();
             Navigator.pop(context);
           },
           child: Text(
             Strings.buttonCancel,
-            style: Theme.of(context).textTheme.subtitle1,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
       );
@@ -172,7 +170,7 @@ class _DialogColorPickerState extends State<DialogColorPicker> {
           },
           child: Text(
             Strings.buttonConfirmFormal,
-            style: Theme.of(context).textTheme.subtitle1,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
       );

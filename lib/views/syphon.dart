@@ -5,37 +5,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/auth.dart';
 import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/alerts/model.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/auth/context/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/sync/actions.dart';
+import 'package:syphon/domain/sync/service/storage.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/connectivity.dart';
 import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/libraries/cache/index.dart';
+import 'package:syphon/global/libraries/storage/database.dart';
+import 'package:syphon/global/libraries/storage/index.dart';
 import 'package:syphon/global/notifications.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/themes.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/storage/database.dart';
-import 'package:syphon/storage/index.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/alerts/model.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/auth/context/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/sync/actions.dart';
-import 'package:syphon/store/sync/service/storage.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/home-screen.dart';
-import 'package:syphon/views/intro/intro-screen.dart';
+import 'package:syphon/views/home/HomeScreen.dart';
+import 'package:syphon/views/intro/IntroScreen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/prelock.dart';
 
 class Syphon extends StatefulWidget {
   final Database? cache;
   final Store<AppState> store;
-  final StorageDatabase? storage;
+  final ColdStorageDatabase? storage;
 
   const Syphon(
     this.cache,
@@ -43,22 +43,16 @@ class Syphon extends StatefulWidget {
     this.storage,
   );
 
-  static Future setAppContext(
-      BuildContext buildContext, AppContext appContext) {
-    return buildContext
-        .findAncestorStateOfType<SyphonState>()!
-        .onContextSet(appContext);
+  static Future setAppContext(BuildContext buildContext, AppContext appContext) {
+    return buildContext.findAncestorStateOfType<SyphonState>()!.onContextSet(appContext);
   }
 
   static AppContext getAppContext(BuildContext buildContext) {
-    return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ??
-        AppContext();
+    return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ?? AppContext();
   }
 
   static Future reloadCurrentContext(BuildContext buildContext) {
-    return buildContext
-        .findAncestorStateOfType<SyphonState>()!
-        .reloadCurrentContext();
+    return buildContext.findAncestorStateOfType<SyphonState>()!.reloadCurrentContext();
   }
 
   @override
@@ -69,7 +63,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   late Store<AppState> store;
 
   Database? cache;
-  StorageDatabase? storage;
+  ColdStorageDatabase? storage;
   AppContext? appContext;
 
   final globalScaffold = GlobalKey<ScaffoldMessengerState>();
@@ -99,7 +93,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     super.initState();
   }
 
-  reloadCurrentContext() async {
+  Future<void> reloadCurrentContext() async {
     // context handling
     final currentContext = await loadContextCurrent();
     appContext = currentContext;
@@ -118,8 +112,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final currentUser = store.state.authStore.user;
 
     // Reset contexts if the current user has no accessToken (unrecoverable state)
-    if (currentUser.accessToken == null &&
-        currentContext.id != AppContext.DEFAULT) {
+    if (currentUser.accessToken == null && currentContext.id != AppContext.DEFAULT) {
       return onResetContext();
     }
 
@@ -162,21 +155,18 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           pluginInstance: globalNotificationPluginInstance,
         );
         saveNotificationsUnchecked(const {});
-        break;
-      case AppLifecycleState.inactive:
-        break;
       case AppLifecycleState.paused:
         store.dispatch(updateLatestLastSince());
-        store.dispatch(setBackgrounded(true));
-        break;
+        store.dispatch(setBackgrounded(backgrounded: true));
       case AppLifecycleState.detached:
         store.dispatch(updateLatestLastSince());
-        store.dispatch(setBackgrounded(true));
+        store.dispatch(setBackgrounded(backgrounded: true));
+      case AppLifecycleState.inactive:
         break;
     }
   }
 
-  onContextSet(AppContext appContext) async {
+  Future<void> onContextSet(AppContext appContext) async {
     await saveContextCurrent(appContext);
     await Prelock.restart(context);
   }
@@ -266,9 +256,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final authObserverNew = storeNew.state.authStore.authObserver;
 
     // revert to another authed user if available and logging out
-    if (user == null &&
-        userNew.accessToken != null &&
-        contextNew.id.isNotEmpty) {
+    if (user == null && userNew.accessToken != null && contextNew.id.isNotEmpty) {
       authObserverNew?.add(userNew);
     } else {
       authObserverNew?.add(user);
@@ -287,9 +275,9 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   onDeleteContextStorage(AppContext context) async {
     if (context.id.isEmpty) {
-      log.info('[onContextChanged] DELETING DEFAULT CONTEXT');
+      console.info('[onContextChanged] DELETING DEFAULT CONTEXT');
     } else {
-      log.info('[onDeleteContext] DELETING CONTEXT DATA ${context.id}');
+      console.info('[onDeleteContext] DELETING CONTEXT DATA ${context.id}');
     }
 
     await deleteCache(context: context);
@@ -299,8 +287,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
   // Reset contexts if the current user has no accessToken (unrecoverable state)
   onResetContext() async {
-    log.error(
-        '[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
+    console.error('[onResetContext] WARNING - RESETTING CONTEXT - HIT UNRECOVERABLE STATE');
 
     resetContextsAll();
 
@@ -324,9 +311,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     }
 
     // New user is found and previously was in an unauthenticated state
-    if (user != null &&
-        user.accessToken != null &&
-        defaultScreen == IntroScreen) {
+    if (user != null && user.accessToken != null && defaultScreen == IntroScreen) {
       defaultHome = HomeScreen();
       return NavigationService.clearTo(Routes.home, context);
     }
@@ -345,7 +330,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
   onAlertsChanged(Alert alert) {
     Color? color;
 
-    var alertOverride;
+    String? alertOverride;
 
     switch (alert.type) {
       case 'error':
@@ -353,33 +338,26 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           alertOverride = Strings.alertOffline;
         }
         color = Colors.red;
-        break;
       case 'warning':
         if (!ConnectionService.isConnected() && !alert.offline) {
           alertOverride = Strings.alertOffline;
         }
         color = Colors.red;
-        break;
       case 'success':
         color = Colors.green;
-        break;
       case 'info':
       default:
         color = Colors.grey;
     }
 
-    final alertMessage =
-        alertOverride ?? alert.message ?? alert.error ?? Strings.alertUnknown;
+    final alertMessage = alertOverride ?? alert.message ?? alert.error ?? Strings.alertUnknown;
 
     globalScaffold.currentState?.showSnackBar(
       SnackBar(
         backgroundColor: color,
         content: Text(
           alertMessage,
-          style: Theme.of(context)
-              .textTheme
-              .subtitle1
-              ?.copyWith(color: Colors.white),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
         ),
         duration: alert.duration,
         action: SnackBarAction(
@@ -418,8 +396,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         child: localization.EasyLocalization(
           path: 'assets/translations',
           useOnlyLangCode: true,
-          startLocale: Locale(
-              findLocale(store.state.settingsStore.language, context: context)),
+          startLocale: Locale(findLocale(store.state.settingsStore.language, context: context)),
           fallbackLocale: Locale(SupportedLanguages.defaultLang),
           useFallbackTranslations: true,
           supportedLocales: SupportedLanguages.list,
@@ -436,8 +413,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
               routes: NavigationProvider.getRoutes(),
               home: defaultHome,
               builder: (context, child) => Directionality(
-                textDirection: SupportedLanguages.rtl
-                        .contains(store.state.settingsStore.language)
+                textDirection: SupportedLanguages.rtl.contains(store.state.settingsStore.language)
                     ? TextDirection.rtl
                     : TextDirection.ltr,
                 child: child!,

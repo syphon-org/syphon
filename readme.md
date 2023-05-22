@@ -165,10 +165,10 @@ See our [CI script](/.drone.yml) if you wish to set up automated builds. It shou
 ## 📐 Architecture
 
 ### store
-- views (flutter + MVVM)
+- views (flutter + hooks)
 - state management (redux)
 - cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast) + [codec cipher](https://github.com/tekartik/sembast.dart/blob/master/sembast/doc/codec.md))
-- storage ([drift](https://pub.dev/packages/drift) + sqflite + sqlcipher)
+- storage ([drift](https://pub.dev/packages/drift) + sqlite + sqlcipher)
 
 ### assets
 - Looking for branding or design files? They can all be found [here](https://github.com/syphon-org/syphon/tree/main/assets), in the top level assets folder.

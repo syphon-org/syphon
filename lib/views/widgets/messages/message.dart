@@ -1,21 +1,21 @@
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:swipeable/swipeable.dart';
+import 'package:syphon/domain/events/messages/model.dart';
+import 'package:syphon/domain/events/messages/selectors.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/models.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/global/libs/matrix/constants.dart';
+
+import 'package:syphon/global/libraries/matrix/events/types.dart';
 import 'package:syphon/global/noop.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/weburl.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/messages/selectors.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/models.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/home/chat/media-full-screen.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
@@ -30,7 +30,7 @@ const MESSAGE_MARGIN_VERTICAL_SMALL = 1.0;
 
 class MessageWidget extends StatelessWidget {
   const MessageWidget({
-    Key? key,
+    super.key,
     required this.message,
     this.editorController,
     this.isUserSent = false,
@@ -57,7 +57,7 @@ class MessageWidget extends StatelessWidget {
     this.onPressAvatar,
     this.onInputReaction,
     this.onToggleReaction,
-  }) : super(key: key);
+  });
 
   final bool messageOnly;
   final bool isNewContext;
@@ -90,7 +90,48 @@ class MessageWidget extends StatelessWidget {
   final Function? onToggleReaction;
   final void Function(Message)? onLongPress;
 
-  buildReactionsInput(
+  onSwipeMessage(Message message) {
+    onSwipe(message);
+  }
+
+  onConfirmLink(BuildContext context, String? url) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DialogConfirm(
+        title: Strings.titleDialogConfirmLinkout.capitalize(),
+        content: Strings.confirmLinkout(url!),
+        confirmStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
+        confirmText: Strings.buttonConfirmFormal.capitalize(),
+        onDismiss: () => Navigator.pop(dialogContext),
+        onConfirm: () async {
+          Navigator.of(dialogContext).pop();
+          await launchUrlWrapper(url);
+        },
+      ),
+    );
+  }
+
+  onViewFullscreen(
+    BuildContext context, {
+    required Uint8List bytes,
+    required String? eventId,
+    required String? roomId,
+    String filename = 'Matrix Image',
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MediaFullScreen(
+          title: filename,
+          bytes: bytes,
+          eventId: eventId,
+          roomId: roomId,
+        ),
+      ),
+    );
+  }
+
+  Widget buildReactionsInput(
     BuildContext context,
     MainAxisAlignment alignment, {
     bool isUserSent = false,
@@ -131,47 +172,6 @@ class MessageWidget extends StatelessWidget {
     );
   }
 
-  onSwipeMessage(Message message) {
-    onSwipe(message);
-  }
-
-  onConfirmLink(BuildContext context, String? url) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => DialogConfirm(
-        title: Strings.titleDialogConfirmLinkout.capitalize(),
-        content: Strings.confirmLinkout(url!),
-        confirmStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
-        confirmText: Strings.buttonConfirmFormal.capitalize(),
-        onDismiss: () => Navigator.pop(dialogContext),
-        onConfirm: () async {
-          Navigator.of(dialogContext).pop();
-          await launchUrl(url);
-        },
-      ),
-    );
-  }
-
-  onViewFullscreen(
-    BuildContext context, {
-    required Uint8List bytes,
-    required String? eventId,
-    required String? roomId,
-    String filename = 'Matrix Image',
-  }) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MediaFullScreen(
-          title: filename,
-          bytes: bytes,
-          eventId: eventId,
-          roomId: roomId,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final message = this.message;
@@ -187,7 +187,7 @@ class MessageWidget extends StatelessWidget {
 
     var textColor = Colors.white;
     Color anchorColor = Colors.blue;
-    var backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
     var showSender = !messageOnly && !isUserSent; // nearly always show the sender
     var luminance = this.luminance;
 
@@ -203,7 +203,6 @@ class MessageWidget extends StatelessWidget {
     var showInfoRow = true;
     var showStatus = true;
 
-    var fontStyle;
     var opacity = 1.0;
     var zIndex = 1.0;
     var status = timeFormat == TimeFormat.full
@@ -217,6 +216,8 @@ class MessageWidget extends StatelessWidget {
             timeFormat: timeFormat,
             showTime: true,
           );
+
+    FontStyle? fontStyle;
 
     // Current User Bubble Styling
     if (isUserSent) {
@@ -404,8 +405,7 @@ class MessageWidget extends StatelessWidget {
                             }
                           },
                           child: Container(
-                            margin: const EdgeInsets.only(right: 8)
-                                .copyWith(bottom: hasReactions ? 16 : 0),
+                            margin: const EdgeInsets.only(right: 8).copyWith(bottom: hasReactions ? 16 : 0),
                             child: Avatar(
                               margin: EdgeInsets.zero,
                               padding: EdgeInsets.zero,
@@ -425,8 +425,7 @@ class MessageWidget extends StatelessWidget {
                             Container(
                               constraints: BoxConstraints(
                                 // NOTE: issue shrinking the message based on width
-                                maxWidth:
-                                    !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
+                                maxWidth: !isMedia ? double.infinity : Dimensions.mediaSizeMaxMessage,
                                 // NOTE: prevents exposing the reply icon
                                 minWidth: 72,
                               ),
@@ -521,8 +520,7 @@ class MessageWidget extends StatelessWidget {
                                       firstChild: MarkdownBody(
                                         data: body.trim(),
                                         softLineBreak: true,
-                                        onTapLink: (text, href, title) =>
-                                            onConfirmLink(context, href),
+                                        onTapLink: (text, href, title) => onConfirmLink(context, href),
                                         styleSheet: MarkdownStyleSheet(
                                           a: TextStyle(color: anchorColor),
                                           blockquote: TextStyle(
@@ -582,8 +580,7 @@ class MessageWidget extends StatelessWidget {
                                         crossAxisAlignment: alignmentMessageText,
                                         children: [
                                           Visibility(
-                                            visible:
-                                                !isUserSent && message.type == EventTypes.encrypted,
+                                            visible: !isUserSent && message.type == EventTypes.encrypted,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
@@ -611,8 +608,7 @@ class MessageWidget extends StatelessWidget {
                                             ),
                                           ),
                                           Visibility(
-                                            visible:
-                                                isUserSent && message.type == EventTypes.encrypted,
+                                            visible: isUserSent && message.type == EventTypes.encrypted,
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,

@@ -37,7 +37,7 @@ Future timeWrapper(
 
   final stoptime = stopwatch.elapsed;
 
-  log.info('[$name TIMER] ${function.runtimeType} $stoptime');
+  console.info('[$name TIMER] ${function.runtimeType} $stoptime');
 
   return result;
 }

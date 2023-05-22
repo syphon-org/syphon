@@ -4,18 +4,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/actions.dart';
+import 'package:syphon/domain/rooms/selectors.dart';
+import 'package:syphon/domain/user/actions.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/selectors.dart';
-import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/chat/chat-screen.dart';
-import 'package:syphon/views/home/profile/profile-user-screen.dart';
+import 'package:syphon/views/home/chat/ChatScreen.dart';
+import 'package:syphon/views/home/profile/ProfileUserScreen.dart';
 import 'package:syphon/views/home/search/search-chats-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -158,7 +158,7 @@ class ModalUserDetails extends StatelessWidget {
                             props.user.displayName ?? '',
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontWeight: FontWeight.w500,
                                 ),
                           ),
@@ -199,7 +199,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsSendMessage,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),
@@ -210,7 +210,8 @@ class ModalUserDetails extends StatelessWidget {
                           width: Dimensions.iconSize - 2,
                           height: Dimensions.iconSize - 2,
                           semanticsLabel: Strings.semanticsCreatePublicRoom,
-                          color: Theme.of(context).iconTheme.color,
+                          colorFilter: ColorFilter.mode(
+                              Theme.of(context).iconTheme.color ?? Colors.white, BlendMode.srcIn),
                         ),
                       ),
                     ),
@@ -221,7 +222,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsRoomInvite,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),
@@ -238,7 +239,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsViewProfile,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),

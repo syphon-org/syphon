@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:syphon/domain/auth/actions.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-
 import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class DialogTextInput extends HookWidget {
   const DialogTextInput({
-    Key? key,
+    super.key,
     this.title = '',
     this.content = '',
     this.label = '',
@@ -27,7 +25,7 @@ class DialogTextInput extends HookWidget {
     this.onConfirm,
     this.onChange,
     this.onCancel,
-  }) : super(key: key);
+  });
 
   final String title;
   final String content;
@@ -50,8 +48,7 @@ class DialogTextInput extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editingControllerLocal =
-        editingController ?? useTextEditingController(text: initialValue);
+    final editingControllerLocal = editingController ?? useTextEditingController(text: initialValue);
 
     final inputFocusNode = useFocusNode();
 
@@ -75,7 +72,7 @@ class DialogTextInput extends HookWidget {
       () {
         if (randomizeText) {
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
               editingControllerLocal.text = generateDeviceId().deviceId ?? '';
             },
             child: Padding(
@@ -134,7 +131,7 @@ class DialogTextInput extends HookWidget {
               child: Text(
                 content,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
             Container(

@@ -7,10 +7,10 @@ import 'package:syphon/global/strings.dart';
 
 class ModalImageOptions extends StatelessWidget {
   const ModalImageOptions({
-    Key? key,
+    super.key,
     this.onSetNewAvatar,
     this.onRemoveAvatar,
-  }) : super(key: key);
+  });
 
   final Function? onSetNewAvatar;
   final Function? onRemoveAvatar;
@@ -52,7 +52,7 @@ class ModalImageOptions extends StatelessWidget {
               ),
               title: Text(
                 Strings.listItemImageOptionsTakePhoto,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               onTap: () async {
                 final PickedFile? image = await ImagePicker().getImage(
@@ -79,7 +79,7 @@ class ModalImageOptions extends StatelessWidget {
               ),
               title: Text(
                 Strings.listItemImageOptionsPickFromGallery,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               onTap: () async {
                 final PickedFile? image = await ImagePicker().getImage(
@@ -110,7 +110,7 @@ class ModalImageOptions extends StatelessWidget {
               ),
               title: Text(
                 Strings.listItemImageOptionsRemovePhoto,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
           ],

@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
 calculatePosition(int copyLength) => copyLength * 3.4;
@@ -20,11 +20,11 @@ class FabRing extends StatelessWidget {
   final GlobalKey<FabCircularMenuState>? fabKey;
 
   const FabRing({
-    Key? key,
+    super.key,
     this.fabKey,
     this.alignment = Alignment.bottomRight,
     this.showLabels = false,
-  }) : super(key: key);
+  });
 
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
@@ -96,7 +96,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToCreateGroupPublic(context),
                     child: SvgPicture.asset(
                       Assets.iconPublicAddBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -110,7 +110,7 @@ class FabRing extends StatelessWidget {
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreatePublic,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Colors.white,
                                 ),
                           ),
@@ -131,7 +131,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToCreateGroup(context),
                     child: SvgPicture.asset(
                       Assets.iconGroupAddBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -145,7 +145,7 @@ class FabRing extends StatelessWidget {
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreateGroup,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Colors.white,
                                 ),
                           ),
@@ -166,7 +166,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToDraft(context),
                     child: SvgPicture.asset(
                       Assets.iconMessageCircleBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -179,7 +179,7 @@ class FabRing extends StatelessWidget {
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreateDM,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Colors.white,
                                 ),
                           ),
@@ -200,7 +200,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToPublicSearch(context),
                     child: SvgPicture.asset(
                       Assets.iconSearchPublicCondensedBeing,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -214,7 +214,7 @@ class FabRing extends StatelessWidget {
                         child: Chip(
                           label: Text(
                             Strings.labelFabSearch,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Colors.white,
                                 ),
                           ),

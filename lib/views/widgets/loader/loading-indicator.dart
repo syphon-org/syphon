@@ -4,10 +4,10 @@ import 'package:syphon/global/dimensions.dart';
 
 class LoadingIndicator extends StatelessWidget {
   const LoadingIndicator({
-    Key? key,
+    super.key,
     this.size = 28,
     this.loading = false,
-  }) : super(key: key);
+  });
 
   final double size;
   final bool loading;

@@ -6,7 +6,7 @@ import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class ButtonSolid extends StatelessWidget {
   const ButtonSolid({
-    Key? key,
+    super.key,
     this.text,
     this.textWidget,
     this.loading = false,
@@ -14,7 +14,7 @@ class ButtonSolid extends StatelessWidget {
     this.width,
     this.height,
     this.onPressed,
-  }) : super(key: key);
+  });
 
   final bool loading;
   final bool disabled;

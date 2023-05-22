@@ -1,15 +1,14 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/actions.dart';
+import 'package:syphon/domain/settings/devices-settings/model.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
-import 'package:syphon/store/settings/devices-settings/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm-password.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-text-input.dart';
@@ -21,8 +20,7 @@ class DevicesScreen extends StatefulWidget {
   DeviceViewState createState() => DeviceViewState();
 }
 
-class DeviceViewState extends State<DevicesScreen>
-    with Lifecycle<DevicesScreen> {
+class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen> {
   bool deleting = false;
   List<Device>? selectedDevices;
 
@@ -67,14 +65,12 @@ class DeviceViewState extends State<DevicesScreen>
     });
   }
 
-  onDeleteDevices(
-      BuildContext context, List<Device> devices, _Props props) async {
+  onDeleteDevices(BuildContext context, List<Device> devices, _Props props) async {
     final store = StoreProvider.of<AppState>(context);
 
     if (devices.isEmpty) return;
 
-    final List<String?> deviceIds =
-        devices.map((device) => device.deviceId).toList();
+    final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
 
     await store.dispatch(deleteDevices(deviceIds: deviceIds));
 
@@ -88,14 +84,12 @@ class DeviceViewState extends State<DevicesScreen>
         title: Strings.titleConfirmPassword,
         content: Strings.contentDeleteDevices,
         checkLoading: () => store.state.settingsStore.loading,
-        checkValid: () =>
-            store.state.authStore.credential?.value?.isNotEmpty ?? false,
+        checkValid: () => store.state.authStore.credential?.value?.isNotEmpty ?? false,
         onChangePassword: (password) {
           store.dispatch(updateCredential(value: password));
         },
         onConfirm: () async {
-          final List<String?> deviceIds =
-              devices.map((device) => device.deviceId).toList();
+          final List<String?> deviceIds = devices.map((device) => device.deviceId).toList();
 
           await store.dispatch(deleteDevices(deviceIds: deviceIds));
 
@@ -144,18 +138,16 @@ class DeviceViewState extends State<DevicesScreen>
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Rename Device',
           color: Colors.white,
-          onPressed: selectedDevices!.length != 1
-              ? null
-              : () => props.onRenameDevice(context, selectedDevices![0]),
+          onPressed:
+              selectedDevices!.length != 1 ? null : () => props.onRenameDevice(context, selectedDevices![0]),
         ),
         IconButton(
           icon: Icon(Icons.delete),
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Delete Device',
           color: Colors.white,
-          onPressed: selfSelectedDevice != -1
-              ? null
-              : () => onDeleteDevices(context, selectedDevices ?? [], props),
+          onPressed:
+              selfSelectedDevice != -1 ? null : () => onDeleteDevices(context, selectedDevices ?? [], props),
         ),
         IconButton(
           icon: Icon(Icons.select_all),
@@ -189,10 +181,9 @@ class DeviceViewState extends State<DevicesScreen>
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(store),
         builder: (context, props) {
-          final sectionBackgroundColor =
-              Theme.of(context).brightness == Brightness.dark
-                  ? const Color(AppColors.blackDefault)
-                  : const Color(AppColors.whiteDefault);
+          final sectionBackgroundColor = Theme.of(context).brightness == Brightness.dark
+              ? const Color(AppColors.blackDefault)
+              : const Color(AppColors.whiteDefault);
 
           Widget currentAppBar = AppBarNormal(title: Strings.titleDevices);
 
@@ -219,33 +210,24 @@ class DeviceViewState extends State<DevicesScreen>
                       Color? iconColor;
                       Color? backgroundColor;
                       IconData deviceTypeIcon = Icons.phone_android;
-                      TextStyle textStyle = Theme.of(context)
-                          .textTheme
-                          .caption!
-                          .copyWith(fontSize: 12);
-                      final bool isCurrentDevice =
-                          props.currentDeviceId == device.deviceId;
+                      TextStyle textStyle = Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 12);
+                      final bool isCurrentDevice = props.currentDeviceId == device.deviceId;
 
-                      if (device.displayName!.contains('Firefox') ||
-                          device.displayName!.contains('Mac')) {
+                      if (device.displayName!.contains('Firefox') || device.displayName!.contains('Mac')) {
                         deviceTypeIcon = Icons.laptop;
                       } else if (device.displayName!.contains('iOS')) {
                         deviceTypeIcon = Icons.phone_iphone;
                       }
 
-                      if (selectedDevices != null &&
-                          selectedDevices!.contains(device)) {
-                        backgroundColor =
-                            AppColors.hashedColor(device.deviceId);
+                      if (selectedDevices != null && selectedDevices!.contains(device)) {
+                        backgroundColor = AppColors.hashedColor(device.deviceId);
                         backgroundColor = Color(AppColors.greyDefault);
                         textStyle = textStyle.copyWith(color: Colors.white);
                         iconColor = Colors.white;
                       }
 
                       return InkWell(
-                        onTap: selectedDevices == null
-                            ? null
-                            : () => onToggleModifyDevice(device: device),
+                        onTap: selectedDevices == null ? null : () => onToggleModifyDevice(device: device),
                         onLongPress: () => onToggleModifyDevice(device: device),
                         child: Card(
                           elevation: 0,
@@ -351,8 +333,7 @@ class _Props extends Equatable {
               randomizeText: true,
               label: device.displayName ?? '',
               onConfirm: (String newDisplayName) async {
-                await store.dispatch(renameDevice(
-                    deviceId: device.deviceId, displayName: newDisplayName));
+                await store.dispatch(renameDevice(deviceId: device.deviceId, displayName: newDisplayName));
                 store.dispatch(resetInteractiveAuth());
                 Navigator.of(dialogContext).pop();
               },

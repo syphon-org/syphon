@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 enum ListItemUserType {
@@ -20,7 +19,7 @@ enum ListItemUserType {
 ///
 class ListItemAccount extends StatelessWidget {
   const ListItemAccount({
-    Key? key,
+    super.key,
     required this.user,
     this.type = ListItemUserType.Selectable,
     this.enabled = false,
@@ -29,7 +28,7 @@ class ListItemAccount extends StatelessWidget {
     this.real = true,
     this.onPress,
     this.onPressAvatar,
-  }) : super(key: key);
+  });
 
   final User user;
   final bool loading;
@@ -49,7 +48,7 @@ class ListItemAccount extends StatelessWidget {
         );
       case ListItemUserType.Selectable:
         return InkWell(
-          splashColor: selected ? Theme.of(context).selectedRowColor : Colors.transparent,
+          splashColor: selected ? Theme.of(context).shadowColor : Colors.transparent,
           child: child,
         );
       default:
@@ -60,8 +59,8 @@ class ListItemAccount extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Opacity(
       opacity: enabled || selected ? 1 : 0.7,
-      child: Container(
-          color: selected ? Theme.of(context).selectedRowColor : Colors.transparent,
+      child: ColoredBox(
+          color: selected ? Theme.of(context).colorScheme.secondary : Colors.transparent,
           child: ListTile(
             enabled: enabled,
             selected: selected,
@@ -79,7 +78,7 @@ class ListItemAccount extends StatelessWidget {
             title: Text(
               user.userId!,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyText2,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           )));
 }
