@@ -40,7 +40,7 @@ abstract class Auth {
     String? deviceId,
     String? deviceName,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/login';
+    final String url = '$protocol$homeserver/_matrix/client/v3/login';
 
     final Map body = {
       'type': type,
@@ -84,7 +84,7 @@ abstract class Auth {
     String? deviceId,
     String? deviceName,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/login';
+    final String url = '$protocol$homeserver/_matrix/client/v3/login';
 
     final Map body = {
       'type': type,
@@ -127,7 +127,7 @@ abstract class Auth {
     String? deviceId,
     String? deviceName,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/login';
+    final String url = '$protocol$homeserver/_matrix/client/v3/login';
 
     final Map body = {
       'type': type,
@@ -163,7 +163,7 @@ abstract class Auth {
     String? email,
     int? sendAttempt = 1,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/register/email/requestToken';
+    final String url = '$protocol$homeserver/_matrix/client/v3/register/email/requestToken';
 
     final Map body = {
       'email': email,
@@ -195,7 +195,7 @@ abstract class Auth {
     String? deviceId,
     String? deviceName,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/register';
+    final String url = '$protocol$homeserver/_matrix/client/v3/register';
 
     Map body = {
       'type': MatrixAuthTypes.DUMMY,
@@ -270,7 +270,7 @@ abstract class Auth {
     String? homeserver,
     String? accessToken,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/logout';
+    final String url = '$protocol$homeserver/_matrix/client/v3/logout';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -291,7 +291,7 @@ abstract class Auth {
     String? homeserver,
     String? accessToken,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/logout/all';
+    final String url = '$protocol$homeserver/_matrix/client/v3/logout/all';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -316,7 +316,7 @@ abstract class Auth {
     String? homeserver = Values.homeserverDefault,
     String? username,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/register/available';
+    String url = '$protocol$homeserver/_matrix/client/v3/register/available';
 
     url += username != null ? '?username=$username' : '';
 
@@ -394,7 +394,7 @@ abstract class Auth {
     String? password,
     String? currentPassword,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/v3/account/password';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -438,7 +438,7 @@ abstract class Auth {
     String? session,
     int sendAttempt = 1,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/password';
+    final String url = '$protocol$homeserver/_matrix/client/v3/account/password';
 
     final Map body = {
       'auth': {
@@ -476,7 +476,7 @@ abstract class Auth {
     String? email,
     int sendAttempt = 1,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/account/password/email/requestToken';
+    final String url = '$protocol$homeserver/_matrix/client/v3/account/password/email/requestToken';
 
     final Map body = {
       'email': email,
