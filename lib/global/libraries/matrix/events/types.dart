@@ -61,7 +61,7 @@ class EventTypes {
   static const name = 'm.room.name';
   static const topic = 'm.room.topic';
   static const avatar = 'm.room.avatar';
-  static const creation = 'm.room.create';
+  static const create = 'm.room.create';
   static const message = 'm.room.message';
   static const encrypted = 'm.room.encrypted';
   static const member = 'm.room.member';

@@ -14,7 +14,7 @@ abstract class Devices {
     String? homeserver = Values.homeserverDefault,
     String? accessToken,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/devices';
+    final String url = '$protocol$homeserver/_matrix/client/v3/devices';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -36,7 +36,7 @@ abstract class Devices {
     String? deviceId,
     String? displayName,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/devices';
+    final String url = '$protocol$homeserver/_matrix/client/v3/devices';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -71,7 +71,7 @@ abstract class Devices {
     String? authType,
     String? authValue,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/delete_devices';
+    final String url = '$protocol$homeserver/_matrix/client/v3/delete_devices';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -111,7 +111,7 @@ abstract class Devices {
     String? deviceId,
     String? displayName,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/devices/$deviceId';
+    final String url = '$protocol$homeserver/_matrix/client/v3/devices/$deviceId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',

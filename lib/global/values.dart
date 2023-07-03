@@ -39,7 +39,7 @@ class Values {
   static const clientSecretMatrix = 'MDWVwN79p5xIz7bgazVXvO8aabbVD0LN';
   static const captchaMatrixSiteKey = '6LcgI54UAAAAABGdGmruw6DdOocFpYVdjYBRe4zb';
   static const matrixSSOUrl =
-      '/_matrix/client/r0/login/sso/redirect?redirectUrl=syphon://syphon.org/login/token';
+      '/_matrix/client/v3/login/sso/redirect?redirectUrl=syphon://syphon.org/login/token';
 
   // regexs - hello darkness, my old friend
   static const emailRegex = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";

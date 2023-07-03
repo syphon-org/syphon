@@ -187,6 +187,13 @@ class Sync {
           case EventTypes.redaction:
             redactionEvents.add(Redaction.fromEvent(event));
             break;
+          case EventTypes.avatar:
+          case EventTypes.create:
+          case EventTypes.member:
+          case EventTypes.joinRules:
+          case EventTypes.encryption:
+            stateEvents.add(event);
+            break;
           default:
             console.warn('Unhandled timeline event ${event.type}');
             stateEvents.add(event);
@@ -272,17 +279,17 @@ class Sync {
         // }
 
         switch (event.type) {
-          case 'm.room.name':
+          case EventTypes.name:
             if (namePriority > 0) {
               namePriority = 1;
               roomNameNew = event.content['name'];
             }
             break;
-          case 'm.room.topic':
+          case EventTypes.topic:
             topicNew = event.content['topic'];
             break;
 
-          case 'm.room.join_rules':
+          case EventTypes.joinRules:
             joinRuleNew = event.content['join_rule'];
             break;
 
@@ -292,19 +299,20 @@ class Sync {
               roomNameNew = event.content['alias'];
             }
             break;
+
           case 'm.room.aliases':
             if (namePriority > 3) {
               namePriority = 3;
               roomNameNew = event.content['aliases'][0];
             }
             break;
-          case 'm.room.avatar':
+          case EventTypes.avatar:
             if (avatarUriNew == null) {
               avatarUriNew = event.content['url'];
             }
             break;
 
-          case 'm.room.member':
+          case EventTypes.member:
             final membership = event.content['membership'];
             final displayName = event.content['displayname'];
             final memberAvatarUri = event.content['avatar_url'];
@@ -343,7 +351,7 @@ class Sync {
           case 'm.room.encryption':
             encryptionEnabledNew = true;
             break;
-          case 'm.room.encrypted':
+          case EventTypes.encrypted:
             break;
           default:
             break;
