@@ -48,7 +48,7 @@ class MatrixMedia {
     final String mediaId = mediaUriParts[mediaUriParts.length - 1];
     final String mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
 
-    String url = '$protocol$homeserver/_matrix/media/r0/thumbnail/$mediaServer/$mediaId';
+    String url = '$protocol$homeserver/_matrix/media/v3/thumbnail/$mediaServer/$mediaId';
 
     // Params
     url += '?height=$size&width=$size&method=$method';
@@ -105,7 +105,7 @@ class MatrixMedia {
     // Parce the mxc uri for the server location and id
     final mediaId = mediaUriParts[mediaUriParts.length - 1];
     final mediaServer = serverName ?? mediaUriParts[mediaUriParts.length - 2];
-    final url = '$protocol$homeserver/_matrix/media/r0/download/$mediaServer/$mediaId';
+    final url = '$protocol$homeserver/_matrix/media/v3/download/$mediaServer/$mediaId';
 
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
@@ -133,7 +133,7 @@ class MatrixMedia {
     required Stream<List<int>> fileStream,
     int? fileLength,
   }) async {
-    final url = '$protocol$homeserver/_matrix/media/r0/config';
+    final url = '$protocol$homeserver/_matrix/media/v3/config';
 
     final Map<String, String> headers = {
       ...Values.defaultHeaders,
@@ -156,7 +156,7 @@ class MatrixMedia {
     required Stream<List<int>> fileStream,
     int? fileLength,
   }) async {
-    String url = '$protocol$homeserver/_matrix/media/r0/upload';
+    String url = '$protocol$homeserver/_matrix/media/v3/upload';
 
     // Params
     url += fileName != null ? '?filename=$fileName' : '';
@@ -200,38 +200,10 @@ dynamic buildMediaDownloadRequest({
   final List<String> mediaUriParts = mediaUri.split('/');
   final String mediaId = mediaUriParts[mediaUriParts.length - 1];
   final String mediaOrigin = serverName ?? homeserver;
-  final String url = '$protocol$homeserver/_matrix/media/r0/download/$mediaOrigin/$mediaId';
+  final String url = '$protocol$homeserver/_matrix/media/v3/download/$mediaOrigin/$mediaId';
 
   final Map<String, String> headers = {
     'Authorization': 'Bearer $accessToken',
-  };
-
-  return {
-    'url': Uri.parse(url),
-    'headers': headers,
-  };
-}
-
-/// https://matrix.org/docs/spec/client_server/latest#id392
-///
-/// Upload some content to the content repository.
-dynamic buildMediaUploadRequest({
-  String protocol = Values.DEFAULT_PROTOCOL,
-  String homeserver = Values.homeserverDefault,
-  String? accessToken,
-  String? fileName,
-  String fileType = 'application/jpeg', // Content-Type: application/pdf
-  int? fileLength,
-}) {
-  String url = '$protocol$homeserver/_matrix/media/r0/upload';
-
-  // Params
-  url += fileName != null ? '?filename=$fileName' : '';
-
-  final Map<String, String> headers = {
-    'Authorization': 'Bearer $accessToken',
-    'Content-Type': fileType,
-    'Content-Length': '$fileLength',
   };
 
   return {

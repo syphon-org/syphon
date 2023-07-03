@@ -12,7 +12,9 @@ import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/hooks.dart';
 import 'package:syphon/global/libraries/redux/hooks.dart';
+import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -44,12 +46,8 @@ class ProfileScreen extends HookWidget {
     );
 
     // local state
-    final avatarFile = useState<File?>(null);
-    final displayName = useState(user?.displayName);
-
-    // TODO: switch to destructuring when released
-    final avatarFileNew = avatarFile.value;
-    final displayNameNew = displayName.value;
+    final (avatarFile, setAvatarFile) = useStateful<File?>(null);
+    final (displayName, setDisplayName) = useStateful(user?.displayName);
 
     // ui state
     final userIdController = useTextEditingController(text: user?.userId);
@@ -60,7 +58,7 @@ class ProfileScreen extends HookWidget {
     final height = MediaQuery.of(context).size.height;
 
     final backgroundColor = selectAvatarBackground(themeType!);
-    final hasNewInfo = avatarFileNew != null || displayNameNew != null;
+    final hasNewInfo = avatarFile != null || displayName != null;
 
     // local widget functionality
     final onCopyToClipboard = useCallback(() async {
@@ -74,7 +72,7 @@ class ProfileScreen extends HookWidget {
         backgroundColor: Colors.transparent,
         builder: (dialogContext) => ModalImageOptions(
           onSetNewAvatar: ({File? image}) {
-            avatarFile.value = image;
+            setAvatarFile(image);
           },
           onRemoveAvatar: () async {
             await dispatch(updateAvatarUri(mxcUri: ''));
@@ -90,20 +88,22 @@ class ProfileScreen extends HookWidget {
       String? displayNameNew,
     }) async {
       if (displayNameNew != null && user?.displayName != displayNameNew) {
-        final bool successful = dispatch(
-          updateDisplayName(displayNameNew),
-        );
-        if (!successful) return false;
+        final successful = await dispatch(updateDisplayName(displayNameNew));
+        if (!successful) {
+          console.warn('failed to update display name');
+          return false;
+        }
       }
 
       if (avatarFileNew != null) {
-        final bool successful = dispatch(
-          updateAvatar(localFile: avatarFileNew),
-        );
-        if (!successful) return false;
+        final successful = await dispatch(updateAvatar(localFile: avatarFileNew));
+        if (!successful) {
+          console.warn('failed to update display name');
+          return false;
+        }
       }
 
-      dispatch(fetchAuthUserProfile());
+      await dispatch(fetchAuthUserProfile());
       return true;
     }, [user]);
 
@@ -150,8 +150,8 @@ class ProfileScreen extends HookWidget {
                             child: GestureDetector(
                               onTap: () => onShowImageOptions(),
                               child: Avatar(
-                                uri: avatarFileNew != null ? null : user?.avatarUri,
-                                file: avatarFileNew,
+                                uri: user?.avatarUri,
+                                file: avatarFile,
                                 alt: formatUsername(user!),
                                 size: imageSize,
                                 background: AppColors.hashedColorUser(user),
@@ -209,7 +209,7 @@ class ProfileScreen extends HookWidget {
                               label: 'Display Name',
                               controller: displayNameController,
                               onChanged: (name) {
-                                displayName.value = name;
+                                setDisplayName(name);
                               },
                             ),
                           ),
@@ -250,10 +250,10 @@ class ProfileScreen extends HookWidget {
                                 loading: loading,
                                 disabled: loading || !hasNewInfo,
                                 onPressed: () async {
-                                  final bool successful = await onSaveProfile(
+                                  final successful = await onSaveProfile(
                                     userIdNew: null,
-                                    avatarFileNew: avatarFileNew,
-                                    displayNameNew: displayNameNew,
+                                    avatarFileNew: avatarFile,
+                                    displayNameNew: displayName,
                                   );
                                   if (successful) {
                                     Navigator.pop(context);

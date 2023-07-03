@@ -5,7 +5,6 @@ import 'package:syphon/global/https.dart';
 import 'package:syphon/global/values.dart';
 
 /// https://matrix.org/docs/spec/client_server/latest#id295
-/// 10.5.3   GET /_matrix/client/r0/publicRooms
 ///
 /// Lists the public rooms on the server. This API returns paginated responses.
 /// The rooms are ordered by the number of joined members, with the largest rooms first.
@@ -24,7 +23,7 @@ class Search {
     String? searchText,
     String? since,
   }) async {
-    final String url = '$protocol$homeserver/_matrix/client/r0/user_directory/search';
+    final String url = '$protocol$homeserver/_matrix/client/v3/user_directory/search';
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
@@ -53,7 +52,7 @@ class Search {
     bool? global,
     String? since,
   }) async {
-    String url = '$protocol$homeserver/_matrix/client/r0/publicRooms';
+    String url = '$protocol$homeserver/_matrix/client/v3/publicRooms';
     final Map<String, String> headers = {
       'Authorization': 'Bearer $accessToken',
       ...Values.defaultHeaders,
