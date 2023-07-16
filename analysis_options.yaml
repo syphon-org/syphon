@@ -40,3 +40,4 @@ linter:
 
     # Enabled
     prefer_single_quotes: true
+    prefer_const_declarations: true
