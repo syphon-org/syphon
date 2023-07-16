@@ -5,12 +5,12 @@ import 'package:syphon/global/noop.dart';
 
 class MediaCard extends StatelessWidget {
   const MediaCard({
-    Key? key,
+    super.key,
     this.text,
     this.icon = Icons.photo,
     this.onPress = noop,
     this.disabled = false,
-  }) : super(key: key);
+  });
 
   final String? text;
   final IconData? icon;
@@ -43,7 +43,7 @@ class MediaCard extends StatelessWidget {
                 Text(
                   text ?? '',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.button?.copyWith(
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w400,
                     fontSize: 13

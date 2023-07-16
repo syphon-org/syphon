@@ -1,17 +1,16 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/actions.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/search/actions.dart';
+import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/search/actions.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -27,14 +26,13 @@ class ChatUsersDetailArguments {
 }
 
 class ChatUsersDetailScreen extends StatefulWidget {
-  const ChatUsersDetailScreen({Key? key}) : super(key: key);
+  const ChatUsersDetailScreen({super.key});
 
   @override
   ChatUsersDetailState createState() => ChatUsersDetailState();
 }
 
-class ChatUsersDetailState extends State<ChatUsersDetailScreen>
-    with Lifecycle<ChatUsersDetailScreen> {
+class ChatUsersDetailState extends State<ChatUsersDetailScreen> with Lifecycle<ChatUsersDetailScreen> {
   final searchInputFocusNode = FocusNode();
 
   bool loading = false;
@@ -44,7 +42,7 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
   @override
   void onMounted() {
     final store = StoreProvider.of<AppState>(context);
-    final arguments = useScreenArguments<ChatUsersDetailArguments>(context)!;
+    final arguments = useScreenArguments<ChatUsersDetailArguments>(context, ChatUsersDetailArguments());
 
     final searchResults = store.state.searchStore.searchResults;
 
@@ -101,11 +99,11 @@ class ChatUsersDetailState extends State<ChatUsersDetailScreen>
                 title: Text(
                   formatUsername(user),
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
                   user.userId!,
-                  style: Theme.of(context).textTheme.caption!.merge(
+                  style: Theme.of(context).textTheme.bodySmall!.merge(
                         TextStyle(
                           color: props.loading ? Color(AppColors.greyDisabled) : null,
                         ),

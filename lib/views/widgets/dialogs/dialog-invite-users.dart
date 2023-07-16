@@ -1,23 +1,23 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 
 class DialogInviteUsers extends StatelessWidget {
   const DialogInviteUsers({
-    Key? key,
+    super.key,
     this.users,
     this.title,
     this.content,
     this.action,
     this.onCancel,
     this.onInviteUsers,
-  }) : super(key: key);
+  });
 
   final String? title;
   final String? content;
@@ -53,7 +53,7 @@ class DialogInviteUsers extends StatelessWidget {
                   ButtonText(
                     textWidget: Text(
                       Strings.buttonCancel,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     disabled: creating,
                     onPressed: () {
@@ -63,7 +63,7 @@ class DialogInviteUsers extends StatelessWidget {
                   ButtonText(
                     textWidget: Text(
                       action ?? Strings.titleInviteUsers.toLowerCase(),
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     loading: creating,
                     disabled: creating,
@@ -107,8 +107,7 @@ class Props extends Equatable {
   static Props mapStateToProps(Store<AppState> store) => Props(
         completed: store.state.authStore.captcha,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]
-              ['public_key'];
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'];
         }(),
         onCompleteCaptcha: (String token, {required BuildContext context}) async {
           await store.dispatch(updateCredential(

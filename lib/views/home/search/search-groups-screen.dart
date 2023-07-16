@@ -1,28 +1,27 @@
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/actions.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/rooms/room/selectors.dart';
+import 'package:syphon/domain/search/actions.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/room/selectors.dart';
-import 'package:syphon/store/search/actions.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/loader/index.dart';
 
 class GroupSearchScreen extends StatefulWidget {
-  const GroupSearchScreen({Key? key}) : super(key: key);
+  const GroupSearchScreen({super.key});
 
   @override
   GroupSearchState createState() => GroupSearchState();
@@ -84,7 +83,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
               padding: EdgeInsets.only(top: 16),
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
           ),
@@ -183,7 +182,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                     child: Text(
                       room.name!,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodyText1,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                 ],
@@ -239,7 +238,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                       formatPreviewTopic(room.topic),
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                 ],
@@ -253,7 +252,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                   padding: Dimensions.listPadding,
                   child: Text(
                     room.topic ?? Strings.placeholderTopic,
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
                 Container(
@@ -262,7 +261,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                     room.name!,
                     textAlign: TextAlign.start,
                     softWrap: true,
-                    style: Theme.of(context).textTheme.caption,
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
                 Container(
@@ -292,7 +291,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                               margin: EdgeInsets.only(top: 4),
                               child: Text(
                                 'Encryption',
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             )
                           ],
@@ -316,7 +315,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                               margin: EdgeInsets.only(top: 4),
                               child: Text(
                                 'Total Users',
-                                style: Theme.of(context).textTheme.caption,
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             )
                           ],

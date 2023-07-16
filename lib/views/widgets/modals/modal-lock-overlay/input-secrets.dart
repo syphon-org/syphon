@@ -6,10 +6,10 @@ import 'package:vector_math/vector_math_64.dart';
 
 class InputSecret extends StatelessWidget {
   const InputSecret({
-    Key? key,
+    super.key,
     this.enabled = false,
     this.config = const InputSecretConfig(),
-  }) : super(key: key);
+  });
 
   final bool enabled;
 
@@ -54,12 +54,12 @@ class SineCurve extends Curve {
 
 class InputSecrets extends StatefulWidget {
   const InputSecrets({
-    Key? key,
+    super.key,
     this.config = const InputSecretsConfig(),
     required this.inputStream,
     required this.verifyStream,
     required this.length,
-  }) : super(key: key);
+  });
 
   final InputSecretsConfig config;
   final Stream<String> inputStream;

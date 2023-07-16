@@ -5,10 +5,10 @@ import 'package:syphon/global/strings.dart';
 
 class DialogEncryption extends StatelessWidget {
   const DialogEncryption({
-    Key? key,
+    super.key,
     this.content,
     this.onAccept,
-  }) : super(key: key);
+  });
 
   final String? content;
   final Function? onAccept;
@@ -39,7 +39,7 @@ class DialogEncryption extends StatelessWidget {
               },
               child: Text(
                 Strings.buttonCancel,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             SimpleDialogOption(
@@ -56,7 +56,7 @@ class DialogEncryption extends StatelessWidget {
               },
               child: Text(
                 Strings.buttonTextLetsEncrypt,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
           ],

@@ -3,18 +3,18 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 
 class CardSection extends StatelessWidget {
   const CardSection({
-    Key? key,
+    super.key,
     this.child,
     this.margin,
     this.padding,
     this.elevation,
-  }) : super(key: key);
+  });
 
   final Widget? child;
   final EdgeInsets? margin;

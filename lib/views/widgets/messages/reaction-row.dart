@@ -1,73 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:syphon/domain/events/reactions/model.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/events/reactions/model.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/views/widgets/lifecycle.dart';
+import 'package:syphon/global/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 
-class ReactionRow extends StatefulWidget {
+class ReactionRow extends HookWidget {
   final String currentUserId;
   final List<Reaction> reactions;
-
   final Function? onToggleReaction;
 
   const ReactionRow({
-    Key? key,
+    super.key,
     this.reactions = const [],
     this.currentUserId = '',
     this.onToggleReaction,
-  }) : super(key: key);
-
-  @override
-  State<ReactionRow> createState() => _ReactionRowState();
-}
-
-class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
-  var reactionsMap = <String, int>{};
-  var reactionsUserMap = <String, bool>{};
-
-  @override
-  void onMounted() {
-    super.onMounted();
-
-    final store = StoreProvider.of<AppState>(context);
-    final currentUserId = store.state.authStore.currentUser.userId;
-
-    setState(() {
-      for (final reaction in widget.reactions) {
-        reactionsMap.update(
-          reaction.body ?? '',
-          (value) => value + 1,
-          ifAbsent: () => 1,
-        );
-
-        reactionsUserMap.update(
-          reaction.body ?? '',
-          (value) => value || reaction.sender == currentUserId,
-          ifAbsent: () => reaction.sender == currentUserId,
-        );
-      }
-    });
-  }
+  });
 
   @override
   Widget build(BuildContext context) {
-    final reactionKeys = reactionsMap.keys;
-    final reactionCounts = reactionsMap.values;
+    final (reactionsMap, setReactionsMap) = useStateful(<String, int>{});
+    final (reactionsUserMap, setreactionsUserMap) = useStateful(<String, bool>{});
+
+    final currentUserId = useSelector<AppState, String>(
+      (state) => state.authStore.currentUser.userId ?? '',
+      '',
+    );
+
+    useEffect(() {
+      for (final reaction in reactions) {
+        setReactionsMap(Map.from(reactionsMap
+          ..update(
+            reaction.body ?? '',
+            (value) => value + 1,
+            ifAbsent: () => 1,
+          )));
+
+        setreactionsUserMap(Map.from(reactionsUserMap
+          ..update(
+            reaction.body ?? '',
+            (value) => value || reaction.sender == currentUserId,
+            ifAbsent: () => reaction.sender == currentUserId,
+          )));
+      }
+    }, []);
 
     return ListView.builder(
       shrinkWrap: true,
+      itemCount: reactionsMap.keys.length,
       physics: ClampingScrollPhysics(),
-      itemCount: reactionKeys.length,
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.antiAlias,
       itemBuilder: (BuildContext context, int index) {
-        final reactionKey = reactionKeys.elementAt(index);
-        final reactionCount = reactionCounts.elementAt(index);
+        final reactionKey = reactionsMap.keys.elementAt(index);
+        final reactionCount = reactionsMap.values.elementAt(index);
         final isUserReaction = reactionsUserMap[reactionKey] ?? false;
 
         return GestureDetector(
-          onTap: () => widget.onToggleReaction?.call(reactionKey),
+          onTap: () => onToggleReaction?.call(reactionKey),
           child: Container(
             width: reactionCount > 1 ? 48 : 32,
             height: 48,
@@ -77,8 +68,7 @@ class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
                   : Theme.of(context).dialogBackgroundColor,
               borderRadius: BorderRadius.circular(Dimensions.iconSize),
               border: Border.all(
-                color:
-                    Theme.of(context).brightness == Brightness.light ? Colors.grey : Colors.white,
+                color: Theme.of(context).brightness == Brightness.light ? Colors.grey : Colors.white,
                 width: 0.8,
               ),
             ),
@@ -89,7 +79,7 @@ class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
                   reactionKey,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.subtitle1!.color,
+                    color: Theme.of(context).textTheme.titleMedium!.color,
                     height: 1.35,
                   ),
                 ),
@@ -103,7 +93,7 @@ class _ReactionRowState extends State<ReactionRow> with Lifecycle<ReactionRow> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.subtitle1!.color,
+                        color: Theme.of(context).textTheme.titleMedium!.color,
                         height: 1.35,
                       ),
                     ),

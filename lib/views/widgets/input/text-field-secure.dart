@@ -16,7 +16,7 @@ const DEFAULT_BORDER_WIDTH = 1.2;
 ///
 class TextFieldSecure extends StatelessWidget {
   const TextFieldSecure({
-    Key? key,
+    super.key,
     this.label,
     this.hint,
     this.suffix,
@@ -41,7 +41,7 @@ class TextFieldSecure extends StatelessWidget {
     this.textInputAction,
     this.autofillHints,
     this.mouseCursor = MaterialStateMouseCursor.textable,
-  }) : super(key: key);
+  });
 
   final bool valid;
   final bool dirty;
@@ -80,7 +80,7 @@ class TextFieldSecure extends StatelessWidget {
 
     if (!valid && dirty) {
       return BorderSide(
-        color: Theme.of(context).errorColor,
+        color: Theme.of(context).colorScheme.error,
         width: DEFAULT_BORDER_WIDTH,
       );
     }
@@ -100,7 +100,7 @@ class TextFieldSecure extends StatelessWidget {
 
     if (!valid && dirty) {
       return BorderSide(
-        color: Theme.of(context).errorColor.withOpacity(0.75),
+        color: Theme.of(context).colorScheme.error.withOpacity(0.75),
         width: DEFAULT_BORDER_WIDTH,
       );
     }

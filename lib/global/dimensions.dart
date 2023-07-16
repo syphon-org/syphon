@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
 
+Size useDimensions(BuildContext context) {
+  return MediaQuery.of(context).size;
+}
+
+EdgeInsets useViewInsets(BuildContext context) {
+  return EdgeInsets.fromViewPadding(
+    View.of(context).viewInsets,
+    View.of(context).devicePixelRatio,
+  );
+}
+
 class Dimensions {
   // Containers
   static const double heightMax = 1024;

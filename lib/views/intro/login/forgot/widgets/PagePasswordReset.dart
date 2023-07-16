@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
 class PasswordResetStep extends StatefulWidget {
-  const PasswordResetStep({Key? key}) : super(key: key);
+  const PasswordResetStep({super.key});
 
   @override
   PasswordResetStepState createState() => PasswordResetStepState();
@@ -86,7 +86,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                       child: Text(
                         Strings.contentPasswordRecommendation,
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
                     Container(
@@ -94,7 +94,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                       child: Text(
                         'Create a password',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline5,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
                   ],

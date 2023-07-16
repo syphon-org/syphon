@@ -3,17 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
-
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/weburl.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
 
 class TermsStep extends StatelessWidget {
-  TermsStep({Key? key}) : super(key: key);
+  TermsStep({super.key});
   final focusNode = FocusNode();
 
   @override
@@ -76,7 +75,7 @@ class TermsStep extends StatelessWidget {
                     child: Text(
                       '${props.homeserver} requires you read\nand agree to a terms of service.',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                   Stack(
@@ -90,7 +89,7 @@ class TermsStep extends StatelessWidget {
                         child: Text(
                           'Agree to Terms of Service',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ),
                       Positioned(
@@ -151,11 +150,11 @@ class TermsStep extends StatelessWidget {
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               text: 'Agree to ${props.homeserver} ',
-                              style: Theme.of(context).textTheme.subtitle1,
+                              style: Theme.of(context).textTheme.titleMedium,
                               children: <TextSpan>[
                                 TextSpan(
                                   text: 'terms of service',
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                         fontWeight: FontWeight.w400,
                                         decorationStyle: TextDecorationStyle.solid,
                                       ),
@@ -209,7 +208,7 @@ class _Props extends Equatable {
       onViewTermsOfService: () async {
         try {
           final termsOfServiceUrl = store.state.authStore.credential!.termsUrl!;
-          launchUrl(termsOfServiceUrl);
+          launchUrlWrapper(termsOfServiceUrl);
         } catch (error) {}
       });
 

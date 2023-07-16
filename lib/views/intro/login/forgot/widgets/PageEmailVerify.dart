@@ -1,17 +1,16 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 import 'package:syphon/views/widgets/input/text-field-secure.dart';
 
@@ -20,7 +19,7 @@ import 'package:syphon/views/widgets/input/text-field-secure.dart';
 // Styling
 
 class EmailVerifyStep extends StatefulWidget {
-  const EmailVerifyStep({Key? key}) : super(key: key);
+  const EmailVerifyStep({super.key});
 
   @override
   EmailStepState createState() => EmailStepState();
@@ -133,7 +132,7 @@ class EmailStepState extends State<EmailVerifyStep> {
                             child: Text(
                               'Enter both your email\n and homeserver',
                               textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headline5,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                           Positioned(
@@ -325,8 +324,7 @@ class _Props extends Equatable {
         loading: store.state.authStore.loading,
         isEmailValid: store.state.authStore.isEmailValid,
         isHomeserverValid: store.state.authStore.homeserver.valid,
-        session: store.state.authStore.authSession != null &&
-            store.state.authStore.authSession!.isNotEmpty,
+        session: store.state.authStore.authSession != null && store.state.authStore.authSession!.isNotEmpty,
         onSetEmail: (email) {
           return store.dispatch(setEmail(email: email));
         },

@@ -4,18 +4,18 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/actions.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/user/actions.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
-import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/home/chat/widgets/dialog-encryption.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
@@ -25,7 +25,7 @@ import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/modals/modal-image-options.dart';
 
 class CreateGroupScreen extends StatefulWidget {
-  const CreateGroupScreen({Key? key}) : super(key: key);
+  const CreateGroupScreen({super.key});
 
   @override
   CreateGroupPublicState createState() => CreateGroupPublicState();
@@ -247,7 +247,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                   child: Text(
                                                     name ?? '',
                                                     overflow: TextOverflow.ellipsis,
-                                                    style: Theme.of(context).textTheme.bodyText1,
+                                                    style: Theme.of(context).textTheme.bodyLarge,
                                                   ),
                                                 ),
                                                 Flexible(
@@ -263,7 +263,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                         maxLines: 1,
                                                         overflow: TextOverflow.ellipsis,
                                                         textAlign: TextAlign.center,
-                                                        style: Theme.of(context).textTheme.caption,
+                                                        style: Theme.of(context).textTheme.bodySmall,
                                                       ),
                                                     )),
                                               ],
@@ -287,7 +287,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                 child: Text(
                                                   'About',
                                                   textAlign: TextAlign.start,
-                                                  style: Theme.of(context).textTheme.subtitle2,
+                                                  style: Theme.of(context).textTheme.titleSmall,
                                                 ),
                                               ),
                                               Container(
@@ -300,8 +300,8 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                   label: 'Name*',
                                                   textInputAction: TextInputAction.next,
                                                   controller: nameController,
-                                                  onSubmitted: (text) => FocusScope.of(context)
-                                                      .requestFocus(topicFocus),
+                                                  onSubmitted: (text) =>
+                                                      FocusScope.of(context).requestFocus(topicFocus),
                                                   onChanged: (text) => setState(() {
                                                     name = text;
                                                   }),
@@ -348,7 +348,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                 Text(
                                                   Strings.labelUsers,
                                                   textAlign: TextAlign.start,
-                                                  style: Theme.of(context).textTheme.subtitle2,
+                                                  style: Theme.of(context).textTheme.titleSmall,
                                                 ),
                                               ],
                                             ),
@@ -384,7 +384,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                                 Text(
                                                   'Options',
                                                   textAlign: TextAlign.start,
-                                                  style: Theme.of(context).textTheme.subtitle2,
+                                                  style: Theme.of(context).textTheme.titleSmall,
                                                 ),
                                               ],
                                             ),
@@ -395,7 +395,7 @@ class CreateGroupPublicState extends State<CreateGroupScreen> {
                                               contentPadding: Dimensions.listPadding,
                                               title: Text(
                                                 'Message Encryption',
-                                                style: Theme.of(context).textTheme.subtitle1,
+                                                style: Theme.of(context).textTheme.titleMedium,
                                               ),
                                               trailing: Switch(
                                                 value: encryption,

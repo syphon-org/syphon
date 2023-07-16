@@ -2,19 +2,19 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 
 class ProfilePreview extends StatelessWidget {
   const ProfilePreview({
-    Key? key,
+    super.key,
     this.hasMultiaccounts = false,
     this.onModifyAccounts,
-  }) : super(key: key);
+  });
 
   final bool hasMultiaccounts;
   final Function? onModifyAccounts;

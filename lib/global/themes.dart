@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 
 // Set the theme for the system UI only
 void setSystemTheme(ThemeType themeType) {
@@ -13,6 +13,10 @@ void setSystemTheme(ThemeType themeType) {
       systemNavigationBarIconBrightness: selectSystemUiIconColor(themeType),
     ),
   );
+}
+
+Brightness useBrightness(BuildContext context) {
+  return Theme.of(context).brightness;
 }
 
 // Set the theme
@@ -33,8 +37,6 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
     final scaffoldBackgroundColor = selectScaffoldBackgroundColor(appTheme.themeType);
     final dialogBackgroundColor = selectModalColor(appTheme.themeType);
     final iconColor = selectIconColor(appTheme.themeType);
-
-    final selectedRowColor = selectRowHighlightColor(appTheme.themeType);
 
     final fontFamily = selectFontNameString(appTheme.fontName);
     final titleWeight = selectFontTitleWeight(appTheme.fontName);
@@ -67,10 +69,8 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
         selectionColor: primaryColor.withAlpha(100),
         selectionHandleColor: primaryColor,
       ),
-      selectedRowColor: Color(selectedRowColor),
       iconTheme: IconThemeData(color: iconColor),
-      scaffoldBackgroundColor:
-          scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
+      scaffoldBackgroundColor: scaffoldBackgroundColor != null ? Color(scaffoldBackgroundColor) : null,
       inputDecorationTheme: InputDecorationTheme(
         helperStyle: TextStyle(
           color: invertedPrimaryColor,
@@ -92,41 +92,41 @@ ThemeData? setupTheme(ThemeSettings appTheme, {bool generateThemeData = false}) 
       // Fonts
       fontFamily: fontFamily,
       primaryTextTheme: TextTheme(
-        headline6: TextStyle(
+        titleLarge: TextStyle(
           color: Colors.white,
           fontWeight: titleWeight,
         ),
       ),
       textTheme: TextTheme(
-        headline5: TextStyle(
+        headlineSmall: TextStyle(
           fontWeight: titleWeight,
         ),
-        headline6: TextStyle(
+        titleLarge: TextStyle(
           fontWeight: titleWeight,
           letterSpacing: letterSpacing,
         ),
-        subtitle1: TextStyle(
+        titleMedium: TextStyle(
           fontSize: subtitleSizeLarge,
           fontWeight: titleWeight,
           letterSpacing: letterSpacing,
         ),
-        subtitle2: TextStyle(
+        titleSmall: TextStyle(
           fontSize: subtitleSize,
           fontWeight: bodyWeight,
           letterSpacing: letterSpacing,
           color: secondaryColor,
         ),
-        caption: TextStyle(
+        bodySmall: TextStyle(
           fontSize: subtitleSize,
           fontWeight: titleWeight,
           letterSpacing: letterSpacing,
         ),
-        bodyText1: TextStyle(
+        bodyLarge: TextStyle(
           fontSize: bodySizeLarge,
           letterSpacing: letterSpacing,
           fontWeight: bodyWeight,
         ),
-        bodyText2: TextStyle(
+        bodyMedium: TextStyle(
           fontSize: bodySize,
           letterSpacing: letterSpacing,
           fontWeight: titleWeight,

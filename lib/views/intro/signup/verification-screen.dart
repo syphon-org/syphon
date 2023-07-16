@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
 import 'package:syphon/views/behaviors.dart';
 import 'package:syphon/views/widgets/buttons/button-solid.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-explaination.dart';
 
 class VerificationScreen extends StatefulWidget {
-  const VerificationScreen({Key? key}) : super(key: key);
+  const VerificationScreen({super.key});
 
   @override
   VerificationScreenState createState() => VerificationScreenState();
@@ -56,7 +56,6 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
             success = result;
           });
         }
-        break;
       default:
         break;
     }
@@ -96,8 +95,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                             ),
                             child: SvgPicture.asset(
                               Assets.heroSignupVerificationView,
-                              semanticsLabel:
-                                  'Letter in envelop floating upward with attached balloons',
+                              semanticsLabel: 'Letter in envelop floating upward with attached balloons',
                             ),
                           ),
                         ),
@@ -110,7 +108,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                 child: Text(
                                   'Check your email and click the verification\nlink to finish account creation.',
                                   textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.caption,
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ),
                               Stack(
@@ -124,7 +122,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                     child: Text(
                                       'Verify your email address',
                                       textAlign: TextAlign.center,
-                                      style: Theme.of(context).textTheme.headline5,
+                                      style: Theme.of(context).textTheme.headlineSmall,
                                     ),
                                   ),
                                   Positioned(

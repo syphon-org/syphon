@@ -1,19 +1,18 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/rooms/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -32,8 +31,8 @@ class MediaPreviewArguments {
 
 class MediaPreviewScreen extends StatefulWidget {
   const MediaPreviewScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   MediaPreviewState createState() => MediaPreviewState();
@@ -46,7 +45,10 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
 
   @override
   onMounted() async {
-    final params = useScreenArguments<MediaPreviewArguments>(context);
+    final params = useScreenArguments<MediaPreviewArguments>(
+      context,
+      MediaPreviewArguments(onConfirmSend: () {}),
+    );
 
     try {
       final firstImage = params?.mediaList.first;
@@ -55,13 +57,17 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
         currentImage = firstImage;
       });
     } catch (error) {
-      log.error(error.toString());
+      console.error(error.toString());
     }
   }
 
   onConfirm(_Props props) async {
-    final params = useScreenArguments<MediaPreviewArguments>(context);
-    await params?.onConfirmSend();
+    final params = useScreenArguments<MediaPreviewArguments>(
+      context,
+      MediaPreviewArguments(onConfirmSend: () {}),
+    );
+
+    await params.onConfirmSend();
     Navigator.pop(context);
   }
 
@@ -69,9 +75,11 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
-          store,
-          useScreenArguments<MediaPreviewArguments>(context)?.roomId,
-        ),
+            store,
+            useScreenArguments<MediaPreviewArguments>(
+              context,
+              MediaPreviewArguments(onConfirmSend: () {}),
+            ).roomId),
         builder: (context, props) {
           final encryptionEnabled = props.room.encryptionEnabled;
           final height = MediaQuery.of(context).size.height;
@@ -116,7 +124,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                                 ? Strings.titleSendMediaMessage
                                 : Strings.titleSendMediaMessageUnencrypted,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.w400,
                                 ),
                           ),
@@ -142,11 +150,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                                         child: CircularProgressIndicator(
                                           strokeWidth: Dimensions.strokeWidthThin * 1.5,
                                           valueColor: AlwaysStoppedAnimation<Color>(
-                                            Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary
-                                                        .computeLuminance() >
-                                                    0.6
+                                            Theme.of(context).colorScheme.secondary.computeLuminance() > 0.6
                                                 ? Colors.black
                                                 : Colors.white,
                                           ),
@@ -159,7 +163,7 @@ class MediaPreviewState extends State<MediaPreviewScreen> with Lifecycle<MediaPr
                                           encryptionEnabled
                                               ? Assets.iconSendLockSolidBeing
                                               : Assets.iconSendUnlockBeing,
-                                          color: Colors.white,
+                                          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                                           semanticsLabel: Strings.labelSendEncrypted,
                                         ),
                                       ),

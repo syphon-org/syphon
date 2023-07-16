@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/index.dart';
 import 'package:syphon/views/widgets/buttons/button-text.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-captcha.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-confirm.dart';
 
 class CaptchaStep extends StatefulWidget {
-  const CaptchaStep({Key? key}) : super(key: key);
+  const CaptchaStep({super.key});
 
   @override
   CaptchaStepState createState() => CaptchaStepState();
@@ -38,7 +38,7 @@ class CaptchaStepState extends State<CaptchaStep> {
         onComplete: (String token) {
           props.onCompleteCaptcha(token);
 
-          log.info('COMPLETED');
+          console.info('COMPLETED');
           Navigator.pop(dialogContext);
         },
       ),
@@ -82,7 +82,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                     child: Text(
                       Strings.contentCaptchaRequirement,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.caption,
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
                   Stack(
@@ -96,7 +96,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                         child: Text(
                           'Confirm you\'re alive',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ),
                       Positioned(
@@ -137,12 +137,8 @@ class CaptchaStepState extends State<CaptchaStep> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   ButtonText(
-                    text: !props.completed
-                        ? Strings.buttonTextLoadCaptcha
-                        : Strings.buttonTextConfirmed,
-                    color: !props.completed
-                        ? Color(AppColors.cyanSyphon)
-                        : Color(AppColors.cyanSyphonAlpha),
+                    text: !props.completed ? Strings.buttonTextLoadCaptcha : Strings.buttonTextConfirmed,
+                    color: !props.completed ? Color(AppColors.cyanSyphon) : Color(AppColors.cyanSyphonAlpha),
                     loading: props.loading,
                     disabled: props.completed,
                     onPressed: () => onShowDialog(context, props),
@@ -183,8 +179,7 @@ class _Props extends Equatable {
         completed: store.state.authStore.captcha,
         hostname: store.state.authStore.hostname,
         publicKey: () {
-          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]
-                  ['public_key'] ??
+          return store.state.authStore.interactiveAuths['params'][MatrixAuthTypes.RECAPTCHA]['public_key'] ??
               '';
         }(),
         onCompleteCaptcha: (String token) async {

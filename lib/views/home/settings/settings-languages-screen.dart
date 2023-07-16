@@ -2,16 +2,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/actions.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 
 class LanguageSettingsScreen extends StatelessWidget {
-  const LanguageSettingsScreen({Key? key}) : super(key: key);
+  const LanguageSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, Props>(
@@ -36,11 +36,11 @@ class LanguageSettingsScreen extends StatelessWidget {
                       contentPadding: Dimensions.listPadding,
                       title: Text(
                         displayName ?? 'Unknown',
-                        style: Theme.of(context).textTheme.bodyText2,
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       subtitle: Text(
                         nativeName ?? 'N/A',
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       trailing: Visibility(
                         visible: props.language == language,

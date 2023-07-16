@@ -4,31 +4,30 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/actions.dart';
+import 'package:syphon/domain/rooms/selectors.dart';
+import 'package:syphon/domain/user/actions.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/selectors.dart';
-import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/views/home/chat/chat-screen.dart';
-import 'package:syphon/views/home/profile/profile-user-screen.dart';
+import 'package:syphon/views/home/chat/ChatScreen.dart';
+import 'package:syphon/views/home/profile/ProfileUserScreen.dart';
 import 'package:syphon/views/home/search/search-chats-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
 
-
 class ModalUserDetails extends StatelessWidget {
   const ModalUserDetails({
-    Key? key,
+    super.key,
     this.user,
     this.userId,
     this.nested,
-  }) : super(key: key);
+  });
 
   final User? user;
   final String? userId;
@@ -145,9 +144,8 @@ class ModalUserDetails extends StatelessWidget {
                             uri: props.user.avatarUri,
                             alt: props.user.displayName ?? props.user.userId,
                             size: Dimensions.avatarSizeDetails,
-                            background: props.user.avatarUri == null
-                                ? AppColors.hashedColorUser(props.user)
-                                : null,
+                            background:
+                                props.user.avatarUri == null ? AppColors.hashedColorUser(props.user) : null,
                           ),
                         ),
                       ],
@@ -160,7 +158,7 @@ class ModalUserDetails extends StatelessWidget {
                             props.user.displayName ?? '',
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
                                   fontWeight: FontWeight.w500,
                                 ),
                           ),
@@ -172,14 +170,15 @@ class ModalUserDetails extends StatelessWidget {
                       children: <Widget>[
                         Flexible(
                           // wrapped with flexible to allow ellipsis
-                          child: InkWell(child: Text(
-                            props.user.userId ?? '',
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.subtitle1,
-                          ),
-                            onLongPress: () async  {
-                              await Clipboard.setData(ClipboardData(text: props.user.userId));
+                          child: InkWell(
+                            child: Text(
+                              props.user.userId ?? '',
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            onLongPress: () async {
+                              await Clipboard.setData(ClipboardData(text: props.user.userId ?? ''));
                               await props.onAddConfirmation('Username copied to clipboard');
                               Navigator.pop(context);
                             },
@@ -200,7 +199,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsSendMessage,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),
@@ -211,7 +210,8 @@ class ModalUserDetails extends StatelessWidget {
                           width: Dimensions.iconSize - 2,
                           height: Dimensions.iconSize - 2,
                           semanticsLabel: Strings.semanticsCreatePublicRoom,
-                          color: Theme.of(context).iconTheme.color,
+                          colorFilter: ColorFilter.mode(
+                              Theme.of(context).iconTheme.color ?? Colors.white, BlendMode.srcIn),
                         ),
                       ),
                     ),
@@ -222,7 +222,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsRoomInvite,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),
@@ -239,7 +239,7 @@ class ModalUserDetails extends StatelessWidget {
                       ),
                       title: Text(
                         Strings.listItemUserDetailsViewProfile,
-                        style: Theme.of(context).textTheme.subtitle1,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(4),
@@ -307,42 +307,41 @@ class _Props extends Equatable {
       ];
 
   static _Props mapStateToProps(Store<AppState> store, {User? user, String? userId}) => _Props(
-        user: () {
-          final users = store.state.userStore.users;
-          final loading = store.state.userStore.loading;
+      user: () {
+        final users = store.state.userStore.users;
+        final loading = store.state.userStore.loading;
 
-          if (user != null && user.userId != null) {
-            return user;
-          }
-
-          if (userId == null) {
-            return User();
-          }
-
-          if (!users.containsKey(userId) && !loading) {
-            store.dispatch(fetchUser(user: User(userId: userId)));
-          }
-
-          return users[userId] ?? User();
-        }(),
-        users: store.state.userStore.users,
-        existingChatId: selectDirectChatIdExisting(
-          state: store.state,
-          user: user ?? User(userId: userId),
-        ),
-        loading: store.state.userStore.loading,
-        blocked: store.state.userStore.blocked.contains(userId ?? user!.userId),
-        onBlockUser: (User user) async {
-          await store.dispatch(toggleBlockUser(user: user));
-        },
-        onCreateChatDirect: ({required User user}) async => store.dispatch(
-          createRoom(
-            isDirect: true,
-            invites: <User>[user],
-          ),
-        ),
-        onAddConfirmation: (String message) async {
-          await store.dispatch(addConfirmation(message: message));
+        if (user != null && user.userId != null) {
+          return user;
         }
-      );
+
+        if (userId == null) {
+          return User();
+        }
+
+        if (!users.containsKey(userId) && !loading) {
+          store.dispatch(fetchUser(user: User(userId: userId)));
+        }
+
+        return users[userId] ?? User();
+      }(),
+      users: store.state.userStore.users,
+      existingChatId: selectDirectChatIdExisting(
+        state: store.state,
+        user: user ?? User(userId: userId),
+      ),
+      loading: store.state.userStore.loading,
+      blocked: store.state.userStore.blocked.contains(userId ?? user!.userId),
+      onBlockUser: (User user) async {
+        await store.dispatch(toggleBlockUser(user: user));
+      },
+      onCreateChatDirect: ({required User user}) async => store.dispatch(
+            createRoom(
+              isDirect: true,
+              invites: <User>[user],
+            ),
+          ),
+      onAddConfirmation: (String message) async {
+        await store.dispatch(addConfirmation(message: message));
+      });
 }

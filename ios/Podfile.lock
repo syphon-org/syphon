@@ -43,7 +43,7 @@ PODS:
     - DKImagePickerController/PhotoGallery
     - Flutter
   - Flutter (1.0.0)
-  - flutter_image_compress (0.0.1):
+  - flutter_image_compress (1.0.0):
     - Flutter
     - Mantle
     - SDWebImage
@@ -52,22 +52,22 @@ PODS:
     - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
-  - flutter_secure_storage (3.3.1):
+  - flutter_secure_storage (6.0.0):
     - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
-  - image_picker (0.0.1):
+  - image_picker_ios (0.0.1):
     - Flutter
-  - libwebp (1.2.3):
-    - libwebp/demux (= 1.2.3)
-    - libwebp/mux (= 1.2.3)
-    - libwebp/webp (= 1.2.3)
-  - libwebp/demux (1.2.3):
+  - libwebp (1.2.4):
+    - libwebp/demux (= 1.2.4)
+    - libwebp/mux (= 1.2.4)
+    - libwebp/webp (= 1.2.4)
+  - libwebp/demux (1.2.4):
     - libwebp/webp
-  - libwebp/mux (1.2.3):
+  - libwebp/mux (1.2.4):
     - libwebp/demux
-  - libwebp/webp (1.2.3)
+  - libwebp/webp (1.2.4)
   - local_image_provider (0.0.1):
     - Flutter
   - Mantle (2.2.0):
@@ -78,35 +78,37 @@ PODS:
     - OLMKit/olmcpp (= 3.2.12)
   - OLMKit/olmc (3.2.12)
   - OLMKit/olmcpp (3.2.12)
-  - package_info (0.0.1):
+  - package_info_plus (0.4.5):
     - Flutter
-  - path_provider_ios (0.0.1):
+  - path_provider_foundation (0.0.1):
     - Flutter
-  - "permission_handler (5.1.0+2)":
+    - FlutterMacOS
+  - permission_handler_apple (9.0.4):
     - Flutter
   - ReachabilitySwift (5.0.0)
-  - SDWebImage (5.13.4):
-    - SDWebImage/Core (= 5.13.4)
-  - SDWebImage/Core (5.13.4)
-  - SDWebImageWebPCoder (0.9.1):
+  - SDWebImage (5.15.8):
+    - SDWebImage/Core (= 5.15.8)
+  - SDWebImage/Core (5.15.8)
+  - SDWebImageWebPCoder (0.11.0):
     - libwebp (~> 1.0)
-    - SDWebImage/Core (~> 5.13)
+    - SDWebImage/Core (~> 5.15)
   - share_plus (0.0.1):
     - Flutter
-  - shared_preferences_ios (0.0.1):
+  - shared_preferences_foundation (0.0.1):
     - Flutter
-  - sqflite (0.0.2):
+    - FlutterMacOS
+  - sqflite (0.0.3):
     - Flutter
     - FMDB (>= 2.7.5)
-  - SQLCipher (4.5.2):
-    - SQLCipher/standard (= 4.5.2)
-  - SQLCipher/common (4.5.2)
-  - SQLCipher/standard (4.5.2):
+  - SQLCipher (4.5.4):
+    - SQLCipher/standard (= 4.5.4)
+  - SQLCipher/common (4.5.4)
+  - SQLCipher/standard (4.5.4):
     - SQLCipher/common
   - sqlcipher_flutter_libs (0.0.1):
     - Flutter
-    - SQLCipher (~> 4.5.0)
-  - SwiftyGif (5.4.3)
+    - SQLCipher (~> 4.5.4)
+  - SwiftyGif (5.4.4)
   - uni_links (0.0.1):
     - Flutter
   - url_launcher_ios (0.0.1):
@@ -127,14 +129,14 @@ DEPENDENCIES:
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
-  - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - local_image_provider (from `.symlinks/plugins/local_image_provider/ios`)
   - OLMKit
-  - package_info (from `.symlinks/plugins/package_info/ios`)
-  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
-  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
-  - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - sqlcipher_flutter_libs (from `.symlinks/plugins/sqlcipher_flutter_libs/ios`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
@@ -177,20 +179,20 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
-  image_picker:
-    :path: ".symlinks/plugins/image_picker/ios"
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
   local_image_provider:
     :path: ".symlinks/plugins/local_image_provider/ios"
-  package_info:
-    :path: ".symlinks/plugins/package_info/ios"
-  path_provider_ios:
-    :path: ".symlinks/plugins/path_provider_ios/ios"
-  permission_handler:
-    :path: ".symlinks/plugins/permission_handler/ios"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
-  shared_preferences_ios:
-    :path: ".symlinks/plugins/shared_preferences_ios/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
   sqlcipher_flutter_libs:
@@ -205,41 +207,41 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/workmanager/ios"
 
 SPEC CHECKSUMS:
-  camera_avfoundation: 07c77549ea54ad95d8581be86617c094a46280d9
+  camera_avfoundation: 3125e8cd1a4387f6f31c6c63abb8a55892a9eeeb
   connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   emoji_picker_flutter: df19dac03a2b39ac667dc8d1da939ef3a9e21347
-  file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
-  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  flutter_image_compress: fd2b476345226e1a10ea352fa306af95704642c1
+  file_picker: ce3938a0df3cc1ef404671531facef740d03f920
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_image_compress: 5a5e9aee05b6553048b8df1c3bc456d0afaac433
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
-  flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
+  flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
-  image_picker: 541dcbb3b9cf32d87eacbd957845d8651d6c62c3
-  libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
+  image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
+  libwebp: f62cb61d0a484ba548448a4bd52aabf150ff6eef
   local_image_provider: 05b1af32561482c0ca5a440fbc7f489ad818c962
   Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
   OLMKit: da115f16582e47626616874e20f7bb92222c7a51
-  package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
-  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
-  permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
+  package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
+  path_provider_foundation: eaf5b3e458fc0e5fbb9940fb09980e853fe058b8
+  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
-  SDWebImage: e5cc87bf736e60f49592f307bdf9e157189298a3
-  SDWebImageWebPCoder: 18503de6621dd2c420d680e33d46bf8e1d5169b0
-  share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
-  shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
-  sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
-  SQLCipher: f5b4857434158b571a3ed3b10b3b43cd18ef5f67
-  sqlcipher_flutter_libs: 87686ab669dda991b2f384e4bcbb04b93e19c8fe
-  SwiftyGif: 6c3eafd0ce693cad58bb63d2b2fb9bacb8552780
+  SDWebImage: cb032eba469c54e0000e78bcb0a13cdde0a52798
+  SDWebImageWebPCoder: 295a6573c512f54ad2dd58098e64e17dcf008499
+  share_plus: 599aa54e4ea31d4b4c0e9c911bcc26c55e791028
+  shared_preferences_foundation: e2dae3258e06f44cc55f49d42024fd8dd03c590c
+  sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
+  SQLCipher: 905b145f65f349f26da9e60a19901ad24adcd381
+  sqlcipher_flutter_libs: fe548e08fa9a8b62ed3ec4dc99a33f69826ca3af
+  SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
-  url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
+  url_launcher_ios: 08a3dfac5fb39e8759aeb0abbd5d9480f30fc8b4
   webview_flutter: 3603125dfd3bcbc9d8d418c3f80aeecf331c068b
   workmanager: 3b3583d3b0cd6b29e9b4f19e4c071d8f85cd24b2
 
-PODFILE CHECKSUM: 8d0140a74334d95218026d2a0d2e9406208758d7
+PODFILE CHECKSUM: cd5e42a3edd0910c94064797400d9bafa27b5ada
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

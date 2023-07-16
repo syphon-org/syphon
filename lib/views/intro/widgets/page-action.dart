@@ -6,7 +6,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
 
 class ActionPage extends StatelessWidget {
-  const ActionPage({Key? key, this.title}) : super(key: key);
+  const ActionPage({super.key, this.title});
 
   final String? title;
 
@@ -44,7 +44,7 @@ class ActionPage extends StatelessWidget {
                   child: Text(
                     Strings.contentIntroFinal,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
               ],

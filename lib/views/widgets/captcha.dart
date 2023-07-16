@@ -17,13 +17,11 @@ class Captcha extends StatefulWidget {
   final Function onVerified;
 
   const Captcha({
-    Key? key,
+    super.key,
     required this.baseUrl,
     required this.publicKey,
     required this.onVerified,
-  }) : super(
-          key: key,
-        );
+  });
 
   @override
   CaptchaState createState() => CaptchaState();

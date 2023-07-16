@@ -7,7 +7,7 @@ import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 
 class LandingPage extends StatelessWidget {
-  const LandingPage({Key? key, this.title}) : super(key: key);
+  const LandingPage({super.key, this.title});
 
   final String? title;
 
@@ -47,7 +47,7 @@ class LandingPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
-                        .headline4!
+                        .headlineMedium!
                         .copyWith(fontSize: height < 569 ? 28 : null),
                   ),
                 ),
@@ -63,7 +63,7 @@ class LandingPage extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
-                    .headline6!
+                    .titleLarge!
                     .copyWith(fontSize: height < 569 ? 18 : null),
               ),
             ],

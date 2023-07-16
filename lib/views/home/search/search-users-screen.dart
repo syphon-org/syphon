@@ -1,18 +1,17 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/actions.dart';
+import 'package:syphon/domain/rooms/selectors.dart';
+import 'package:syphon/domain/search/actions.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/selectors.dart';
-import 'package:syphon/store/search/actions.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
-import 'package:syphon/views/home/chat/chat-screen.dart';
+import 'package:syphon/views/home/chat/ChatScreen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/dialogs/dialog-start-chat.dart';
@@ -21,7 +20,7 @@ import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class SearchUserScreen extends StatefulWidget {
-  const SearchUserScreen({Key? key}) : super(key: key);
+  const SearchUserScreen({super.key});
 
   @override
   SearchUserState createState() => SearchUserState();
@@ -184,8 +183,7 @@ class SearchUserState extends State<SearchUserScreen> {
 
     final attemptableUser = User(
       displayName: searchable,
-      userId:
-          searchable.isNotEmpty && searchable.contains(':') ? searchable : formatUserId(searchable),
+      userId: searchable.isNotEmpty && searchable.contains(':') ? searchable : formatUserId(searchable),
     );
 
     return ListView(
@@ -197,7 +195,7 @@ class SearchUserState extends State<SearchUserScreen> {
               Text(
                 Strings.labelSearchResults,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.subtitle2,
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ],
           ),
@@ -256,7 +254,7 @@ class SearchUserState extends State<SearchUserScreen> {
                 Text(
                   Strings.labelUsersRecent,
                   textAlign: TextAlign.start,
-                  style: Theme.of(context).textTheme.subtitle2,
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ],
             ),
@@ -292,7 +290,7 @@ class SearchUserState extends State<SearchUserScreen> {
               Text(
                 Strings.labelKnownUsers,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.subtitle2,
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ],
           ),

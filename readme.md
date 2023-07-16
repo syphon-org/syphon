@@ -19,7 +19,7 @@ a privacy centric matrix client - now in open alpha*
         <img height="56" src="assets/external/get-it-on-fdroid.png">
     </a>
     <a href='https://flathub.org/apps/details/org.syphon.Syphon'>
-        <img height='56' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/>
+        <img height='56' alt='Download on Flathub' src='https://dl.flathub.org/assets/badges/flathub-badge-en.png'/>
     </a>
 </p>
 
@@ -94,6 +94,10 @@ Syphon will always be a not for profit, community driven application.
 ## 🏗️ Building
 You may notice Syphon does not look very dart-y (for example, no \_private variable declarations, or using redux instead of provider) in an effort to reduce the learning curve from other languages or platforms. The faster one can get people contributing, the easier it will be for others to maintain or oversee a tool that does not exploit the user.
 
+### continuous integration
+
+See our [CI script](/.drone.yml) if you wish to set up automated builds. It should also contain the most up-to-date build steps in case you are having trouble with those below.
+
 ### workstation
 - workstation independent setup for Syphon development
     - install flutter (stable channel for all platforms)
@@ -102,7 +106,7 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - android -> android studio
     - install cmake from cli through android studio platform tools (for olm/megolm)
           - ```sdkmanager --install "cmake;3.10.2.4988404"```
-    - (alternate) install cmake version from donwload per workstation platform
+    - (alternate) install cmake version from download per workstation platform
         - [macos](https://cmake.org/files/v3.10/cmake-3.10.2-Darwin-x86_64.dmg) 
         - [linux](https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh)
         - [windows](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
@@ -117,12 +121,18 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
         - ```flutter pub run build_runner build```
 
 ### ios/android
+
+#### only android
 0. install android studio
 0. install latest commandline tools through android studio gui
 0. confirm `sdkmanager` is available in your path
 0. pull the latest cmake, NDK, and other dependencies
-  - ```sdkmanager --install "ndk;21.4.7075529"```
-  - ```sdkmanager --install "cmake;3.10.2.4988404"```
+   - ```sdkmanager --install "ndk;21.4.7075529"```
+   - ```sdkmanager --install "cmake;3.10.2.4988404"```
+0. run the script ```scripts/init-android.sh```
+0. continue with next section `ios & android`
+
+#### ios & android
 0. pull dependencies needed 
   - ```flutter pub get```
 1. generate json conversion for models
@@ -141,7 +151,7 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 
 ### linux
 1. ```flutter config --enable-linux-desktop```
-2. ```apt install libolm3 libsqlite3-dev``` or ```pacman -S libolm``` or platform equivalent for libolm
+2. ```apt install libgtk-3-dev liblzma-dev libblkid-dev libsecret-1-dev libolm-dev libolm3 libsqlite3-dev libjsoncpp-dev libsqlcipher-dev``` or distribution equivalent
 3. ```flutter build linux && flutter build bundle```
 4. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
 5. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
@@ -155,10 +165,10 @@ You may notice Syphon does not look very dart-y (for example, no \_private varia
 ## 📐 Architecture
 
 ### store
-- views (flutter + MVVM)
+- views (flutter + hooks)
 - state management (redux)
 - cache (redux_persist + json_serializable + [sembast](https://pub.dev/packages/sembast) + [codec cipher](https://github.com/tekartik/sembast.dart/blob/master/sembast/doc/codec.md))
-- storage ([drift](https://pub.dev/packages/drift) + sqflite + sqlcipher)
+- storage ([drift](https://pub.dev/packages/drift) + sqlite + sqlcipher)
 
 ### assets
 - Looking for branding or design files? They can all be found [here](https://github.com/syphon-org/syphon/tree/main/assets), in the top level assets folder.

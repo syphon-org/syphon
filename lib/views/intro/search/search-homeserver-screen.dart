@@ -1,20 +1,19 @@
 import 'package:equatable/equatable.dart';
 import 'package:expandable/expandable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/auth/homeserver/actions.dart';
+import 'package:syphon/domain/auth/homeserver/model.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/search/actions.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
+import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/auth/homeserver/actions.dart';
-import 'package:syphon/store/auth/homeserver/model.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/search/actions.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -27,7 +26,7 @@ class SearchHomeserverArguments {
 }
 
 class SearchHomeserverScreen extends StatefulWidget {
-  const SearchHomeserverScreen({Key? key}) : super(key: key);
+  const SearchHomeserverScreen({super.key});
 
   @override
   SearchHomeserverScreenState createState() => SearchHomeserverScreenState();
@@ -75,9 +74,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
           // ignore: cast_nullable_to_non_nullable
-          signup:
-              (ModalRoute.of(context)!.settings.arguments as SearchHomeserverArguments?)?.signup ??
-                  false,
+          signup: (ModalRoute.of(context)!.settings.arguments as SearchHomeserverArguments?)?.signup ?? false,
         ),
         builder: (context, props) => Scaffold(
           appBar: AppBarSearch(
@@ -123,11 +120,11 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                           ),
                           title: Text(
                             homeserver.hostname!,
-                            style: Theme.of(context).textTheme.headline6,
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
                           subtitle: Text(
                             homeserver.description!,
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                           trailing: Visibility(
                             visible: homeserver.hostname == props.homeserver.hostname,
@@ -154,7 +151,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                                 children: <Widget>[
                                   Text(
                                     'Location',
-                                    style: Theme.of(context).textTheme.caption,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                     softWrap: true,
                                   ),
                                   Text(
@@ -169,7 +166,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                                 children: <Widget>[
                                   Text(
                                     'Users',
-                                    style: Theme.of(context).textTheme.caption,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                     softWrap: true,
                                   ),
                                   Text(
@@ -184,7 +181,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                                 children: <Widget>[
                                   Text(
                                     'Chats',
-                                    style: Theme.of(context).textTheme.caption,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                     softWrap: true,
                                   ),
                                   Text(
@@ -199,7 +196,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                                 children: <Widget>[
                                   Text(
                                     'Founded',
-                                    style: Theme.of(context).textTheme.caption,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                     softWrap: true,
                                   ),
                                   Text(
@@ -221,9 +218,8 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                   ),
                 ),
                 Visibility(
-                  visible: props.searchText.isNotEmpty &&
-                      props.searchText.isNotEmpty &&
-                      props.homeservers.isEmpty,
+                  visible:
+                      props.searchText.isNotEmpty && props.searchText.isNotEmpty && props.homeservers.isEmpty,
                   child: Container(
                     padding: EdgeInsets.only(top: 8, bottom: 8),
                     child: GestureDetector(
@@ -243,11 +239,11 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                         title: Text(
                           props.searchText,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.headline6,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                         subtitle: Text(
                           'Try logging in with this server',
-                          style: Theme.of(context).textTheme.caption!.merge(
+                          style: Theme.of(context).textTheme.bodySmall!.merge(
                                 TextStyle(fontStyle: FontStyle.italic),
                               ),
                         ),
@@ -298,11 +294,11 @@ class _Props extends Equatable {
         homeserver: store.state.authStore.homeserver,
         onSelect: (String hostname) async {
           await store.dispatch(selectHomeserver(hostname: hostname));
-          final _homeserver = store.state.authStore.homeserver;
+          final homeserver = store.state.authStore.homeserver;
 
           if (signup &&
-              _homeserver.signupTypes.isEmpty &&
-              (!_homeserver.loginTypes.contains(MatrixAuthTypes.SSO))) {
+              homeserver.signupTypes.isEmpty &&
+              (!homeserver.loginTypes.contains(MatrixAuthTypes.SSO))) {
             store.dispatch(addInfo(
               origin: 'selectHomeserver',
               message: 'No new signups allowed on this server, try another if creating an account.',

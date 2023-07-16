@@ -1,16 +1,15 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/auth/actions.dart';
+import 'package:syphon/domain/auth/homeserver/model.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
-import 'package:syphon/global/libs/matrix/auth.dart';
-import 'package:syphon/store/auth/actions.dart';
-import 'package:syphon/store/auth/homeserver/model.dart';
-import 'package:syphon/store/index.dart';
+import 'package:syphon/global/libraries/matrix/auth/types.dart';
 import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -19,7 +18,7 @@ import 'package:syphon/views/widgets/lifecycle.dart';
 import 'package:touchable_opacity/touchable_opacity.dart';
 
 class HomeserverStep extends StatefulWidget {
-  const HomeserverStep({Key? key}) : super(key: key);
+  const HomeserverStep({super.key});
 
   @override
   HomeserverStepState createState() => HomeserverStepState();
@@ -59,11 +58,11 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
           ),
           title: Text(
             props.homeserver.hostname ?? '',
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           subtitle: Text(
             props.homeserver.baseUrl ?? '',
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           trailing: TouchableOpacity(
             onTap: () {
@@ -160,7 +159,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
                     Text(
                       'Find a homeserver',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline5,
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ],
                 ),
