@@ -33,7 +33,7 @@ class SettingsChatsScreen extends StatelessWidget {
             ),
             body: SingleChildScrollView(
               child: Container(
-                  padding: EdgeInsets.only(bottom: 24),
+                  padding: const EdgeInsets.only(bottom: 24),
                   child: Column(
                     children: <Widget>[
                       CardSection(
@@ -73,7 +73,7 @@ class SettingsChatsScreen extends StatelessWidget {
                                 ),
                                 trailing: Switch(
                                   value: false,
-                                  inactiveThumbColor: Color(AppColors.greyDisabled),
+                                  inactiveThumbColor: const Color(AppColors.greyDisabled),
                                   onChanged: (showMembershipEvents) {},
                                 ),
                               ),

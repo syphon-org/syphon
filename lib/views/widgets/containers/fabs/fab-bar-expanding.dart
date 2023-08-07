@@ -49,7 +49,7 @@ class FabBarExpanding extends StatelessWidget {
         builder: (context, props) => SpeedDial(
           overlayOpacity: 0.4,
           switchLabelPosition: alignment == Alignment.bottomLeft,
-          childMargin: EdgeInsets.symmetric(vertical: 16),
+          childMargin: const EdgeInsets.symmetric(vertical: 16),
           spacing: 8,
           children: <SpeedDialChild>[
             SpeedDialChild(
@@ -58,7 +58,7 @@ class FabBarExpanding extends StatelessWidget {
               onTap: () => onNavigateToCreateGroupPublic(context),
               child: SvgPicture.asset(
                 Assets.iconPublicAddBeing,
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
             SpeedDialChild(
@@ -67,7 +67,7 @@ class FabBarExpanding extends StatelessWidget {
               onTap: () => onNavigateToCreateGroup(context),
               child: SvgPicture.asset(
                 Assets.iconGroupAddBeing,
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
             SpeedDialChild(
@@ -76,7 +76,7 @@ class FabBarExpanding extends StatelessWidget {
               onTap: () => onNavigateToDraft(context),
               child: SvgPicture.asset(
                 Assets.iconMessageCircleBeing,
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
             SpeedDialChild(
@@ -85,7 +85,7 @@ class FabBarExpanding extends StatelessWidget {
               onTap: () => onNavigateToPublicSearch(context),
               child: SvgPicture.asset(
                 Assets.iconSearchPublicCondensedBeing,
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
           ],

@@ -133,7 +133,7 @@ class Routes {
 
 class NavigationProvider {
   static Map<String, Widget Function(BuildContext)> getRoutes() => <String, WidgetBuilder>{
-        Routes.intro: (BuildContext context) => IntroScreen(),
+        Routes.intro: (BuildContext context) => const IntroScreen(),
         Routes.login: (BuildContext context) => const LoginScreen(),
         Routes.signup: (BuildContext context) => SignupScreen(),
         Routes.forgot: (BuildContext context) => const ForgotPasswordScreen(),
@@ -153,7 +153,7 @@ class NavigationProvider {
         Routes.searchGroups: (BuildContext context) => const GroupSearchScreen(),
         Routes.groupCreate: (BuildContext context) => const CreateGroupScreen(),
         Routes.groupCreatePublic: (BuildContext context) => const CreatePublicGroupScreen(),
-        Routes.settingsProfile: (BuildContext context) => ProfileScreen(),
+        Routes.settingsProfile: (BuildContext context) => const ProfileScreen(),
         Routes.settingsNotifications: (BuildContext context) => const NotificationSettingsScreen(),
         Routes.settingsLanguages: (BuildContext context) => const LanguageSettingsScreen(),
         Routes.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),

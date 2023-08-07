@@ -95,7 +95,7 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-            constraints: BoxConstraints(
+            constraints: const BoxConstraints(
               minWidth: Dimensions.mediaSizeMin,
               maxWidth: Dimensions.mediaSizeMax,
               maxHeight: Dimensions.mediaSizeMin,
@@ -107,8 +107,8 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
           ),
           GestureDetector(
             child: Container(
-              margin: EdgeInsets.only(bottom: 48),
-              padding: EdgeInsets.only(top: 16),
+              margin: const EdgeInsets.only(bottom: 48),
+              padding: const EdgeInsets.only(top: 16),
               child: Text(
                 Strings.labelMessagesEmpty,
                 style: Theme.of(context).textTheme.titleLarge,
@@ -131,7 +131,7 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
 
         if (preview == null || preview.isEmpty) {
           preview = 'No Description';
-          previewStyle = TextStyle(fontStyle: FontStyle.italic);
+          previewStyle = const TextStyle(fontStyle: FontStyle.italic);
         }
 
         // GestureDetector w/ animation
@@ -167,7 +167,7 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
                                 width: Dimensions.badgeAvatarSize,
                                 height: Dimensions.badgeAvatarSize,
                                 color: Colors.green,
-                                child: Icon(
+                                child: const Icon(
                                   Icons.lock,
                                   color: Colors.white,
                                   size: Dimensions.iconSizeMini,
@@ -186,7 +186,7 @@ class ChatSearchState extends State<ChatSearchScreen> with Lifecycle<ChatSearchS
                               width: Dimensions.badgeAvatarSize,
                               height: Dimensions.badgeAvatarSize,
                               color: Colors.grey,
-                              child: Icon(
+                              child: const Icon(
                                 Icons.mail_outline,
                                 color: Colors.white,
                                 size: Dimensions.iconSizeMini,

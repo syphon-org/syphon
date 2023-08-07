@@ -48,7 +48,7 @@ class ModalContextSwitcher extends StatelessWidget {
             future: props.availableContext, // async work
             builder: (context, contextsAllData) {
               final knownUsers = props.availableUsers.map((u) => generateContextId_DEPRECATED(id: u.userId!));
-              final contextCurrent = currentContextData.data ?? AppContext();
+              final contextCurrent = currentContextData.data ?? const AppContext();
               final contextsAll = contextsAllData.data ?? [];
 
               final contextsUnknown =
@@ -105,14 +105,14 @@ class ModalContextSwitcher extends StatelessWidget {
       distinct: true,
       converter: (Store<AppState> store) => _Props.mapStateToProps(store),
       builder: (context, props) => Container(
-            constraints: BoxConstraints(
+            constraints: const BoxConstraints(
               maxHeight: Dimensions.modalHeightMax,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     vertical: Dimensions.paddingContainer,
                     horizontal: Dimensions.paddingLarge,
                   ),
@@ -122,8 +122,8 @@ class ModalContextSwitcher extends StatelessWidget {
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).brightness == Brightness.light
-                              ? Color(AppColors.greyDark)
-                              : Color(AppColors.whiteDefault),
+                              ? const Color(AppColors.greyDark)
+                              : const Color(AppColors.whiteDefault),
                         ),
                   ),
                 ),
@@ -145,7 +145,7 @@ class ModalContextSwitcher extends StatelessWidget {
                               context: context,
                               props: props,
                             ),
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                               horizontal: Dimensions.paddingContainer,
                             ),
                             title: Text(
@@ -155,8 +155,8 @@ class ModalContextSwitcher extends StatelessWidget {
                             leading: Container(
                               height: Dimensions.avatarSizeMin,
                               width: Dimensions.avatarSizeMin,
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              child: Icon(
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              child: const Icon(
                                 Icons.add_circle_outline,
                                 size: Dimensions.iconSize,
                               ),

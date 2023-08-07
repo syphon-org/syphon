@@ -134,7 +134,7 @@ ThunkAction<AppState> deleteDevices({List<String?>? deviceIds}) {
     try {
       store.dispatch(SetLoadingSettings(loading: true));
 
-      final currentCredential = store.state.authStore.credential ?? Credential();
+      final currentCredential = store.state.authStore.credential ?? const Credential();
 
       final data = await MatrixApi.deleteDevices(
         protocol: store.state.authStore.protocol,

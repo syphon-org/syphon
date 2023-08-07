@@ -147,10 +147,10 @@ class IntroSettingsScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   props.host,
-                                  style: TextStyle(fontSize: 18.0),
+                                  style: const TextStyle(fontSize: 18.0),
                                 ),
                               ),
                             ),
@@ -166,10 +166,10 @@ class IntroSettingsScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   props.port,
-                                  style: TextStyle(fontSize: 18.0),
+                                  style: const TextStyle(fontSize: 18.0),
                                 ),
                               ),
                             ),
@@ -203,10 +203,10 @@ class IntroSettingsScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   props.username,
-                                  style: TextStyle(fontSize: 18.0),
+                                  style: const TextStyle(fontSize: 18.0),
                                 ),
                               ),
                             ),
@@ -222,10 +222,10 @@ class IntroSettingsScreen extends StatelessWidget {
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   '*' * props.password.length, // hide password
-                                  style: TextStyle(fontSize: 18.0),
+                                  style: const TextStyle(fontSize: 18.0),
                                 ),
                               ),
                             ),

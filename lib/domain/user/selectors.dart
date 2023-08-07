@@ -46,7 +46,7 @@ Map<String, User> messageUsers({required AppState state, String? roomId}) {
   return Map.fromIterable(
     messages,
     key: (msg) => msg.sender,
-    value: (msg) => state.userStore.users[msg.sender] ?? User(),
+    value: (msg) => state.userStore.users[msg.sender] ?? const User(),
   );
 }
 

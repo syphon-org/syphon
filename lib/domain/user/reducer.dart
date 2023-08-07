@@ -36,7 +36,7 @@ UserStore userReducer([UserStore state = const UserStore(), dynamic actionAny]) 
     case ClearUserInvites:
       return state.copyWith(invites: const []);
     case ResetUsers:
-      return UserStore();
+      return const UserStore();
     default:
       return state;
   }

@@ -75,7 +75,7 @@ class HomeChatList extends HookWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 minWidth: Dimensions.mediaSizeMin,
                 maxWidth: Dimensions.mediaSizeMax,
                 maxHeight: Dimensions.mediaSizeMin,
@@ -87,8 +87,8 @@ class HomeChatList extends HookWidget {
             ),
             GestureDetector(
               child: Container(
-                margin: EdgeInsets.only(bottom: 48),
-                padding: EdgeInsets.only(top: 16),
+                margin: const EdgeInsets.only(bottom: 48),
+                padding: const EdgeInsets.only(top: 16),
                 child: Text(
                   noChatsLabel,
                   style: Theme.of(context).textTheme.titleLarge,

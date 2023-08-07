@@ -50,7 +50,7 @@ class DialogOptions extends StatelessWidget {
         children: <Widget>[
           Text(content),
           Container(
-            padding: EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(top: 8),
             child: Wrap(
               alignment: WrapAlignment.center,
               children: [

@@ -21,7 +21,7 @@ extension CryptoQueries on ColdStorageDatabase {
     if (Platform.isLinux) {
       return into(cryptos).insert(
         CryptosCompanion(
-          id: Value(StorageKeys.CRYPTO),
+          id: const Value(StorageKeys.CRYPTO),
           store: Value(storeJson),
         ),
         mode: InsertMode.insertOrReplace,
@@ -29,7 +29,7 @@ extension CryptoQueries on ColdStorageDatabase {
     }
 
     return into(cryptos).insertOnConflictUpdate(CryptosCompanion(
-      id: Value(StorageKeys.CRYPTO),
+      id: const Value(StorageKeys.CRYPTO),
       store: Value(storeJson),
     ));
   }

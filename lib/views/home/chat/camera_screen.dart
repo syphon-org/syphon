@@ -144,7 +144,7 @@ class CameraScreenState extends State<CameraScreen> {
                           heightFactor: 0.9, // Adjust those two for the white space
                           widthFactor: 0.9,
                           child: Container(
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
@@ -160,7 +160,7 @@ class CameraScreenState extends State<CameraScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.flip_camera_android_rounded, color: Colors.white),
+                      icon: const Icon(Icons.flip_camera_android_rounded, color: Colors.white),
                       onPressed: () {
                         _toggleCameraLens();
                       },

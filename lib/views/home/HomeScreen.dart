@@ -126,7 +126,7 @@ class HomeScreen extends HookWidget {
         arguments: ChatScreenArguments(roomId: room.id, title: chatName),
       );
 
-      Timer(Duration(milliseconds: 500), () {
+      Timer(const Duration(milliseconds: 500), () {
         searchModeState.value = false;
         onDismissChatOptions();
         dispatch(clearSearchResults());

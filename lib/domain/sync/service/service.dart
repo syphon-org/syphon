@@ -64,7 +64,7 @@ class SyncService {
 
     console.info('[SyncService] starting');
 
-    final secureStorage = FlutterSecureStorage();
+    const secureStorage = FlutterSecureStorage();
 
     // only write here if one does not exist
     if (!await secureStorage.containsKey(key: SyncService.lastSinceKey)) {
@@ -80,7 +80,7 @@ class SyncService {
     ]);
 
     await AndroidAlarmManager.periodic(
-      Duration(seconds: serviceTimeout),
+      const Duration(seconds: serviceTimeout),
       service_id,
       notificationJob,
       exact: true,
@@ -126,7 +126,7 @@ Future notificationJob() async {
     ProxySettings proxySettings;
 
     try {
-      final secureStorage = FlutterSecureStorage();
+      const secureStorage = FlutterSecureStorage();
       protocol = await secureStorage.read(key: SyncService.protocolKey);
       lastSince = await secureStorage.read(key: SyncService.lastSinceKey);
       final proxySettingsString = await secureStorage.read(key: SyncService.proxySettingsKey);
@@ -168,11 +168,11 @@ Future notificationJob() async {
     );
 
     final cutoff = DateTime.now().add(
-      Duration(seconds: SyncService.serviceTimeout),
+      const Duration(seconds: SyncService.serviceTimeout),
     );
 
     while (DateTime.now().isBefore(cutoff)) {
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
 
       // TODO: check for on the fly disabled notification services
       await backgroundSync(
@@ -419,7 +419,7 @@ Future notificationSyncTEST() async {
     String? lastSince;
 
     try {
-      final secureStorage = FlutterSecureStorage();
+      const secureStorage = FlutterSecureStorage();
       protocol = await secureStorage.read(key: SyncService.protocolKey);
       lastSince = await secureStorage.read(key: SyncService.lastSinceKey);
       currentUser = User.fromJson(

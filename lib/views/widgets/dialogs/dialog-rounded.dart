@@ -21,13 +21,13 @@ class DialogRounded extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      titlePadding: EdgeInsets.only(
+      titlePadding: const EdgeInsets.only(
         left: 24,
         right: 16,
         top: 16,
         bottom: 16,
       ),
-      contentPadding: EdgeInsets.only(
+      contentPadding: const EdgeInsets.only(
         // left: 16,
         // right: 16,
         bottom: 16,

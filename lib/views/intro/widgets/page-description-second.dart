@@ -49,7 +49,7 @@ class SecondDescriptionPage extends StatelessWidget {
                   children: <TextSpan>[
                     TextSpan(
                       text: Strings.contentIntroSecondPartBold,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                       ),
                     ),

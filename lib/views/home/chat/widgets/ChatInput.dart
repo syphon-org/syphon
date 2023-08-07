@@ -91,7 +91,7 @@ class ChatInput extends HookWidget {
 
     final room = useSelector<AppState, Room>(
       (state) => selectRoom(id: roomId, state: state),
-      Room(id: ''),
+      const Room(id: ''),
     );
 
     // Global Chat Settings
@@ -172,12 +172,14 @@ class ChatInput extends HookWidget {
           setTypingNotifier(null);
         }
       });
+      return null;
     }, []);
 
     useEffect(() {
       if (inset > keyboardHeight) {
         setKeyboardHeight(inset);
       }
+      return null;
     }, [keyboardHeight]);
 
     onUpdateInput(String text) {
@@ -188,7 +190,7 @@ class ChatInput extends HookWidget {
         dispatch(sendTyping(typing: true, roomId: room.id));
 
         setTypingNotifier(Timer.periodic(
-          Duration(milliseconds: 4000),
+          const Duration(milliseconds: 4000),
           (timer) => dispatch(sendTyping(typing: true, roomId: room.id)),
         ));
       }
@@ -199,7 +201,7 @@ class ChatInput extends HookWidget {
           typingNotifierTimeout.cancel();
         }
 
-        setTypingNotifierTimeout(Timer(Duration(milliseconds: 4000), () {
+        setTypingNotifierTimeout(Timer(const Duration(milliseconds: 4000), () {
           if (typingNotifier != null) {
             typingNotifier.cancel();
             setTypingNotifier(null);
@@ -260,7 +262,7 @@ class ChatInput extends HookWidget {
         builder: (ctx) => AlertDialog(
           title: Text(
             Strings.titleDialogPhotoPermission,
-            style: TextStyle(fontWeight: FontWeight.w600),
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
           content: Text(Strings.contentPhotoPermission),
           actions: <Widget>[
@@ -313,7 +315,7 @@ class ChatInput extends HookWidget {
 
     if (mediumType == MediumType.plaintext) {
       hintText = Strings.placeholderMatrixUnencrypted;
-      sendButtonColor = Color(AppColors.greyDark);
+      sendButtonColor = const Color(AppColors.greyDark);
     }
 
     if (mediumType == MediumType.encryption) {
@@ -323,7 +325,7 @@ class ChatInput extends HookWidget {
 
     // if the button is disabled, make it more transparent to indicate that
     if (sending) {
-      sendButtonColor = Color(AppColors.greyDisabled);
+      sendButtonColor = const Color(AppColors.greyDisabled);
     }
 
     var sendButton = Semantics(
@@ -337,10 +339,10 @@ class ChatInput extends HookWidget {
         child: CircleAvatar(
           backgroundColor: sendButtonColor,
           child: Container(
-            margin: EdgeInsets.only(left: 2, top: 3),
+            margin: const EdgeInsets.only(left: 2, top: 3),
             child: SvgPicture.asset(
               Assets.iconSendUnlockBeing,
-              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
               semanticsLabel: Strings.labelSendUnencrypted,
             ),
           ),
@@ -360,10 +362,10 @@ class ChatInput extends HookWidget {
           child: CircleAvatar(
             backgroundColor: sendButtonColor,
             child: Container(
-              margin: EdgeInsets.only(left: 2, top: 3),
+              margin: const EdgeInsets.only(left: 2, top: 3),
               child: SvgPicture.asset(
                 Assets.iconSendLockSolidBeing,
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 semanticsLabel: Strings.labelSendEncrypted,
               ),
             ),
@@ -384,10 +386,10 @@ class ChatInput extends HookWidget {
           child: CircleAvatar(
             backgroundColor: sendButtonColor,
             child: Container(
-              margin: EdgeInsets.only(left: 2, top: 3),
+              margin: const EdgeInsets.only(left: 2, top: 3),
               child: SvgPicture.asset(
                 Assets.iconSendLockSolidBeing,
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 semanticsLabel: Strings.labelSendEncrypted,
               ),
             ),
@@ -406,7 +408,7 @@ class ChatInput extends HookWidget {
           onTap: sending ? null : onToggleMediaOptions,
           child: CircleAvatar(
             backgroundColor: sendButtonColor,
-            child: Icon(
+            child: const Icon(
               Icons.add,
               color: Colors.white,
               size: Dimensions.iconSizeLarge,
@@ -454,8 +456,8 @@ class ChatInput extends HookWidget {
                             width: 1,
                           ),
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(24),
-                            topRight: Radius.circular(24),
+                            topLeft: const Radius.circular(24),
+                            topRight: const Radius.circular(24),
                             bottomLeft: Radius.circular(!replying ? 24 : 0),
                             bottomRight: Radius.circular(!replying ? 24 : 0),
                           ),
@@ -466,8 +468,8 @@ class ChatInput extends HookWidget {
                             width: 1,
                           ),
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(24),
-                            topRight: Radius.circular(24),
+                            topLeft: const Radius.circular(24),
+                            topRight: const Radius.circular(24),
                             bottomLeft: Radius.circular(!replying ? 24 : 0),
                             bottomRight: Radius.circular(!replying ? 24 : 0),
                           ),
@@ -481,7 +483,7 @@ class ChatInput extends HookWidget {
                     bottom: 0,
                     child: IconButton(
                       onPressed: () => onCancelReply?.call(),
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.close,
                         size: Dimensions.iconSize,
                       ),
@@ -548,7 +550,7 @@ class ChatInput extends HookWidget {
                             child: IconButton(
                               color: Theme.of(context).iconTheme.color,
                               onPressed: () => onToggleMediaOptions(),
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.add,
                                 size: Dimensions.iconSizeLarge,
                               ),
@@ -564,8 +566,8 @@ class ChatInput extends HookWidget {
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
                                 topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                bottomLeft: const Radius.circular(DEFAULT_BORDER_RADIUS),
+                                bottomRight: const Radius.circular(DEFAULT_BORDER_RADIUS),
                               )),
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
@@ -575,8 +577,8 @@ class ChatInput extends HookWidget {
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
                                 topRight: Radius.circular(!replying ? DEFAULT_BORDER_RADIUS : 0),
-                                bottomLeft: Radius.circular(DEFAULT_BORDER_RADIUS),
-                                bottomRight: Radius.circular(DEFAULT_BORDER_RADIUS),
+                                bottomLeft: const Radius.circular(DEFAULT_BORDER_RADIUS),
+                                bottomRight: const Radius.circular(DEFAULT_BORDER_RADIUS),
                               )),
                         ),
                       ),
@@ -589,7 +591,7 @@ class ChatInput extends HookWidget {
               visible: showAttachments,
               child: Container(
                 width: Dimensions.buttonSendSize,
-                padding: EdgeInsets.symmetric(vertical: 4),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Semantics(
                   button: true,
                   enabled: true,
@@ -602,7 +604,7 @@ class ChatInput extends HookWidget {
                     },
                     child: CircleAvatar(
                       backgroundColor: sendButtonColor,
-                      child: Icon(
+                      child: const Icon(
                         Icons.camera_alt,
                         color: Colors.white,
                       ),
@@ -613,7 +615,7 @@ class ChatInput extends HookWidget {
             ),
             Container(
               width: Dimensions.buttonSendSize,
-              padding: EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(vertical: 4),
               child: sendButton,
             ),
           ],
@@ -625,7 +627,7 @@ class ChatInput extends HookWidget {
           maintainState: false,
           maintainAnimation: false,
           child: Container(
-            padding: EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.only(top: 4),
             constraints: BoxConstraints(
               maxHeight: imageHeightMax, // whole media field max height
             ),
@@ -652,7 +654,7 @@ class ChatInput extends HookWidget {
                 ),
                 Row(children: [
                   Padding(
-                    padding: EdgeInsets.only(right: 2),
+                    padding: const EdgeInsets.only(right: 2),
                     child: MediaCard(
                       text: Strings.buttonGallery,
                       icon: Icons.photo,
@@ -668,7 +670,7 @@ class ChatInput extends HookWidget {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: MediaCard(
                       text: Strings.buttonFile,
                       icon: Icons.note_add,
@@ -676,7 +678,7 @@ class ChatInput extends HookWidget {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: MediaCard(
                       text: Strings.buttonContact,
                       icon: Icons.person,
@@ -684,7 +686,7 @@ class ChatInput extends HookWidget {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: MediaCard(
                       text: Strings.buttonLocation,
                       icon: Icons.near_me_rounded,

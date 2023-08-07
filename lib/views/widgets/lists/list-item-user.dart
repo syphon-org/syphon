@@ -56,7 +56,7 @@ class ListItemUser extends StatelessWidget {
               child: Container(
                 width: Dimensions.iconSizeLite,
                 height: Dimensions.iconSizeLite,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   borderRadius: BorderRadius.all(
                     Radius.circular(Dimensions.avatarSize),
                   ),
@@ -124,7 +124,7 @@ class ListItemUser extends StatelessWidget {
               user.userId!,
               style: Theme.of(context).textTheme.bodySmall!.merge(
                     TextStyle(
-                      color: loading ? Color(AppColors.greyDisabled) : null,
+                      color: loading ? const Color(AppColors.greyDisabled) : null,
                     ),
                   ),
             ),

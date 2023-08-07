@@ -189,7 +189,7 @@ class SearchUserState extends State<SearchUserScreen> {
     return ListView(
       children: [
         Container(
-          padding: EdgeInsets.only(left: 20, right: 20, top: 24),
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 24),
           child: Row(
             children: [
               Text(
@@ -248,7 +248,7 @@ class SearchUserState extends State<SearchUserScreen> {
         Visibility(
           visible: usersList.isNotEmpty,
           child: Container(
-            padding: EdgeInsets.only(left: 20, right: 20, top: 24),
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 24),
             child: Row(
               children: [
                 Text(
@@ -284,7 +284,7 @@ class SearchUserState extends State<SearchUserScreen> {
           },
         ),
         Container(
-          padding: EdgeInsets.only(left: 20, right: 20, top: 24),
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 24),
           child: Row(
             children: [
               Text(

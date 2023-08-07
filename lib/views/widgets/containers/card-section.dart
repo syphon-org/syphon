@@ -27,12 +27,12 @@ class CardSection extends StatelessWidget {
         converter: (Store<AppState> store) => Props.mapStateToProps(store),
         builder: (context, props) {
           return Card(
-            margin: margin ?? EdgeInsets.symmetric(vertical: 4),
+            margin: margin ?? const EdgeInsets.symmetric(vertical: 4),
             elevation: elevation ?? 0.5,
             // Re-use the System UI color because they are exactly the same
             color: Color(selectSystemUiColor(props.themeType)),
             child: Container(
-              padding: padding ?? EdgeInsets.only(top: 12),
+              padding: padding ?? const EdgeInsets.only(top: 12),
               child: child,
             ),
           );

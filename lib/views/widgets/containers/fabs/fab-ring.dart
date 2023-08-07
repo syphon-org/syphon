@@ -83,7 +83,7 @@ class FabRing extends StatelessWidget {
             fabColor: props.primaryColor,
             ringColor: props.primaryColor.withAlpha(144),
             ringDiameter: actionRingDefaultDimensions(context),
-            animationDuration: Duration(milliseconds: 275),
+            animationDuration: const Duration(milliseconds: 275),
             onDisplayChange: (opened) {},
             children: [
               Stack(
@@ -96,7 +96,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToCreateGroupPublic(context),
                     child: SvgPicture.asset(
                       Assets.iconPublicAddBeing,
-                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -106,7 +106,7 @@ class FabRing extends StatelessWidget {
                     child: Visibility(
                       visible: showLabels,
                       child: Padding(
-                        padding: EdgeInsets.only(right: 4),
+                        padding: const EdgeInsets.only(right: 4),
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreatePublic,
@@ -131,7 +131,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToCreateGroup(context),
                     child: SvgPicture.asset(
                       Assets.iconGroupAddBeing,
-                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -141,7 +141,7 @@ class FabRing extends StatelessWidget {
                     child: Visibility(
                       visible: showLabels,
                       child: Padding(
-                        padding: EdgeInsets.only(right: 4),
+                        padding: const EdgeInsets.only(right: 4),
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreateGroup,
@@ -166,7 +166,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToDraft(context),
                     child: SvgPicture.asset(
                       Assets.iconMessageCircleBeing,
-                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -175,7 +175,7 @@ class FabRing extends StatelessWidget {
                     child: Visibility(
                       visible: showLabels,
                       child: Padding(
-                        padding: EdgeInsets.only(right: 4),
+                        padding: const EdgeInsets.only(right: 4),
                         child: Chip(
                           label: Text(
                             Strings.labelFabCreateDM,
@@ -200,7 +200,7 @@ class FabRing extends StatelessWidget {
                     onPressed: () => onNavigateToPublicSearch(context),
                     child: SvgPicture.asset(
                       Assets.iconSearchPublicCondensedBeing,
-                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                   ),
                   Positioned(
@@ -210,7 +210,7 @@ class FabRing extends StatelessWidget {
                     child: Visibility(
                       visible: showLabels,
                       child: Padding(
-                        padding: EdgeInsets.only(right: 4),
+                        padding: const EdgeInsets.only(right: 4),
                         child: Chip(
                           label: Text(
                             Strings.labelFabSearch,

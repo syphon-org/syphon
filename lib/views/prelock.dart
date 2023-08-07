@@ -92,7 +92,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
       _navigatorKey.currentState?.pushReplacement(
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) => buildSyphon(),
-          transitionDuration: Duration(seconds: 200),
+          transitionDuration: const Duration(seconds: 200),
         ),
       );
     }
@@ -154,7 +154,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     _navigatorKey.currentState?.pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) => buildLockScreen(),
-        transitionDuration: Duration(seconds: 200),
+        transitionDuration: const Duration(seconds: 200),
       ),
     );
   }
@@ -167,7 +167,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     await _navigatorKey.currentState?.pushAndRemoveUntil(
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) => buildLoadingScreen(),
-        transitionDuration: Duration(seconds: 200),
+        transitionDuration: const Duration(seconds: 200),
       ),
       ModalRoute.withName(PrelockRoutes.root),
     );
@@ -190,7 +190,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
       _navigatorKey.currentState?.pushAndRemoveUntil(
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) => buildSyphon(),
-          transitionDuration: Duration(seconds: 200),
+          transitionDuration: const Duration(seconds: 200),
         ),
         ModalRoute.withName(PrelockRoutes.root),
       );
@@ -225,7 +225,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
       _navigatorKey.currentState?.pushAndRemoveUntil(
         PageRouteBuilder(
           pageBuilder: (context, animation1, animation2) => buildSyphon(),
-          transitionDuration: Duration(seconds: 200),
+          transitionDuration: const Duration(seconds: 200),
         ),
         ModalRoute.withName(PrelockRoutes.root),
       );

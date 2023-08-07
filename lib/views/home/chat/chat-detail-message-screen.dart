@@ -29,7 +29,7 @@ class MessageDetailsScreen extends StatelessWidget {
   const MessageDetailsScreen({super.key});
 
   Widget buildUserReadList(_Props props, double width) {
-    final Receipt readReceipts = props.readReceipts[props.message!.id!] ?? Receipt();
+    final Receipt readReceipts = props.readReceipts[props.message!.id!] ?? const Receipt();
     final userReads = Map<String, int>.from(readReceipts.userReads);
 
     final List<User?> users = userReads.keys.map((userId) => props.users[userId]).toList();
@@ -62,12 +62,12 @@ class MessageDetailsScreen extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => Navigator.pop(context, false),
               ),
               title: Text(
                 Strings.titleMessageDetails,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
                 ),
@@ -81,7 +81,7 @@ class MessageDetailsScreen extends StatelessWidget {
                   child: ListView.builder(
                     reverse: true,
                     shrinkWrap: true,
-                    padding: EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.only(bottom: 4),
                     // ignore: avoid_redundant_argument_values
                     scrollDirection: Axis.vertical,
                     // ignore: avoid_redundant_argument_values
@@ -104,14 +104,14 @@ class MessageDetailsScreen extends StatelessWidget {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemSent,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   trailing: Text(
                     DateFormat('MMM d h:mm a').format(timestamp),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w300,
                     ),
@@ -122,14 +122,14 @@ class MessageDetailsScreen extends StatelessWidget {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemReceived,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   trailing: Text(
                     DateFormat('MMM d h:mm a').format(received),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w300,
                     ),
@@ -140,12 +140,12 @@ class MessageDetailsScreen extends StatelessWidget {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemVia,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  trailing: Text(
+                  trailing: const Text(
                     'Matrix',
                     style: TextStyle(
                       fontSize: 14.0,
@@ -158,7 +158,7 @@ class MessageDetailsScreen extends StatelessWidget {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemFrom,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),
@@ -166,7 +166,7 @@ class MessageDetailsScreen extends StatelessWidget {
                   trailing: Text(
                     message.sender!,
                     textAlign: TextAlign.start,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w300,
                     ),
@@ -176,7 +176,7 @@ class MessageDetailsScreen extends StatelessWidget {
                   contentPadding: Dimensions.listPadding,
                   title: Text(
                     Strings.listItemReadBy,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w600,
                     ),

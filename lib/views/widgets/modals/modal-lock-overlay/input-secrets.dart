@@ -146,7 +146,7 @@ class _InputSecretsState extends State<InputSecrets> with SingleTickerProviderSt
                       (index) {
                         if (!snapshot.hasData) {
                           return Padding(
-                            padding: EdgeInsets.only(bottom: 4),
+                            padding: const EdgeInsets.only(bottom: 4),
                             child: InputSecret(
                               config: widget.config.secretConfig,
                               enabled: false,
@@ -155,7 +155,7 @@ class _InputSecretsState extends State<InputSecrets> with SingleTickerProviderSt
                         }
 
                         return Padding(
-                          padding: EdgeInsets.only(bottom: 4),
+                          padding: const EdgeInsets.only(bottom: 4),
                           child: InputSecret(
                             config: widget.config.secretConfig,
                             enabled: enabled ?? index < snapshot.data!.length,

@@ -36,7 +36,7 @@ ThunkAction<AppState> muteChatNotifications({
     final settings = store.state.settingsStore.notificationSettings;
     final options = Map<String, NotificationOptions>.from(settings.notificationOptions);
 
-    options.putIfAbsent(roomId, () => NotificationOptions());
+    options.putIfAbsent(roomId, () => const NotificationOptions());
 
     options[roomId] = options[roomId]!.copyWith(
       muteTimestamp: timestamp,
@@ -65,7 +65,7 @@ ThunkAction<AppState> toggleChatNotifications({
     final settings = store.state.settingsStore.notificationSettings;
     final options = Map<String, NotificationOptions>.from(settings.notificationOptions);
 
-    options.putIfAbsent(roomId, () => NotificationOptions());
+    options.putIfAbsent(roomId, () => const NotificationOptions());
 
     options[roomId] = options[roomId]!.copyWith(
       enabled: enabled ?? !options[roomId]!.enabled,
