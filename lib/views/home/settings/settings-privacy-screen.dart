@@ -13,7 +13,6 @@ import 'package:syphon/domain/crypto/actions.dart';
 import 'package:syphon/domain/crypto/keys/selectors.dart';
 import 'package:syphon/domain/crypto/sessions/actions.dart';
 import 'package:syphon/domain/crypto/sessions/service/actions.dart';
-import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/actions.dart';
 import 'package:syphon/domain/settings/devices-settings/selectors.dart';
@@ -25,6 +24,7 @@ import 'package:syphon/domain/settings/storage-settings/actions.dart';
 import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/navigation.dart';
@@ -177,7 +177,7 @@ class PrivacySettingsScreen extends HookWidget {
           content: Strings.warrningDeactivateAccountFinal,
           loading: loading,
           confirmText: Strings.buttonDeactivate.capitalize(),
-          confirmStyle: TextStyle(color: Colors.red),
+          confirmStyle: const TextStyle(color: Colors.red),
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
             Navigator.of(dialogContext).pop();
@@ -194,7 +194,7 @@ class PrivacySettingsScreen extends HookWidget {
           title: Strings.titleDialogConfirmDeactivateAccount,
           content: Strings.warningDeactivateAccount,
           confirmText: Strings.buttonDeactivate.capitalize(),
-          confirmStyle: TextStyle(color: Colors.red),
+          confirmStyle: const TextStyle(color: Colors.red),
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
             Navigator.of(dialogContext).pop();
@@ -325,7 +325,7 @@ class PrivacySettingsScreen extends HookWidget {
       required BuildContext context,
     }) async {
       final store = StoreProvider.of<AppState>(context);
-      final defaultPadding = EdgeInsets.symmetric(horizontal: 10);
+      const defaultPadding = EdgeInsets.symmetric(horizontal: 10);
       final isDefault = store.state.settingsStore.privacySettings.keyBackupInterval == Duration.zero;
 
       final onSelect = (BuildContext dialogContext, Duration duration) {
@@ -369,7 +369,7 @@ class PrivacySettingsScreen extends HookWidget {
                       style: Theme.of(context).textTheme.titleMedium,
                     )),
                 onTap: () {
-                  onSelect(dialogContext, Duration(minutes: 15));
+                  onSelect(dialogContext, const Duration(minutes: 15));
                 },
               ),
               ListTile(
@@ -380,7 +380,7 @@ class PrivacySettingsScreen extends HookWidget {
                       style: Theme.of(context).textTheme.titleMedium,
                     )),
                 onTap: () {
-                  onSelect(dialogContext, Duration(hours: 1));
+                  onSelect(dialogContext, const Duration(hours: 1));
                 },
               ),
               ListTile(
@@ -391,7 +391,7 @@ class PrivacySettingsScreen extends HookWidget {
                       style: Theme.of(context).textTheme.titleMedium,
                     )),
                 onTap: () {
-                  onSelect(dialogContext, Duration(hours: 6));
+                  onSelect(dialogContext, const Duration(hours: 6));
                 },
               ),
               ListTile(
@@ -403,7 +403,7 @@ class PrivacySettingsScreen extends HookWidget {
                   ),
                 ),
                 onTap: () {
-                  onSelect(dialogContext, Duration(hours: 12));
+                  onSelect(dialogContext, const Duration(hours: 12));
                 },
               ),
               ListTile(
@@ -415,7 +415,7 @@ class PrivacySettingsScreen extends HookWidget {
                   ),
                 ),
                 onTap: () {
-                  onSelect(dialogContext, Duration(hours: 24));
+                  onSelect(dialogContext, const Duration(hours: 24));
                 },
               ),
               ListTile(
@@ -427,7 +427,7 @@ class PrivacySettingsScreen extends HookWidget {
                   ),
                 ),
                 onTap: () {
-                  onSelect(dialogContext, Duration(days: 7));
+                  onSelect(dialogContext, const Duration(days: 7));
                 },
               ),
               ListTile(
@@ -439,7 +439,7 @@ class PrivacySettingsScreen extends HookWidget {
                   ),
                 ),
                 onTap: () {
-                  onSelect(dialogContext, Duration(days: 29));
+                  onSelect(dialogContext, const Duration(days: 29));
                 },
               )
             ],
@@ -483,7 +483,7 @@ class PrivacySettingsScreen extends HookWidget {
           content: Strings.confirmDeleteKeys,
           loading: loading,
           confirmText: Strings.buttonTextConfirmDeleteKeys,
-          confirmStyle: TextStyle(color: Colors.red),
+          confirmStyle: const TextStyle(color: Colors.red),
           onDismiss: () => Navigator.pop(dialogContext),
           onConfirm: () async {
             await store.dispatch(resetSessionKeys());
@@ -503,7 +503,7 @@ class PrivacySettingsScreen extends HookWidget {
             content: Strings.contentRemoveScreenLock,
             loading: loading,
             confirmText: Strings.buttonTextRemove,
-            confirmStyle: TextStyle(color: Colors.red),
+            confirmStyle: const TextStyle(color: Colors.red),
             onDismiss: () => Navigator.pop(dialogContext),
             onConfirm: () async {
               Navigator.of(dialogContext).pop();
@@ -574,7 +574,7 @@ class PrivacySettingsScreen extends HookWidget {
                     ),
                     ListTile(
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Public Device Name',
                       ),
                       subtitle: Text(
@@ -584,12 +584,12 @@ class PrivacySettingsScreen extends HookWidget {
                       onTap: () => onRenameDevice(),
                       trailing: IconButton(
                         onPressed: () => onRenameDevice(),
-                        icon: Icon(Icons.edit),
+                        icon: const Icon(Icons.edit),
                       ),
                     ),
                     ListTile(
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Session ID',
                       ),
                       subtitle: Text(
@@ -601,12 +601,12 @@ class PrivacySettingsScreen extends HookWidget {
                       },
                       trailing: IconButton(
                         onPressed: () => onCopyToClipboard(sessionId),
-                        icon: Icon(Icons.copy),
+                        icon: const Icon(Icons.copy),
                       ),
                     ),
                     ListTile(
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Session Key',
                       ),
                       subtitle: Text(
@@ -618,7 +618,7 @@ class PrivacySettingsScreen extends HookWidget {
                       },
                       trailing: IconButton(
                         onPressed: () => onCopyToClipboard(sessionKey),
-                        icon: Icon(Icons.copy),
+                        icon: const Icon(Icons.copy),
                       ),
                     ),
                   ],
@@ -641,7 +641,7 @@ class PrivacySettingsScreen extends HookWidget {
                         Navigator.pushNamed(context, Routes.settingsPassword);
                       },
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Change Password',
                       ),
                       subtitle: Text(
@@ -654,7 +654,7 @@ class PrivacySettingsScreen extends HookWidget {
                         Navigator.pushNamed(context, Routes.settingsBlocked);
                       },
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Blocked Users',
                       ),
                       subtitle: Text(
@@ -692,7 +692,7 @@ class PrivacySettingsScreen extends HookWidget {
                     ListTile(
                       onTap: () => onToggleTypingIndicators(),
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Typing Indicators',
                       ),
                       subtitle: Text(
@@ -721,7 +721,7 @@ class PrivacySettingsScreen extends HookWidget {
                     ),
                     ListTile(
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Screen lock',
                       ),
                       subtitle: Text(
@@ -736,7 +736,7 @@ class PrivacySettingsScreen extends HookWidget {
                     ListTile(
                       enabled: false,
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Screen lock inactivity timeout',
                       ),
                       subtitle: Text(
@@ -778,7 +778,7 @@ class PrivacySettingsScreen extends HookWidget {
                       child: ListTile(
                         onTap: () => onUpdateBackupLocation(),
                         contentPadding: Dimensions.listPadding,
-                        title: Text(
+                        title: const Text(
                           'Backup Folder',
                         ),
                         subtitle: Text(
@@ -792,7 +792,7 @@ class PrivacySettingsScreen extends HookWidget {
                       child: ListTile(
                         onTap: () => onUpdateBackupSchedule(context: context),
                         contentPadding: Dimensions.listPadding,
-                        title: Text(
+                        title: const Text(
                           'Backup Schedule',
                         ),
                         subtitle: Text(
@@ -826,7 +826,7 @@ class PrivacySettingsScreen extends HookWidget {
                     ListTile(
                       onTap: () => onDeleteSessionKeys(),
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Delete Keys',
                         style: TextStyle(
                           fontSize: 18.0,
@@ -837,7 +837,7 @@ class PrivacySettingsScreen extends HookWidget {
                     ListTile(
                       onTap: () => onConfirmDeactivateAccount(),
                       contentPadding: Dimensions.listPadding,
-                      title: Text(
+                      title: const Text(
                         'Deactivate Account',
                         style: TextStyle(
                           fontSize: 18.0,

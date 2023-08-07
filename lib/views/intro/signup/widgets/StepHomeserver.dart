@@ -72,7 +72,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
                 arguments: SearchHomeserverArguments(signup: true),
               );
             },
-            child: Icon(
+            child: const Icon(
               Icons.search_rounded,
               size: Dimensions.iconSizeLarge,
             ),
@@ -83,7 +83,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
   buildContinueNormal(_Props props) => Container(
         width: Dimensions.contentWidthWide(context),
         height: Dimensions.inputHeight,
-        constraints: BoxConstraints(
+        constraints: const BoxConstraints(
           minWidth: Dimensions.inputWidthMin,
           maxWidth: Dimensions.inputWidthMax,
         ),
@@ -99,7 +99,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
             FocusScope.of(context).unfocus();
           },
           suffix: IconButton(
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
               tooltip: 'Find your homeserver',
               onPressed: () {
                 Navigator.pushNamed(
@@ -140,7 +140,7 @@ class HomeserverStepState extends State<HomeserverStep> with Lifecycle<Homeserve
                 flex: 2,
                 child: Container(
                   width: Dimensions.contentWidth(context),
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),

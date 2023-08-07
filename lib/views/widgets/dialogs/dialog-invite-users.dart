@@ -46,7 +46,7 @@ class DialogInviteUsers extends StatelessWidget {
           children: <Widget>[
             Text(content ?? Strings.confirmAttemptChat),
             Container(
-              padding: EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

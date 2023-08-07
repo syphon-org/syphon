@@ -28,12 +28,12 @@ class MediaCard extends StatelessWidget {
           onLongPress: disabled ? null : () => onPress(),
           child: Container(
             width: 76,
-            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.only(bottom: 8, top: 8),
+                  padding: const EdgeInsets.only(bottom: 8, top: 8),
                   child: Icon(
                     icon,
                     size: 39,

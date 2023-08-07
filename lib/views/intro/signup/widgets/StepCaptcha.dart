@@ -61,7 +61,7 @@ class CaptchaStepState extends State<CaptchaStep> {
               flex: 6,
               child: Container(
                 width: width * 0.75,
-                constraints: BoxConstraints(
+                constraints: const BoxConstraints(
                   maxHeight: Dimensions.mediaSizeMax,
                   maxWidth: Dimensions.mediaSizeMax,
                 ),
@@ -78,7 +78,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.only(bottom: 8, top: 8),
+                    padding: const EdgeInsets.only(bottom: 8, top: 8),
                     child: Text(
                       Strings.contentCaptchaRequirement,
                       textAlign: TextAlign.center,
@@ -89,7 +89,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                     clipBehavior: Clip.none,
                     children: <Widget>[
                       Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           vertical: 8,
                           horizontal: 24,
                         ),
@@ -117,7 +117,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                           child: Container(
                             height: 20,
                             width: 20,
-                            child: Icon(
+                            child: const Icon(
                               Icons.info_outline,
                               color: Colors.red,
                               size: 20,
@@ -138,7 +138,7 @@ class CaptchaStepState extends State<CaptchaStep> {
                 children: [
                   ButtonText(
                     text: !props.completed ? Strings.buttonTextLoadCaptcha : Strings.buttonTextConfirmed,
-                    color: !props.completed ? Color(AppColors.cyanSyphon) : Color(AppColors.cyanSyphonAlpha),
+                    color: !props.completed ? const Color(AppColors.cyanSyphon) : const Color(AppColors.cyanSyphonAlpha),
                     loading: props.loading,
                     disabled: props.completed,
                     onPressed: () => onShowDialog(context, props),

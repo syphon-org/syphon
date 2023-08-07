@@ -34,7 +34,7 @@ class DialogInvite extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SimpleDialogOption(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 12,
                 ),
@@ -46,12 +46,12 @@ class DialogInvite extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              Spacer(flex: 1),
+              const Spacer(flex: 1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SimpleDialogOption(
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 12,
                     ),
@@ -64,7 +64,7 @@ class DialogInvite extends StatelessWidget {
                     ),
                   ),
                   SimpleDialogOption(
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 8,
                     ),

@@ -63,7 +63,7 @@ class FabCircleExpanding extends StatelessWidget {
                 onPressed: () => onNavigateToCreateGroupPublic(context),
                 child: SvgPicture.asset(
                   Assets.iconPublicAddBeing,
-                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
               FloatingActionButton(
@@ -73,7 +73,7 @@ class FabCircleExpanding extends StatelessWidget {
                 onPressed: () => onNavigateToCreateGroup(context),
                 child: SvgPicture.asset(
                   Assets.iconGroupAddBeing,
-                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
               FloatingActionButton(
@@ -83,7 +83,7 @@ class FabCircleExpanding extends StatelessWidget {
                 onPressed: () => onNavigateToDraft(context),
                 child: SvgPicture.asset(
                   Assets.iconPersonAddBeing,
-                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
               FloatingActionButton(
@@ -93,7 +93,7 @@ class FabCircleExpanding extends StatelessWidget {
                 onPressed: () => onNavigateToPublicSearch(context),
                 child: SvgPicture.asset(
                   Assets.iconSearchPublicCondensedBeing,
-                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
             ],

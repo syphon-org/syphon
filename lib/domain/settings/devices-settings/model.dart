@@ -47,7 +47,7 @@ class Device extends Equatable {
         lastSeenTs: json['last_seen_ts'],
       );
     } catch (error) {
-      return Device();
+      return const Device();
     }
   }
 

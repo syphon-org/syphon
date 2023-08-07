@@ -86,7 +86,7 @@ class ChatScreen extends HookWidget {
     // Global App State
     final currentUser = useSelector<AppState, User>(
       (state) => state.authStore.user,
-      User(),
+      const User(),
     );
     final showAvatars = useSelector<AppState, bool>(
       (state) =>
@@ -97,7 +97,7 @@ class ChatScreen extends HookWidget {
     // Global Room State
     final room = useSelector<AppState, Room>(
       (state) => selectRoom(id: roomId, state: state),
-      Room(id: ''),
+      const Room(id: ''),
     );
     final loading = useSelector<AppState, bool>(
       (state) => selectRoom(state: state, id: roomId).syncing,
@@ -115,7 +115,7 @@ class ChatScreen extends HookWidget {
     // Global Chat Settings
     final chatColorPrimary = useSelector<AppState, Color>(
       (state) => selectChatColor(state, roomId),
-      Color(AppColors.cyanSyphon),
+      const Color(AppColors.cyanSyphon),
     );
     final roomTypeBadgesEnabled = useSelector<AppState, bool>(
       (state) => state.settingsStore.roomTypeBadgesEnabled,
@@ -203,7 +203,7 @@ class ChatScreen extends HookWidget {
 
     final onLoadMoreMessages = useCallback(() async {
       // TODO: need to account for 25 reactions, for example. "Messages" are different to spec
-      final oldest = selectOldestMessage(messages) ?? Message();
+      final oldest = selectOldestMessage(messages) ?? const Message();
 
       // fetch messages from the oldest cached batch
       await dispatch(fetchMessageEvents(
@@ -276,6 +276,7 @@ class ChatScreen extends HookWidget {
           ),
         );
       }
+      return null;
     }, []);
 
     useEffect(() {
@@ -555,21 +556,21 @@ class ChatScreen extends HookWidget {
                 onChangeMediumType(MediumType.plaintext);
               },
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.only(right: 8),
                       child: CircleAvatar(
                         backgroundColor: const Color(AppColors.greyDisabled),
                         child: SvgPicture.asset(
                           Assets.iconSendUnlockBeing,
-                          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                           semanticsLabel: 'Switch to ${Strings.labelSendUnencrypted}',
                         ),
                       ),
                     ),
-                    Text('Unencrypted'),
+                    const Text('Unencrypted'),
                   ],
                 ),
               ),
@@ -585,21 +586,21 @@ class ChatScreen extends HookWidget {
                       onChangeMediumType(MediumType.encryption);
                     },
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.only(right: 8),
                       child: CircleAvatar(
                         backgroundColor: Theme.of(context).primaryColor,
                         child: SvgPicture.asset(
                           Assets.iconSendLockSolidBeing,
-                          colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                           semanticsLabel: 'Switch to ${Strings.labelSendEncrypted}',
                         ),
                       ),
                     ),
-                    Text('Encrypted'),
+                    const Text('Encrypted'),
                   ],
                 ),
               ),
@@ -730,11 +731,11 @@ class ChatScreen extends HookWidget {
               ),
             ),
             Container(
-              padding: EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
+              padding: const EdgeInsets.only(left: 8, right: 8, top: 12, bottom: 12),
               decoration: BoxDecoration(
                 color: inputContainerColor,
                 boxShadow: isScrolling
-                    ? [BoxShadow(blurRadius: 6, offset: Offset(0, -4), color: Colors.black12)]
+                    ? [const BoxShadow(blurRadius: 6, offset: Offset(0, -4), color: Colors.black12)]
                     : [],
               ),
               child: AnimatedPadding(

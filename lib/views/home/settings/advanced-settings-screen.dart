@@ -264,10 +264,10 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     Strings.subtitleSettingsSyncInterval,
                   ),
                   trailing: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
                       Duration(milliseconds: props.syncInterval).inSeconds.toString(),
-                      style: TextStyle(fontSize: 18.0),
+                      style: const TextStyle(fontSize: 18.0),
                     ),
                   ),
                 ),
@@ -283,10 +283,10 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     Strings.subtitleSettingsSyncToggle,
                   ),
                   trailing: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
                       props.syncObserverActive ? Strings.labelSyncing : Strings.labelStopped,
-                      style: TextStyle(fontSize: 18.0),
+                      style: const TextStyle(fontSize: 18.0),
                     ),
                   ),
                 ),
@@ -299,17 +299,17 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     title: Text(
                       Strings.listItemSettingsManualSync,
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: props.syncing ? Color(AppColors.greyDisabled) : null,
+                            color: props.syncing ? const Color(AppColors.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
                       Strings.subtitleManualSync,
                       style: TextStyle(
-                        color: props.syncing ? Color(AppColors.greyDisabled) : null,
+                        color: props.syncing ? const Color(AppColors.greyDisabled) : null,
                       ),
                     ),
                     trailing: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: CircularProgressIndicator(value: props.syncing ? null : 0),
                     ),
                   ),
@@ -323,14 +323,14 @@ class AdvancedSettingsScreenState extends State<AdvancedSettingsScreen> {
                     title: Text(
                       Strings.listItemSettingsForceFullSync,
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: props.syncing ? Color(AppColors.greyDisabled) : null,
+                            color: props.syncing ? const Color(AppColors.greyDisabled) : null,
                           ),
                     ),
                     subtitle: Text(
                       Strings.subtitleForceFullSync,
                     ),
                     trailing: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: CircularProgressIndicator(
                         value: props.syncing ? null : 0,
                       ),

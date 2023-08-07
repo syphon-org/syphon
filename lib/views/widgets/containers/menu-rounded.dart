@@ -19,7 +19,7 @@ class RoundedPopupMenu<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PopupMenuButton<T>(
         onSelected: onSelected,
-        icon: icon ?? Icon(Icons.more_vert, color: Colors.white),
+        icon: icon ?? const Icon(Icons.more_vert, color: Colors.white),
         itemBuilder: itemBuilder,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),

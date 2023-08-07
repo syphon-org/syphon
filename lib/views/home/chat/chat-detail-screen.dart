@@ -141,7 +141,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
       builder: (dialogContext) => DialogConfirm(
         title: Strings.buttonLeaveChat.capitalize(),
         confirmText: Strings.buttonLeaveChat.capitalize(),
-        confirmStyle: TextStyle(color: Colors.red),
+        confirmStyle: const TextStyle(color: Colors.red),
         content: Strings.confirmLeaveRooms(rooms: [props.room]),
         onDismiss: () => Navigator.pop(dialogContext),
         onConfirm: () async {
@@ -166,7 +166,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
         ModalRoute.of(context)!.settings.arguments as ChatDetailsArguments?;
 
     final scaffordBackgroundColor = Theme.of(context).brightness == Brightness.light
-        ? Color(AppColors.greyLightest)
+        ? const Color(AppColors.greyLightest)
         : Theme.of(context).scaffoldBackgroundColor;
 
     return StoreConnector<AppState, _Props>(
@@ -242,12 +242,12 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
               SliverList(
                   delegate: SliverChildListDelegate([
                 Container(
-                  padding: EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.only(bottom: 12),
                   child: Column(
                     children: <Widget>[
                       CardSection(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        margin: EdgeInsets.only(bottom: 4),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        margin: const EdgeInsets.only(bottom: 4),
                         child: Column(
                           children: [
                             Container(
@@ -307,7 +307,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                         ),
                       ),
                       CardSection(
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -343,10 +343,10 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                   Visibility(
                                     visible: props.room.topic != null && props.room.topic!.isNotEmpty,
                                     child: Container(
-                                      padding: EdgeInsets.only(top: 12),
+                                      padding: const EdgeInsets.only(top: 12),
                                       child: Text(
                                         props.room.topic!,
-                                        style: TextStyle(fontSize: 16),
+                                        style: const TextStyle(fontSize: 16),
                                       ),
                                     ),
                                   ),
@@ -357,7 +357,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                         ),
                       ),
                       CardSection(
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Column(
                           children: [
                             Container(
@@ -376,7 +376,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.only(right: 8),
+                                padding: const EdgeInsets.only(right: 8),
                                 child: CircleAvatar(
                                   radius: 16,
                                   backgroundColor: props.chatColorPrimary,
@@ -409,7 +409,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                         ),
                       ),
                       CardSection(
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Column(
                           children: [
                             Container(
@@ -439,7 +439,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                 Strings.listItemChatDetailVibrate,
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   Strings.labelDefault,
                                   style:
@@ -454,7 +454,7 @@ class ChatSettingsState extends State<ChatSettingsScreen> with Lifecycle<ChatSet
                                 Strings.listItemChatDetailNotificationSound,
                               ),
                               trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   Strings.placeholderDefaultRoomNotification,
                                   style:

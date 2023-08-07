@@ -27,7 +27,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
   PageController? pageController;
 
   var sections = [
-    PasswordResetStep(),
+    const PasswordResetStep(),
   ];
 
   PasswordResetState();
@@ -86,7 +86,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                           children: <Widget>[
                             Container(
                               width: width,
-                              constraints: BoxConstraints(
+                              constraints: const BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
                                 maxHeight: Dimensions.heightMax * 0.5,
                               ),
@@ -94,7 +94,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                                 pageSnapping: true,
                                 allowImplicitScrolling: false,
                                 controller: pageController,
-                                physics: NeverScrollableScrollPhysics(),
+                                physics: const NeverScrollableScrollPhysics(),
                                 onPageChanged: (index) {
                                   setState(() {
                                     currentStep = index;
@@ -116,7 +116,7 @@ class PasswordResetState extends State<ResetPasswordScreen> {
                             Container(
                               width: width * 0.66,
                               height: Dimensions.inputHeight,
-                              constraints: BoxConstraints(
+                              constraints: const BoxConstraints(
                                 minWidth: Dimensions.buttonWidthMin,
                                 maxWidth: Dimensions.buttonWidthMax,
                               ),

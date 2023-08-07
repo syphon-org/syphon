@@ -71,7 +71,7 @@ Future<void> initPlatformDependencies() async {
 
   // Init flutter secure storage
   if (Platform.isAndroid || Platform.isIOS) {
-    SecureStorage.instance = FlutterSecureStorage();
+    SecureStorage.instance = const FlutterSecureStorage();
   }
 
   // init background sync for Android only

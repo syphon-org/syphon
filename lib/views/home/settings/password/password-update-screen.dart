@@ -25,7 +25,7 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
   bool onboarding = false;
   PageController? pageController;
 
-  var sections = [PasswordUpdateStep()];
+  var sections = [const PasswordUpdateStep()];
 
   PasswordUpdateState();
 
@@ -82,7 +82,7 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
                           children: <Widget>[
                             Container(
                               width: width,
-                              constraints: BoxConstraints(
+                              constraints: const BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
                                 maxHeight: Dimensions.heightMax * 0.5,
                               ),
@@ -90,7 +90,7 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
                                 pageSnapping: true,
                                 allowImplicitScrolling: false,
                                 controller: pageController,
-                                physics: NeverScrollableScrollPhysics(),
+                                physics: const NeverScrollableScrollPhysics(),
                                 children: sections,
                                 onPageChanged: (index) {
                                   setState(() {
@@ -112,7 +112,7 @@ class PasswordUpdateState extends State<PasswordUpdateScreen> {
                             Container(
                               width: width * 0.66,
                               height: Dimensions.inputHeight,
-                              constraints: BoxConstraints(
+                              constraints: const BoxConstraints(
                                 minWidth: Dimensions.buttonWidthMin,
                                 maxWidth: Dimensions.buttonWidthMax,
                               ),

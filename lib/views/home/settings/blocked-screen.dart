@@ -77,7 +77,7 @@ class BlockedScreenState extends State<BlockedScreen> {
                   user.userId!,
                   style: Theme.of(context).textTheme.bodySmall!.merge(
                         TextStyle(
-                          color: props.loading ? Color(AppColors.greyDisabled) : null,
+                          color: props.loading ? const Color(AppColors.greyDisabled) : null,
                         ),
                       ),
                 ),

@@ -75,7 +75,7 @@ class NotificationSettingsScreen extends StatelessWidget {
           }
 
           return Scaffold(
-            appBar: AppBarNormal(title: 'Notifications'),
+            appBar: const AppBarNormal(title: 'Notifications'),
             body: Column(
               children: <Widget>[
                 Visibility(
@@ -157,7 +157,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                         dense: true,
                         onTap: () => onConfirmNotifications(context: context, props: props),
                         contentPadding: Dimensions.listPadding,
-                        title: Text(
+                        title: const Text(
                           'Notifications',
                           style: TextStyle(fontSize: 18.0),
                         ),
@@ -173,7 +173,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                         dense: true,
                         onTap: () => props.onTogglePusher(),
                         contentPadding: Dimensions.listPadding,
-                        title: Text(
+                        title: const Text(
                           'Fetch Notifications',
                           style: TextStyle(fontSize: 18.0),
                         ),
@@ -201,7 +201,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                       ListTile(
                         onTap: !props.localNotificationsEnabled ? null : () => props.onIncrementStyleType(),
                         contentPadding: Dimensions.listPadding,
-                        title: Text('Notification Type'),
+                        title: const Text('Notification Type'),
                         subtitle: Text(
                           styleTypeDescription,
                           style: Theme.of(context).textTheme.bodySmall,
@@ -211,7 +211,7 @@ class NotificationSettingsScreen extends StatelessWidget {
                       ListTile(
                         onTap: !props.localNotificationsEnabled ? null : () => props.onIncrementToggleType(),
                         contentPadding: Dimensions.listPadding,
-                        title: Text('Notification Default'),
+                        title: const Text('Notification Default'),
                         subtitle: Text(
                           props.toggleType == ToggleType.Enabled
                               ? 'All chats have notifications enabled by default'

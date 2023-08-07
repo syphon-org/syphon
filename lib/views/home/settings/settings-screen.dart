@@ -34,7 +34,7 @@ class SettingsScreen extends StatelessWidget {
     // NOTE: example of setting modal backgroound w/ inkwell working
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: Dimensions.modalBorderRadius,
       ),
       isScrollControlled: true,
@@ -82,13 +82,13 @@ class SettingsScreen extends StatelessWidget {
       builder: (context, props) => Scaffold(
             appBar: AppBar(
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
                 tooltip: Strings.labelBack,
                 onPressed: props.authLoading ? null : () => Navigator.pop(context, false),
               ),
               title: Text(
                 Strings.titleSettings,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w100,
                 ),
@@ -128,11 +128,11 @@ class SettingsScreen extends StatelessWidget {
                             ),
                             subtitle: Text(
                               Strings.labelOff,
-                              style: TextStyle(fontSize: 14.0),
+                              style: const TextStyle(fontSize: 14.0),
                             ),
                             leading: Container(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(
+                                padding: const EdgeInsets.all(4),
+                                child: const Icon(
                                   Icons.chat,
                                   size: 28,
                                 )),
@@ -145,8 +145,8 @@ class SettingsScreen extends StatelessWidget {
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(
                                 Icons.notifications,
                                 size: 28,
                               )),
@@ -155,7 +155,7 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           subtitle: Text(
                             props.notificationsEnabled! ? Strings.labelOn : Strings.labelOff,
-                            style: TextStyle(fontSize: 14.0),
+                            style: const TextStyle(fontSize: 14.0),
                           ),
                         ),
                         GestureDetector(
@@ -167,8 +167,8 @@ class SettingsScreen extends StatelessWidget {
                             },
                             contentPadding: Dimensions.listPaddingSettings,
                             leading: Container(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(
+                                padding: const EdgeInsets.all(4),
+                                child: const Icon(
                                   Icons.lock,
                                   size: 28,
                                 )),
@@ -192,8 +192,8 @@ class SettingsScreen extends StatelessWidget {
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(
                                 Icons.brightness_medium,
                                 size: 28,
                               )),
@@ -213,13 +213,13 @@ class SettingsScreen extends StatelessWidget {
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
-                              padding: EdgeInsets.only(
+                              padding: const EdgeInsets.only(
                                 top: 4,
                                 left: 4,
                                 bottom: 4,
                                 right: 4,
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.photo_filter,
                                 size: 28,
                               )),
@@ -235,8 +235,8 @@ class SettingsScreen extends StatelessWidget {
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(
                                 Icons.phone_android,
                                 size: 28,
                               )),
@@ -252,8 +252,8 @@ class SettingsScreen extends StatelessWidget {
                           },
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(
                                 Icons.code,
                                 size: 28,
                               )),
@@ -267,8 +267,8 @@ class SettingsScreen extends StatelessWidget {
                           onTap: () => props.onLogoutUser(),
                           contentPadding: Dimensions.listPaddingSettings,
                           leading: Container(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(
                                 Icons.exit_to_app,
                                 size: 28,
                               )),

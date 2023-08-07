@@ -47,12 +47,12 @@ class LanguageSettingsScreen extends StatelessWidget {
                         child: Container(
                           width: 32,
                           height: 32,
-                          margin: EdgeInsets.all(6),
+                          margin: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             color: Theme.of(context).primaryColor,
                             borderRadius: BorderRadius.circular(24),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.check,
                             color: Colors.white,
                           ),

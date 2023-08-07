@@ -30,7 +30,7 @@ class DialogEncryption extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             SimpleDialogOption(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 12,
               ),
@@ -43,7 +43,7 @@ class DialogEncryption extends StatelessWidget {
               ),
             ),
             SimpleDialogOption(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 8,
               ),

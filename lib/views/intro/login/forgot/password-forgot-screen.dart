@@ -27,7 +27,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
   PageController? pageController;
 
   var sections = [
-    EmailVerifyStep(),
+    const EmailVerifyStep(),
   ];
 
   ForgotPasswordState();
@@ -103,7 +103,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                           children: <Widget>[
                             Container(
                               width: width,
-                              constraints: BoxConstraints(
+                              constraints: const BoxConstraints(
                                 minHeight: Dimensions.pageViewerHeightMin,
                                 maxHeight: Dimensions.heightMax * 0.5,
                               ),
@@ -111,7 +111,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                                 pageSnapping: true,
                                 allowImplicitScrolling: false,
                                 controller: pageController,
-                                physics: NeverScrollableScrollPhysics(),
+                                physics: const NeverScrollableScrollPhysics(),
                                 children: sections,
                               ),
                             ),
@@ -126,7 +126,7 @@ class ForgotPasswordState extends State<ForgotPasswordScreen> {
                           children: <Widget>[
                             Container(
                               height: Dimensions.inputHeight,
-                              constraints: BoxConstraints(
+                              constraints: const BoxConstraints(
                                 minWidth: Dimensions.buttonWidthMin,
                               ),
                               child: Stack(

@@ -31,7 +31,7 @@ class ProfilePreview extends StatelessWidget {
               Container(
                 width: Dimensions.avatarSize,
                 height: Dimensions.avatarSize,
-                margin: EdgeInsets.only(right: 16),
+                margin: const EdgeInsets.only(right: 16),
                 child: Avatar(
                   uri: props.avatarUri,
                   alt: props.user.displayName ?? props.user.userId,
@@ -46,11 +46,11 @@ class ProfilePreview extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     props.username ?? '',
-                    style: TextStyle(fontSize: 20.0),
+                    style: const TextStyle(fontSize: 20.0),
                   ),
                   Text(
                     props.userId ?? '',
-                    style: TextStyle(fontSize: 14.0),
+                    style: const TextStyle(fontSize: 14.0),
                   ),
                 ],
               ),
@@ -65,7 +65,7 @@ class ProfilePreview extends StatelessWidget {
                     height: Dimensions.avatarSize,
                     child: IconButton(
                       onPressed: () => onModifyAccounts?.call(),
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.more_horiz_rounded,
                         color: Color(AppColors.greyDefault),
                         size: avatarSize,

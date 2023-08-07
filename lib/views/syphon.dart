@@ -48,7 +48,7 @@ class Syphon extends StatefulWidget {
   }
 
   static AppContext getAppContext(BuildContext buildContext) {
-    return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ?? AppContext();
+    return buildContext.findAncestorStateOfType<SyphonState>()!.appContext ?? const AppContext();
   }
 
   static Future reloadCurrentContext(BuildContext buildContext) {
@@ -87,7 +87,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
     final authed = currentUser.accessToken != null;
 
     if (!authed) {
-      defaultHome = IntroScreen();
+      defaultHome = const IntroScreen();
     }
 
     super.initState();
@@ -264,7 +264,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // wipe unauthenticated storage
     if (user != null) {
-      onDeleteContextStorage(AppContext(id: AppContext.DEFAULT));
+      onDeleteContextStorage(const AppContext(id: AppContext.DEFAULT));
     } else {
       // delete cache data if removing context / account (context is not default)
       onDeleteContextStorage(contextOld);
@@ -301,7 +301,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
 
     // No user is present and no contexts are availble to jump to
     if (user == null && allContexts.isEmpty && defaultScreen == HomeScreen) {
-      defaultHome = IntroScreen();
+      defaultHome = const IntroScreen();
       return NavigationService.clearTo(Routes.intro, context);
     }
 
@@ -397,7 +397,7 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
           path: 'assets/translations',
           useOnlyLangCode: true,
           startLocale: Locale(findLocale(store.state.settingsStore.language, context: context)),
-          fallbackLocale: Locale(SupportedLanguages.defaultLang),
+          fallbackLocale: const Locale(SupportedLanguages.defaultLang),
           useFallbackTranslations: true,
           supportedLocales: SupportedLanguages.list,
           child: StoreConnector<AppState, ThemeSettings>(

@@ -162,7 +162,7 @@ CryptoStore cryptoReducer([CryptoStore state = const CryptoStore(), dynamic acti
         deviceKeysExist: actionAny.existence,
       );
     case ResetCrypto:
-      return CryptoStore();
+      return const CryptoStore();
     default:
       return state;
   }

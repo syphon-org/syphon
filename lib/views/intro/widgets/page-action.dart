@@ -23,7 +23,7 @@ class ActionPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Container(
-            padding: EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 16),
             constraints: BoxConstraints(
               maxWidth: widthScale,
               maxHeight: heightScale,

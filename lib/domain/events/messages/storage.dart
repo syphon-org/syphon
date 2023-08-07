@@ -68,7 +68,7 @@ extension MessageQueries on ColdStorageDatabase {
     int limit = DEFAULT_LOAD_LIMIT,
   }) {
     return (select(messages)
-          ..where((tbl) => tbl.roomId.equals(roomId!) & tbl.timestamp.isSmallerThanValue(timestamp!))
+          ..where((tbl) => tbl.roomId.equals(roomId) & tbl.timestamp.isSmallerThanValue(timestamp!))
           ..orderBy([(tbl) => OrderingTerm(expression: tbl.timestamp, mode: OrderingMode.desc)])
           ..limit(limit, offset: offset))
         .get();

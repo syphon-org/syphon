@@ -114,7 +114,7 @@ class TextFieldSecure extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         height: Dimensions.inputHeight,
-        constraints: BoxConstraints(
+        constraints: const BoxConstraints(
           minWidth: Dimensions.inputWidthMin,
           maxWidth: Dimensions.inputWidthMax,
         ),

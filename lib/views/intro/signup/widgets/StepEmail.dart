@@ -50,22 +50,22 @@ class EmailStepState extends State<EmailStep> {
         final double height = MediaQuery.of(context).size.height;
 
         Color suffixBackgroundColor = Colors.grey;
-        Widget suffixWidget = CircularProgressIndicator(
+        Widget suffixWidget = const CircularProgressIndicator(
           strokeWidth: Dimensions.strokeWidthDefault,
-          valueColor: const AlwaysStoppedAnimation<Color>(
+          valueColor: AlwaysStoppedAnimation<Color>(
             Colors.white,
           ),
         );
 
         if (!props.loading && typingTimeout == null) {
           if (props.isEmailValid && props.isEmailAvailable) {
-            suffixWidget = Icon(
+            suffixWidget = const Icon(
               Icons.check,
               color: Colors.white,
             );
             suffixBackgroundColor = Theme.of(context).primaryColor;
           } else {
-            suffixWidget = Icon(
+            suffixWidget = const Icon(
               Icons.close,
               color: Colors.white,
             );
@@ -86,7 +86,7 @@ class EmailStepState extends State<EmailStep> {
                 flex: 2,
                 child: Container(
                   width: Dimensions.contentWidth(context),
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
@@ -103,7 +103,7 @@ class EmailStepState extends State<EmailStep> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.only(bottom: 8, top: 8),
+                      padding: const EdgeInsets.only(bottom: 8, top: 8),
                       child: Text(
                         'This homeserver requires an email\n for account creation.',
                         textAlign: TextAlign.center,
@@ -114,7 +114,7 @@ class EmailStepState extends State<EmailStep> {
                       clipBehavior: Clip.none,
                       children: <Widget>[
                         Container(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                             vertical: 8,
                             horizontal: 24,
                           ),
@@ -156,7 +156,7 @@ class EmailStepState extends State<EmailStep> {
                     Visibility(
                       visible: !props.isEmailAvailable,
                       child: Container(
-                        padding: EdgeInsets.only(top: 16),
+                        padding: const EdgeInsets.only(top: 16),
                         child: Text(
                           '* Email is already in use by another user',
                           textAlign: TextAlign.center,
@@ -174,7 +174,7 @@ class EmailStepState extends State<EmailStep> {
                 child: Container(
                   width: Dimensions.contentWidthWide(context),
                   height: Dimensions.inputHeight,
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     minWidth: Dimensions.inputWidthMin,
                     maxWidth: Dimensions.inputWidthMax,
                   ),
@@ -203,7 +203,7 @@ class EmailStepState extends State<EmailStep> {
 
                       // Run check after 1 second of no typing
                       typingTimeout = Timer(
-                        Duration(milliseconds: 1000),
+                        const Duration(milliseconds: 1000),
                         () {
                           setState(() {
                             typingTimeout = null;
@@ -216,13 +216,13 @@ class EmailStepState extends State<EmailStep> {
                       child: Container(
                         width: 12,
                         height: 12,
-                        margin: EdgeInsets.all(6),
+                        margin: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: suffixBackgroundColor,
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Container(
-                          padding: EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(6),
                           child: suffixWidget,
                         ),
                       ),
