@@ -11,7 +11,7 @@ analyzer:
 linter:
   rules:
     # TODO: convert to true
-    prefer_const_constructors: false
+    prefer_const_constructors: true
     lines_longer_than_80_chars: false
     avoid_redundant_argument_values: false
     prefer_typing_uninitialized_variables: false
@@ -40,3 +40,4 @@ linter:
 
     # Enabled
     prefer_single_quotes: true
+    prefer_const_declarations: true

@@ -143,14 +143,14 @@ class MessageWidget extends StatelessWidget {
           width: 36,
           height: Dimensions.iconSizeLarge,
           decoration: BoxDecoration(
-            color: Color(AppColors.greyDefault),
+            color: const Color(AppColors.greyDefault),
             borderRadius: BorderRadius.circular(Dimensions.iconSizeLarge),
             border: Border.all(
               color: Colors.white,
               width: 1,
             ),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.tag_faces,
             size: 22,
             color: Colors.white,
@@ -224,12 +224,12 @@ class MessageWidget extends StatelessWidget {
       if (isLastSender) {
         if (isNextSender) {
           // Message in the middle of a sender messages block
-          bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_SMALL);
+          bubbleMargin = const EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderMiddleUser;
           showInfoRow = isNewContext;
         } else {
           // Message at the beginning of a user sender messages block
-          bubbleMargin = EdgeInsets.only(
+          bubbleMargin = const EdgeInsets.only(
             top: MESSAGE_MARGIN_VERTICAL_LARGE,
             bottom: MESSAGE_MARGIN_VERTICAL_SMALL,
           );
@@ -240,7 +240,7 @@ class MessageWidget extends StatelessWidget {
 
       if (!isLastSender && isNextSender) {
         // End of a sender messages block
-        bubbleMargin = EdgeInsets.only(
+        bubbleMargin = const EdgeInsets.only(
           top: MESSAGE_MARGIN_VERTICAL_SMALL,
           bottom: MESSAGE_MARGIN_VERTICAL_LARGE,
         );
@@ -251,13 +251,13 @@ class MessageWidget extends StatelessWidget {
       if (isLastSender) {
         if (isNextSender) {
           // Message in the middle of a sender messages block
-          bubbleMargin = EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_SMALL);
+          bubbleMargin = const EdgeInsets.symmetric(vertical: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderMiddleSender;
           showSender = false;
           showInfoRow = isNewContext;
         } else {
           // Message at the beginning of a sender messages block
-          bubbleMargin = EdgeInsets.only(top: 8, bottom: MESSAGE_MARGIN_VERTICAL_SMALL);
+          bubbleMargin = const EdgeInsets.only(top: 8, bottom: MESSAGE_MARGIN_VERTICAL_SMALL);
           bubbleBorder = Styles.bubbleBorderTopSender;
           showInfoRow = isNewContext;
         }
@@ -265,7 +265,7 @@ class MessageWidget extends StatelessWidget {
 
       if (!isLastSender && isNextSender) {
         // End of a sender messages block
-        bubbleMargin = EdgeInsets.only(
+        bubbleMargin = const EdgeInsets.only(
           top: MESSAGE_MARGIN_VERTICAL_SMALL,
           bottom: MESSAGE_MARGIN_VERTICAL_LARGE,
         );
@@ -275,10 +275,10 @@ class MessageWidget extends StatelessWidget {
 
     if (isUserSent) {
       if (themeType == ThemeType.Dark) {
-        bubbleColor = Color(AppColors.greyDark);
+        bubbleColor = const Color(AppColors.greyDark);
         luminance = 0.2;
       } else if (themeType != ThemeType.Light) {
-        bubbleColor = Color(AppColors.greyDarkest);
+        bubbleColor = const Color(AppColors.greyDarkest);
         luminance = bubbleColor.computeLuminance();
         luminance = 0.2;
       } else {
@@ -320,7 +320,7 @@ class MessageWidget extends StatelessWidget {
 
     if (message.hasLink) {
       if (bubbleColor.delta(Colors.blue) > 0.85) {
-        anchorColor = Color(AppColors.blueDark);
+        anchorColor = const Color(AppColors.blueDark);
       }
     }
 
@@ -353,7 +353,7 @@ class MessageWidget extends StatelessWidget {
               children: <Widget>[
                 Transform(
                   transform: isUserSent ? Matrix4.rotationY(-185) : Matrix4.rotationY(0),
-                  child: Icon(
+                  child: const Icon(
                     Icons.reply,
                     size: Dimensions.iconSizeLarge,
                   ),
@@ -554,7 +554,7 @@ class MessageWidget extends StatelessWidget {
                                       secondChild: !selected
                                           ? Container()
                                           : Padding(
-                                              padding: EdgeInsets.only(left: 12, right: 12),
+                                              padding: const EdgeInsets.only(left: 12, right: 12),
                                               child: IntrinsicWidth(
                                                 child: TextFieldInline(
                                                   body: body,
@@ -584,7 +584,7 @@ class MessageWidget extends StatelessWidget {
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
-                                              margin: EdgeInsets.only(right: 4),
+                                              margin: const EdgeInsets.only(right: 4),
                                               child: Icon(
                                                 Icons.lock,
                                                 color: textColor,
@@ -596,7 +596,7 @@ class MessageWidget extends StatelessWidget {
                                             visible: showStatus,
                                             child: Container(
                                               // timestamp and error message
-                                              margin: EdgeInsets.only(right: 4),
+                                              margin: const EdgeInsets.only(right: 4),
                                               child: Text(
                                                 status,
                                                 style: TextStyle(
@@ -612,7 +612,7 @@ class MessageWidget extends StatelessWidget {
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
-                                              margin: EdgeInsets.only(left: 2),
+                                              margin: const EdgeInsets.only(left: 2),
                                               child: Icon(
                                                 Icons.lock,
                                                 color: textColor,
@@ -625,8 +625,8 @@ class MessageWidget extends StatelessWidget {
                                             child: Container(
                                               width: Dimensions.indicatorSize,
                                               height: Dimensions.indicatorSize,
-                                              margin: EdgeInsets.only(left: 3),
-                                              child: Icon(
+                                              margin: const EdgeInsets.only(left: 3),
+                                              child: const Icon(
                                                 Icons.close,
                                                 color: Colors.redAccent,
                                                 size: Dimensions.indicatorSize,
@@ -642,8 +642,8 @@ class MessageWidget extends StatelessWidget {
                                                   child: Container(
                                                     width: Dimensions.indicatorSize,
                                                     height: Dimensions.indicatorSize,
-                                                    margin: EdgeInsets.only(left: 4),
-                                                    child: CircularProgressIndicator(
+                                                    margin: const EdgeInsets.only(left: 4),
+                                                    child: const CircularProgressIndicator(
                                                       strokeWidth: Dimensions.strokeWidthThin,
                                                     ),
                                                   ),
@@ -653,7 +653,7 @@ class MessageWidget extends StatelessWidget {
                                                   child: Container(
                                                     width: Dimensions.indicatorSize,
                                                     height: Dimensions.indicatorSize,
-                                                    margin: EdgeInsets.only(left: 4),
+                                                    margin: const EdgeInsets.only(left: 4),
                                                     decoration: ShapeDecoration(
                                                       color: indicatorColor,
                                                       shape: CircleBorder(
@@ -675,7 +675,7 @@ class MessageWidget extends StatelessWidget {
                                                   child: Container(
                                                     width: Dimensions.indicatorSize,
                                                     height: Dimensions.indicatorSize,
-                                                    margin: EdgeInsets.only(left: 11),
+                                                    margin: const EdgeInsets.only(left: 11),
                                                     decoration: ShapeDecoration(
                                                       color: indicatorColor,
                                                       shape: CircleBorder(

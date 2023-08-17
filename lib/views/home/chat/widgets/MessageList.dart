@@ -67,7 +67,7 @@ class MessageList extends HookWidget {
 
     final currentUser = useSelector<AppState, User>(
       (state) => state.authStore.currentUser,
-      User(userId: ''),
+      const User(userId: ''),
     );
 
     final users = useSelector<AppState, Map<String, User>>(
@@ -159,12 +159,12 @@ class MessageList extends HookWidget {
         backgroundColor: Colors.transparent,
         builder: (context) => Container(
           height: height / 2.2,
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             vertical: 12,
           ),
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
             ),
@@ -175,7 +175,7 @@ class MessageList extends HookWidget {
                 emojiSizeMax: 24,
                 indicatorColor: Theme.of(context).colorScheme.secondary,
                 bgColor: Theme.of(context).scaffoldBackgroundColor,
-                categoryIcons: CategoryIcons(
+                categoryIcons: const CategoryIcons(
                   smileyIcon: Icons.tag_faces_rounded,
                   objectIcon: Icons.lightbulb,
                   travelIcon: Icons.flight,
@@ -199,7 +199,7 @@ class MessageList extends HookWidget {
       onTap: () => onToggleSelectedMessage!(null),
       child: ListView(
         reverse: true,
-        padding: EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.only(bottom: 16),
         physics: lockScrolling ? const NeverScrollableScrollPhysics() : null,
         controller: scrollController,
         children: [

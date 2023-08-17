@@ -99,7 +99,7 @@ AuthStore authReducer([AuthStore state = const AuthStore(), dynamic actionAny]) 
 
       return state.copyWith(availableUsers: availableUsers);
     case ResetUser:
-      return state.copyWith(user: User());
+      return state.copyWith(user: const User());
     case ResetOnboarding:
       return state.copyWith(
         username: '',

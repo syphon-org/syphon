@@ -112,16 +112,16 @@ class ModalUserDetails extends StatelessWidget {
           userId: userId,
         ),
         builder: (context, props) => Container(
-          constraints: BoxConstraints(
+          constraints: const BoxConstraints(
             maxHeight: Dimensions.modalHeightMax,
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             vertical: 12,
             horizontal: 24,
           ),
           decoration: BoxDecoration(
             color: Theme.of(context).dialogBackgroundColor,
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
             ),
@@ -131,7 +131,7 @@ class ModalUserDetails extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -139,7 +139,7 @@ class ModalUserDetails extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Container(
-                          padding: EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.only(bottom: 16),
                           child: Avatar(
                             uri: props.user.avatarUri,
                             alt: props.user.displayName ?? props.user.userId,
@@ -202,8 +202,8 @@ class ModalUserDetails extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
-                        padding: EdgeInsets.all(4),
-                        margin: EdgeInsets.only(left: 2),
+                        padding: const EdgeInsets.all(4),
+                        margin: const EdgeInsets.only(left: 2),
                         child: SvgPicture.asset(
                           Assets.iconMessageCircleBeing,
                           fit: BoxFit.contain,
@@ -225,8 +225,8 @@ class ModalUserDetails extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
+                        padding: const EdgeInsets.all(4),
+                        child: const Icon(
                           Icons.mail_outline,
                           size: Dimensions.iconSize,
                         ),
@@ -242,8 +242,8 @@ class ModalUserDetails extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       leading: Container(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
+                        padding: const EdgeInsets.all(4),
+                        child: const Icon(
                           Icons.info_outline,
                           size: Dimensions.iconSize,
                         ),
@@ -260,8 +260,8 @@ class ModalUserDetails extends StatelessWidget {
                             : Strings.listItemUserDetailsBlockUser,
                       ),
                       leading: Container(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
+                        padding: const EdgeInsets.all(4),
+                        child: const Icon(
                           Icons.block,
                           size: Dimensions.iconSize,
                         ),
@@ -316,14 +316,14 @@ class _Props extends Equatable {
         }
 
         if (userId == null) {
-          return User();
+          return const User();
         }
 
         if (!users.containsKey(userId) && !loading) {
           store.dispatch(fetchUser(user: User(userId: userId)));
         }
 
-        return users[userId] ?? User();
+        return users[userId] ?? const User();
       }(),
       users: store.state.userStore.users,
       existingChatId: selectDirectChatIdExisting(

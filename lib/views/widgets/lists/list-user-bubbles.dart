@@ -54,7 +54,7 @@ class ListUserBubbles extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
-              final user = users[index] ?? User();
+              final user = users[index] ?? const User();
 
               return Align(
                 child: GestureDetector(
@@ -83,8 +83,8 @@ class ListUserBubbles extends StatelessWidget {
           Visibility(
             visible: users.length > max || forceOption,
             child: Container(
-              margin: EdgeInsets.only(left: 4, right: 12),
-              padding: EdgeInsets.symmetric(vertical: 14),
+              margin: const EdgeInsets.only(left: 4, right: 12),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               child: ClipOval(
                 child: Material(
                   color: Theme.of(context).scaffoldBackgroundColor, // button color
@@ -112,7 +112,7 @@ class ListUserBubbles extends StatelessWidget {
                         width: Dimensions.avatarSize,
                         height: Dimensions.avatarSize,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(
+                          borderRadius: const BorderRadius.all(
                             Radius.circular(Dimensions.avatarSize),
                           ),
                           border: Border.all(

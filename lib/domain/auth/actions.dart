@@ -367,7 +367,7 @@ ThunkAction<AppState> loginUser() {
       store.dispatch(SetStopgap(stopgap: true));
 
       // prevents people spamming the login if it were to fail repeatedly
-      Timer(Duration(seconds: 2), () {
+      Timer(const Duration(seconds: 2), () {
         store.dispatch(SetStopgap(stopgap: false));
       });
 
@@ -484,7 +484,7 @@ ThunkAction<AppState> loginUserSSO({String? token}) {
       store.dispatch(SetStopgap(stopgap: true));
 
       // prevents people spamming the login if it were to fail repeatedly
-      Timer(Duration(seconds: 2), () {
+      Timer(const Duration(seconds: 2), () {
         store.dispatch(SetStopgap(stopgap: false));
       });
 
@@ -1107,7 +1107,7 @@ ThunkAction<AppState> updateCredential({
 }) {
   return (Store<AppState> store) {
     try {
-      final currentCredential = store.state.authStore.credential ?? Credential();
+      final currentCredential = store.state.authStore.credential ?? const Credential();
 
       store.dispatch(SetCredential(
         credential: currentCredential.copyWith(
@@ -1149,7 +1149,7 @@ ThunkAction<AppState> deactivateAccount() => (Store<AppState> store) async {
       try {
         store.dispatch(SetLoading(loading: true));
 
-        final currentCredential = store.state.authStore.credential ?? Credential();
+        final currentCredential = store.state.authStore.credential ?? const Credential();
 
         final user = store.state.authStore.user;
         final idServer = user.idserver;

@@ -39,12 +39,12 @@ class MediaFullScreen extends StatelessWidget {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: Icon(Icons.download),
+            icon: const Icon(Icons.download),
             color: backgroundColor,
             onPressed: () => onPressDownload(context),
           ),
           IconButton(
-              icon: Icon(Icons.share),
+              icon: const Icon(Icons.share),
               color: backgroundColor,
               onPressed: () async {
                 await Share.share(MatrixApi.buildMessageUrl(
@@ -61,7 +61,7 @@ class MediaFullScreen extends StatelessWidget {
             onPressed: () => {
                   Navigator.of(context).pop(),
                 },
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back_outlined,
             ),
             color: backgroundColor),

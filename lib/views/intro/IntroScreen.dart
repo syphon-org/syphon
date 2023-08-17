@@ -1,17 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/settings/actions.dart';
 import 'package:syphon/domain/settings/storage.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/hooks.dart';
+import 'package:syphon/global/libraries/redux/hooks.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
 import 'package:syphon/views/navigation.dart';
@@ -25,11 +23,11 @@ import 'widgets/page-description-third.dart';
 import 'widgets/page-landing.dart';
 
 final List<Widget> sections = [
-  LandingPage(),
-  FirstDescriptionPage(),
-  SecondDescriptionPage(),
-  ThirdDescriptionPage(),
-  ActionPage(),
+  const LandingPage(),
+  const FirstDescriptionPage(),
+  const SecondDescriptionPage(),
+  const ThirdDescriptionPage(),
+  const ActionPage(),
 ];
 
 class IntroScreen extends HookWidget {
@@ -73,15 +71,15 @@ class IntroScreen extends HookWidget {
                   termsTitle,
                   textAlign: TextAlign.center,
                 ),
-                titlePadding: EdgeInsets.only(left: 24, right: 24, top: 24),
-                contentPadding: EdgeInsets.symmetric(
+                titlePadding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+                contentPadding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
                 ),
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.all(24),
-                    child: Image(
+                    padding: const EdgeInsets.all(24),
+                    child: const Image(
                       width: 98,
                       height: 98,
                       image: AssetImage(Assets.appIconPng),
@@ -103,13 +101,13 @@ class IntroScreen extends HookWidget {
                     child: Text(
                       Strings.confirmAlphaWarning,
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.w100),
+                      style: const TextStyle(fontWeight: FontWeight.w100),
                     ),
                   ),
                   Text(
                     Strings.confirmAlphaWarningAlt,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.w300),
+                    style: const TextStyle(fontWeight: FontWeight.w300),
                   ),
                   Text(
                     Strings.confirmTermsOfServiceConclusion,
@@ -117,13 +115,13 @@ class IntroScreen extends HookWidget {
                   ),
                   Text(
                     Strings.confirmAppTermsOfService,
-                    style: TextStyle(fontSize: 12),
+                    style: const TextStyle(fontSize: 12),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         child: TextButton(
                           onPressed: () async {
                             await dispatch(acceptAgreement());
@@ -178,7 +176,7 @@ class IntroScreen extends HookWidget {
             flex: 6,
             fit: FlexFit.tight,
             child: Container(
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 minWidth: Dimensions.mediaSizeMin,
               ),
               child: PageView(
@@ -215,8 +213,8 @@ class IntroScreen extends HookWidget {
                       Navigator.pushNamed(context, Routes.signup);
                     }
 
-                    pageController!.nextPage(
-                      duration: Duration(
+                    pageController.nextPage(
+                      duration: const Duration(
                         milliseconds: Values.animationDurationDefault,
                       ),
                       curve: Curves.ease,
@@ -234,7 +232,7 @@ class IntroScreen extends HookWidget {
               children: <Widget>[
                 Container(
                   height: Dimensions.inputHeight,
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     minHeight: Dimensions.inputHeight,
                   ),
                   child: onboarding
@@ -265,7 +263,7 @@ class IntroScreen extends HookWidget {
                               Text(
                                 loginText,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w100,
                                 ),

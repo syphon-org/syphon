@@ -61,7 +61,7 @@ void _printRelease(String content, {String? title}) {
 
 void _printJson(Map? jsonMap) {
   if (DEBUG_MODE) {
-    final JsonEncoder encoder = JsonEncoder.withIndent('  ');
+    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
     final String prettyEvent = encoder.convert(jsonMap);
     debugPrint(prettyEvent, wrapWidth: 2048);
   }

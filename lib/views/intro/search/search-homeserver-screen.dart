@@ -82,7 +82,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
             label: Strings.labelSearchHomeservers,
             tooltip: 'Search Homeservers',
             focusNode: searchInputFocusNode,
-            throttle: Duration(milliseconds: 500),
+            throttle: const Duration(milliseconds: 500),
             forceFocus: true,
             onChange: (text) {
               props.onSearch(text);
@@ -105,9 +105,9 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                     final homeserver = props.homeservers[index] ?? {} as Homeserver;
 
                     return Container(
-                      padding: EdgeInsets.only(top: 8, bottom: 8),
+                      padding: const EdgeInsets.only(top: 8, bottom: 8),
                       child: ExpandablePanel(
-                        theme: ExpandableThemeData(
+                        theme: const ExpandableThemeData(
                           hasIcon: false,
                         ),
                         header: ListTile(
@@ -131,19 +131,19 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                             child: Container(
                               width: 32,
                               height: 32,
-                              margin: EdgeInsets.all(6),
+                              margin: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).primaryColor,
                                 borderRadius: BorderRadius.circular(24),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.check,
                                 color: Colors.white,
                               ),
                             ),
                           ),
                         ),
-                        collapsed: Row(),
+                        collapsed: const Row(),
                         expanded: Row(
                           children: <Widget>[
                             Expanded(
@@ -221,7 +221,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                   visible:
                       props.searchText.isNotEmpty && props.searchText.isNotEmpty && props.homeservers.isEmpty,
                   child: Container(
-                    padding: EdgeInsets.only(top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(top: 8, bottom: 8),
                     child: GestureDetector(
                       onTap: () {
                         props.onSelect(props.searchText);
@@ -244,7 +244,7 @@ class SearchHomeserverScreenState extends State<SearchHomeserverScreen>
                         subtitle: Text(
                           'Try logging in with this server',
                           style: Theme.of(context).textTheme.bodySmall!.merge(
-                                TextStyle(fontStyle: FontStyle.italic),
+                                const TextStyle(fontStyle: FontStyle.italic),
                               ),
                         ),
                       ),

@@ -18,12 +18,12 @@ class ModalImageOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         height: Dimensions.defaultModalHeight,
-        padding: EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           vertical: 12,
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(16),
             topRight: Radius.circular(16),
           ),
@@ -33,7 +33,7 @@ class ModalImageOptions extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 vertical: 8,
                 horizontal: 24,
               ),
@@ -44,8 +44,8 @@ class ModalImageOptions extends StatelessWidget {
             ),
             ListTile(
               leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
+                padding: const EdgeInsets.all(4),
+                child: const Icon(
                   Icons.camera_alt,
                   size: 30,
                 ),
@@ -71,8 +71,8 @@ class ModalImageOptions extends StatelessWidget {
             ),
             ListTile(
               leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
+                padding: const EdgeInsets.all(4),
+                child: const Icon(
                   Icons.photo_library,
                   size: 28,
                 ),
@@ -102,8 +102,8 @@ class ModalImageOptions extends StatelessWidget {
                 Navigator.pop(context);
               },
               leading: Container(
-                padding: EdgeInsets.all(4),
-                child: Icon(
+                padding: const EdgeInsets.all(4),
+                child: const Icon(
                   Icons.delete_forever,
                   size: 34,
                 ),

@@ -60,9 +60,9 @@ a privacy centric matrix client - now in open alpha*
 **Syphon aims to be built on the foundations of privacy, branding, and user experience** 
 <br>in an effort to pull others away from proprietary chat platforms to the matrix protocol.
 
-Matrix has the potential to be a standardized peer-to-peer chat protocol, [and in a way already is,](https://matrix.org/blog/2020/06/02/introducing-p-2-p-matrix) that allows people to communicate and control their conversation data. Email has been standardized in this way for a long time. For example, someone using Outlook can still email someone using Gmail. Most popular proprietary chat platforms do not adhere to a federated or decentralized protocol, and as a result have too much control over users data.
+Matrix has the potential to be a standardized peer-to-peer chat protocol, [and in a way already is,](https://matrix.org/blog/2020/06/02/introducing-p-2-p-matrix) that allows people to communicate and control their conversation data. Email has been standardized this way for a long while. Someone using Outlook can still email someone using Gmail. Most popular proprietary chat platforms do not adhere to a federated or decentralized protocol, and as a result have too much control over users data.
 
-If the goal for Matrix is adoption, a network effect is required for this paradigm shift. Syphon makes the bet that the best way to attract new users is through strong branding and user experience. I hope that contributing and maintaining Syphon will help kick start this process and help those in need. 
+If the goal for Matrix is adoption, a network effect is required for this paradigm shift. Syphon bets the best way to attract new users is through strong branding and user experience. I hope that contributing and maintaining Syphon will help kick start this process and help those in need. 
 
 Syphon will always be a not for profit, community driven application.
 

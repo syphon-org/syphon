@@ -311,7 +311,7 @@ ThunkAction<AppState> sendMessage({
       store.dispatch(UpdateRoom(
         id: room.id,
         sending: false,
-        reply: Message(),
+        reply: const Message(),
       ));
     }
   };
@@ -440,7 +440,7 @@ ThunkAction<AppState> sendMessageEncrypted({
       );
       return false;
     } finally {
-      store.dispatch(UpdateRoom(id: roomId, sending: false, reply: Message()));
+      store.dispatch(UpdateRoom(id: roomId, sending: false, reply: const Message()));
     }
   };
 }

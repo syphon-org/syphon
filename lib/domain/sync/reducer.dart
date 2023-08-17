@@ -46,7 +46,7 @@ SyncStore syncReducer([SyncStore state = const SyncStore(), dynamic actionAny]) 
         syncObserver: action.syncObserver,
       );
     case ResetSync:
-      return SyncStore();
+      return const SyncStore();
     default:
       return state;
   }

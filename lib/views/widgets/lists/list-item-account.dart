@@ -65,7 +65,7 @@ class ListItemAccount extends StatelessWidget {
             enabled: enabled,
             selected: selected,
             onTap: onPress != null && enabled ? () => onPress!() : null,
-            contentPadding: EdgeInsets.symmetric(
+            contentPadding: const EdgeInsets.symmetric(
               vertical: Dimensions.paddingMin,
               horizontal: Dimensions.paddingContainer,
             ),

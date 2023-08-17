@@ -159,7 +159,7 @@ Future<Store<AppState>> initStore(
     storage: CacheStorage(cache: cache),
     serializer: CacheSerializer(cache: cache, preloaded: preloaded),
     shouldSave: cacheMiddleware,
-    throttleDuration: Duration(milliseconds: 500),
+    throttleDuration: const Duration(milliseconds: 500),
   );
 
   // Finally load persisted store
@@ -181,7 +181,7 @@ Future<Store<AppState>> initStore(
 
   final store = Store<AppState>(
     appReducer,
-    initialState: initialState ?? AppState(),
+    initialState: initialState ?? const AppState(),
     middleware: [
       thunkMiddleware,
       authMiddleware,

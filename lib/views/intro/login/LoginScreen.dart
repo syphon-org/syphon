@@ -58,7 +58,7 @@ class LoginScreen extends HookWidget {
     final loading = useSelector<AppState, bool>((state) => state.authStore.loading, false);
     final hostname = useSelector<AppState, String>((state) => state.authStore.hostname, Values.empty);
     final username = useSelector<AppState, String>((state) => state.authStore.username, Values.empty);
-    final homeserver = useSelector<AppState, Homeserver>((state) => state.authStore.homeserver, Homeserver());
+    final homeserver = useSelector<AppState, Homeserver>((state) => state.authStore.homeserver, const Homeserver());
 
     final availableUsers = useSelector<AppState, List<User>>(
       (state) => state.authStore.availableUsers,
@@ -74,6 +74,7 @@ class LoginScreen extends HookWidget {
       if (multiaccount) {
         dispatch(initDeepLinks());
       }
+      return null;
     }, []);
 
     final isSSOLoginAvailable = useSelector<AppState, bool>((state) => selectSSOEnabled(state), false);
@@ -175,7 +176,7 @@ class LoginScreen extends HookWidget {
 
       if (!passwordFocus.hasFocus) {
         //Enable the text field's focus node request after some delay
-        Future.delayed(Duration(milliseconds: 100), () {
+        Future.delayed(const Duration(milliseconds: 100), () {
           passwordFocus.canRequestFocus = true;
         });
       }
@@ -202,7 +203,7 @@ class LoginScreen extends HookWidget {
             onTap: () {
               Navigator.pushNamed(context, Routes.searchHomeservers);
             },
-            child: Icon(
+            child: const Icon(
               Icons.search_rounded,
               size: Dimensions.iconSizeLarge,
             ),
@@ -239,7 +240,7 @@ class LoginScreen extends HookWidget {
                   onTap: () {
                     Navigator.pushNamed(context, Routes.searchHomeservers);
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.search_rounded,
                   ),
                 ),
@@ -252,7 +253,7 @@ class LoginScreen extends HookWidget {
               top: 8,
               bottom: 10,
             ),
-            constraints: BoxConstraints(
+            constraints: const BoxConstraints(
               minWidth: Dimensions.inputWidthMin,
               maxWidth: Dimensions.inputWidthMax,
             ),
@@ -280,16 +281,16 @@ class LoginScreen extends HookWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(right: 4),
+                padding: const EdgeInsets.only(right: 4),
                 child: TouchableOpacity(
                   activeOpacity: 0.4,
                   onTap: () async {
                     await onResetSession();
                     Navigator.pushNamed(context, Routes.forgot);
                   },
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
+                    children: <Widget>[
                       Text(
                         'Forgot Password?',
                         textAlign: TextAlign.center,
@@ -316,7 +317,7 @@ class LoginScreen extends HookWidget {
           Visibility(
             visible: DEBUG_MODE,
             child: IconButton(
-              icon: Icon(Icons.settings),
+              icon: const Icon(Icons.settings),
               iconSize: Dimensions.iconSizeLarge,
               tooltip: 'General Settings',
               color: Theme.of(context).scaffoldBackgroundColor,
@@ -327,7 +328,7 @@ class LoginScreen extends HookWidget {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
             iconSize: Dimensions.iconSizeLarge,
             tooltip: Strings.listItemSettingsProxy,
             color: Theme.of(context).primaryColor,
@@ -354,7 +355,7 @@ class LoginScreen extends HookWidget {
           child: Container(
             height: height,
             width: width,
-            constraints: BoxConstraints(
+            constraints: const BoxConstraints(
               maxHeight: Dimensions.heightMax,
             ),
             child: Flex(
@@ -375,14 +376,14 @@ class LoginScreen extends HookWidget {
                             onIncrementThemeType();
                           },
                           child: Container(
-                            constraints: BoxConstraints(
+                            constraints: const BoxConstraints(
                               maxWidth: 180,
                               maxHeight: 180,
                             ),
                             child: Image(
                               width: width * 0.35,
                               height: width * 0.35,
-                              image: AssetImage(Assets.appIconPng),
+                              image: const AssetImage(Assets.appIconPng),
                             ),
                           ),
                         ),
@@ -400,7 +401,7 @@ class LoginScreen extends HookWidget {
                                   onIncrementThemeType();
                                 },
                                 child: Container(
-                                  constraints: BoxConstraints(
+                                  constraints: const BoxConstraints(
                                     maxWidth: 180,
                                     maxHeight: 180,
                                   ),
@@ -421,7 +422,7 @@ class LoginScreen extends HookWidget {
                 Flexible(
                   flex: 4,
                   child: Container(
-                    constraints: BoxConstraints(
+                    constraints: const BoxConstraints(
                       minWidth: Dimensions.inputWidthMin,
                       maxWidth: Dimensions.inputWidthMax,
                     ),
@@ -438,7 +439,7 @@ class LoginScreen extends HookWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Container(
-                                  padding: EdgeInsets.only(bottom: Dimensions.paddingSmall),
+                                  padding: const EdgeInsets.only(bottom: Dimensions.paddingSmall),
                                   child: Text(
                                     'Add another account',
                                     textAlign: TextAlign.center,
@@ -519,7 +520,7 @@ class LoginScreen extends HookWidget {
                   child: Flexible(
                     child: Container(
                       height: Dimensions.inputHeight,
-                      constraints: BoxConstraints(
+                      constraints: const BoxConstraints(
                         minHeight: Dimensions.inputHeight,
                       ),
                       child: TouchableOpacity(
@@ -531,7 +532,7 @@ class LoginScreen extends HookWidget {
                             Text(
                               Strings.buttonTextSignupQuestion,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w100,
                               ),

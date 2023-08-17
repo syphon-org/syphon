@@ -27,7 +27,7 @@ class LoadingScreen extends StatelessWidget {
           child: Container(
             height: height,
             width: width,
-            color: Color(AppColors.whiteDefault),
+            color: const Color(AppColors.whiteDefault),
             child: Flex(
               direction: Axis.vertical,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +60,7 @@ class LoadingScreen extends StatelessWidget {
           child: Container(
             height: height,
             width: width,
-            color: Color(AppColors.cyanSyphon),
+            color: const Color(AppColors.cyanSyphon),
             child: Flex(
               direction: Axis.vertical,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -70,7 +70,7 @@ class LoadingScreen extends StatelessWidget {
                     Assets.appIcon,
                     width: width * 0.35,
                     height: width * 0.35,
-                    colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                   ),
                 ),
               ],

@@ -103,11 +103,11 @@ Color selectIconBackground(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Color(AppColors.greyDefault);
+      return const Color(AppColors.greyDefault);
     case ThemeType.Night:
-      return Color(AppColors.greyDefault);
+      return const Color(AppColors.greyDefault);
     default:
-      return Color(AppColors.greyDark);
+      return const Color(AppColors.greyDark);
   }
 }
 
@@ -116,11 +116,11 @@ Color selectAvatarBackground(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Color(AppColors.greyLightest);
+      return const Color(AppColors.greyLightest);
     case ThemeType.Night:
-      return Color(AppColors.greyDefault);
+      return const Color(AppColors.greyDefault);
     default:
-      return Color(AppColors.greyDark);
+      return const Color(AppColors.greyDark);
   }
 }
 
@@ -177,7 +177,7 @@ Color selectInputTextColor(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Color(AppColors.blackDefault);
+      return const Color(AppColors.blackDefault);
     default:
       return Colors.white;
   }
@@ -199,7 +199,7 @@ Color selectInputBackgroundColor(ThemeType themeTypeNew) {
 
   switch (themeType) {
     case ThemeType.Light:
-      return Color(AppColors.greyEnabled);
+      return const Color(AppColors.greyEnabled);
     case ThemeType.Dark:
       return Colors.grey[800]!;
     default:

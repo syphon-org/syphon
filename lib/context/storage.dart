@@ -13,7 +13,7 @@ const CURRENT_APP_CONTEXT_KEY = '${Values.appLabel}@app-context-current';
 Future<AppContext> findContext(String contextId) async {
   final all = await loadContextsAll();
 
-  return all.firstWhere((e) => e.id == contextId, orElse: () => AppContext());
+  return all.firstWhere((e) => e.id == contextId, orElse: () => const AppContext());
 }
 
 Future saveContextCurrent(AppContext? current) async {
@@ -66,7 +66,7 @@ Future<AppContext> loadContextCurrent() async {
     } catch (error) {
       console.error('[loadNextContext] ERROR LOADING NEXT CONTEXT - RESETTING CONTEXT');
       resetContextsAll();
-      return AppContext();
+      return const AppContext();
     }
   }
 }
@@ -74,11 +74,11 @@ Future<AppContext> loadContextCurrent() async {
 Future<AppContext> loadContextNext() async {
   try {
     final allContexts = await loadContextsAll();
-    return allContexts.isNotEmpty ? allContexts[0] : AppContext();
+    return allContexts.isNotEmpty ? allContexts[0] : const AppContext();
   } catch (error) {
     console.error('[loadNextContext] ERROR LOADING NEXT CONTEXT $error');
 
-    return AppContext();
+    return const AppContext();
   }
 }
 
@@ -91,7 +91,7 @@ Future<List<AppContext>> loadContextsAll() async {
 
     resetContextsAll();
 
-    return [AppContext()];
+    return [const AppContext()];
   }
 }
 
@@ -105,7 +105,7 @@ Future deleteContext(AppContext? current) async {
   if (allContexts.isNotEmpty) {
     saveContextCurrent(allContexts.first);
   } else {
-    saveContextCurrent(AppContext());
+    saveContextCurrent(const AppContext());
   }
 
   return saveContextsAll(updatedContexts);
@@ -124,7 +124,7 @@ resetContextsAll() async {
     );
 
     await SecureStorage().write(key: ALL_APP_CONTEXT_KEY, value: json.encode([]));
-    await SecureStorage().write(key: CURRENT_APP_CONTEXT_KEY, value: json.encode(AppContext()));
+    await SecureStorage().write(key: CURRENT_APP_CONTEXT_KEY, value: json.encode(const AppContext()));
   } catch (error) {
     console.error('[resetAllContexts] ERROR RESETTING CONTEXT STORAGE $error');
   }

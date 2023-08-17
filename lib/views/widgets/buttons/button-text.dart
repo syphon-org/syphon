@@ -28,17 +28,17 @@ class ButtonText extends StatelessWidget {
         style: ButtonStyle(
           foregroundColor: MaterialStateProperty.resolveWith<Color?>(
             (Set<MaterialState> states) =>
-                states.contains(MaterialState.disabled) ? Color(AppColors.greyDisabled) : null,
+                states.contains(MaterialState.disabled) ? const Color(AppColors.greyDisabled) : null,
           ),
         ),
         onPressed: disabled ? null : onPressed as void Function()?,
         child: loading
             ? Container(
-                constraints: BoxConstraints(
+                constraints: const BoxConstraints(
                   maxHeight: 24,
                   maxWidth: 24,
                 ),
-                child: CircularProgressIndicator(
+                child: const CircularProgressIndicator(
                   strokeWidth: Dimensions.strokeWidthDefault,
                   backgroundColor: Colors.white,
                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -56,7 +56,7 @@ class ButtonText extends StatelessWidget {
                       letterSpacing: 0.8,
                       color: () {
                         if (disabled) {
-                          return Color(AppColors.greyDisabled);
+                          return const Color(AppColors.greyDisabled);
                         }
                         if (color != null) {
                           return color;

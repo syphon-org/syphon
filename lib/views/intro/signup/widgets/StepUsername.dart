@@ -41,22 +41,22 @@ class UsernameStepState extends State<UsernameStep> with Lifecycle<UsernameStep>
         final double height = MediaQuery.of(context).size.height;
 
         Color suffixBackgroundColor = Colors.grey;
-        Widget suffixWidget = CircularProgressIndicator(
+        Widget suffixWidget = const CircularProgressIndicator(
           strokeWidth: Dimensions.strokeWidthDefault,
-          valueColor: const AlwaysStoppedAnimation<Color>(
+          valueColor: AlwaysStoppedAnimation<Color>(
             Colors.white,
           ),
         );
 
         if (!props.loading && typingTimeout == null) {
           if (props.isUsernameAvailable) {
-            suffixWidget = Icon(
+            suffixWidget = const Icon(
               Icons.check,
               color: Colors.white,
             );
             suffixBackgroundColor = Theme.of(context).primaryColor;
           } else {
-            suffixWidget = Icon(
+            suffixWidget = const Icon(
               Icons.close,
               color: Colors.white,
             );
@@ -77,7 +77,7 @@ class UsernameStepState extends State<UsernameStep> with Lifecycle<UsernameStep>
                 flex: 2,
                 child: Container(
                   width: Dimensions.contentWidth(context),
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
@@ -104,7 +104,7 @@ class UsernameStepState extends State<UsernameStep> with Lifecycle<UsernameStep>
                 child: Container(
                   width: Dimensions.contentWidthWide(context),
                   height: Dimensions.inputHeight,
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     minWidth: Dimensions.inputWidthMin,
                     maxWidth: Dimensions.inputWidthMax,
                   ),
@@ -136,7 +136,7 @@ class UsernameStepState extends State<UsernameStep> with Lifecycle<UsernameStep>
 
                       // Run check after 1 second of no typing
                       typingTimeout = Timer(
-                        Duration(milliseconds: 1000),
+                        const Duration(milliseconds: 1000),
                         () {
                           props.onCheckUsernameAvailability();
                           setState(() {
@@ -150,13 +150,13 @@ class UsernameStepState extends State<UsernameStep> with Lifecycle<UsernameStep>
                       child: Container(
                         width: 12,
                         height: 12,
-                        margin: EdgeInsets.all(6),
+                        margin: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: suffixBackgroundColor,
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Container(
-                          padding: EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(6),
                           child: suffixWidget,
                         ),
                       ),

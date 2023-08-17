@@ -36,7 +36,7 @@ class ButtonOutline extends StatelessWidget {
             color: Theme.of(context).primaryColor,
           ),
         ),
-        constraints: BoxConstraints(
+        constraints: const BoxConstraints(
           minWidth: Dimensions.buttonWidthMin,
           maxWidth: Dimensions.buttonWidthMax,
         ),
@@ -44,7 +44,7 @@ class ButtonOutline extends StatelessWidget {
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.resolveWith<Color?>(
               (Set<MaterialState> states) => states.contains(MaterialState.disabled)
-                  ? Color(AppColors.greyLight)
+                  ? const Color(AppColors.greyLight)
                   : Theme.of(context).primaryColor,
             ),
             backgroundColor: MaterialStateProperty.resolveWith<Color?>(
@@ -59,7 +59,7 @@ class ButtonOutline extends StatelessWidget {
           ),
           onPressed: disabled ? null : onPressed as void Function()?,
           child: loading
-              ? LoadingIndicator()
+              ? const LoadingIndicator()
               : (child != null
                   ? child!
                   : Text(
@@ -69,7 +69,7 @@ class ButtonOutline extends StatelessWidget {
                         fontWeight: FontWeight.w100,
                         letterSpacing: 0.8,
                         color:
-                            disabled ? Color(AppColors.greyLight) : Theme.of(context).primaryColor,
+                            disabled ? const Color(AppColors.greyLight) : Theme.of(context).primaryColor,
                       ),
                     )),
         ),

@@ -1,4 +1,3 @@
-import 'package:redux/redux.dart';
 import 'package:syphon/domain/index.dart';
 
 bool selectHasDecryptableMessages(AppState state, String roomId) {

@@ -41,7 +41,7 @@ class LandingPage extends StatelessWidget {
               direction: Axis.vertical,
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.only(bottom: 14),
                   child: Text(
                     Strings.titleIntro,
                     textAlign: TextAlign.center,

@@ -62,7 +62,7 @@ Future onFocusSafe({FocusNode? focusNode, required Future<void> Function() onFun
 
   if (!focusNode.hasFocus) {
     //Enable the text field's focus node request after some delay
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       focusNode.canRequestFocus = true;
     });
   }
