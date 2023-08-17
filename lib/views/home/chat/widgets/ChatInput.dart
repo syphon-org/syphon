@@ -713,7 +713,6 @@ class ChatInput extends HookWidget {
             height: 250,
             child: EmojiPicker(
               textEditingController: controller ,
-              // onEmojiSelected: () => onUpdateInput(controller.value.text),
               onEmojiSelected: (Category? category, Emoji emoji) {
                 onUpdateInput(controller.value.text);
               },
@@ -724,7 +723,6 @@ class ChatInput extends HookWidget {
                   indicatorColor: Colors.blue,
                   iconColor: Colors.grey,
                   iconColorSelected: Colors.blue,
-                  // progressIndicatorColor: Colors.blue,
                   skinToneDialogBgColor: Colors.white,
                   skinToneIndicatorColor: Colors.grey,
                   enableSkinTones: true,
