@@ -424,37 +424,6 @@ class ChatInput extends HookWidget {
     return Column(
       children: [
         Visibility(
-          visible: isEmojiShowing.value,
-          child: SizedBox(
-            height: 250,
-            child: EmojiPicker(
-            textEditingController: controller ,
-            config: Config(
-                emojiSizeMax: 28 * (Platform.isIOS ? 1.30 : 1.0),
-                initCategory: Category.RECENT,
-                bgColor: Colors.white,
-                indicatorColor: Colors.blue,
-                iconColor: Colors.grey,
-                iconColorSelected: Colors.blue,
-                // progressIndicatorColor: Colors.blue,
-                skinToneDialogBgColor: Colors.white,
-                skinToneIndicatorColor: Colors.grey,
-                enableSkinTones: true,
-                showRecentsTab: true,
-                recentsLimit: 28,
-                replaceEmojiOnLimitExceed: false,
-                noRecents: const Text(
-                  'No Recents',
-                  style: TextStyle(fontSize: 20, color: Colors.black26),
-                  textAlign: TextAlign.center,
-                ),
-                tabIndicatorAnimDuration: kTabScrollDuration,
-                categoryIcons: const CategoryIcons(),
-                buttonMode: ButtonMode.CUPERTINO),
-            ),
-          ),
-        ),
-        Visibility(
           visible: replying,
           maintainSize: false,
           maintainState: false,
@@ -538,7 +507,7 @@ class ChatInput extends HookWidget {
               onPressed: () {
                 isEmojiShowing.value = !isEmojiShowing.value;
               },
-              icon: Icon(isEmojiShowing.value ? Icons.keyboard : Icons.emoji_emotions),
+              icon: Icon(isEmojiShowing.value ? Icons.keyboard_hide : Icons.emoji_emotions),
             ),
             Container(
               constraints: BoxConstraints(
@@ -737,7 +706,37 @@ class ChatInput extends HookWidget {
               ],
             ),
           ),
-        )
+        ),
+        Visibility(
+          visible: isEmojiShowing.value,
+          child: SizedBox(
+            height: 250,
+            child: EmojiPicker(
+              textEditingController: controller ,
+              // onEmojiSelected: () => onUpdateInput(controller.value.text),
+              onEmojiSelected: (Category? category, Emoji emoji) {
+                onUpdateInput(controller.value.text);
+              },
+              config: Config(
+                  emojiSizeMax: 28 * (Platform.isIOS ? 1.30 : 1.0),
+                  initCategory: Category.RECENT,
+                  bgColor: Colors.white,
+                  indicatorColor: Colors.blue,
+                  iconColor: Colors.grey,
+                  iconColorSelected: Colors.blue,
+                  // progressIndicatorColor: Colors.blue,
+                  skinToneDialogBgColor: Colors.white,
+                  skinToneIndicatorColor: Colors.grey,
+                  enableSkinTones: true,
+                  showRecentsTab: true,
+                  recentsLimit: 28,
+                  replaceEmojiOnLimitExceed: false,
+                  tabIndicatorAnimDuration: kTabScrollDuration,
+                  categoryIcons: const CategoryIcons(),
+                  buttonMode: ButtonMode.CUPERTINO),
+            ),
+          ),
+        ),
       ],
     );
   }
