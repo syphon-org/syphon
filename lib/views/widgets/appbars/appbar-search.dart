@@ -8,7 +8,7 @@ import 'package:touchable_opacity/touchable_opacity.dart';
 
 class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
   const AppBarSearch({
-    Key? key,
+    super.key,
     this.title = 'title:',
     this.label = 'label:',
     this.tooltip = 'tooltip:',
@@ -23,7 +23,7 @@ class AppBarSearch extends StatefulWidget implements PreferredSizeWidget {
     this.onChange,
     this.onSearch,
     this.onToggleSearch,
-  }) : super(key: key);
+  });
 
   final bool loading;
   final bool forceFocus;

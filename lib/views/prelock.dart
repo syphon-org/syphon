@@ -4,17 +4,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:sembast/sembast.dart';
-import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/storage.dart';
 import 'package:syphon/context/types.dart';
+import 'package:syphon/domain/index.dart';
 import 'package:syphon/global/https.dart';
+import 'package:syphon/global/libraries/cache/index.dart';
+import 'package:syphon/global/libraries/storage/database.dart';
+import 'package:syphon/global/libraries/storage/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/storage/database.dart';
-import 'package:syphon/storage/index.dart';
-import 'package:syphon/store/index.dart';
 import 'package:syphon/views/intro/lock-screen.dart';
-import 'package:syphon/views/intro/signup/loading-screen.dart';
+import 'package:syphon/views/intro/signup/LoadingScreen.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/syphon.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
@@ -50,9 +50,7 @@ class Prelock extends StatefulWidget {
   }
 
   static Future? toggleLocked(BuildContext context, String pin, {bool? override}) {
-    return context
-        .findAncestorStateOfType<_PrelockState>()!
-        .toggleLocked(pin: pin, override: override);
+    return context.findAncestorStateOfType<_PrelockState>()!.toggleLocked(pin: pin, override: override);
   }
 
   @override
@@ -69,7 +67,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
   Timer? backgroundLockLatencyTimer;
 
   Database? cache;
-  StorageDatabase? storage;
+  ColdStorageDatabase? storage;
   Store<AppState>? store;
   AppContext? appContext;
 
@@ -89,7 +87,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     if (!locked) {
       await _onLoadStorage();
 
-      log.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+      console.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushReplacement(
         PageRouteBuilder(
@@ -187,7 +185,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     } else {
       await _onLoadStorage();
 
-      log.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
+      console.info('[Prelock] onMounted LOADED STORAGE ${widget.appContext.id}');
 
       _navigatorKey.currentState?.pushAndRemoveUntil(
         PageRouteBuilder(
@@ -199,7 +197,22 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     }
   }
 
-  toggleLocked({required String pin, bool? override}) async {
+  Widget buildLoadingScreen() => LoadingScreen(dark: Platform.isAndroid);
+
+  Widget buildLockScreen() => LockScreen(
+        appContext: appContext ?? widget.appContext,
+      );
+
+  Widget buildSyphon() => WillPopScope(
+        onWillPop: () => NavigationService.goBack(),
+        child: Syphon(
+          cache,
+          store!,
+          storage,
+        ),
+      );
+
+  Future<void> toggleLocked({required String pin, bool? override}) async {
     final lockedNew = override ?? !locked;
 
     if (!lockedNew) {
@@ -233,24 +246,7 @@ class _PrelockState extends State<Prelock> with WidgetsBindingObserver, Lifecycl
     }
   }
 
-  buildLoadingScreen() => LoadingScreen(
-        dark: Platform.isAndroid,
-      );
-
-  buildLockScreen() => LockScreen(
-        appContext: appContext ?? widget.appContext,
-      );
-
-  buildSyphon() => WillPopScope(
-        onWillPop: () => NavigationService.goBack(),
-        child: Syphon(
-          cache,
-          store!,
-          storage,
-        ),
-      );
-
-  buildHome() {
+  Widget buildHome() {
     if (enabled) {
       return buildLockScreen();
     }

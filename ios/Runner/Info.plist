@@ -74,5 +74,7 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
     <string>Camera access is needed to take picture.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>

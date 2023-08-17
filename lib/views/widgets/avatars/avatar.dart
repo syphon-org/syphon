@@ -1,16 +1,14 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/widgets/image-matrix.dart';
 
 ///
@@ -22,7 +20,7 @@ import 'package:syphon/views/widgets/image-matrix.dart';
 /// params. Should be fixed in the parser.
 class Avatar extends StatelessWidget {
   const Avatar({
-    Key? key,
+    super.key,
     this.uri = '',
     this.url = '',
     this.file,
@@ -35,7 +33,7 @@ class Avatar extends StatelessWidget {
     this.selected = false,
     this.rebuild = true,
     this.computeColors = false,
-  }) : super(key: key);
+  });
 
   final bool force;
   final bool selected;
@@ -57,8 +55,7 @@ class Avatar extends StatelessWidget {
         builder: (context, props) {
           // TODO: uri is parsed as an empty string under dendrite
           final bool emptyAvi = uri == null && url == null || (uri?.isEmpty ?? true);
-          final Color backgroundColor =
-              !emptyAvi || force ? Colors.transparent : background ?? Colors.grey;
+          final Color backgroundColor = !emptyAvi || force ? Colors.transparent : background ?? Colors.grey;
 
           var borderRadius = BorderRadius.circular(size);
 

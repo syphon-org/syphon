@@ -4,10 +4,10 @@ import 'package:syphon/global/strings.dart';
 
 class AppBarNormal extends StatelessWidget implements PreferredSizeWidget {
   const AppBarNormal({
-    Key? key,
+    super.key,
     required this.title,
     this.actions,
-  }) : super(key: key);
+  });
 
   final String title;
   final List<Widget>? actions;
@@ -15,11 +15,11 @@ class AppBarNormal extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) => AppBar(
         automaticallyImplyLeading: false,
-        // leading: IconButton(
-        //   icon: Icon(Icons.arrow_back, color: Colors.white),
-        //   onPressed: () => Navigator.pop(context, false),
-        //   tooltip: Strings.labelBack.capitalize(),
-        // ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context, false),
+          tooltip: Strings.labelBack.capitalize(),
+        ),
         title: Text(
           title,
           style: TextStyle(

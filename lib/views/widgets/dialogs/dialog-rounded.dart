@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class DialogRounded extends StatelessWidget {
   const DialogRounded({
-    Key? key,
+    super.key,
     this.title = '',
     this.content = '',
     this.children = const <Widget>[],
-  }) : super(key: key);
+  });
 
   final String title;
   final String content;

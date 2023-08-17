@@ -1,17 +1,16 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/events/messages/model.dart';
+import 'package:syphon/domain/events/receipts/model.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/models.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/events/messages/model.dart';
-import 'package:syphon/store/events/receipts/model.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/models.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/lists/list-user-bubbles.dart';
 import 'package:syphon/views/widgets/messages/message.dart';
@@ -27,7 +26,7 @@ class MessageDetailArguments {
 }
 
 class MessageDetailsScreen extends StatelessWidget {
-  const MessageDetailsScreen({Key? key}) : super(key: key);
+  const MessageDetailsScreen({super.key});
 
   Widget buildUserReadList(_Props props, double width) {
     final Receipt readReceipts = props.readReceipts[props.message!.id!] ?? Receipt();
@@ -47,7 +46,7 @@ class MessageDetailsScreen extends StatelessWidget {
         distinct: true,
         converter: (Store<AppState> store) => _Props.mapStateToProps(
           store,
-          useScreenArguments<MessageDetailArguments>(context),
+          useScreenArguments<MessageDetailArguments>(context, MessageDetailArguments()),
         ),
         builder: (context, props) {
           final double width = MediaQuery.of(context).size.width;
@@ -227,8 +226,7 @@ class _Props extends Equatable {
         readReceipts: store.state.eventStore.receipts[args?.roomId!] ?? <String, Receipt>{},
         userId: store.state.authStore.user.userId,
         themeType: store.state.settingsStore.themeSettings.themeType,
-        timeFormat:
-            store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
+        timeFormat: store.state.settingsStore.timeFormat24Enabled ? TimeFormat.hr24 : TimeFormat.hr12,
       );
 
   @override

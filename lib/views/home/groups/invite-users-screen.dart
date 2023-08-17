@@ -1,25 +1,24 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/actions.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/search/actions.dart';
+import 'package:syphon/domain/settings/theme-settings/model.dart';
+import 'package:syphon/domain/user/actions.dart';
+import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/formatters.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/actions.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/search/actions.dart';
-import 'package:syphon/store/settings/theme-settings/model.dart';
-import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 import 'package:syphon/views/widgets/appbars/appbar-search.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
@@ -37,7 +36,7 @@ class InviteUsersArguments {
 }
 
 class InviteUsersScreen extends StatefulWidget {
-  const InviteUsersScreen({Key? key}) : super(key: key);
+  const InviteUsersScreen({super.key});
 
   @override
   InviteUsersState createState() => InviteUsersState();
@@ -146,8 +145,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   /// also attempts to invite users directly if a room id already exists
   ///
   onConfirmInvites(_Props props) async {
-    final arguments = useScreenArguments<InviteUsersArguments>(context);
-    final roomId = arguments?.roomId;
+    final arguments = useScreenArguments<InviteUsersArguments>(context, InviteUsersArguments());
+    final roomId = arguments.roomId;
 
     if (roomId != null && invites.isNotEmpty) {
       await onSendInvites(props);
@@ -162,7 +161,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
   ///
   onSendInvites(_Props props) async {
     FocusScope.of(context).unfocus();
-    final arguments = useScreenArguments<InviteUsersArguments>(context);
+    final arguments = useScreenArguments<InviteUsersArguments>(context, InviteUsersArguments());
     final store = StoreProvider.of<AppState>(context);
 
     final roomId = arguments?.roomId;
@@ -226,14 +225,14 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                 ),
                 label: Text(
                   formatUsername(user),
-                  style: Theme.of(context).textTheme.caption!.copyWith(
-                        color: Theme.of(context).textTheme.bodyText1!.color,
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).textTheme.bodyLarge!.color,
                       ),
                 ),
                 deleteIcon: Icon(
                   Icons.close,
                   size: Dimensions.avatarSizeMessage / 1.5,
-                  color: Theme.of(context).textTheme.bodyText1!.color,
+                  color: Theme.of(context).textTheme.bodyLarge!.color,
                 ),
                 onDeleted: () => onToggleInvite(user: user),
               ),
@@ -263,8 +262,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
 
         final showManualUser = searchable.isNotEmpty && foundResult < 0 && !props.loading;
         final usersList = searchable.isEmpty ? props.usersRecent : props.searchResults;
-        final usersListLabel =
-            searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
+        final usersListLabel = searchable.isEmpty ? Strings.labelUsersRecent : Strings.labelUsersResults;
 
         return Scaffold(
           appBar: AppBarSearch(
@@ -291,7 +289,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                 padding: EdgeInsets.only(left: 2),
                 child: SvgPicture.asset(
                   Assets.iconChevronsRightBeing,
-                  color: Colors.white,
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                   semanticsLabel: Strings.semanticsHomeDefault,
                 ),
               ),
@@ -328,7 +326,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                                 Text(
                                   usersListLabel,
                                   textAlign: TextAlign.start,
-                                  style: Theme.of(context).textTheme.subtitle2,
+                                  style: Theme.of(context).textTheme.titleSmall,
                                 ),
                               ],
                             ),
@@ -336,8 +334,8 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                           Visibility(
                             visible: showManualUser,
                             child: ListItemUser(
-                              onPress: () => onAttemptInvite(
-                                  props: props, context: context, user: attemptableUser),
+                              onPress: () =>
+                                  onAttemptInvite(props: props, context: context, user: attemptableUser),
                               type: ListItemUserType.Selectable,
                               user: attemptableUser,
                               enabled: creatingRoomDisplayName != searchable,
@@ -360,8 +358,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                                 selected: invites.contains(user),
                                 loading: props.loading,
                                 onPress: () => onToggleInvite(user: user),
-                                onPressAvatar: () =>
-                                    onShowUserDetails(context: context, user: user),
+                                onPressAvatar: () => onShowUserDetails(context: context, user: user),
                               );
                             },
                           )

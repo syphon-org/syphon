@@ -2,29 +2,27 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:syphon/global/libs/matrix/index.dart';
+import 'package:syphon/domain/alerts/actions.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
+import 'package:syphon/global/libraries/matrix/index.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/alerts/actions.dart';
-import 'package:syphon/store/index.dart';
-
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
 
 class MediaFullScreen extends StatelessWidget {
   final String title;
-  final Uint8List bytes;
   final String? roomId;
   final String? eventId;
+  final Uint8List bytes;
 
   const MediaFullScreen({
-    Key? key,
-    required this.roomId,
+    super.key,
     required this.title,
-    required this.bytes,
+    required this.roomId,
     required this.eventId,
-  }) : super(key: key);
+    required this.bytes,
+  });
 
   onPressDownload(BuildContext context) async {
     final store = StoreProvider.of<AppState>(context);

@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:syphon/cache/index.dart';
 import 'package:syphon/context/types.dart';
-import 'package:syphon/global/libs/storage/secure-storage.dart';
+import 'package:syphon/global/libraries/cache/index.dart';
+import 'package:syphon/global/libraries/secure-storage/secure-storage.dart';
+import 'package:syphon/global/libraries/storage/index.dart';
 import 'package:syphon/global/print.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/storage/index.dart';
 
 const ALL_APP_CONTEXT_KEY = '${Values.appLabel}@app-context-all';
 const CURRENT_APP_CONTEXT_KEY = '${Values.appLabel}@app-context-current';
@@ -55,7 +55,7 @@ Future<AppContext> loadContextCurrent() async {
 
     return currentContext;
   } catch (error) {
-    log.error('[loadCurrentContext] ERROR LOADING CURRENT CONTEXT ${error.toString()}');
+    console.error('[loadCurrentContext] ERROR LOADING CURRENT CONTEXT $error');
 
     try {
       final fallback = await loadContextNext();
@@ -64,7 +64,7 @@ Future<AppContext> loadContextCurrent() async {
 
       return fallback;
     } catch (error) {
-      log.error('[loadNextContext] ERROR LOADING NEXT CONTEXT - RESETTING CONTEXT');
+      console.error('[loadNextContext] ERROR LOADING NEXT CONTEXT - RESETTING CONTEXT');
       resetContextsAll();
       return AppContext();
     }
@@ -76,7 +76,7 @@ Future<AppContext> loadContextNext() async {
     final allContexts = await loadContextsAll();
     return allContexts.isNotEmpty ? allContexts[0] : AppContext();
   } catch (error) {
-    log.error('[loadNextContext] ERROR LOADING NEXT CONTEXT ${error.toString()}');
+    console.error('[loadNextContext] ERROR LOADING NEXT CONTEXT $error');
 
     return AppContext();
   }
@@ -87,7 +87,7 @@ Future<List<AppContext>> loadContextsAll() async {
     final contextJson = await SecureStorage().read(key: ALL_APP_CONTEXT_KEY) ?? '[]';
     return List.from(await json.decode(contextJson)).map((c) => AppContext.fromJson(c)).toList();
   } catch (error) {
-    log.error('[loadAllContexts] ERROR LOADING ALL CONTEXTS ${error.toString()}');
+    console.error('[loadAllContexts] ERROR LOADING ALL CONTEXTS $error');
 
     resetContextsAll();
 
@@ -126,6 +126,6 @@ resetContextsAll() async {
     await SecureStorage().write(key: ALL_APP_CONTEXT_KEY, value: json.encode([]));
     await SecureStorage().write(key: CURRENT_APP_CONTEXT_KEY, value: json.encode(AppContext()));
   } catch (error) {
-    log.error('[resetAllContexts] ERROR RESETTING CONTEXT STORAGE ${error.toString()}');
+    console.error('[resetAllContexts] ERROR RESETTING CONTEXT STORAGE $error');
   }
 }

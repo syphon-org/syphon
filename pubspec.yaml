@@ -1,43 +1,13 @@
 name: syphon
 description: a privacy focused matrix client
-version: 0.2.14+2140
+version: 0.2.20+2200
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
   flutter: 3.0.5
 
-scripts:
-  start: flutter run # -d <device_id>
-  start-fresh: flutter run --no-fast-start # -d <device_id>
-  devices: flutter devices
-  install: flutter pub get
-  build: flutter pub run build_runner build --delete-conflicting-outputs
-  watch: flutter pub run build_runner watch --delete-conflicting-outputs
-  uninstall: adb shell && pm uninstall org.tether.tether # (sometimes doesn't uninstall when debugging?)
-  format: flutter dartfmt --line-length=120 .
-
-  build-release-ios: flutter build ipa  --release # open under xcworkspace, not xcodeproj
-  build-release-macos: flutter pub run build_runner build --delete-conflicting-outputs && flutter build macos --release
-  build-release-android: flutter pub run build_runner build --delete-conflicting-outputs && flutter build apk --release
-
-  # mobile development commands
-  setup-ios: pod install && flutter precache --ios
-  clean-ios: xcrun simctl delete unavailable
-  list-ios: xcrun simctl list devices
-  boot-ios: xcrun simctl boot #<device_id>
-  list-android: emulator -list-avds
-  boot-android: emulator -avd #<device_id>
-  inspect-android: adb shell && run-as org.tether.tether # cache inspection
-  log-android: adb logcat ActivityManager:I flutter:I *:S
-
-  # configuration and troubleshooting
-  init-repo: git submodule update --init --recursive
-  reset-xcode: defaults delete com.apple.dt.Xcode
-  dev-tools: flutter pub global run devtools
-  cache-clean: pub cache repair && flutter pub cache repair
-  upgrade-deps: flutter pub upgrade --major-versions
-  init-platform-dirs: flutter create --org org.tether.tether
-  enable-desktop: flutter config --enable-macos-desktop --enable-linux-desktop # --no-enable-<type>-desktop
+scripts: 
+  # look for the makefile to see frequently used commands
 
 dependencies:
   flutter:
@@ -58,11 +28,10 @@ dependencies:
   mime: ^1.0.0
   path: ^1.8.0
   path_provider: ^2.0.14
-  package_info: ^2.0.0
+  package_info_plus: ^4.0.0
 
   ### encryption
   olm: ^2.0.0
-  crypto: ^3.0.1
   encrypt: ^5.0.0
   cryptography: ^2.0.5
   canonical_json: ^1.1.1
@@ -75,20 +44,20 @@ dependencies:
   sqlcipher_flutter_libs: ^0.5.1
   sqlcipher_library_windows: ^1.0.1
   flutter_secure_storage: ^8.0.0
-  drift: ^2.6.0
+  drift: ^2.8.0
 
   ### services
   http: ^0.13.1
   html: ^0.15.0
-  intl: ^0.17.0
+  intl: ^0.18.0
   connectivity_plus: ^3.0.4
   http_parser: ^4.0.0
   easy_localization: ^3.0.0
   flutter_dotenv: ^5.0.2
   android_alarm_manager_plus: ^2.0.3
   workmanager: 0.5.0 
-  # background_fetch: 1.1.0
   uni_links: ^0.5.0
+  # background_fetch: 1.1.0
   # flutter_apns: 1.1.0  # TODO: extract only the iOS code and remove
 
   ### ui
@@ -115,16 +84,16 @@ dependencies:
   # window_utils: 1.0.2 # TODO: desktop only window sizing
 
   ## media
-  file_picker: ^5.2.7
-  image_picker: ^0.8.4
+  file_picker: ^5.3.0
+  image_picker: ^0.8.7+5
   permission_handler: ^10.2.0
   local_image_provider: ^4.3.0 
   flutter_image_compress: ^1.1.3
-  share_plus: ^6.3.2
+  share_plus: ^7.0.0
 
   ### data
   uuid: ^3.0.4
-  json_annotation: ^4.0.0
+  json_annotation: ^4.8.0
   collection: ^1.15.0-nullsafety.4
 
   # TODO: potential overrides
@@ -135,11 +104,11 @@ dependencies:
 dev_dependencies:
   build_config: ^1.0.0
   build_runner: ^2.1.4
-  drift_dev: ^2.6.0
-  lint: ^2.0.1
+  drift_dev: ^2.8.2
+  lint: 2.0.1 # TODO: 2.1.0+ treats dynamic returns as errors
   json_serializable: ^6.1.3
   flutter_launcher_icons: ^0.13.0
-  test: any
+  test: ^1.24.2
 
 # TODO: remove when similar functionality is merged
 dependency_overrides:
@@ -156,7 +125,7 @@ dependency_overrides:
   fab_circular_menu: # TODO: accesibility and color theme issues
     git:
       url: https://github.com/ereio/fab-circular-menu.git
-      ref: 623b65c0d8f392065f41a4628c0278563a809644
+      ref: 3f8a1f40ddb4d6fdfa9c7bdbdd96a1233b469c98
   webview_flutter: # TODO: open html as link from as different origins
     git:
       url: https://github.com/ereio/plugins.git

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart' as crypt;
 import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:flutter/foundation.dart' as io;
@@ -17,23 +16,15 @@ import 'package:syphon/global/print.dart';
 /// allows multiaccount feature to be domain logic independent
 ///
 String generateContextId() {
-  final shaHash = crypt.sha256.convert(utf8.encode(getRandomString(10)));
-  return base64
-      .encode(shaHash.bytes)
-      .toLowerCase()
-      .replaceAll(RegExp(r'[^\w]'), '')
-      .substring(0, 10);
+  final shaHash = Sha256().toSync().hashSync(utf8.encode(getRandomString(10)));
+  return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 }
 
 // Switch to generating UserID independent context IDs that can still be managed globally
 // ignore: non_constant_identifier_names
 String generateContextId_DEPRECATED({required String id}) {
-  final shaHash = crypt.sha256.convert(utf8.encode(id));
-  return base64
-      .encode(shaHash.bytes)
-      .toLowerCase()
-      .replaceAll(RegExp(r'[^\w]'), '')
-      .substring(0, 10);
+  final shaHash = Sha256().toSync().hashSync(utf8.encode(id));
+  return base64.encode(shaHash.bytes).toLowerCase().replaceAll(RegExp(r'[^\w]'), '').substring(0, 10);
 }
 
 Future<String> generatePinHash({required String passcode, String salt = 'TODO:'}) async {
@@ -86,7 +77,7 @@ Future<String> unlockSecretKey(AppContext context, String passcode) async {
   final iv = IV.fromBase64(context.id.substring(0, 8));
   final encrypter = Encrypter(AES(convertPasscodeToKey(passcode), mode: AESMode.sic));
 
-  log.info('[unlockSecretKey] $passcode, ${context.secretKeyEncrypted}, ${context.id}');
+  console.info('[unlockSecretKey] $passcode, ${context.secretKeyEncrypted}, ${context.id}');
 
   // ignore: await_only_futures
   return encrypter.decrypt(Encrypted.fromBase64(context.secretKeyEncrypted), iv: iv);
@@ -96,7 +87,7 @@ Future<String> convertSecretKey(AppContext context, String passcode, String plai
   final iv = IV.fromBase64(context.id.substring(0, 8));
   final encrypter = Encrypter(AES(convertPasscodeToKey(passcode), mode: AESMode.sic));
 
-  log.info('[convertSecretKey] $passcode, $plaintextKey, ${context.id}');
+  console.info('[convertSecretKey] $passcode, $plaintextKey, ${context.id}');
 
   // ignore: await_only_futures
   return await encrypter.encrypt(plaintextKey, iv: iv).base64;

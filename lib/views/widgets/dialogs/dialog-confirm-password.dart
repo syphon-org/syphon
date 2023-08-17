@@ -9,7 +9,7 @@ import 'package:syphon/views/widgets/loader/loading-indicator.dart';
 
 class DialogConfirmPassword extends HookWidget {
   const DialogConfirmPassword({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
     this.checkValid,
@@ -17,7 +17,7 @@ class DialogConfirmPassword extends HookWidget {
     this.onCancel,
     this.onConfirm,
     this.onChangePassword,
-  }) : super(key: key);
+  });
 
   final Function? checkValid;
   final Function? checkLoading;
@@ -69,7 +69,7 @@ class DialogConfirmPassword extends HookWidget {
               child: Text(
                 content,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
             Container(
@@ -123,9 +123,7 @@ class DialogConfirmPassword extends HookWidget {
               child: !loading
                   ? Text(Strings.buttonConfirmFormal,
                       style: TextStyle(
-                        color: valid
-                            ? Theme.of(context).primaryColor
-                            : Color(AppColors.greyDisabled),
+                        color: valid ? Theme.of(context).primaryColor : Color(AppColors.greyDisabled),
                       ))
                   : LoadingIndicator(),
             ),

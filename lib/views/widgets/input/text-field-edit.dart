@@ -18,12 +18,12 @@ class TextFieldInline extends StatefulWidget {
   final Function? onEdit;
 
   const TextFieldInline({
-    Key? key,
+    super.key,
     this.body,
     this.onEdit,
     this.autofocus = false,
     this.controller,
-  }) : super(key: key);
+  });
 
   @override
   State<TextFieldInline> createState() => _TextFieldInlineState();

@@ -2,18 +2,17 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/rooms/room/model.dart';
+import 'package:syphon/domain/rooms/room/selectors.dart';
+import 'package:syphon/domain/settings/notification-settings/actions.dart';
+import 'package:syphon/domain/user/actions.dart';
+import 'package:syphon/domain/user/model.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/global/values.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/rooms/room/model.dart';
-import 'package:syphon/store/rooms/room/selectors.dart';
-import 'package:syphon/store/settings/notification-settings/actions.dart';
-import 'package:syphon/store/user/actions.dart';
-import 'package:syphon/store/user/model.dart';
 import 'package:syphon/views/home/chat/chat-detail-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
 import 'package:syphon/views/navigation.dart';
@@ -51,7 +50,7 @@ class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
   final Function? onToggleSearch;
 
   const AppBarChat({
-    Key? key,
+    super.key,
     this.title = 'title:',
     this.label = 'label:',
     this.tooltip = 'tooltip:',
@@ -67,7 +66,7 @@ class AppBarChat extends StatefulWidget implements PreferredSizeWidget {
     this.badgesEnabled = true,
     this.forceFocus = false,
     this.loading = false,
-  }) : super(key: key);
+  });
 
   @override
   AppBarChatState createState() => AppBarChatState();
@@ -147,7 +146,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                 padding: defaultPadding,
                 child: Text(
                   Strings.listItemMuteForOneHour,
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 )),
             onTap: () {
               props.onMuteNotifications(Duration(hours: 1));
@@ -159,7 +158,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               padding: defaultPadding,
               child: Text(
                 Strings.listItemMuteForHours(8),
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             onTap: () {
@@ -172,7 +171,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               padding: defaultPadding,
               child: Text(
                 Strings.listItemMuteForOneDay,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             onTap: () {
@@ -185,7 +184,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               padding: defaultPadding,
               child: Text(
                 Strings.listItemMuteForDays(7),
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             onTap: () {
@@ -198,7 +197,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               padding: defaultPadding,
               child: Text(
                 Strings.labelAlways,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
             onTap: () {
@@ -214,8 +213,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
   @override
   Widget build(BuildContext context) => StoreConnector<AppState, _Props>(
         distinct: true,
-        converter: (Store<AppState> store) =>
-            _Props.mapStateToProps(store, widget.room.id),
+        converter: (Store<AppState> store) => _Props.mapStateToProps(store, widget.room.id),
         builder: (context, props) => AppBar(
           titleSpacing: 0.0,
           automaticallyImplyLeading: false,
@@ -277,9 +275,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                         ),
                       ),
                       Visibility(
-                        visible: widget.badgesEnabled &&
-                            widget.room.type == 'group' &&
-                            !widget.room.invite,
+                        visible: widget.badgesEnabled && widget.room.type == 'group' && !widget.room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -299,9 +295,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                         ),
                       ),
                       Visibility(
-                        visible: widget.badgesEnabled &&
-                            widget.room.type == 'public' &&
-                            !widget.room.invite,
+                        visible: widget.badgesEnabled && widget.room.type == 'public' && !widget.room.invite,
                         child: Positioned(
                           right: 0,
                           bottom: 0,
@@ -328,10 +322,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                 child: Text(
                   widget.room.name!,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText1!
-                      .copyWith(color: Colors.white),
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Colors.white),
                 ),
               ),
             ],
@@ -441,8 +432,7 @@ class _Props extends Equatable {
   @override
   List<Object> get props => [];
 
-  static _Props mapStateToProps(Store<AppState> store, String? roomId) =>
-      _Props(
+  static _Props mapStateToProps(Store<AppState> store, String? roomId) => _Props(
         currentUser: store.state.authStore.user,
         roomUsers: (store.state.roomStore.rooms[roomId]?.userIds ?? [])
             .map((id) => store.state.userStore.users[id])
@@ -458,8 +448,7 @@ class _Props extends Equatable {
           ));
         },
         onToggleNotifications: () {
-          store.dispatch(
-              toggleChatNotifications(roomId: roomId!, enabled: false));
+          store.dispatch(toggleChatNotifications(roomId: roomId!, enabled: false));
         },
       );
 }

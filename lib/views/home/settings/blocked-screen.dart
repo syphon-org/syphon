@@ -2,12 +2,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/user/model.dart';
+import 'package:syphon/domain/user/selectors.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
 import 'package:syphon/global/strings.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/user/model.dart';
-import 'package:syphon/store/user/selectors.dart';
 import 'package:syphon/views/widgets/appbars/appbar-normal.dart';
 import 'package:syphon/views/widgets/avatars/avatar.dart';
 import 'package:syphon/views/widgets/containers/card-section.dart';
@@ -15,7 +15,7 @@ import 'package:syphon/views/widgets/loader/index.dart';
 import 'package:syphon/views/widgets/modals/modal-user-details.dart';
 
 class BlockedScreen extends StatefulWidget {
-  const BlockedScreen({Key? key}) : super(key: key);
+  const BlockedScreen({super.key});
 
   @override
   BlockedScreenState createState() => BlockedScreenState();
@@ -71,11 +71,11 @@ class BlockedScreenState extends State<BlockedScreen> {
                 title: Text(
                   formatUsername(user),
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
                   user.userId!,
-                  style: Theme.of(context).textTheme.caption!.merge(
+                  style: Theme.of(context).textTheme.bodySmall!.merge(
                         TextStyle(
                           color: props.loading ? Color(AppColors.greyDisabled) : null,
                         ),
@@ -128,7 +128,6 @@ class _Props extends Equatable {
 
   static _Props mapStateToProps(Store<AppState> store) => _Props(
         loading: store.state.roomStore.loading,
-        usersBlocked:
-            store.state.userStore.blocked.map((id) => store.state.userStore.users[id]).toList(),
+        usersBlocked: store.state.userStore.blocked.map((id) => store.state.userStore.users[id]).toList(),
       );
 }

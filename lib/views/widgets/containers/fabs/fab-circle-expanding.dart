@@ -6,9 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:redux/redux.dart';
+import 'package:syphon/domain/index.dart';
+import 'package:syphon/domain/settings/theme-settings/selectors.dart';
 import 'package:syphon/global/assets.dart';
-import 'package:syphon/store/index.dart';
-import 'package:syphon/store/settings/theme-settings/selectors.dart';
 import 'package:syphon/views/navigation.dart';
 
 class FabCircleExpanding extends StatelessWidget {
@@ -17,10 +17,10 @@ class FabCircleExpanding extends StatelessWidget {
   final Alignment? alignment;
 
   const FabCircleExpanding({
-    Key? key,
+    super.key,
     this.fabKey,
     this.alignment,
-  }) : super(key: key);
+  });
 
   onNavigateToPublicSearch(context) {
     HapticFeedback.lightImpact();
@@ -63,7 +63,7 @@ class FabCircleExpanding extends StatelessWidget {
                 onPressed: () => onNavigateToCreateGroupPublic(context),
                 child: SvgPicture.asset(
                   Assets.iconPublicAddBeing,
-                  color: Colors.white,
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
               FloatingActionButton(
@@ -73,7 +73,7 @@ class FabCircleExpanding extends StatelessWidget {
                 onPressed: () => onNavigateToCreateGroup(context),
                 child: SvgPicture.asset(
                   Assets.iconGroupAddBeing,
-                  color: Colors.white,
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
               FloatingActionButton(
@@ -83,7 +83,7 @@ class FabCircleExpanding extends StatelessWidget {
                 onPressed: () => onNavigateToDraft(context),
                 child: SvgPicture.asset(
                   Assets.iconPersonAddBeing,
-                  color: Colors.white,
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
               FloatingActionButton(
@@ -93,7 +93,7 @@ class FabCircleExpanding extends StatelessWidget {
                 onPressed: () => onNavigateToPublicSearch(context),
                 child: SvgPicture.asset(
                   Assets.iconSearchPublicCondensedBeing,
-                  color: Colors.white,
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
             ],
@@ -121,12 +121,12 @@ class _Props extends Equatable {
 
 class FabBarContainer extends StatefulWidget {
   const FabBarContainer({
-    Key? key,
+    super.key,
     this.initialOpen,
     this.alignment,
     required this.distance,
     required this.children,
-  }) : super(key: key);
+  });
 
   final bool? initialOpen;
   final Alignment? alignment;
@@ -273,12 +273,11 @@ class FabBarContainerState extends State<FabBarContainer> with SingleTickerProvi
 @immutable
 class _ExpandingActionButton extends StatelessWidget {
   const _ExpandingActionButton({
-    Key? key,
     required this.directionInDegrees,
     required this.maxDistance,
     required this.progress,
     required this.child,
-  }) : super(key: key);
+  });
 
   final double directionInDegrees;
   final double maxDistance;

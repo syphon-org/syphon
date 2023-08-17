@@ -13,7 +13,7 @@ import 'package:syphon/views/widgets/modals/modal-lock-overlay/lock-controller.d
 /// which makes it difficult to specify the size intuitively.
 class KeyPad extends StatelessWidget {
   const KeyPad({
-    Key? key,
+    super.key,
     required this.lockController,
     required this.canCancel,
     this.inputButtonConfig = const InputButtonConfig(),
@@ -21,7 +21,7 @@ class KeyPad extends StatelessWidget {
     this.onLeftButtonTap,
     this.deleteButton,
     this.cancelButton,
-  }) : super(key: key);
+  });
 
   final LockController lockController;
   final bool canCancel;

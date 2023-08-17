@@ -6,7 +6,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
 
 class FirstDescriptionPage extends StatelessWidget {
-  const FirstDescriptionPage({Key? key, this.title}) : super(key: key);
+  const FirstDescriptionPage({super.key, this.title});
 
   final String? title;
 
@@ -42,7 +42,7 @@ class FirstDescriptionPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                   text: TextSpan(
                     text: Strings.contentIntroFirstPartOne,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                     children: const <TextSpan>[
                       TextSpan(
                         text: 'Matrix',

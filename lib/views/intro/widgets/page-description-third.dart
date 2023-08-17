@@ -6,7 +6,7 @@ import 'package:syphon/global/assets.dart';
 import 'package:syphon/global/strings.dart';
 
 class ThirdDescriptionPage extends StatelessWidget {
-  const ThirdDescriptionPage({Key? key, this.title}) : super(key: key);
+  const ThirdDescriptionPage({super.key, this.title});
 
   final String? title;
 
@@ -42,7 +42,7 @@ class ThirdDescriptionPage extends StatelessWidget {
               Text(
                 Strings.contentIntroThird,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
           ),

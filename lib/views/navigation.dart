@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:syphon/global/values.dart';
+import 'package:syphon/views/home/HomeScreen.dart';
+import 'package:syphon/views/home/chat/ChatScreen.dart';
 import 'package:syphon/views/home/chat/chat-detail-all-users-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-message-screen.dart';
 import 'package:syphon/views/home/chat/chat-detail-screen.dart';
-import 'package:syphon/views/home/chat/chat-screen.dart';
 import 'package:syphon/views/home/chat/media-preview-screen.dart';
 import 'package:syphon/views/home/groups/group-create-public-screen.dart';
 import 'package:syphon/views/home/groups/group-create-screen.dart';
 import 'package:syphon/views/home/groups/invite-users-screen.dart';
-import 'package:syphon/views/home/home-screen.dart';
-import 'package:syphon/views/home/profile/profile-screen.dart';
-import 'package:syphon/views/home/profile/profile-user-screen.dart';
+import 'package:syphon/views/home/profile/ProfileScreen.dart';
+import 'package:syphon/views/home/profile/ProfileUserScreen.dart';
 import 'package:syphon/views/home/search/search-chats-screen.dart';
 import 'package:syphon/views/home/search/search-groups-screen.dart';
 import 'package:syphon/views/home/search/search-users-screen.dart';
@@ -25,24 +24,20 @@ import 'package:syphon/views/home/settings/settings-notifications-screen.dart';
 import 'package:syphon/views/home/settings/settings-privacy-screen.dart';
 import 'package:syphon/views/home/settings/settings-screen.dart';
 import 'package:syphon/views/home/settings/settings-theme-screen.dart';
-import 'package:syphon/views/intro/intro-screen.dart';
+import 'package:syphon/views/intro/IntroScreen.dart';
+import 'package:syphon/views/intro/login/LoginScreen.dart';
 import 'package:syphon/views/intro/login/forgot/password-forgot-screen.dart';
 import 'package:syphon/views/intro/login/forgot/password-reset-screen.dart';
-import 'package:syphon/views/intro/login/login-screen.dart';
 import 'package:syphon/views/intro/search/search-homeserver-screen.dart';
-import 'package:syphon/views/intro/signup/loading-screen.dart';
-import 'package:syphon/views/intro/signup/signup-screen.dart';
+import 'package:syphon/views/intro/signup/LoadingScreen.dart';
+import 'package:syphon/views/intro/signup/SignupScreen.dart';
 import 'package:syphon/views/intro/signup/verification-screen.dart';
 
 import 'home/settings/settings-intro-screen.dart';
 
 // helper hook for extracting navigation params
-T? useScreenArguments<T>(BuildContext context) {
-  return ModalRoute.of(context)?.settings.arguments as T;
-}
-
-T? useArguments<T>(BuildContext context) {
-  return useMemoized(() => ModalRoute.of(context)?.settings.arguments as T, [context]);
+T useScreenArguments<T>(BuildContext context, T fallback) {
+  return (ModalRoute.of(context)?.settings.arguments ?? fallback) as T;
 }
 
 class NavigationService {
@@ -138,9 +133,9 @@ class Routes {
 
 class NavigationProvider {
   static Map<String, Widget Function(BuildContext)> getRoutes() => <String, WidgetBuilder>{
-        Routes.intro: (BuildContext context) => const IntroScreen(),
+        Routes.intro: (BuildContext context) => IntroScreen(),
         Routes.login: (BuildContext context) => const LoginScreen(),
-        Routes.signup: (BuildContext context) => const SignupScreen(),
+        Routes.signup: (BuildContext context) => SignupScreen(),
         Routes.forgot: (BuildContext context) => const ForgotPasswordScreen(),
         Routes.reset: (BuildContext context) => const ResetPasswordScreen(),
         Routes.searchHomeservers: (BuildContext context) => const SearchHomeserverScreen(),
@@ -164,8 +159,7 @@ class NavigationProvider {
         Routes.settingsAdvanced: (BuildContext context) => const AdvancedSettingsScreen(),
         Routes.settingsProxy: (BuildContext context) => const IntroSettingsScreen(),
         Routes.settingsPassword: (BuildContext context) => const PasswordUpdateScreen(),
-        Routes.licenses: (BuildContext context) =>
-            const LicensePage(applicationName: Values.appName),
+        Routes.licenses: (BuildContext context) => const LicensePage(applicationName: Values.appName),
         Routes.settingsPrivacy: (BuildContext context) => const PrivacySettingsScreen(),
         Routes.settingsChat: (BuildContext context) => const SettingsChatsScreen(),
         Routes.settingsTheme: (BuildContext context) => const ThemeSettingsScreen(),
