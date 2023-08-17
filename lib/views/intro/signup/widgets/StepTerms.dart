@@ -30,11 +30,11 @@ class TermsStep extends StatelessWidget {
               flex: 6,
               child: Container(
                 width: width * 0.75,
-                constraints: BoxConstraints(
+                constraints: const BoxConstraints(
                   maxHeight: Dimensions.mediaSize,
                   maxWidth: Dimensions.mediaSize,
                 ),
-                padding: EdgeInsets.only(
+                padding: const EdgeInsets.only(
                   bottom: 24,
                 ),
                 child: Stack(
@@ -53,7 +53,7 @@ class TermsStep extends StatelessWidget {
                           borderRadius: BorderRadius.circular(40),
                           color: const Color(AppColors.cyanSyphon),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.check,
                           color: Colors.white,
                           size: 32,
@@ -71,7 +71,7 @@ class TermsStep extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.only(bottom: 8, top: 8),
+                    padding: const EdgeInsets.only(bottom: 8, top: 8),
                     child: Text(
                       '${props.homeserver} requires you read\nand agree to a terms of service.',
                       textAlign: TextAlign.center,
@@ -82,7 +82,7 @@ class TermsStep extends StatelessWidget {
                     clipBehavior: Clip.none,
                     children: <Widget>[
                       Container(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           vertical: 8,
                           horizontal: 24,
                         ),
@@ -102,7 +102,7 @@ class TermsStep extends StatelessWidget {
                           child: Container(
                             height: 20,
                             width: 20,
-                            child: Icon(
+                            child: const Icon(
                               Icons.info_outline,
                               color: Colors.white,
                               size: 20,
@@ -127,7 +127,7 @@ class TermsStep extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Container(
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                             top: 8,
                             left: 8,
                             right: 8,

@@ -17,10 +17,10 @@ class CacheStorage implements StorageEngine {
   @override
   Future<Uint8List> load() async {
     final List<Object> stores = [
-      AuthStore(),
-      SyncStore(),
-      CryptoStore(),
-      RoomStore(),
+      const AuthStore(),
+      const SyncStore(),
+      const CryptoStore(),
+      const RoomStore(),
     ];
 
     await Future.wait(stores.map((store) async {

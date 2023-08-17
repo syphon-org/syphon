@@ -38,7 +38,7 @@ class HomeChatListItem extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final preview = formatPreview(room: room, message: messageLatest);
-    final currentUser = useSelector<AppState, User>((state) => state.authStore.user, User());
+    final currentUser = useSelector<AppState, User>((state) => state.authStore.user, const User());
 
     final chatName = room.name ?? '';
     final newMessage = messageLatest != null &&
@@ -46,7 +46,7 @@ class HomeChatListItem extends HookWidget {
         messageLatest!.sender != currentUser.userId;
 
     var backgroundColor;
-    var textStyle = TextStyle();
+    var textStyle = const TextStyle();
 
     final chatColor = useSelector<AppState, Color>(
       (state) => selectChatColor(state, room.id),
@@ -64,17 +64,17 @@ class HomeChatListItem extends HookWidget {
 
     // show draft inidicator if it's an empty room
     if (room.drafting || messages.isEmpty) {
-      textStyle = TextStyle(fontStyle: FontStyle.italic);
+      textStyle = const TextStyle(fontStyle: FontStyle.italic);
     }
 
     if (messages.isNotEmpty && messageLatest != null) {
       // it has undecrypted message contained within
       if (messageLatest!.type == EventTypes.encrypted && messageLatest!.body!.isEmpty) {
-        textStyle = TextStyle(fontStyle: FontStyle.italic);
+        textStyle = const TextStyle(fontStyle: FontStyle.italic);
       }
 
       if (messageLatest!.body == null || messageLatest!.body!.isEmpty) {
-        textStyle = TextStyle(fontStyle: FontStyle.italic);
+        textStyle = const TextStyle(fontStyle: FontStyle.italic);
       }
 
       // display message as being 'unread'
@@ -233,7 +233,7 @@ class HomeChatListItem extends HookWidget {
                       ),
                       Text(
                         formatTimestamp(lastUpdateMillis: room.lastUpdate),
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
                       ),
                     ],
                   ),

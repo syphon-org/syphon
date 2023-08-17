@@ -21,7 +21,7 @@ extension SyncQueries on ColdStorageDatabase {
     if (Platform.isLinux) {
       return into(syncs).insert(
         SyncsCompanion(
-          id: Value(StorageKeys.SYNC),
+          id: const Value(StorageKeys.SYNC),
           store: Value(storeJson),
         ),
         mode: InsertMode.insertOrReplace,
@@ -30,7 +30,7 @@ extension SyncQueries on ColdStorageDatabase {
 
     return into(syncs).insertOnConflictUpdate(
       SyncsCompanion(
-        id: Value(StorageKeys.SYNC),
+        id: const Value(StorageKeys.SYNC),
         store: Value(storeJson),
       ),
     );

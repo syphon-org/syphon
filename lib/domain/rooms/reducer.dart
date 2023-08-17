@@ -51,7 +51,7 @@ RoomStore roomReducer([RoomStore state = const RoomStore(), dynamic actionAny]) 
 
       return state.copyWith(rooms: rooms);
     case ResetRooms:
-      return RoomStore();
+      return const RoomStore();
     default:
       return state;
   }

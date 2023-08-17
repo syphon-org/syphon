@@ -22,7 +22,7 @@ extension SettingsQueries on ColdStorageDatabase {
     if (Platform.isLinux) {
       return into(settings).insert(
         SettingsCompanion(
-          id: Value(StorageKeys.SETTINGS),
+          id: const Value(StorageKeys.SETTINGS),
           store: Value(storeJson),
         ),
         mode: InsertMode.insertOrReplace,
@@ -31,7 +31,7 @@ extension SettingsQueries on ColdStorageDatabase {
 
     return into(settings).insertOnConflictUpdate(
       SettingsCompanion(
-        id: Value(StorageKeys.SETTINGS),
+        id: const Value(StorageKeys.SETTINGS),
         store: Value(storeJson),
       ),
     );

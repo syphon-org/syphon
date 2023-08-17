@@ -9,7 +9,7 @@ FlutterSecureStorage? _secureStorage;
 
 _initStorage() {
   if (_secureStorage != null) return;
-  _secureStorage = FlutterSecureStorage();
+  _secureStorage = const FlutterSecureStorage();
 }
 
 ///

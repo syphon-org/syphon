@@ -145,8 +145,8 @@ class Avatar extends StatelessWidget {
                         ),
                         width: Dimensions.badgeAvatarSize,
                         height: Dimensions.badgeAvatarSize,
-                        margin: EdgeInsets.only(left: 4),
-                        child: Icon(
+                        margin: const EdgeInsets.only(left: 4),
+                        child: const Icon(
                           Icons.check,
                           size: Dimensions.iconSizeMini,
                           color: Colors.white,

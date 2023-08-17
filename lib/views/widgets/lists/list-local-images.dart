@@ -6,9 +6,9 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:syphon/global/colors.dart';
 import 'package:syphon/global/dimensions.dart';
+import 'package:syphon/global/noop.dart';
 import 'package:syphon/global/strings.dart';
 import 'package:syphon/views/widgets/lifecycle.dart';
-import 'package:syphon/global/noop.dart';
 
 ///
 /// Local Image List
@@ -79,11 +79,11 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.only(bottom: 8, top: 8),
-              child: Icon(
+              padding: const EdgeInsets.only(bottom: 8, top: 8),
+              child: const Icon(
                 Icons.search,
                 size: Dimensions.iconSize * 1.5,
-                color: const Color(AppColors.greyDefault),
+                color: Color(AppColors.greyDefault),
               ),
             ),
             Text(
@@ -119,12 +119,12 @@ class _ListLocalImagesState extends State<ListLocalImages> with Lifecycle<ListLo
           borderRadius: BorderRadius.circular(24),
           clipBehavior: Clip.antiAlias,
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(15.0)),
             ),
             width: widget.imageSize,
             height: widget.imageSize,
-            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
             child: Stack(
               children: <Widget>[
                 Positioned.fill(

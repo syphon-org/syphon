@@ -5,15 +5,15 @@ import 'package:test/test.dart';
 void main() {
   group('Event Selectors]', () {
     test('latestMessage - one message works', () {
-      final messageLatest = Message(timestamp: 2);
+      const messageLatest = Message(timestamp: 2);
       final result = latestMessage([messageLatest]);
 
       expect(result, equals(messageLatest));
     });
 
     test('latestMessage - largest timestamp of 2 wins', () {
-      final messageLatest = Message(timestamp: 2);
-      final result = latestMessage([messageLatest, Message()]);
+      const messageLatest = Message(timestamp: 2);
+      final result = latestMessage([messageLatest, const Message()]);
 
       expect(result, equals(messageLatest));
     });

@@ -28,11 +28,11 @@ class AppBarAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        margin: EdgeInsets.only(right: 8),
+        margin: const EdgeInsets.only(right: 8),
         child: Stack(
           children: <Widget>[
             IconButton(
-              padding: EdgeInsets.all(4),
+              padding: const EdgeInsets.all(4),
               icon: Avatar(
                 uri: user!.avatarUri,
                 alt: user!.displayName ?? user!.userId,
@@ -54,7 +54,7 @@ class AppBarAvatar extends StatelessWidget {
                     height: 16,
                     width: 16,
                     color: selectIconBackground(themeType),
-                    child: Icon(
+                    child: const Icon(
                       Icons.offline_bolt,
                       color: Colors.white,
                       size: 16,
@@ -76,7 +76,7 @@ class AppBarAvatar extends StatelessWidget {
                     height: 16,
                     width: 16,
                     color: selectIconBackground(themeType),
-                    child: Icon(
+                    child: const Icon(
                       Icons.block,
                       color: Colors.white,
                       size: 16,
@@ -97,7 +97,7 @@ class AppBarAvatar extends StatelessWidget {
                   child: Container(
                     height: 16,
                     width: 16,
-                    padding: EdgeInsets.all(2),
+                    padding: const EdgeInsets.all(2),
                     child: CircularProgressIndicator(
                       strokeWidth: Dimensions.strokeWidthThin,
                       color: computeContrastColorText(

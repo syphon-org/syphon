@@ -14,7 +14,7 @@ class Loader extends StatelessWidget {
   Widget build(BuildContext context) => Visibility(
         visible: loading,
         child: Container(
-          margin: EdgeInsets.only(top: 8),
+          margin: const EdgeInsets.only(top: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

@@ -2,14 +2,11 @@ import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/events/reactions/model.dart';
 import 'package:syphon/domain/index.dart';
 import 'package:syphon/domain/rooms/room/model.dart';
-import 'package:syphon/domain/settings/models.dart';
-import 'package:syphon/global/formatters.dart';
 
 import 'package:syphon/global/libraries/matrix/events/types.dart';
-import 'package:syphon/global/print.dart';
 
 List<Message> roomMessages(AppState state, String? roomId) {
-  final room = state.roomStore.rooms[roomId] ?? Room(id: '');
+  final room = state.roomStore.rooms[roomId] ?? const Room(id: '');
   var messages = (state.eventStore.messages[roomId] ?? []).toList();
 
   // If encryption is enabled, combine the decrypted event cache
@@ -30,7 +27,7 @@ List<Message> roomMessages(AppState state, String? roomId) {
 
     messages = messagesNormal.keys
         .map((id) =>
-            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? Message())
+            (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? const Message())
         .toList();
   }
 
@@ -38,7 +35,7 @@ List<Message> roomMessages(AppState state, String? roomId) {
 }
 
 Map<String, Message> roomMessagesMap(AppState state, String? roomId) {
-  final room = state.roomStore.rooms[roomId] ?? Room(id: '');
+  final room = state.roomStore.rooms[roomId] ?? const Room(id: '');
   final messages = state.eventStore.messages[roomId] ?? [];
 
   final messagesNormal = Map<String, Message>.fromIterable(
@@ -59,7 +56,7 @@ Map<String, Message> roomMessagesMap(AppState state, String? roomId) {
 
     return Map<String, Message>.fromIterable(
       messagesNormal.keys.map(
-        (id) => (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? Message(),
+        (id) => (messagesDecrypted.containsKey(id) ? messagesDecrypted[id] : messagesNormal[id]) ?? const Message(),
       ),
       key: (msg) => msg.id,
       value: (msg) => msg,

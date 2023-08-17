@@ -21,7 +21,7 @@ extension AuthQueries on ColdStorageDatabase {
     if (Platform.isLinux) {
       return into(auths).insert(
         AuthsCompanion(
-          id: Value(StorageKeys.AUTH),
+          id: const Value(StorageKeys.AUTH),
           store: Value(storeJson),
         ),
         mode: InsertMode.insertOrReplace,
@@ -29,7 +29,7 @@ extension AuthQueries on ColdStorageDatabase {
     }
 
     return into(auths).insertOnConflictUpdate(AuthsCompanion(
-      id: Value(StorageKeys.AUTH),
+      id: const Value(StorageKeys.AUTH),
       store: Value(storeJson),
     ));
   }

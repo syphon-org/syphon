@@ -27,14 +27,14 @@ import 'widgets/StepHomeserver.dart';
 import 'widgets/StepPassword.dart';
 import 'widgets/StepUsername.dart';
 
-final Duration nextAnimationDuration = Duration(
+const Duration nextAnimationDuration = Duration(
   milliseconds: Values.animationDurationDefault,
 );
 
 final sectionsPassword = [
-  HomeserverStep(),
-  UsernameStep(),
-  PasswordStep(),
+  const HomeserverStep(),
+  const UsernameStep(),
+  const PasswordStep(),
 ];
 
 class SignupScreen extends HookWidget {
@@ -48,19 +48,19 @@ class SignupScreen extends HookWidget {
     final (currentStep, setCurrentStep) = useStateful<int>(0);
 
     final (sections, setSections) = useStateful<List<Widget>>([
-      HomeserverStep(),
-      UsernameStep(),
-      PasswordStep(),
-      CaptchaStep(),
+      const HomeserverStep(),
+      const UsernameStep(),
+      const PasswordStep(),
+      const CaptchaStep(),
       TermsStep(),
-      EmailStep(),
+      const EmailStep(),
     ]);
 
     final hostname = useSelector<AppState, String>((state) => state.authStore.hostname, 'matrix.org');
     final homeserver = useSelector<AppState, Homeserver>(
         (state) => state.authStore.homeserver, Homeserver(hostname: hostname));
 
-    final user = useSelector<AppState, User>((state) => state.authStore.user, User());
+    final user = useSelector<AppState, User>((state) => state.authStore.user, const User());
     final completed = useSelector<AppState, List<String>>((state) => state.authStore.completed, const []);
 
     final loading = useSelector<AppState, bool>((state) => state.authStore.loading, false);
@@ -110,7 +110,7 @@ class SignupScreen extends HookWidget {
       if (isPasswordLoginAvailable) {
         setSections([...sectionsPassword]);
       } else if (isSSOLoginAvailable) {
-        setSections([HomeserverStep()]);
+        setSections([const HomeserverStep()]);
       }
 
       var sectionsNew = [...sections];
@@ -118,10 +118,10 @@ class SignupScreen extends HookWidget {
       for (final stage in signupTypes) {
         switch (stage) {
           case MatrixAuthTypes.EMAIL:
-            sectionsNew = {...sectionsNew, EmailStep()}.toList();
+            sectionsNew = {...sectionsNew, const EmailStep()}.toList();
             break;
           case MatrixAuthTypes.RECAPTCHA:
-            sectionsNew = {...sectionsNew, CaptchaStep()}.toList();
+            sectionsNew = {...sectionsNew, const CaptchaStep()}.toList();
             break;
           case MatrixAuthTypes.TERMS:
             sectionsNew = {...sectionsNew, TermsStep()}.toList();
@@ -140,10 +140,12 @@ class SignupScreen extends HookWidget {
       if (hostname != Values.homeserverDefault) {
         onUpdateFlows();
       }
+      return null;
     }, []);
 
     useEffect(() {
       onUpdateFlows();
+      return null;
     }, [isPasswordLoginAvailable, isSSOLoginAvailable, homeserver.signupTypes]);
 
     onSubmitEmail() async {
@@ -180,7 +182,7 @@ class SignupScreen extends HookWidget {
 
       pageController.animateToPage(
         currentStep,
-        duration: Duration(milliseconds: 275),
+        duration: const Duration(milliseconds: 275),
         curve: Curves.easeInOut,
       );
     }
@@ -360,7 +362,7 @@ class SignupScreen extends HookWidget {
                     children: <Widget>[
                       Container(
                         width: width,
-                        constraints: BoxConstraints(
+                        constraints: const BoxConstraints(
                           minHeight: Dimensions.pageViewerHeightMin,
                           maxHeight: Dimensions.pageViewerHeightMax,
                         ),
@@ -368,7 +370,7 @@ class SignupScreen extends HookWidget {
                           pageSnapping: true,
                           allowImplicitScrolling: false,
                           controller: pageController,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           onPageChanged: (index) {
                             setCurrentStep(index);
                           },
@@ -423,8 +425,8 @@ class SignupScreen extends HookWidget {
                     direction: Axis.vertical,
                     children: <Widget>[
                       Container(
-                        margin: EdgeInsets.symmetric(vertical: 12),
-                        constraints: BoxConstraints(
+                        margin: const EdgeInsets.symmetric(vertical: 12),
+                        constraints: const BoxConstraints(
                           minHeight: Dimensions.buttonHeightMin,
                         ),
                         child: Flex(
@@ -432,7 +434,7 @@ class SignupScreen extends HookWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SmoothPageIndicator(
-                              controller: pageController!,
+                              controller: pageController,
                               count: sections.length,
                               effect: WormEffect(
                                 spacing: 16,

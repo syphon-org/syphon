@@ -111,7 +111,7 @@ class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch>
   Widget build(BuildContext context) => AppBar(
         elevation: widget.elevation,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => onBack(),
           tooltip: Strings.labelBack,
         ),
@@ -124,7 +124,7 @@ class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch>
                 onTap: () => onToggleSearch(context: context),
                 child: Text(
                   widget.title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w100,
                   ),
@@ -154,7 +154,7 @@ class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch>
                     });
                   },
                   cursorColor: Colors.white,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     color: Colors.white,
                     fontWeight: FontWeight.w100,
@@ -166,7 +166,7 @@ class AppBarSearchState extends State<AppBarSearch> with Lifecycle<AppBarSearch>
                     errorBorder: InputBorder.none,
                     disabledBorder: InputBorder.none,
                     hintText: widget.label,
-                    hintStyle: TextStyle(
+                    hintStyle: const TextStyle(
                       fontSize: 20,
                       color: Colors.white,
                       fontWeight: FontWeight.w100,

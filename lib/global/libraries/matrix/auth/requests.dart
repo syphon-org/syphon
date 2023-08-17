@@ -322,7 +322,7 @@ abstract class Auth {
 
     // Specified timeout because servers can hang
     final response = await httpClient.get(Uri.parse(url)).timeout(
-      Duration(seconds: 5),
+      const Duration(seconds: 5),
       onTimeout: () {
         // Time has run out, do what you wanted to do.
         return http.Response('Error', 500); // Replace 500 with your http code.

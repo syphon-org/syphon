@@ -137,26 +137,26 @@ class CacheSerializer implements StateSerializer<AppState> {
       }
     });
 
-    final cryptoState = cryptoStore ?? preloaded[StorageKeys.CRYPTO] as CryptoStore? ?? CryptoStore();
+    final cryptoState = cryptoStore ?? preloaded[StorageKeys.CRYPTO] as CryptoStore? ?? const CryptoStore();
 
     final messageSessionsLoaded = (preloaded[StorageKeys.MESSAGE_SESSIONS] ??
         <String, Map<String, List<MessageSession>>>{}) as Map<String, Map<String, List<MessageSession>>>;
 
     return AppState(
       loading: false,
-      authStore: authStore ?? preloaded[StorageKeys.AUTH] ?? AuthStore(),
+      authStore: authStore ?? preloaded[StorageKeys.AUTH] ?? const AuthStore(),
       cryptoStore: messageSessionsLoaded.isEmpty
           ? cryptoState
           : cryptoState.copyWith(
               messageSessionsInbound: messageSessionsLoaded,
             ),
-      settingsStore: preloaded[StorageKeys.SETTINGS] ?? settingsStore ?? SettingsStore(),
-      syncStore: syncStore ?? SyncStore(),
-      mediaStore: mediaStore ?? MediaStore().copyWith(mediaCache: preloaded[StorageKeys.MEDIA]),
-      roomStore: roomStore ?? RoomStore().copyWith(rooms: preloaded[StorageKeys.ROOMS] ?? {}),
-      userStore: userStore ?? UserStore().copyWith(users: preloaded[StorageKeys.USERS] ?? {}),
+      settingsStore: preloaded[StorageKeys.SETTINGS] ?? settingsStore ?? const SettingsStore(),
+      syncStore: syncStore ?? const SyncStore(),
+      mediaStore: mediaStore ?? const MediaStore().copyWith(mediaCache: preloaded[StorageKeys.MEDIA]),
+      roomStore: roomStore ?? const RoomStore().copyWith(rooms: preloaded[StorageKeys.ROOMS] ?? {}),
+      userStore: userStore ?? const UserStore().copyWith(users: preloaded[StorageKeys.USERS] ?? {}),
       eventStore: eventStore ??
-          EventStore().copyWith(
+          const EventStore().copyWith(
             messages: preloaded[StorageKeys.MESSAGES] ?? <String, List<Message>>{},
             messagesDecrypted: preloaded[StorageKeys.DECRYPTED] ?? <String, List<Message>>{},
             reactions: preloaded[StorageKeys.REACTIONS] ?? <String, List<Reaction>>{},

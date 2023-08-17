@@ -49,8 +49,8 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                 fit: FlexFit.tight,
                 child: Container(
                   width: width * 0.65,
-                  padding: EdgeInsets.only(bottom: 16),
-                  constraints: BoxConstraints(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  constraints: const BoxConstraints(
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
@@ -67,7 +67,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.only(bottom: 8, top: 8),
+                      padding: const EdgeInsets.only(bottom: 8, top: 8),
                       child: Text(
                         Strings.contentPasswordRecommendation,
                         textAlign: TextAlign.center,
@@ -75,7 +75,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
                         Strings.headerUpdatePassword,
                         textAlign: TextAlign.center,
@@ -90,7 +90,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                 child: Container(
                   width: width * 0.7,
                   height: Dimensions.inputHeight,
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     minWidth: Dimensions.inputWidthMin,
                     maxWidth: Dimensions.inputWidthMax,
                   ),
@@ -114,7 +114,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                 ),
               ),
               Container(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                 vertical: 8,
               )),
               Flexible(
@@ -122,7 +122,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                 child: Container(
                   width: width * 0.7,
                   height: Dimensions.inputHeight,
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     minWidth: Dimensions.inputWidthMin,
                     maxWidth: Dimensions.inputWidthMax,
                   ),
@@ -159,7 +159,7 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
 
                         if (!passwordFocusNode.hasFocus) {
                           //Enable the text field's focus node request after some delay
-                          Future.delayed(Duration(milliseconds: 100), () {
+                          Future.delayed(const Duration(milliseconds: 100), () {
                             passwordFocusNode.canRequestFocus = true;
                           });
                         }
@@ -171,13 +171,13 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                   ),
                 ),
               ),
-              Container(padding: EdgeInsets.symmetric(vertical: 8)),
+              Container(padding: const EdgeInsets.symmetric(vertical: 8)),
               Flexible(
                 flex: 1,
                 child: Container(
                   width: width * 0.7,
                   height: Dimensions.inputHeight,
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     minWidth: Dimensions.inputWidthMin,
                     maxWidth: Dimensions.inputWidthMax,
                   ),
@@ -198,14 +198,14 @@ class PasswordUpdateStepState extends State<PasswordUpdateStep> {
                       child: Container(
                         width: 12,
                         height: 12,
-                        margin: EdgeInsets.all(6),
+                        margin: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: Container(
-                          padding: EdgeInsets.all(6),
-                          child: Icon(
+                          padding: const EdgeInsets.all(6),
+                          child: const Icon(
                             Icons.check,
                             color: Colors.white,
                           ),

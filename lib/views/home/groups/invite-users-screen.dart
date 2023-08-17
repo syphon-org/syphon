@@ -111,7 +111,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
       WidgetsBinding.instance.addPostFrameCallback((_) {
         avatarScrollController.animateTo(
           avatarScrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: Values.animationDurationDefaultFast),
+          duration: const Duration(milliseconds: Values.animationDurationDefaultFast),
           curve: Curves.easeInOut,
         );
       });
@@ -164,7 +164,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
     final arguments = useScreenArguments<InviteUsersArguments>(context, InviteUsersArguments());
     final store = StoreProvider.of<AppState>(context);
 
-    final roomId = arguments?.roomId;
+    final roomId = arguments.roomId;
     final room = store.state.roomStore.rooms[roomId!];
 
     final multiple = invites.length > 1;
@@ -212,7 +212,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                 right: index == invites.length - 1 ? 12 : 4,
               ),
               child: Chip(
-                labelPadding: EdgeInsets.only(left: 8),
+                labelPadding: const EdgeInsets.only(left: 8),
                 padding: EdgeInsets.zero,
                 visualDensity: VisualDensity.comfortable,
                 avatar: Avatar(
@@ -286,10 +286,10 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
               backgroundColor: Theme.of(context).colorScheme.secondary,
               onPressed: () => onConfirmInvites(props),
               child: Container(
-                padding: EdgeInsets.only(left: 2),
+                padding: const EdgeInsets.only(left: 2),
                 child: SvgPicture.asset(
                   Assets.iconChevronsRightBeing,
-                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                   semanticsLabel: Strings.semanticsHomeDefault,
                 ),
               ),
@@ -305,7 +305,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                   child: Container(
                     width: width,
                     height: Dimensions.listAvatarHeighttMax,
-                    padding: EdgeInsets.only(top: 8),
+                    padding: const EdgeInsets.only(top: 8),
                     constraints: BoxConstraints(
                       maxWidth: width,
                       maxHeight: Dimensions.listAvatarHeighttMax,
@@ -320,7 +320,7 @@ class InviteUsersState extends State<InviteUsersScreen> with Lifecycle<InviteUse
                         shrinkWrap: true,
                         children: [
                           Container(
-                            padding: EdgeInsets.only(left: 20, right: 20, top: 16),
+                            padding: const EdgeInsets.only(left: 20, right: 20, top: 16),
                             child: Row(
                               children: [
                                 Text(

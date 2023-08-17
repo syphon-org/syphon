@@ -75,12 +75,12 @@ class AppBarHome extends HookWidget implements PreferredSizeWidget {
         builder: (dialogContext) => DialogOptions(
           title: 'How can we help?',
           content: Strings.contentSupportDialog,
-          confirmStyle: TextStyle(color: Colors.grey),
-          dismissStyle: TextStyle(color: Colors.blue),
+          confirmStyle: const TextStyle(color: Colors.grey),
+          dismissStyle: const TextStyle(color: Colors.blue),
           dismissText: 'Join Support chat',
           confirmText: 'Email our team',
           onDismiss: () async {
-            final supportRoom = Room(
+            const supportRoom = Room(
               id: Values.supportChatId,
               alias: Values.supportChatAlias,
             );
@@ -134,7 +134,7 @@ class AppBarHome extends HookWidget implements PreferredSizeWidget {
       actions: <Widget>[
         IconButton(
           color: assetColor,
-          icon: Icon(Icons.search),
+          icon: const Icon(Icons.search),
           tooltip: Strings.tooltipSearchChats,
           onPressed: () => onToggleSearch?.call(),
         ),

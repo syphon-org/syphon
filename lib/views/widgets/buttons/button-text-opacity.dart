@@ -44,11 +44,11 @@ class ButtonTextState extends State<ButtonTextOpacity> {
           }),
           child: widget.loading
               ? Container(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxHeight: 24,
                     maxWidth: 24,
                   ),
-                  child: CircularProgressIndicator(
+                  child: const CircularProgressIndicator(
                     strokeWidth: Dimensions.strokeWidthDefault,
                     backgroundColor: Colors.white,
                     valueColor: AlwaysStoppedAnimation<Color>(
@@ -66,7 +66,7 @@ class ButtonTextState extends State<ButtonTextOpacity> {
                       letterSpacing: 0.8,
                       color: () {
                         if (widget.disabled) {
-                          return Color(AppColors.greyLight);
+                          return const Color(AppColors.greyLight);
                         }
                         if (widget.color != null) {
                           return widget.color;

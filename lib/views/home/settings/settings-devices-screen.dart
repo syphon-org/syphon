@@ -115,16 +115,16 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
 
     return AppBar(
       systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
-      backgroundColor: Color(AppColors.greyDefault),
+      backgroundColor: const Color(AppColors.greyDefault),
       automaticallyImplyLeading: false,
       titleSpacing: 0.0,
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(left: 8),
+            margin: const EdgeInsets.only(left: 8),
             child: IconButton(
-              icon: Icon(Icons.close),
+              icon: const Icon(Icons.close),
               color: Colors.white,
               iconSize: Dimensions.buttonAppBarSize,
               onPressed: onDismissDeviceOptions,
@@ -134,7 +134,7 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
       ),
       actions: <Widget>[
         IconButton(
-          icon: Icon(Icons.edit),
+          icon: const Icon(Icons.edit),
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Rename Device',
           color: Colors.white,
@@ -142,7 +142,7 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
               selectedDevices!.length != 1 ? null : () => props.onRenameDevice(context, selectedDevices![0]),
         ),
         IconButton(
-          icon: Icon(Icons.delete),
+          icon: const Icon(Icons.delete),
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Delete Device',
           color: Colors.white,
@@ -150,7 +150,7 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
               selfSelectedDevice != -1 ? null : () => onDeleteDevices(context, selectedDevices ?? [], props),
         ),
         IconButton(
-          icon: Icon(Icons.select_all),
+          icon: const Icon(Icons.select_all),
           iconSize: Dimensions.buttonAppBarSize,
           tooltip: 'Select All',
           color: Colors.white,
@@ -163,12 +163,12 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
   Widget buildAppBar({BuildContext? context, _Props? props}) {
     return AppBar(
       leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: Colors.white),
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () => Navigator.pop(context!, false),
       ),
       title: Text(
         Strings.titleDevices,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w100,
         ),
@@ -194,14 +194,14 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
           return Scaffold(
             appBar: currentAppBar as PreferredSizeWidget?,
             body: Container(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: Stack(
                 children: [
                   GridView.builder(
                     primary: true,
                     shrinkWrap: true,
                     itemCount: props.devices.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                     ),
                     itemBuilder: (BuildContext context, int index) {
@@ -221,7 +221,7 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
 
                       if (selectedDevices != null && selectedDevices!.contains(device)) {
                         backgroundColor = AppColors.hashedColor(device.deviceId);
-                        backgroundColor = Color(AppColors.greyDefault);
+                        backgroundColor = const Color(AppColors.greyDefault);
                         textStyle = textStyle.copyWith(color: Colors.white);
                         iconColor = Colors.white;
                       }
@@ -238,7 +238,7 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
                               Stack(
                                 children: <Widget>[
                                   Container(
-                                    padding: EdgeInsets.only(bottom: 8, top: 8),
+                                    padding: const EdgeInsets.only(bottom: 8, top: 8),
                                     child: Icon(
                                       deviceTypeIcon,
                                       size: Dimensions.iconSize * 1.5,
@@ -247,7 +247,7 @@ class DeviceViewState extends State<DevicesScreen> with Lifecycle<DevicesScreen>
                                   ),
                                   Visibility(
                                     visible: isCurrentDevice,
-                                    child: Positioned(
+                                    child: const Positioned(
                                       right: 0,
                                       bottom: 4,
                                       child: CircleAvatar(

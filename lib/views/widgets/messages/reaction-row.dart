@@ -44,12 +44,13 @@ class ReactionRow extends HookWidget {
             ifAbsent: () => reaction.sender == currentUserId,
           )));
       }
+      return null;
     }, []);
 
     return ListView.builder(
       shrinkWrap: true,
       itemCount: reactionsMap.keys.length,
-      physics: ClampingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       scrollDirection: Axis.horizontal,
       clipBehavior: Clip.antiAlias,
       itemBuilder: (BuildContext context, int index) {
@@ -86,7 +87,7 @@ class ReactionRow extends HookWidget {
                 Visibility(
                   visible: reactionCount > 1,
                   child: Container(
-                    padding: EdgeInsets.only(left: 3),
+                    padding: const EdgeInsets.only(left: 3),
                     child: Text(
                       reactionCount.toString(),
                       textAlign: TextAlign.center,

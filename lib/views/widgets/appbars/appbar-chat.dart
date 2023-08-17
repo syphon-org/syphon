@@ -122,7 +122,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
     });
     if (searching) {
       Timer(
-        Duration(milliseconds: 5), // hack to focus after visibility change
+        const Duration(milliseconds: 5), // hack to focus after visibility change
         () => FocusScope.of(
           context!,
         ).requestFocus(
@@ -135,7 +135,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
   }
 
   onOpenMuteDialog(BuildContext context, _Props props) {
-    final defaultPadding = EdgeInsets.symmetric(horizontal: 10);
+    const defaultPadding = EdgeInsets.symmetric(horizontal: 10);
     showDialog(
       context: context,
       builder: (BuildContext context) => DialogRounded(
@@ -149,7 +149,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                   style: Theme.of(context).textTheme.titleMedium,
                 )),
             onTap: () {
-              props.onMuteNotifications(Duration(hours: 1));
+              props.onMuteNotifications(const Duration(hours: 1));
               Navigator.pop(context);
             },
           ),
@@ -162,7 +162,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               ),
             ),
             onTap: () {
-              props.onMuteNotifications(Duration(hours: 8));
+              props.onMuteNotifications(const Duration(hours: 8));
               Navigator.pop(context);
             },
           ),
@@ -175,7 +175,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               ),
             ),
             onTap: () {
-              props.onMuteNotifications(Duration(days: 1));
+              props.onMuteNotifications(const Duration(days: 1));
               Navigator.pop(context);
             },
           ),
@@ -188,7 +188,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
               ),
             ),
             onTap: () {
-              props.onMuteNotifications(Duration(days: 7));
+              props.onMuteNotifications(const Duration(days: 7));
               Navigator.pop(context);
             },
           ),
@@ -221,9 +221,9 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
           title: Row(
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(left: 8),
+                margin: const EdgeInsets.only(left: 8),
                 child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => widget.onBack!(),
                   tooltip: Strings.labelBack,
                 ),
@@ -331,7 +331,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
             Visibility(
               visible: DEBUG_MODE,
               child: IconButton(
-                icon: Icon(Icons.gamepad),
+                icon: const Icon(Icons.gamepad),
                 iconSize: Dimensions.buttonAppBarSize,
                 tooltip: 'Debug Room Function',
                 color: Colors.white,
@@ -372,7 +372,7 @@ class AppBarChatState extends State<AppBarChat> with Lifecycle<AppBarChat> {
                       break;
                   }
                 },
-                icon: Icon(Icons.more_vert, color: Colors.white),
+                icon: const Icon(Icons.more_vert, color: Colors.white),
                 itemBuilder: (BuildContext context) {
                   final menu = <PopupMenuEntry<ChatOptions>>[
                     const PopupMenuItem<ChatOptions>(

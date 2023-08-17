@@ -258,7 +258,7 @@ EventStore eventReducer([EventStore state = const EventStore(), dynamic actionAn
     case LoadReceipts:
       return state.copyWith(receipts: actionAny.receiptsMap);
     case ResetEvents:
-      return EventStore();
+      return const EventStore();
     default:
       return state;
   }

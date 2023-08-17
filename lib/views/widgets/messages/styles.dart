@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Styles {
   // Message in the middle of a users messages block
-  static final bubbleBorderMiddleUser = BorderRadius.only(
+  static const bubbleBorderMiddleUser = BorderRadius.only(
     topLeft: Radius.circular(16),
     topRight: Radius.circular(4),
     bottomLeft: Radius.circular(16),
@@ -10,7 +10,7 @@ class Styles {
   );
 
   // Message at the beginning of a users messages block
-  static final bubbleBorderTopUser = BorderRadius.only(
+  static const bubbleBorderTopUser = BorderRadius.only(
     topLeft: Radius.circular(16),
     topRight: Radius.circular(16),
     bottomLeft: Radius.circular(16),
@@ -18,7 +18,7 @@ class Styles {
   );
 
   // End of a users messages block
-  static final bubbleBorderBottomUser = BorderRadius.only(
+  static const bubbleBorderBottomUser = BorderRadius.only(
     topLeft: Radius.circular(16),
     topRight: Radius.circular(4),
     bottomLeft: Radius.circular(16),
@@ -26,7 +26,7 @@ class Styles {
   );
 
   // Message in the middle of a senders messages block
-  static final bubbleBorderMiddleSender = BorderRadius.only(
+  static const bubbleBorderMiddleSender = BorderRadius.only(
     topLeft: Radius.circular(4),
     topRight: Radius.circular(16),
     bottomLeft: Radius.circular(4),
@@ -34,7 +34,7 @@ class Styles {
   );
 
   // Message at the beginning of a senders messages block
-  static final bubbleBorderTopSender = BorderRadius.only(
+  static const bubbleBorderTopSender = BorderRadius.only(
     topLeft: Radius.circular(16),
     topRight: Radius.circular(16),
     bottomLeft: Radius.circular(4),
@@ -42,7 +42,7 @@ class Styles {
   );
 
   // End of a sender messages block
-  static final bubbleBorderBottomSender = BorderRadius.only(
+  static const bubbleBorderBottomSender = BorderRadius.only(
     topLeft: Radius.circular(4),
     topRight: Radius.circular(16),
     bottomLeft: Radius.circular(16),

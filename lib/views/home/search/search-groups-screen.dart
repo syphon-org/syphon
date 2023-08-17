@@ -67,7 +67,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-            constraints: BoxConstraints(
+            constraints: const BoxConstraints(
               minWidth: Dimensions.mediaSizeMin,
               maxWidth: Dimensions.mediaSizeMax,
               maxHeight: Dimensions.mediaSizeMin,
@@ -79,8 +79,8 @@ class GroupSearchState extends State<GroupSearchScreen> {
           ),
           GestureDetector(
             child: Container(
-              margin: EdgeInsets.only(bottom: 48),
-              padding: EdgeInsets.only(top: 16),
+              margin: const EdgeInsets.only(bottom: 48),
+              padding: const EdgeInsets.only(top: 16),
               child: Text(
                 label,
                 style: Theme.of(context).textTheme.titleLarge,
@@ -106,7 +106,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
             bottom: 8,
           ),
           child: ExpandablePanel(
-            theme: ExpandableThemeData(
+            theme: const ExpandableThemeData(
               hasIcon: false,
               tapBodyToCollapse: true,
               tapHeaderToExpand: true,
@@ -130,9 +130,9 @@ class GroupSearchState extends State<GroupSearchScreen> {
                           Dimensions.thumbnailSizeMax,
                         ),
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.grey,
-                            boxShadow: const [
+                            boxShadow: [
                               BoxShadow(
                                 color: Colors.red,
                                 offset: Offset(8.0, 8.0),
@@ -141,7 +141,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                           ),
                           height: 16,
                           width: 16,
-                          child: Icon(
+                          child: const Icon(
                             Icons.lock_open,
                             color: Colors.white,
                             size: 10,
@@ -163,7 +163,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                           height: 16,
                           width: 16,
                           color: Colors.green,
-                          child: Icon(
+                          child: const Icon(
                             Icons.lock,
                             color: Colors.white,
                             size: 10,
@@ -199,23 +199,23 @@ class GroupSearchState extends State<GroupSearchScreen> {
                         formattedUserTotal.format(
                           room.totalJoinedUsers,
                         ),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: Dimensions.textSizeTiny,
                         ),
                       ),
-                      Icon(
+                      const Icon(
                         Icons.person,
                         size: 20,
                       ),
                     ],
                   ),
                   IconButton(
-                    padding: EdgeInsets.only(
+                    padding: const EdgeInsets.only(
                       left: 8,
                       top: 8,
                       bottom: 8,
                     ),
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.add_circle,
                       color: Colors.greenAccent,
                     ),
@@ -265,7 +265,7 @@ class GroupSearchState extends State<GroupSearchScreen> {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -274,21 +274,21 @@ class GroupSearchState extends State<GroupSearchScreen> {
                         child: Column(
                           children: <Widget>[
                             Container(
-                              padding: EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.symmetric(vertical: 4),
                               child: !room.encryptionEnabled
-                                  ? Icon(
+                                  ? const Icon(
                                       Icons.lock_open,
                                       size: Dimensions.iconSizeLarge,
                                       color: Colors.redAccent,
                                     )
-                                  : Icon(
+                                  : const Icon(
                                       Icons.lock,
                                       size: Dimensions.iconSizeLarge,
                                       color: Colors.greenAccent,
                                     ),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 4),
+                              margin: const EdgeInsets.only(top: 4),
                               child: Text(
                                 'Encryption',
                                 style: Theme.of(context).textTheme.bodySmall,
@@ -301,18 +301,18 @@ class GroupSearchState extends State<GroupSearchScreen> {
                         child: Column(
                           children: <Widget>[
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 vertical: 4,
                               ),
                               child: Text(
                                 localUserTotal.format(room.totalJoinedUsers),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 24,
                                 ),
                               ),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 4),
+                              margin: const EdgeInsets.only(top: 4),
                               child: Text(
                                 'Total Users',
                                 style: Theme.of(context).textTheme.bodySmall,

@@ -33,13 +33,13 @@ class _DialogCaptchaState extends State<DialogCaptcha> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      titlePadding: EdgeInsets.only(
+      titlePadding: const EdgeInsets.only(
         left: 24,
         right: 16,
         top: 16,
         bottom: 16,
       ),
-      contentPadding: EdgeInsets.only(
+      contentPadding: const EdgeInsets.only(
         left: 8,
         right: 8,
         bottom: 16,
@@ -52,7 +52,7 @@ class _DialogCaptchaState extends State<DialogCaptcha> {
             child: Container(
               width: width,
               height: height * 0.5,
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 minWidth: Dimensions.inputWidthMin,
                 maxWidth: Dimensions.inputWidthMax,
               ),

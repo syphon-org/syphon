@@ -89,7 +89,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                           flex: 2,
                           child: Container(
                             width: Dimensions.contentWidth(context),
-                            constraints: BoxConstraints(
+                            constraints: const BoxConstraints(
                               maxHeight: Dimensions.mediaSizeMax,
                               maxWidth: Dimensions.mediaSizeMax,
                             ),
@@ -104,7 +104,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                             direction: Axis.vertical,
                             children: <Widget>[
                               Container(
-                                padding: EdgeInsets.only(bottom: 8, top: 8),
+                                padding: const EdgeInsets.only(bottom: 8, top: 8),
                                 child: Text(
                                   'Check your email and click the verification\nlink to finish account creation.',
                                   textAlign: TextAlign.center,
@@ -115,7 +115,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                 clipBehavior: Clip.none,
                                 children: <Widget>[
                                   Container(
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                       vertical: 8,
                                       horizontal: 24,
                                     ),
@@ -166,7 +166,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                 width: Dimensions.contentWidth(context),
                                 margin: EdgeInsets.only(top: height * 0.01),
                                 height: Dimensions.inputHeight,
-                                constraints: BoxConstraints(
+                                constraints: const BoxConstraints(
                                   minWidth: Dimensions.buttonWidthMin,
                                   maxWidth: Dimensions.buttonWidthMax,
                                 ),
@@ -186,7 +186,7 @@ class VerificationScreenState extends State<VerificationScreen> with WidgetsBind
                                 width: Dimensions.contentWidth(context),
                                 margin: EdgeInsets.only(top: height * 0.01),
                                 height: Dimensions.inputHeight,
-                                constraints: BoxConstraints(
+                                constraints: const BoxConstraints(
                                   minWidth: Dimensions.buttonWidthMin,
                                   maxWidth: Dimensions.buttonWidthMax,
                                 ),

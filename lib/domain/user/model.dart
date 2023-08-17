@@ -88,7 +88,7 @@ class User extends Equatable implements drift.Insertable<User> {
       );
     } catch (error) {
       console.error('[User.fromMatrix] $error');
-      return User();
+      return const User();
     }
   }
 

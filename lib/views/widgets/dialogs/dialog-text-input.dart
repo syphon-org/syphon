@@ -76,9 +76,9 @@ class DialogTextInput extends HookWidget {
               editingControllerLocal.text = generateDeviceId().deviceId ?? '';
             },
             child: Padding(
-              padding: EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.only(top: 16),
               child: Icon(
-                FaIcon(FontAwesomeIcons.dice).icon,
+                const FaIcon(FontAwesomeIcons.dice).icon,
                 color: Theme.of(context).primaryColor,
               ),
             ),
@@ -91,7 +91,7 @@ class DialogTextInput extends HookWidget {
               visibility.value = !visibility.value;
             },
             child: Padding(
-              padding: EdgeInsets.only(top: 16),
+              padding: const EdgeInsets.only(top: 16),
               child: Icon(
                 visibility.value ? Icons.visibility : Icons.visibility_off,
                 color: visibility.value ? Theme.of(context).primaryColor : null,
@@ -107,12 +107,12 @@ class DialogTextInput extends HookWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      titlePadding: EdgeInsets.only(
+      titlePadding: const EdgeInsets.only(
         left: 24,
         right: 16,
         top: 16,
       ),
-      contentPadding: EdgeInsets.only(
+      contentPadding: const EdgeInsets.only(
         left: 16,
         right: 16,
         bottom: 16,
@@ -141,7 +141,7 @@ class DialogTextInput extends HookWidget {
                 top: 12,
                 bottom: 20,
               ),
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 minWidth: Dimensions.inputWidthMin,
                 maxWidth: Dimensions.inputWidthMax,
               ),
@@ -195,7 +195,7 @@ class DialogTextInput extends HookWidget {
                     },
               child: !loadingAny
                   ? Text(confirmText.isEmpty ? Strings.buttonSave : confirmText)
-                  : LoadingIndicator(size: 16),
+                  : const LoadingIndicator(size: 16),
             ),
           ],
         )

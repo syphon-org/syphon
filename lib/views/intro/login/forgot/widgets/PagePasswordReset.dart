@@ -64,8 +64,8 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                 fit: FlexFit.tight,
                 child: Container(
                   width: width * 0.65,
-                  padding: EdgeInsets.only(bottom: 8),
-                  constraints: BoxConstraints(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  constraints: const BoxConstraints(
                     maxHeight: Dimensions.mediaSizeMax,
                     maxWidth: Dimensions.mediaSizeMax,
                   ),
@@ -82,7 +82,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.only(bottom: 8, top: 8),
+                      padding: const EdgeInsets.only(bottom: 8, top: 8),
                       child: Text(
                         Strings.contentPasswordRecommendation,
                         textAlign: TextAlign.center,
@@ -90,7 +90,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
                         'Create a password',
                         textAlign: TextAlign.center,
@@ -133,7 +133,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
 
                       if (!passwordFocusNode.hasFocus) {
                         //Enable the text field's focus node request after some delay
-                        Future.delayed(Duration(milliseconds: 100), () {
+                        Future.delayed(const Duration(milliseconds: 100), () {
                           passwordFocusNode.canRequestFocus = true;
                         });
                       }
@@ -145,7 +145,7 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                 ),
               ),
               Container(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                 vertical: 8,
               )),
               Flexible(
@@ -169,14 +169,14 @@ class PasswordResetStepState extends State<PasswordResetStep> {
                     child: Container(
                       width: 12,
                       height: 12,
-                      margin: EdgeInsets.all(6),
+                      margin: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Container(
-                        padding: EdgeInsets.all(6),
-                        child: Icon(
+                        padding: const EdgeInsets.all(6),
+                        child: const Icon(
                           Icons.check,
                           color: Colors.white,
                         ),
