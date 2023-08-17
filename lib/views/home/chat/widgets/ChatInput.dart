@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -93,6 +94,8 @@ class ChatInput extends HookWidget {
       (state) => selectRoom(id: roomId, state: state),
       const Room(id: ''),
     );
+
+    final isEmojiShowing = useState(false);
 
     // Global Chat Settings
     // TODO: not yet referenced
@@ -500,10 +503,16 @@ class ChatInput extends HookWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
+            IconButton(
+              onPressed: () {
+                isEmojiShowing.value = !isEmojiShowing.value;
+              },
+              icon: Icon(isEmojiShowing.value ? Icons.keyboard_hide : Icons.emoji_emotions),
+            ),
             Container(
               constraints: BoxConstraints(
                 maxHeight: maxInputHeight,
-                maxWidth: messageInputWidth,
+                maxWidth: messageInputWidth - 40,
               ),
               child: Stack(
                 children: [
@@ -525,7 +534,7 @@ class ChatInput extends HookWidget {
                   Visibility(
                     visible: !editing,
                     child: SizedBox(
-                      width: showAttachments ? width - 120 : width,
+                      width: showAttachments ? width - 160 : width,
                       child: TextField(
                         maxLines: null,
                         autocorrect: autocorrectEnabled,
@@ -697,7 +706,35 @@ class ChatInput extends HookWidget {
               ],
             ),
           ),
-        )
+        ),
+        Visibility(
+          visible: isEmojiShowing.value,
+          child: SizedBox(
+            height: 250,
+            child: EmojiPicker(
+              textEditingController: controller ,
+              onEmojiSelected: (Category? category, Emoji emoji) {
+                onUpdateInput(controller.value.text);
+              },
+              config: Config(
+                  emojiSizeMax: 28 * (Platform.isIOS ? 1.30 : 1.0),
+                  initCategory: Category.RECENT,
+                  bgColor: Colors.white,
+                  indicatorColor: Colors.blue,
+                  iconColor: Colors.grey,
+                  iconColorSelected: Colors.blue,
+                  skinToneDialogBgColor: Colors.white,
+                  skinToneIndicatorColor: Colors.grey,
+                  enableSkinTones: true,
+                  showRecentsTab: true,
+                  recentsLimit: 28,
+                  replaceEmojiOnLimitExceed: false,
+                  tabIndicatorAnimDuration: kTabScrollDuration,
+                  categoryIcons: const CategoryIcons(),
+                  buttonMode: ButtonMode.CUPERTINO),
+            ),
+          ),
+        ),
       ],
     );
   }
