@@ -533,7 +533,7 @@ class ChatInput extends HookWidget {
                   Visibility(
                     visible: !editing,
                     child: SizedBox(
-                      width: showAttachments ? width - 120 : width,
+                      width: showAttachments ? width - 160 : width,
                       child: TextField(
                         maxLines: null,
                         autocorrect: autocorrectEnabled,
