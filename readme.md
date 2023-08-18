@@ -151,10 +151,11 @@ See our [CI script](/.drone.yml) if you wish to set up automated builds. It shou
 
 ### linux
 1. ```flutter config --enable-linux-desktop```
-2. ```apt install libgtk-3-dev liblzma-dev libblkid-dev libsecret-1-dev libolm-dev libolm3 libsqlite3-dev libjsoncpp-dev libsqlcipher-dev``` or distribution equivalent
-3. ```flutter build linux && flutter build bundle```
+2. ```apt install libgtk-3-dev liblzma-dev libblkid-dev libsecret-1-dev libolm-dev libolm3 libsqlite3-dev libjsoncpp-dev libsqlcipher-dev libssl-dev lib32stdc++-12-dev libstdc++-12-dev``` or distribution equivalent
+3. ```flutter build linux && flutter build bundle``` (Don't forget to do the Steps by Workstation first
 4. navigate to release at ```$SYPHON_ROOT/build/linux/release/bundle```
 5. Confirm build works with running ```$SYPHON_ROOT/build/linux/release/bundle/syphon```
+   
 
 ### windows
 1. ```flutter doctor``` should give you warnings for anything missing
