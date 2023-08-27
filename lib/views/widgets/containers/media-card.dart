@@ -36,7 +36,7 @@ class MediaCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8, top: 8),
                   child: Icon(
                     icon,
-                    size: 39,
+                    size: 35,
                     color: Colors.white,
                   ),
                 ),
@@ -46,6 +46,7 @@ class MediaCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w400,
+                    fontSize: 13
                       ),
                 ),
               ],
