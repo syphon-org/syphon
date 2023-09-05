@@ -163,6 +163,8 @@ class SyphonState extends State<Syphon> with WidgetsBindingObserver {
         store.dispatch(setBackgrounded(backgrounded: true));
       case AppLifecycleState.inactive:
         break;
+      case AppLifecycleState.hidden:
+        break;
     }
   }
 
