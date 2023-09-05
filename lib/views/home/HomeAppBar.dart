@@ -75,7 +75,7 @@ class AppBarHome extends HookWidget implements PreferredSizeWidget {
         builder: (dialogContext) => DialogOptions(
           title: 'How can we help?',
           content: Strings.contentSupportDialog,
-          confirmStyle: const TextStyle(color: Colors.grey),
+          confirmStyle: const TextStyle(color: Colors.blue),
           dismissStyle: const TextStyle(color: Colors.blue),
           dismissText: 'Join Support chat',
           confirmText: 'Email our team',
