@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:markdown/markdown.dart';
 import 'package:mime/mime.dart';
 import 'package:syphon/domain/events/messages/model.dart';
 import 'package:syphon/domain/media/converters.dart';
@@ -37,6 +38,7 @@ Future<Message> formatMessageContent({
     id: tempId,
     url: message.url,
     body: message.body?.trimRight(),
+    formattedBody: markdownToHtml('${message.body}'),
     type: message.type,
     sender: userId,
     roomId: room.id,
@@ -149,6 +151,8 @@ Future<Message> formatMessageContent({
         if (edit && related != null) {
           return formatted.copyWith(content: {
             'body': '* ${message.body}',
+            'format': 'org.matrix.custom.html',
+            'formatted_body': formatted.formattedBody,
             'msgtype': message.type ?? MatrixMessageTypes.text,
             'm.new_content': {
               'body': message.body,
@@ -163,6 +167,8 @@ Future<Message> formatMessageContent({
 
         return formatted.copyWith(content: {
           'body': message.body,
+          'format': 'org.matrix.custom.html',
+          'formatted_body': formatted.formattedBody,
           'msgtype': message.type ?? MatrixMessageTypes.text,
         });
       }
