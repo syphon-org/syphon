@@ -158,5 +158,6 @@
     "confirm-block-user": "Ak zablokujete {}, nebudete schopný vidieť správy dotyčného a okamžite opustíte túto konverzáciu.",
     "content-captcha-warning": "Niekteré servery Matrix vyžadujú captcha vo forme reCAPTCHA od spoločnosti Google.\n\nPokiaľ nechcete vyplňovat captcha, možno sa budete musieť vrátiť k výberu serveru a vybrať si iní server pre dokončenie registrácie.",
     "content-dialog-device-rename": "Zadajte nové meno, ktoré sa bude zobrazovať pre toto zariadenie.",
-    "title-device-rename": "Premenovať zariadenie"
+    "title-device-rename": "Premenovať zariadenie",
+    "label-syncing": "Synchronizácia"
 }
