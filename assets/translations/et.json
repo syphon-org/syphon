@@ -253,5 +253,14 @@
     "list-item-image-options-pick-from-gallery": "Vali galeriist",
     "list-item-context-switcher-accounts": "Kasutajakontod",
     "list-item-context-switcher-add-account": "Lisa kasutajakonto",
-    "list-item-user-details-view-profile": "Vaata profiili"
+    "list-item-user-details-view-profile": "Vaata profiili",
+    "label-proxy-port": "Port",
+    "subtitle-proxy-use-proxy": "Selle seadistusega määrad et kõik Syphonist väljuv liiklus käib läbi puhverserveri",
+    "label-send-encrypted": "Saada krüptitud sõnum",
+    "label-send-unencrypted": "Saada krüptimata sõnum",
+    "popup-menu-item-search": "Otsi",
+    "popup-menu-item-all-media": "Kõik meedia",
+    "popup-menu-item-chat-settings": "Vestluse seadistused",
+    "popup-menu-item-invite-friends": "Kutsu sõpru liituma",
+    "label-proxy-host": "Serveri nimi"
 }
