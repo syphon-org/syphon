@@ -282,9 +282,9 @@
     "button-dismiss": "Zamknij",
     "title-dialog-sync-interval": "Zmień Interwał Synchronizacji",
     "title-dialog-chat-with-user": "Rozmawiaj z {}",
-    "title-export-session-keys": "Eksportuj Klucze Sesji",
+    "title-export-session-keys": "Stwórz Kopię Zapasową Kluczy Sesji",
     "title-blocked-users": "Zablokowani Użytkownicy",
-    "title-import-session-keys": "Importuj Klucze Sesji",
+    "title-import-session-keys": "Przywróć klucze sesji",
     "title-dialog-confirm-deactivate-account": "Potwierdź Dezaktywację Konta",
     "title-dialog-confirm-deactivate-account-final": "Ostatnie Potwierdzenie Dezaktywacji Konta",
     "title-dialog-enter-new-screen-lock-pin": "Podaj nowy pin blokady ekranu",
@@ -318,5 +318,12 @@
     "list-item-image-options-photo-select-method": "Metoda Wybierania Obrazów",
     "list-item-advanced-settings-stop-background": "Zatrzymaj Wszystkie Usługi",
     "alert-storage-access-required-for-keys": "Podaj hasło tego importu kluczy sesji.",
-    "alert-log-out-enable-multiaccount": "Wymagane jest wylogowanie z obecnej sesji aby uruchomić funkcję wielu kont"
+    "alert-log-out-enable-multiaccount": "Wymagane jest wylogowanie z obecnej sesji aby uruchomić funkcję wielu kont",
+    "button-text-lets-encrypt": "let's encrypt",
+    "label-about": "O",
+    "label-fab-search": "Wyszukaj czaty",
+    "title-proxy-use-basic-authentication": "Użyj uwierzytelniania proxy",
+    "title-dialog-attempt-chat-with-user": "Spróbuj porozmawiać z {}",
+    "label-import-session-keys": "Przywróć klucze",
+    "subtitle-settings-view-uploaded-media": "Zobacz wszystkie przesłane dane, nawet te niedostępne w wiadomościach"
 }
